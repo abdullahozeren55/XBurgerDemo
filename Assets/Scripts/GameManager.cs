@@ -91,6 +91,11 @@ public class GameManager : MonoBehaviour
     private Drink lastThrowedDrink;
     private MeshRenderer[] lastThrowedBurgerBoxMeshRenderers;
 
+    [Header("Ertan Settings")]
+    [SerializeField] private GameObject[] allErtans; //0 for regular, turning into an abomination as the number goes up
+    [HideInInspector] public bool ertanDidEatCheeseYesterday;
+    [HideInInspector] public int levelOfMadness = 0; //0 for regular, turning into an abomination as the number goes up
+
     private ICustomer currentCustomer;
 
     [SerializeField] private GameObject skyColliderControllerGO;

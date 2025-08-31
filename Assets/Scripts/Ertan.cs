@@ -68,7 +68,6 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
     private bool trueDrinkReceived;
 
     private Transform currentDestination;
-    private Coroutine currentRotateCoroutine;
 
     [Header("Components")]
     private Animator anim;
@@ -95,9 +94,8 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
     [SerializeField] private Transform rayPointForPushingPlayer;
 
     [Header("Ertan Settings")]
-    [SerializeField] private float headSizeMultiplier = 1.25f;
-    [SerializeField] private GameObject head;
-    private bool eatCheeseYesterday;
+    private bool ertanDidEatCheeseYesterday;
+    private int levelOfMadness = 0; //0 for regular, turning into an abomination as the number goes up
 
     private int day;
 
@@ -114,8 +112,6 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         customerLayer = LayerMask.NameToLayer("Customer");
 
-        eatCheeseYesterday = true;
-
         StartPathFollow(restaurantDestination);
     }
 
@@ -126,10 +122,8 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
         trueBurgerReceived = false;
         trueDrinkReceived = false;
 
-        if (eatCheeseYesterday)
-        {
-            head.transform.localScale *= headSizeMultiplier;
-        }
+        ertanDidEatCheeseYesterday = GameManager.Instance.ertanDidEatCheeseYesterday;
+        levelOfMadness = GameManager.Instance.levelOfMadness;
 
         for (int i = 0; i < CustomerDayChanges.Length; i++)
         {
