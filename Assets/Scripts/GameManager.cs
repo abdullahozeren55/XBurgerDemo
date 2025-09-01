@@ -131,7 +131,10 @@ public class GameManager : MonoBehaviour
     private ICustomer.CustomerName[] allCustomersName;
 
     [Header("Day Settings")]
+    public Light sun;
+    public Material skyboxMat;
     public DayState[] DayStates;
+    [Space]
     public CustomerDaySortSegment[] DayCustomerSort;
     private int customerCounter = 0;
 
