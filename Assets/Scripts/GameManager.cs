@@ -5,6 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using static UnityEditor.VersionControl.Asset;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
         public Color sunColor;
 
         public float skyboxExposure;
+        public float skyboxRotate;
         public Color skyboxColor;
 
         public Color fogColor;
@@ -134,6 +136,9 @@ public class GameManager : MonoBehaviour
     public Light sun;
     public Material skyboxMat;
     public DayState[] DayStates;
+    public float transitionDuration = 10f;
+    private int currentIndex = 0;
+    private Coroutine transitionRoutine;
     [Space]
     public CustomerDaySortSegment[] DayCustomerSort;
     private int customerCounter = 0;
@@ -202,6 +207,8 @@ public class GameManager : MonoBehaviour
             allCustomersName[i] = allCustomers[i].GetComponent<ICustomer>().PersonName;
         }
 
+        NextState();
+
         firstPersonController = FindFirstObjectByType<FirstPersonController>();
         characterController = FindFirstObjectByType<CharacterController>();
 
@@ -221,6 +228,31 @@ public class GameManager : MonoBehaviour
         }
         
     }
+
+    public void NextState()
+    {
+        // O günün state’lerini filtrele
+        var todaysStates = DayStates.Where(s => s.Day == DayCount).ToArray();
+        if (todaysStates.Length == 0)
+        {
+            Debug.LogWarning("Bugün için tanýmlý DayState yok: " + DayCount);
+            return;
+        }
+
+        // sýradaki state
+        int nextIndex = (currentIndex + 1) % todaysStates.Length;
+
+        if (transitionRoutine != null) StopCoroutine(transitionRoutine);
+        transitionRoutine = StartCoroutine(Transition(todaysStates[currentIndex], todaysStates[nextIndex]));
+        currentIndex = nextIndex;
+    }
+
+    public void NextDay()
+    {
+        DayCount++;
+        currentIndex = 0; // yeni güne baþlarken baþtan
+    }
+
 
     public void ResetPlayerGrabAndInteract()
     {
@@ -473,5 +505,34 @@ public class GameManager : MonoBehaviour
         var sortedList2 = list2.OrderBy(x => x).ToList();
 
         return sortedList1.SequenceEqual(sortedList2);
+    }
+
+    IEnumerator Transition(DayState from, DayState to)
+    {
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / transitionDuration;
+
+            // Sun
+            sun.transform.rotation = Quaternion.Slerp(
+                Quaternion.Euler(from.sunRotation),
+                Quaternion.Euler(to.sunRotation),
+                t
+            );
+            sun.intensity = Mathf.Lerp(from.sunIntensity, to.sunIntensity, t);
+            sun.color = Color.Lerp(from.sunColor, to.sunColor, t);
+
+            // Skybox
+            skyboxMat.SetFloat("_Exposure", Mathf.Lerp(from.skyboxExposure, to.skyboxExposure, t));
+            skyboxMat.SetFloat("_Rotation", Mathf.Lerp(from.skyboxRotate, to.skyboxRotate, t));
+            skyboxMat.SetColor("_Tint", Color.Lerp(from.skyboxColor, to.skyboxColor, t));
+
+            // Fog
+            RenderSettings.fogColor = Color.Lerp(from.fogColor, to.fogColor, t);
+            RenderSettings.fogDensity = Mathf.Lerp(from.fogDensity, to.fogDensity, t);
+
+            yield return null;
+        }
     }
 }
