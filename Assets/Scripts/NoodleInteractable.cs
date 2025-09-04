@@ -30,7 +30,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
 
     [SerializeField] private GameObject saucePack;
     [SerializeField] private GameObject water;
-    [SerializeField] private Kettle kettle;
     [SerializeField] private ParticleSystem smoke;
     [SerializeField] private Color targetWaterColor;
     [SerializeField] private float colorLerpTime = 0.3f;
@@ -139,11 +138,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         StartCoroutine(LerpColor(currentWaterMat));
 
         Destroy(saucePack, 0.2f);
-    }
-
-    private void KettleInteractable()
-    {
-        kettle.gameObject.layer = interactableLayer;
     }
 
     public void PourWater()

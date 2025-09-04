@@ -20,11 +20,15 @@ public class Tray : MonoBehaviour
     [SerializeField] private GameObject topBun;
     [SerializeField] private GameObject box;
 
+    [Header("Sauces")]
+    [SerializeField] private GameObject[] sauces; //0 ketchup, 1 mayo, 2 mustard, 3 bbq
+
     private Vector3 currentLocationToPutBurgerIngredient;
     private Vector3 hologramLocation;
 
     private List<BurgerIngredient> allBurgerIngredients = new List<BurgerIngredient>();
     private List<SauceBottle.SauceType> allSauces = new List<SauceBottle.SauceType>();
+    private List<GameObject> allGO = new List<GameObject>();
 
     private float boxColliderStartZ;
     private float boxColliderStartCenterZ;
@@ -80,20 +84,25 @@ public class Tray : MonoBehaviour
 
     public void AddSauce(SauceBottle.SauceType type)
     {
-        if (!allSauces.Contains(type))
+        if (!allSauces.Contains(type) && !burgerIsDone)
+        {
+            GameObject go = Instantiate(type == SauceBottle.SauceType.Ketchup ? sauces[0] :
+                        type == SauceBottle.SauceType.Mayo ? sauces[1] :
+                        type == SauceBottle.SauceType.Mustard ? sauces[2] : sauces[3], new Vector3 (currentLocationToPutBurgerIngredient.x, currentLocationToPutBurgerIngredient.y + 0.003f, currentLocationToPutBurgerIngredient.z), Quaternion.Euler(90, Random.Range(0, 360), 0), transform);
+
+            currentLocationToPutBurgerIngredient.y += 0.0025f;
+
             allSauces.Add(type);
+            allGO.Add(go);
+        }
+            
     }
 
     public void ResetTray()
     {
-        for (int i = 1; i < transform.childCount; i++)
+        foreach (GameObject go in allGO)
         {
-            Destroy(transform.GetChild(i).gameObject);
-        }
-
-        for (int i = 0; i < burgerCollider.transform.childCount; i++)
-        {
-            Destroy(burgerCollider.transform.GetChild(i).gameObject);
+            Destroy(go);
         }
 
         foreach (BurgerIngredient burgerIngredient in allBurgerIngredients)
@@ -108,6 +117,7 @@ public class Tray : MonoBehaviour
 
         allBurgerIngredients.Clear();
         allSauces.Clear();
+        allGO.Clear();
 
         burgerIsDone = false;
         currentBox = null;
@@ -243,6 +253,7 @@ public class Tray : MonoBehaviour
                     burgerCollider.enabled = true;
 
                 allBurgerIngredients.Add(currentIngredient);
+                allGO.Add(currentIngredient.gameObject);
 
                 UpdateCurrentLocationToPutBurgerIngredient(currentIngredient.data.yHeight);
 

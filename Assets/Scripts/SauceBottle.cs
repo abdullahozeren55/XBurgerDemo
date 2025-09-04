@@ -21,7 +21,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         Ketchup,
         Mayo,
         Mustard,
-        BBQ
+        BBQ,
+        Water
     }
 
     [Header("Regular Settings")]

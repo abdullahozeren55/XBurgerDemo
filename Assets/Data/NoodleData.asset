@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NoodleData
   m_EditorClassIdentifier: 
   timeToPutOnHologram: 0.3
-  grabPositionOffset: {x: 0.0002, y: 0.00075, z: 0.0006}
+  grabPositionOffset: {x: 0.0002, y: 0.00085, z: 0.0005}
   grabRotationOffset: {x: 45, y: -125, z: -30}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}

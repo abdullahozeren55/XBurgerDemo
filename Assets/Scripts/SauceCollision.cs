@@ -25,22 +25,26 @@ public class SauceCollision : MonoBehaviour
             {
                 GameManager.Instance.AddSauceToTray(sauceType);
             }
-            int count = ps.GetCollisionEvents(other, collisionEvents);
-
-            for (int i = 0; i < count; i++)
+            else
             {
-                Vector3 hitPoint = collisionEvents[i].intersection;
-                Vector3 normal = collisionEvents[i].normal;
+                int count = ps.GetCollisionEvents(other, collisionEvents);
 
-                // Normal yönüne göre rotation hesapla
-                Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
+                for (int i = 0; i < count; i++)
+                {
+                    Vector3 hitPoint = collisionEvents[i].intersection;
+                    Vector3 normal = collisionEvents[i].normal;
 
-                // Objeyi doðru ebeveyne yerleþtir
-                Transform decalParent = other.transform.Find("DecalParent");
-                Transform parentToUse = decalParent != null ? decalParent : other.transform;
+                    // Normal yönüne göre rotation hesapla
+                    Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
 
-                SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, parentToUse, other.CompareTag("BurgerSauceArea"));
+                    // Objeyi doðru ebeveyne yerleþtir
+                    Transform decalParent = other.transform.Find("DecalParent");
+                    Transform parentToUse = decalParent != null ? decalParent : other.transform;
+
+                    SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, parentToUse);
+                }
             }
+                
         }
         
     }
