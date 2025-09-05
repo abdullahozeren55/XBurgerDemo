@@ -21,6 +21,7 @@ public class SaucePack : MonoBehaviour, IGrabable
     [SerializeField] private GameObject hologramPart;
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
+    [SerializeField] private Kettle kettle;
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -70,14 +71,14 @@ public class SaucePack : MonoBehaviour, IGrabable
     {
         IsGettingPutOnHologram = true;
 
+        hologramPart.SetActive(false);
+
         audioSource.enabled = false;
 
         gameObject.layer = ungrabableLayer;
 
         IsGrabbed = false;
         HandleText(false);
-
-        hologramPart.SetActive(false);
 
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
@@ -93,6 +94,7 @@ public class SaucePack : MonoBehaviour, IGrabable
 
         PlayAudioWithRandomPitch(0);
 
+        rb.isKinematic = false;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
@@ -241,6 +243,8 @@ public class SaucePack : MonoBehaviour, IGrabable
 
         transform.position = hologramPos;
         transform.rotation = hologramRotation;
+
+        kettle.SetGrabable();
 
         IsGettingPutOnHologram = false;
 

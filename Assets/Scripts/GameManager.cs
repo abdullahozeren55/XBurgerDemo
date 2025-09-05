@@ -149,6 +149,16 @@ public class GameManager : MonoBehaviour
     public CustomerDaySortSegment[] DayCustomerSort;
     private int customerCounter = 0;
 
+    [Header("Noodle Water Settings")]
+    private Vector3 waterStartPos;
+    public Vector3 waterEndPos;
+    private Vector3 waterStartScale;
+    public Vector3 waterEndScale;
+    public int requiredDrops = 200;
+    private int currentDrops = 0;
+    private GameObject currentWaterGO;
+    [SerializeField] private GameObject hologramKettle;
+
     private ICustomer currentCustomer;
 
     [SerializeField] private GameObject skyColliderControllerGO;
@@ -257,6 +267,28 @@ public class GameManager : MonoBehaviour
     {
         DayCount++;
         currentIndex = 0; // yeni güne baþlarken baþtan
+    }
+
+    public void SetCurrentNoodleWater(GameObject water)
+    {
+        currentWaterGO = water;
+
+        waterStartPos = currentWaterGO.transform.localPosition;
+        waterStartScale = currentWaterGO.transform.localScale;
+    }
+
+    public void AddWaterToNoodle()
+    {
+        currentDrops++;
+        float t = Mathf.Clamp01((float)currentDrops / requiredDrops);
+
+        currentWaterGO.transform.localPosition = Vector3.Lerp(waterStartPos, waterEndPos, t);
+        currentWaterGO.transform.localScale = Vector3.Lerp(waterStartScale, waterEndScale, t);
+
+        if (t > 0.9f)
+        {
+            hologramKettle.SetActive(true);
+        }
     }
 
 

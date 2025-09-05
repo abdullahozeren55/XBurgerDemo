@@ -23,6 +23,8 @@ TagManager:
   - SauceBottle
   - BurgerSauceArea
   - SaucePack
+  - Water
+  - Kettle
   layers:
   - Default
   - TransparentFX

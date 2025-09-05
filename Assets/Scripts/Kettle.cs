@@ -14,27 +14,37 @@ public class Kettle : MonoBehaviour, IGrabable
     public float HandLerp { get => handLerp; set => handLerp = value; }
     [SerializeField] private float handLerp;
 
+    public bool IsGettingPutOnHologram;
+
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
 
     public AudioClip[] audioClips;
 
     [Header("Regular Settings")]
+    [SerializeField] private GameObject hologramPart;
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
     [Space]
     [SerializeField] private Transform pourInstantiatePoint;
     [SerializeField] private ParticleSystem pourParticlePrefab;
+    [SerializeField] private float timeToPutOnHologram = 0.3f;
     private ParticleSystem currentPourPrefab;
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Renderer hologramRenderer;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
     private int ungrabableLayer;
 
+    private Vector3 hologramPos;
+    private Quaternion hologramRotation;
+
     private bool isJustThrowed;
+
+    private Coroutine putOnHologramCoroutine;
 
     private float audioLastPlayedTime;
 
@@ -75,12 +85,32 @@ public class Kettle : MonoBehaviour, IGrabable
 
     }
 
+    public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation)
+    {
+        IsGettingPutOnHologram = true;
+
+        hologramPart.SetActive(false);
+
+        audioSource.enabled = false;
+
+        gameObject.layer = ungrabableLayer;
+
+        IsGrabbed = false;
+        HandleText(false);
+
+        this.hologramPos = hologramPos;
+        this.hologramRotation = hologramRotation;
+
+        putOnHologramCoroutine = StartCoroutine(PutOnHologram());
+    }
+
     public void OnGrab(Transform grabPoint)
     {
         gameObject.layer = ungrabableLayer;
 
         PlayAudioWithRandomPitch(0);
 
+        rb.isKinematic = false;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
@@ -129,6 +159,11 @@ public class Kettle : MonoBehaviour, IGrabable
         isJustThrowed = true;
     }
 
+    public void SetGrabable()
+    {
+        gameObject.layer = grabableLayer;
+    }
+
     private void HandleText(bool isFocused)
     {
         if (isFocused)
@@ -169,5 +204,34 @@ public class Kettle : MonoBehaviour, IGrabable
         }
 
 
+    }
+
+    private IEnumerator PutOnHologram()
+    {
+        rb.isKinematic = true;
+
+        Vector3 startPos = transform.position;
+        Quaternion startRotation = transform.rotation;
+
+        float timeElapsed = 0f;
+        float rate = 0f;
+
+        while (timeElapsed < timeToPutOnHologram)
+        {
+
+            rate = timeElapsed / timeToPutOnHologram;
+
+            transform.position = Vector3.Lerp(startPos, hologramPos, rate);
+            transform.rotation = Quaternion.Slerp(startRotation, hologramRotation, rate);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = hologramPos;
+        transform.rotation = hologramRotation;
+
+        IsGettingPutOnHologram = false;
+
+        putOnHologramCoroutine = null;
     }
 }

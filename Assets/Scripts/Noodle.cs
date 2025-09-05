@@ -20,7 +20,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
     [SerializeField] private GameObject[] childObjects;
     [SerializeField] private GameObject hologramPart;
-    [SerializeField] private GameObject hologramStorePart;
+    [SerializeField] private GameObject waterCollider;
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
     [SerializeField] private GameObject water;
@@ -28,7 +28,6 @@ public class Noodle : MonoBehaviour, IGrabable
     private AudioSource audioSource;
     private Rigidbody rb;
     private Renderer hologramRenderer;
-    private Renderer hologramStoreRenderer;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -51,18 +50,8 @@ public class Noodle : MonoBehaviour, IGrabable
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         hologramRenderer = hologramPart.GetComponent<Renderer>();
-        hologramStoreRenderer = hologramStorePart.GetComponent<Renderer>();
 
         foreach (Material material in hologramRenderer.materials)
-        {
-            Color color = material.color;
-
-            color.a = 0f;
-
-            material.color = color;
-        }
-
-        foreach (Material material in hologramStoreRenderer.materials)
         {
             Color color = material.color;
 
@@ -84,11 +73,12 @@ public class Noodle : MonoBehaviour, IGrabable
         audioLastPlayedTime = 0f;
     }
 
-    public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation, bool isStoreHologram)
+    public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation)
     {
         IsGettingPutOnHologram = true;
 
-        audioSource.enabled = false;
+        hologramPart.SetActive(false);
+        waterCollider.SetActive(true);
 
         gameObject.layer = ungrabableLayer;
         ChangeChildLayers(ungrabableLayer);
@@ -96,15 +86,10 @@ public class Noodle : MonoBehaviour, IGrabable
         IsGrabbed = false;
         HandleText(false);
 
-        if (isStoreHologram)
-            hologramStorePart.SetActive(false);
-        else
-            hologramPart.SetActive(false);
-
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
 
-        putOnHologramCoroutine = StartCoroutine(PutOnHologram(isStoreHologram));
+        putOnHologramCoroutine = StartCoroutine(PutOnHologram());
     }
 
     public void OnGrab(Transform grabPoint)
@@ -126,15 +111,6 @@ public class Noodle : MonoBehaviour, IGrabable
             Color color = material.color;
 
             color.a = 40f/255f;
-
-            material.color = color;
-        }
-
-        foreach (Material material in hologramStoreRenderer.materials)
-        {
-            Color color = material.color;
-
-            color.a = 40f / 255f;
 
             material.color = color;
         }
@@ -187,15 +163,6 @@ public class Noodle : MonoBehaviour, IGrabable
             material.color = color;
         }
 
-        foreach (Material material in hologramStoreRenderer.materials)
-        {
-            Color color = material.color;
-
-            color.a = 0f;
-
-            material.color = color;
-        }
-
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
@@ -208,15 +175,6 @@ public class Noodle : MonoBehaviour, IGrabable
         transform.SetParent(null);
 
         foreach (Material material in hologramRenderer.materials)
-        {
-            Color color = material.color;
-
-            color.a = 0f;
-
-            material.color = color;
-        }
-
-        foreach (Material material in hologramStoreRenderer.materials)
         {
             Color color = material.color;
 
@@ -282,7 +240,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
     }
 
-    private IEnumerator PutOnHologram(bool isStoreHologram)
+    private IEnumerator PutOnHologram()
     {
         rb.isKinematic = true;
 
@@ -306,12 +264,10 @@ public class Noodle : MonoBehaviour, IGrabable
         transform.position = hologramPos;
         transform.rotation = hologramRotation;
 
-        if (!isStoreHologram)
-        {
+        GameManager.Instance.SetCurrentNoodleWater(water);
 
-            gameObject.layer = interactableLayer;
-            ChangeChildLayers(interactableLayer);
-        } 
+        gameObject.layer = interactableLayer;
+        ChangeChildLayers(interactableLayer);
 
         IsGettingPutOnHologram = false;
 

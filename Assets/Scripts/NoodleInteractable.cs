@@ -35,7 +35,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
     [SerializeField] private float colorLerpTime = 0.3f;
 
     private MeshFilter lidMeshFilter;
-    private MeshFilter bucketMeshFilter;
     private Animator anim;
 
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
@@ -54,7 +53,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         lidMeshFilter = lidPart.GetComponent<MeshFilter>();
-        bucketMeshFilter = bucketPart.GetComponent<MeshFilter>();
     }
 
     public void OnFocus()
@@ -74,7 +72,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
             lidMeshFilter.mesh = lidPartMeshes[0];
             col.enabled = false;
             saucePack.GetComponent<Collider>().enabled = true;
-            saucePack.GetComponent<Rigidbody>().isKinematic = false;
         }
         else
         {

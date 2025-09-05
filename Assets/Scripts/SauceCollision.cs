@@ -18,12 +18,16 @@ public class SauceCollision : MonoBehaviour
 
     void OnParticleCollision(GameObject other)
     {
-        if (!other.CompareTag("SauceBottle"))
+        if (!other.CompareTag("SauceBottle") && !other.CompareTag("Kettle"))
         {
 
-            if (other.CompareTag("BurgerSauceArea"))
+            if (sauceType != SauceBottle.SauceType.Water && other.CompareTag("BurgerSauceArea"))
             {
                 GameManager.Instance.AddSauceToTray(sauceType);
+            }
+            else if (sauceType == SauceBottle.SauceType.Water && other.CompareTag("Water"))
+            {
+                GameManager.Instance.AddWaterToNoodle();
             }
             else
             {
