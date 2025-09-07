@@ -22,7 +22,8 @@ public class DialogueData : ScriptableObject
     public enum DialogueType
     {
         NORMAL,
-        ENDSWITHACHOICE
+        ENDSWITHACHOICE,
+        ENDSWITHACUTSCENE
     }
 
     public DialogueSegment[] dialogueSegments;
@@ -32,4 +33,6 @@ public class DialogueData : ScriptableObject
     public string question;
     public string optionA;
     public string optionD;
+    [Space]
+    public CutsceneType cutsceneType;
 }

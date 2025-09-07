@@ -230,6 +230,9 @@ public class Kettle : MonoBehaviour, IGrabable
         transform.position = hologramPos;
         transform.rotation = hologramRotation;
 
+        gameObject.layer = ungrabableLayer;
+        NoodleManager.Instance.currentSaucePackGO.layer = grabableLayer;
+
         IsGettingPutOnHologram = false;
 
         putOnHologramCoroutine = null;

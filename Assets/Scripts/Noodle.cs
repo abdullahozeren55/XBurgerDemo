@@ -20,10 +20,8 @@ public class Noodle : MonoBehaviour, IGrabable
 
     [SerializeField] private GameObject[] childObjects;
     [SerializeField] private GameObject hologramPart;
-    [SerializeField] private GameObject waterCollider;
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
-    [SerializeField] private GameObject water;
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -78,7 +76,6 @@ public class Noodle : MonoBehaviour, IGrabable
         IsGettingPutOnHologram = true;
 
         hologramPart.SetActive(false);
-        waterCollider.SetActive(true);
 
         gameObject.layer = ungrabableLayer;
         ChangeChildLayers(ungrabableLayer);
@@ -264,7 +261,7 @@ public class Noodle : MonoBehaviour, IGrabable
         transform.position = hologramPos;
         transform.rotation = hologramRotation;
 
-        GameManager.Instance.SetCurrentNoodleWater(water);
+        NoodleManager.Instance.SetCurrentNoodle(gameObject);
 
         gameObject.layer = interactableLayer;
         ChangeChildLayers(interactableLayer);

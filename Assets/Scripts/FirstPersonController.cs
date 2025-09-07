@@ -295,13 +295,17 @@ public class FirstPersonController : MonoBehaviour
 
     private void LateUpdate()
     {
+        
+
+        if (canUseHeadbob)
+            HandleHeadbob();
+
         if (CanMove)
         {
-            HandleMouseLook();
-            
 
-            if (canUseHeadbob)
-                HandleHeadbob();
+            HandleMouseLook();
+
+
 
             HandleHandPoseScrollLerp();
             HandleHandTargetPositions();

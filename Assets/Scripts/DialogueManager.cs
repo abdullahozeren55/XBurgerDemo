@@ -11,7 +11,8 @@ public class DialogueManager : MonoBehaviour
         TalkWithCustomer,
         TalkWithSeller,
         TalkWithYourself,
-        TalkWithMascott
+        TalkWithMascott,
+        TalkWithYourselfInCutscene
     }
     public static DialogueManager Instance { get; private set; }
 
@@ -91,6 +92,8 @@ public class DialogueManager : MonoBehaviour
                         EndSellerDialogue();
                     else if (talkType == TalkType.TalkWithYourself)
                         EndSelfDialogue();
+                    else if (talkType == TalkType.TalkWithYourselfInCutscene)
+                        EndSelfDialogueInCutscene();
                 }
 
                 else if (!playingDialogue)
@@ -215,6 +218,37 @@ public class DialogueManager : MonoBehaviour
         visualPart.SetActive(false);
 
         firstPersonController.CanMove = true;
+    }
+
+    public void StartSelfDialogueInCutscene(DialogueData data)
+    {
+        dialogueData = data;
+
+        IsInDialogue = true;
+
+        talkType = TalkType.TalkWithYourselfInCutscene;
+
+        firstPersonController.CanMove = false;
+        dialogueIndex = 0;
+
+        currentCoroutineTime = coroutineTimeBeforeSkip;
+
+        ChangeDialogueBar(true);
+
+        visualPart.SetActive(true);
+
+        StartCoroutine(PlayDialogue(dialogueData.dialogueSegments[dialogueIndex]));
+    }
+
+    private void EndSelfDialogueInCutscene()
+    {
+        IsInDialogue = false;
+        visualPart.SetActive(false);
+
+        if (dialogueData.type == DialogueData.DialogueType.ENDSWITHACUTSCENE)
+        {
+            CutsceneManager.Instance.PlayCutscene(dialogueData.cutsceneType);
+        }
     }
 
     private void SetRandomPitch()

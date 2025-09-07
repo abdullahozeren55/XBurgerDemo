@@ -21,7 +21,6 @@ public class SaucePack : MonoBehaviour, IGrabable
     [SerializeField] private GameObject hologramPart;
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
-    [SerializeField] private Kettle kettle;
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -214,10 +213,22 @@ public class SaucePack : MonoBehaviour, IGrabable
             {
                 PlayAudioWithRandomPitch(1);
             }
-
         }
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!IsGrabbed && !IsGettingPutOnHologram && other.CompareTag("Water"))
+        {
+            NoodleManager.Instance.AddSauceToWater();
+            Destroy(gameObject);
+        }
+    }
 
+    private void OnDestroy()
+    {
+        HandleText(false);
+        GameManager.Instance.ResetPlayerGrab(this);
     }
 
     private IEnumerator PutOnHologram()
@@ -244,7 +255,7 @@ public class SaucePack : MonoBehaviour, IGrabable
         transform.position = hologramPos;
         transform.rotation = hologramRotation;
 
-        kettle.SetGrabable();
+        NoodleManager.Instance.kettle.SetGrabable();
 
         IsGettingPutOnHologram = false;
 

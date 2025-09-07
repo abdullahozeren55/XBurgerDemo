@@ -28,14 +28,9 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
     [SerializeField] private Mesh[] lidPartMeshes;
     [SerializeField] private Mesh[] bucketPartMeshes;
 
-    [SerializeField] private GameObject saucePack;
-    [SerializeField] private GameObject water;
     [SerializeField] private ParticleSystem smoke;
-    [SerializeField] private Color targetWaterColor;
-    [SerializeField] private float colorLerpTime = 0.3f;
 
     private MeshFilter lidMeshFilter;
-    private Animator anim;
 
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
@@ -45,7 +40,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         isOpened = false;
 
         audioSource = GetComponent<AudioSource>();
-        anim = GetComponent<Animator>();
         col = GetComponent<MeshCollider>();
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
@@ -71,11 +65,14 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         {
             lidMeshFilter.mesh = lidPartMeshes[0];
             col.enabled = false;
-            saucePack.GetComponent<Collider>().enabled = true;
+
+            if (NoodleManager.Instance.currentSaucePackGO != null)
+                NoodleManager.Instance.currentSaucePackGO.GetComponent<Collider>().enabled = true;
         }
         else
         {
             lidMeshFilter.mesh = lidPartMeshes[1];
+            col.enabled = false;
 
             var main = smoke.main;
             main.stopAction = ParticleSystemStopAction.Callback;
@@ -83,6 +80,8 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
             // Disable the emission
             var emission = smoke.emission;
             emission.rateOverTime = 0f;
+
+            NoodleManager.Instance.currentNoodleStatus = NoodleManager.NoodleStatus.Prepared;
         }
 
     }
@@ -126,35 +125,5 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         gameObject.layer = layerIndex;
         lidPart.layer = layerIndex;
         bucketPart.layer = layerIndex;
-    }
-
-    private void ApplySaucePack()
-    {
-        Material currentWaterMat = water.GetComponent<MeshRenderer>().material;
-
-        StartCoroutine(LerpColor(currentWaterMat));
-
-        Destroy(saucePack, 0.2f);
-    }
-
-    public void PourWater()
-    {
-        anim.Play("NoodleWater");
-    }
-
-    private IEnumerator LerpColor(Material mat)
-    {
-        Color startColor = mat.color;
-
-        float elapsedTime = 0f;
-
-        while (elapsedTime < colorLerpTime)
-        {
-            mat.color = Color.Lerp(startColor, targetWaterColor, elapsedTime / colorLerpTime);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        mat.color = targetWaterColor;
     }
 }

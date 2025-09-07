@@ -14,6 +14,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera firstPersonCam;
     [SerializeField] private CinemachineVirtualCamera customerCam;
     [SerializeField] private CinemachineVirtualCamera monitorCam;
+    [SerializeField] private CinemachineVirtualCamera cutsceneDollyCam;
     [SerializeField] private CinemachineVirtualCamera phoneCam;
 
     private FirstPersonController firstPersonController;
