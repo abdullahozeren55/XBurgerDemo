@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: WHOLETOMATO
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: b177dc38e30a5d746bf5bceed40353b7, type: 3}
-  followingSpeed: 40
-  trashSpaceValue: 20
-  timeToPutOnTray: 0.3
   minForce: 0.25
   maxForce: 0.35
   objectAmount: 4
+  grabPositionOffset: {x: 0.0008, y: 0.00085, z: 0.0002}
+  grabRotationOffset: {x: -160, y: -260, z: 0}
   audioClips:
   - {fileID: 8300000, guid: 6bb232783a14c814eafe9995837763fd, type: 3}
   - {fileID: 8300000, guid: 5ae132e105a2fdb4b9d2a24417df0a6f, type: 3}

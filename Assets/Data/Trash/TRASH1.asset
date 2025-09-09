@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37adf64c92825a3408e4aaf73c1834dc, type: 3}
   m_Name: TRASH1
   m_EditorClassIdentifier: 
-  trashSpaceValue: 10
-  followingSpeed: 40
-  timeToPutOnTray: 0.3
+  grabPositionOffset: {x: -0.00035, y: 0.00065, z: 0.0004}
+  grabRotationOffset: {x: 0, y: 100, z: 0}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}

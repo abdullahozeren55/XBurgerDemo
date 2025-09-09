@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: WHOLEPICKLE
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: 50c3fc7e83a5ec643b86ae10043b30d4, type: 3}
-  followingSpeed: 40
-  trashSpaceValue: 25
-  timeToPutOnTray: 0.3
   minForce: 0.3
   maxForce: 0.4
   objectAmount: 5
+  grabPositionOffset: {x: 0.0001, y: 0.0008, z: 0.0001}
+  grabRotationOffset: {x: 120, y: -240, z: 40}
   audioClips:
   - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
   - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}

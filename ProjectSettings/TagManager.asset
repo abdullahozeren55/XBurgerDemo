@@ -13,7 +13,6 @@ TagManager:
   - Tray
   - Customer
   - WholeIngredient
-  - SupplyBox
   - Trash
   - Drink
   - Knife
@@ -25,6 +24,7 @@ TagManager:
   - SaucePack
   - Water
   - Kettle
+  - FoodPack
   layers:
   - Default
   - TransparentFX

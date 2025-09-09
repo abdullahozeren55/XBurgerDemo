@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: WHOLEONION
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: 70a503ecd2717464abe4caaba10110c2, type: 3}
-  followingSpeed: 40
-  trashSpaceValue: 20
-  timeToPutOnTray: 0.3
   minForce: 0.25
   maxForce: 0.35
   objectAmount: 4
+  grabPositionOffset: {x: 0.0001, y: 0.001, z: 0.0004}
+  grabRotationOffset: {x: -40, y: -280, z: 30}
   audioClips:
   - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
   - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}

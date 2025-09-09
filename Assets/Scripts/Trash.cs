@@ -15,14 +15,10 @@ public class Trash : MonoBehaviour, IGrabable
 
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
-    [Space]
-    [SerializeField] private Vector3 grabPositionOffset;
-    [SerializeField] private Vector3 grabRotationOffset;
 
 
     private AudioSource audioSource;
     private Rigidbody rb;
-    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -31,13 +27,11 @@ public class Trash : MonoBehaviour, IGrabable
     private bool isJustThrowed;
 
     private float audioLastPlayedTime;
-    private float distance;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -68,8 +62,8 @@ public class Trash : MonoBehaviour, IGrabable
 
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
-        transform.localPosition = grabPositionOffset;
-        transform.localRotation = Quaternion.Euler(grabRotationOffset);
+        transform.localPosition = data.grabPositionOffset;
+        transform.localRotation = Quaternion.Euler(data.grabRotationOffset);
 
     }
     public void OnFocus()

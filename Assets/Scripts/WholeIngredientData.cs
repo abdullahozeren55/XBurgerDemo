@@ -6,12 +6,12 @@ using UnityEngine;
 public class WholeIngredientData : ScriptableObject
 {
     public GameObject destroyParticle;
-    public float followingSpeed = 40f;
-    public float trashSpaceValue = 1f;
-    public float timeToPutOnTray = 0.3f;
     public float minForce = 0.2f;
     public float maxForce = 0.4f;
     public int objectAmount = 4;
+    [Space]
+    public Vector3 grabPositionOffset;
+    public Vector3 grabRotationOffset;
 
     public AudioClip[] audioClips;
 }

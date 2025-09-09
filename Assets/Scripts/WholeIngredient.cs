@@ -11,21 +11,19 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     public float HandLerp { get => handLerp; set => handLerp = value; }
     [SerializeField] private float handLerp;
 
+    [HideInInspector] public bool CanGetSliced;
+
     public WholeIngredientData data;
 
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
-    [Space]
-    [SerializeField] private Vector3 grabPositionOffset;
-    [SerializeField] private Vector3 grabRotationOffset;
 
     [Header("Instantiate Settings")]
-    [SerializeField] private GameObject instantiateObject;
+    [SerializeField] private GameObject[] instantiateObjects;
     
 
     private AudioSource audioSource;
     private Rigidbody rb;
-    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -34,13 +32,11 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     private bool isJustThrowed;
 
     private float audioLastPlayedTime;
-    private float distance;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -51,6 +47,8 @@ public class WholeIngredient : MonoBehaviour, IGrabable
         isJustThrowed = false;
 
         audioLastPlayedTime = 0f;
+
+        CanGetSliced = true;
     }
 
     public void OnGrab(Transform grabPoint)
@@ -70,8 +68,8 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
-        transform.localPosition = grabPositionOffset;
-        transform.localRotation = Quaternion.Euler(grabRotationOffset);
+        transform.localPosition = data.grabPositionOffset;
+        transform.localRotation = Quaternion.Euler(data.grabRotationOffset);
     }
     public void OnFocus()
     {
@@ -110,31 +108,49 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     public void Slice()
     {
-        gameObject.layer = ungrabableLayer;
-
-        for (int i = 0; i < data.objectAmount; i++)
+        if (CanGetSliced)
         {
-            GameObject newObject = Instantiate(instantiateObject, transform.position, Quaternion.identity);
+            gameObject.layer = ungrabableLayer;
 
-            Rigidbody rb = newObject.GetComponent<Rigidbody>();
-
-            if (rb != null)
+            for (int i = 0; i < data.objectAmount; i++)
             {
-                // Generate a random force direction and magnitude
-                Vector3 randomForce = new Vector3(
-                    Random.Range(-0.5f, 0.5f), // Random x direction
-                    Random.Range(0.5f, 1f), // Random y direction
-                    Random.Range(-0.5f, 0.5f)  // Random z direction
-                ).normalized * Random.Range(data.minForce, data.maxForce); // Apply random magnitude
+                foreach (GameObject go in instantiateObjects)
+                {
+                    GameObject newObject = Instantiate(go, transform.position, Quaternion.identity);
 
-                // Apply the random force to the Rigidbody
-                rb.AddForce(randomForce, ForceMode.Impulse);
+                    Rigidbody rb = newObject.GetComponent<Rigidbody>();
+
+                    if (rb != null)
+                    {
+                        // Generate a random force direction and magnitude
+                        Vector3 randomForce = new Vector3(
+                            Random.Range(-0.5f, 0.5f), // Random x direction
+                            Random.Range(0.5f, 1f), // Random y direction
+                            Random.Range(-0.5f, 0.5f)  // Random z direction
+                        ).normalized * Random.Range(data.minForce, data.maxForce); // Apply random magnitude
+
+                        // Apply the random force to the Rigidbody
+                        rb.AddForce(randomForce, ForceMode.Impulse);
+                    }
+                }
+                
             }
-        }
 
-        Instantiate(data.destroyParticle, transform.position, Quaternion.Euler(transform.rotation.x - 90f, transform.rotation.y + 90f, transform.rotation.z + 90f));
+            Instantiate(data.destroyParticle, transform.position, Quaternion.Euler(transform.rotation.x - 90f, transform.rotation.y + 90f, transform.rotation.z + 90f));
 
-        Destroy(gameObject);
+            Destroy(gameObject);
+        }  
+    }
+
+    public void HandlePackOpening()
+    {
+        CanGetSliced = false;
+        Invoke("TurnOnSlice", 0.5f);
+    }
+
+    private void TurnOnSlice()
+    {
+        CanGetSliced = true;
     }
 
     private void OnDestroy()
