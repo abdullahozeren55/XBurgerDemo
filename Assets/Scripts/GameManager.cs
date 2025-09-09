@@ -68,12 +68,6 @@ public class GameManager : MonoBehaviour
         Nothing,
     }
 
-    public enum GrabTypes
-    {
-        SingleHand,
-        BothHands
-    }
-
     [Header("Burger Lists")]
     public List<BurgerIngredientData.IngredientType> classicBurger = new List<BurgerIngredientData.IngredientType>();
     public List <SauceBottle.SauceType> classicBurgerSauces = new List<SauceBottle.SauceType>();

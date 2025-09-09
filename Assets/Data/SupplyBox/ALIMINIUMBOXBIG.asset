@@ -15,7 +15,7 @@ MonoBehaviour:
   destroyParticle: {fileID: 939900511580441035, guid: b1aa171ede49dd14ca4966340bcad396, type: 3}
   followingSpeed: 40
   weight: 1.6
-  grabPositionOffset: {x: 0.001, y: 0.0015, z: 0.003}
+  grabPositionOffset: {x: -0.0006467691, y: 0.0036738866, z: 0.00062172406}
   grabRotationOffset: {x: 190, y: 70, z: 50}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}

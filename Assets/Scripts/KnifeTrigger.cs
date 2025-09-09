@@ -8,12 +8,6 @@ public class KnifeTrigger : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("WholeIngredient"))
-            other.GetComponent<WholeIngredient>().Slice();
-
-        if (other.CompareTag("SupplyBox"))
-        {
-            other.GetComponent<SupplyBox>().OpenBox();
-        }
-            
+            other.GetComponent<WholeIngredient>().Slice();       
     }
 }
