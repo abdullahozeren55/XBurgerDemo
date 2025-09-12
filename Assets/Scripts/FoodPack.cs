@@ -53,7 +53,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public void OnGrab(Transform grabPoint)
     {
-        gameObject.layer = ungrabableLayer;
+        ChangeLayer(ungrabableLayer);
 
         PlayAudioWithRandomPitch(0);
 
@@ -74,12 +74,12 @@ public class FoodPack : MonoBehaviour, IGrabable
     public void OnFocus()
     {
         HandleText(true);
-        gameObject.layer = grabableOutlinedLayer;
+        ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
         HandleText(false);
-        gameObject.layer = grabableLayer;
+        ChangeLayer(grabableLayer);
     }
 
     public void OnDrop(Vector3 direction, float force)
@@ -135,6 +135,16 @@ public class FoodPack : MonoBehaviour, IGrabable
         Instantiate(data.destroyParticle, transform.position, Quaternion.Euler(transform.rotation.x - 90f, transform.rotation.y + 90f, transform.rotation.z + 90f));
 
         Destroy(gameObject);
+    }
+
+    private void ChangeLayer(int layer)
+    {
+        gameObject.layer = layer;
+
+        foreach (Transform tr in allTransform)
+        {
+            tr.gameObject.layer = layer;
+        }
     }
 
     private void OnDestroy()
