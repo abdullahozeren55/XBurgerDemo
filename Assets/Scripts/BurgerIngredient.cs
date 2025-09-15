@@ -36,9 +36,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     private int ungrabableLayer;
     private int onTrayLayer;
 
-    private Vector3 relativePosition;
-    private Quaternion relativeRotation;
-
     private Vector3 trayPos;
 
     private bool isJustThrowed;
@@ -46,8 +43,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     public bool canStick;
 
     public Cookable.CookAmount cookAmount;
-
-    private Coroutine putOnTrayCoroutine;
 
     private float audioLastPlayedTime;
 
@@ -112,7 +107,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         this.trayPos = trayPos;
 
-        putOnTrayCoroutine = StartCoroutine(PutOnTray());
+        StartCoroutine(PutOnTray());
     }
 
     public void OnGrab(Transform grabPoint)
@@ -222,20 +217,80 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private void StickToSurface(Collision collision)
     {
-
         Vector3 surfaceNormal = collision.contacts[0].normal;
         Vector3 bigSideDirection = transform.up;
+
+        // Rotasyonu ayarla
         Quaternion targetRotation = Quaternion.FromToRotation(bigSideDirection, surfaceNormal) * transform.rotation;
         transform.rotation = targetRotation;
+
+        // Contact noktasýný al
+        Vector3 contactPoint = collision.contacts[0].point;
+
+        // Collider yarýçaplarýný al
+        Vector3 extents = GetComponent<Collider>().bounds.extents;
+
+        // Normal yönüne en yakýn ekseni bul
+        Vector3 localNormal = transform.InverseTransformDirection(surfaceNormal);
+        Vector3 absLocalNormal = new Vector3(Mathf.Abs(localNormal.x), Mathf.Abs(localNormal.y), Mathf.Abs(localNormal.z));
+
+        float offset = 0f;
+        if (absLocalNormal.x > absLocalNormal.y && absLocalNormal.x > absLocalNormal.z)
+            offset = extents.x;
+        else if (absLocalNormal.y > absLocalNormal.x && absLocalNormal.y > absLocalNormal.z)
+            offset = extents.y;
+        else
+            offset = extents.z;
+
+        // Biraz daha az ekle (ör. %30'u)
+        offset *= 0.15f;
+
+        // Pozisyonu ayarla
+        transform.position = contactPoint + surfaceNormal * offset;
+
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.SetParent(collision.transform);
         rb.isKinematic = true;
 
-        relativePosition = transform.position - collision.transform.position;  // Relative position
-        relativeRotation = Quaternion.Inverse(collision.transform.rotation) * transform.rotation;  // Relative rotation
+        transform.SetParent(collision.transform);
 
         isStuck = true;
+    }
+
+    private void HandleSauceDrops(Collision collision)
+    {
+        int countToDrop = Mathf.CeilToInt(decalParent.childCount / 2f);
+
+        ContactPoint contact = collision.contacts[0];
+
+        Vector3 normal = contact.normal;
+        Vector3 hitPoint = contact.point + normal * 0.02f;
+
+        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
+        if (tangent == Vector3.zero)
+            tangent = Vector3.Cross(normal, Vector3.forward);
+        tangent.Normalize();
+        Vector3 bitangent = Vector3.Cross(normal, tangent);
+
+        // Rastgele offset (yüzeye paralel düzlemde)
+        float spreadRadius = 0.05f;
+
+        // Normal yönüne göre rotation hesapla
+        Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
+
+        for (int i = 0; i < countToDrop; i++)
+        {
+            Transform child = decalParent.GetChild(i);
+            child.transform.parent = collision.transform;
+
+            Vector3 randomOffset = tangent * Random.Range(-spreadRadius, spreadRadius) +
+                               bitangent * Random.Range(-spreadRadius, spreadRadius);
+
+            Vector3 spawnPoint = hitPoint + randomOffset;
+
+            child.transform.position = spawnPoint;
+            child.transform.rotation = finalRotation;
+        }
     }
 
     private void Unstick()
@@ -294,8 +349,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         transform.position = trayPos;
         transform.rotation = targetRotation;
-
-        putOnTrayCoroutine = null;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -304,40 +357,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         {
 
             if (decalParent != null && decalParent.childCount > 0)
-            {
-                int countToDrop = Mathf.CeilToInt(decalParent.childCount / 2f);
-
-                ContactPoint contact = collision.contacts[0];
-
-                Vector3 normal = contact.normal;
-                Vector3 hitPoint = contact.point + normal * 0.02f;
-
-                Vector3 tangent = Vector3.Cross(normal, Vector3.up);
-                if (tangent == Vector3.zero)
-                    tangent = Vector3.Cross(normal, Vector3.forward);
-                tangent.Normalize();
-                Vector3 bitangent = Vector3.Cross(normal, tangent);
-
-                // Rastgele offset (yüzeye paralel düzlemde)
-                float spreadRadius = 0.05f;
-
-                // Normal yönüne göre rotation hesapla
-                Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
-
-                for (int i = 0; i < countToDrop; i++)
-                {
-                    Transform child = decalParent.GetChild(i);
-                    child.transform.parent = collision.transform;
-
-                    Vector3 randomOffset = tangent * Random.Range(-spreadRadius, spreadRadius) +
-                                       bitangent * Random.Range(-spreadRadius, spreadRadius);
-
-                    Vector3 spawnPoint = hitPoint + randomOffset;
-
-                    child.transform.position = spawnPoint;
-                    child.transform.rotation = finalRotation;
-                }
-            }
+                HandleSauceDrops(collision);
 
             if (isJustThrowed)
             {
