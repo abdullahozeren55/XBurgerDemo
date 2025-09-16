@@ -87,4 +87,12 @@ public class CutsceneManager : MonoBehaviour
     {
         dollyCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_Path = path;
     }
+
+    public void CloseDoor(Door door)
+    {
+        if (door.isOpened)
+        {
+            door.HandleRotation();
+        }
+    }
 }
