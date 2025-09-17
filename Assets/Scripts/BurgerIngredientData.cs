@@ -8,8 +8,6 @@ public class BurgerIngredientData : ScriptableObject
 
     public IngredientType ingredientType;
     public float yHeight = 0.1f;
-    public float trashSpaceValue = 1f;
-    public float followingSpeed = 40f;
     public float timeToPutOnTray = 0.3f;
     [Space]
     public Vector3 grabPositionOffset;

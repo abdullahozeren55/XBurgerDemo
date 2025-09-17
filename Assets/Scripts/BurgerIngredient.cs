@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -74,10 +75,10 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public void PutOnTray(Vector3 trayPos, Transform parentTray)
     {
-
         IsGettingPutOnTray = true;
         gameObject.layer = onTrayLayer;
-        
+
+        // Ses çalma kýsmý ayný kalýyor
         if (data.audioClips.Length < 4)
         {
             PlayAudioWithRandomPitch(1);
@@ -85,29 +86,26 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         else
         {
             if (cookAmount == Cookable.CookAmount.RAW)
-            {
                 PlayAudioWithRandomPitch(1);
-            }
             else if (cookAmount == Cookable.CookAmount.REGULAR)
-            {
                 PlayAudioWithRandomPitch(4);
-            }
             else if (cookAmount == Cookable.CookAmount.BURNT)
-            {
                 PlayAudioWithRandomPitch(7);
-            }
         }
 
         col.enabled = false;
         rb.isKinematic = true;
-
         IsGrabbed = false;
 
         transform.parent = parentTray;
 
-        this.trayPos = trayPos;
+        // Pozisyon tween
+        transform.DOMove(trayPos, data.timeToPutOnTray)
+            .SetEase(Ease.OutBack); // biraz lastikli otursun
 
-        StartCoroutine(PutOnTray());
+        // Rotasyon tween
+        transform.DORotateQuaternion(Quaternion.identity, data.timeToPutOnTray)
+            .SetEase(Ease.OutCubic);
     }
 
     public void OnGrab(Transform grabPoint)

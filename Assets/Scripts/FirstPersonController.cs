@@ -292,6 +292,8 @@ public class FirstPersonController : MonoBehaviour
                 ChangeCrosshairSize(defaultCrosshairSize);
             }
 
+            anim.SetFloat("speed", 0f, 0.15f, Time.deltaTime);
+
         }
                 
     }

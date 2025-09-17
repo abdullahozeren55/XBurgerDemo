@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ public class Tray : MonoBehaviour
 {
     [SerializeField] private float startPointYHeight = 0.01f;
     [SerializeField] private Transform burgerBoxTransform;
+    [SerializeField] private Transform ingredientsParent;
     [SerializeField] private BoxCollider boxCollider;
     [SerializeField] private BoxCollider burgerCollider;
 
@@ -260,6 +262,18 @@ public class Tray : MonoBehaviour
         UpdateCurrentLocationToPutBurgerIngredient(startPointYHeight);
     }
 
+    private void Squash()
+    {
+        ingredientsParent
+    .DOScale(new Vector3(1.1f, 1.1f, 1f - currentIngredient.data.yHeight), 0.2f) // biraz daha uzun süre
+    .SetEase(Ease.OutQuad)                        // daha yumuþak çöküþ
+    .OnComplete(() =>
+    {
+        ingredientsParent.DOScale(Vector3.one, 0.3f) // kalkýþý daha uzun yap
+            .SetEase(Ease.OutElastic, 1f + currentIngredient.data.yHeight);          // lastikli, overshootlu
+    });
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer != onTrayLayer && (other.CompareTag("BurgerIngredient") || other.CompareTag("BurgerBox")))
@@ -278,7 +292,9 @@ public class Tray : MonoBehaviour
 
                 UpdateCurrentLocationToPutBurgerIngredient(currentIngredient.data.yHeight);
 
-                currentIngredient.PutOnTray(currentLocationToPutBurgerIngredient, this.transform);
+                currentIngredient.PutOnTray(currentLocationToPutBurgerIngredient, ingredientsParent);
+
+                Invoke("Squash", currentIngredient.data.timeToPutOnTray/2);
 
                 UpdateCurrentLocationToPutBurgerIngredient(currentIngredient.data.yHeight);
             }
