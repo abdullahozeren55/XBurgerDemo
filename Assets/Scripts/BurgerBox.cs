@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using static Cookable;
 
 public class BurgerBox : MonoBehaviour, IGrabable
 {
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
-    public float HandLerp { get => handLerp; set => handLerp = value; }
-    [SerializeField] private float handLerp;
-
     public bool IsGettingPutOnTray { get => isGettingPutOnTray; set => isGettingPutOnTray = value; }
+    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
+    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
+    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
+    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
+
     private bool isGettingPutOnTray;
 
     public BurgerBoxData data;
@@ -255,5 +256,15 @@ public class BurgerBox : MonoBehaviour, IGrabable
             }
 
         }
+    }
+
+    public void OnUseHold()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnUseRelease()
+    {
+        throw new System.NotImplementedException();
     }
 }

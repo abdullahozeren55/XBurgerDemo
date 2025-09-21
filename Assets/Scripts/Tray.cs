@@ -269,7 +269,7 @@ public class Tray : MonoBehaviour
             return;
 
         // Ne kadar squash yapýlacaðýný hesapla
-        float excessHeight = currentLocationToPutBurgerIngredient.y - boxClosingSquashMinLimit;
+        float excessHeight = (currentLocationToPutBurgerIngredient.y - boxClosingSquashMinLimit) * 3f;
 
         // Ýstediðin oranda Z scale küçült
         float squashFactor = Mathf.Clamp01(excessHeight); // istersen çarpan ekleyebilirsin
@@ -277,7 +277,7 @@ public class Tray : MonoBehaviour
 
         // Tween ile squash (sadece Z ekseni)
         ingredientsParent
-            .DOScale(new Vector3(ingredientsParent.localScale.x, ingredientsParent.localScale.y, targetZ), 0.06f)
+            .DOScale(new Vector3(ingredientsParent.localScale.x, ingredientsParent.localScale.y, targetZ), 0.16f)
             .SetEase(Ease.Linear); // lineer, geri yaylanma yok
     }
 

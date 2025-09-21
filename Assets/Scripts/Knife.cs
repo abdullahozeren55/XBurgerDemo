@@ -1,32 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Cookable;
 
 public class Knife : MonoBehaviour, IGrabable
 {
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
-    private bool isGrabbed;
+    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
+    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
+    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
+    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
 
-    public float HandLerp { get => handLerp; set => handLerp = value; }
-    [SerializeField] private float handLerp;
+    [Space]
+
+    [SerializeField] private Vector3 stabPositionOffset = new Vector3(0.2f, 0.3f, 1.5f);
+    [SerializeField] private Vector3 stabRotationOffset = new Vector3(2.5f, -70f, -100f);
+
+    [Space]
+
+    private bool isGrabbed;
 
     public KnifeData data;
     [Space]
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
     [Space]
-    [SerializeField] private Vector3 grabPositionOffset;
-    [SerializeField] private Vector3 grabRotationOffset;
-    [Space]
     [SerializeField] private float throwMultiplier;
+    [Space]
+    [SerializeField] private Collider triggerCol; 
 
     private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
-
-    private Vector3 relativePosition;
-    private Quaternion relativeRotation;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -36,6 +40,8 @@ public class Knife : MonoBehaviour, IGrabable
     private bool isStuck;
 
     private float audioLastPlayedTime;
+
+    private Coroutine stabCoroutine;
 
     private void Awake()
     {
@@ -60,6 +66,15 @@ public class Knife : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
+        transform.localScale = data.grabScaleOffset;
+        GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -80,6 +95,8 @@ public class Knife : MonoBehaviour, IGrabable
         if (isStuck)
             Unstick();
 
+        triggerCol.enabled = false;
+
         PlayAudioWithRandomPitch(0);
 
         isJustThrowed = false;
@@ -94,8 +111,9 @@ public class Knife : MonoBehaviour, IGrabable
 
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
-        transform.localPosition = grabPositionOffset;
-        transform.localRotation = Quaternion.Euler(grabRotationOffset);
+        transform.localPosition = data.grabPositionOffset;
+        transform.localRotation = Quaternion.Euler(data.grabRotationOffset);
+        transform.localScale = data.grabScaleOffset;
     }
 
     public void OnLoseFocus()
@@ -107,6 +125,17 @@ public class Knife : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
+        triggerCol.enabled = true;
+
+        transform.localScale = data.grabScaleOffset;
+        GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
         transform.SetParent(null);
 
@@ -169,10 +198,6 @@ public class Knife : MonoBehaviour, IGrabable
         transform.SetParent(collision.transform);
         rb.isKinematic = true;
 
-        // Save the relative position and rotation for possible future calculations
-        relativePosition = transform.position - collision.transform.position;  // Relative position
-        relativeRotation = Quaternion.Inverse(collision.transform.rotation) * transform.rotation;  // Relative rotation
-
         // Set the flag that the object is stuck
         isStuck = true;
     }
@@ -202,6 +227,8 @@ public class Knife : MonoBehaviour, IGrabable
 
                 PlayAudioWithRandomPitch(2);
 
+                triggerCol.enabled = false;
+
                 isJustThrowed = false;
             }
             else if (Time.time > audioLastPlayedTime + 0.1f)
@@ -211,6 +238,73 @@ public class Knife : MonoBehaviour, IGrabable
 
         }
 
+
+    }
+
+    public void OnUseHold()
+    {
+        GameManager.Instance.SetPlayerAnimBool("stabRight", true);
+        GameManager.Instance.SetPlayerUseHandLerp(stabPositionOffset, stabRotationOffset, data.timeToStab);
+        GameManager.Instance.SetPlayerIsUsingItemXY(false, true);
+
+        triggerCol.enabled = true;
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
+        stabCoroutine = StartCoroutine(Stab(true));
+    }
+
+    public void OnUseRelease()
+    {
+        GameManager.Instance.SetPlayerAnimBool("stabRight", false);
+        GameManager.Instance.SetPlayerUseHandLerp(grabPositionOffset, grabRotationOffset, data.timeToStab/2f);
+        GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
+
+        triggerCol.enabled = false;
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
+        stabCoroutine = StartCoroutine(Stab(false));
+    }
+
+    private IEnumerator Stab(bool shouldStab)
+    {
+        Vector3 startPos = transform.localPosition;
+        Quaternion startRot = transform.localRotation;
+        Vector3 startScale = transform.localScale;
+
+        Vector3 endPos = shouldStab ? data.stabPositionOffset : data.grabPositionOffset;
+        Quaternion endRot = shouldStab ? Quaternion.Euler(data.stabRotationOffset) : Quaternion.Euler(data.grabRotationOffset);
+        Vector3 endScale = shouldStab ? data.stabScaleOffset : data.grabScaleOffset;
+
+        float elapsedTime = 0f;
+        float value = 0f;
+
+        while (elapsedTime < data.timeToStab)
+        {
+            value = elapsedTime / data.timeToStab;
+
+            transform.localPosition = Vector3.Lerp(startPos, endPos, value);
+            transform.localRotation = Quaternion.Lerp(startRot, endRot, value);
+            transform.localScale = Vector3.Lerp(startScale, endScale, value);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localPosition = endPos;
+        transform.localRotation = endRot;
+        transform.localScale = endScale;
+
+        stabCoroutine = null;
 
     }
 }

@@ -12,9 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffafc54a53686654a804b577eb7e81c8, type: 3}
   m_Name: KNIFE
   m_EditorClassIdentifier: 
-  trashSpaceValue: 15
-  followingSpeed: 40
-  timeToPutOnTrash: 0.3
+  grabPositionOffset: {x: -0.000023400884, y: 0.00043231747, z: -0.00018449826}
+  grabRotationOffset: {x: 8.61262, y: 77.27481, z: 231.09416}
+  grabScaleOffset: {x: 0.01, y: 0.01, z: 0.01}
+  stabPositionOffset: {x: -0.0000010572512, y: 0.00051305967, z: 0.000011773997}
+  stabRotationOffset: {x: 9.527423, y: 61.804817, z: 280.1402}
+  stabScaleOffset: {x: 0.013, y: 0.013, z: 0.013}
+  timeToStab: 0.3
   audioClips:
   - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
   - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}

@@ -1,20 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Cookable;
 
 public class Kettle : MonoBehaviour, IGrabable
 {
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
+    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
+    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
+    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
+    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
+
     private bool isGrabbed;
 
-    public float HandLerp { get => handLerp; set => handLerp = value; }
-    [SerializeField] private float handLerp;
-
     public bool IsGettingPutOnHologram;
-
-    public Vector3 grabPositionOffset;
-    public Vector3 grabRotationOffset;
 
     public AudioClip[] audioClips;
 
@@ -59,27 +57,6 @@ public class Kettle : MonoBehaviour, IGrabable
         isJustThrowed = false;
 
         audioLastPlayedTime = 0f;
-    }
-
-    private void Update()
-    {
-
-        if (HandLerp > 0.7f && (IsGrabbed || isJustThrowed))
-        {
-            if (currentPourPrefab == null || !currentPourPrefab.isPlaying)
-            {
-                currentPourPrefab = Instantiate(pourParticlePrefab, pourInstantiatePoint);
-            }
-        }
-        else
-        {
-            if (currentPourPrefab != null && currentPourPrefab.isPlaying)
-            {
-                currentPourPrefab.Stop();
-                currentPourPrefab = null;
-            }
-        }
-
     }
 
     public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation)
@@ -233,5 +210,15 @@ public class Kettle : MonoBehaviour, IGrabable
         IsGettingPutOnHologram = false;
 
         putOnHologramCoroutine = null;
+    }
+
+    public void OnUseHold()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnUseRelease()
+    {
+        throw new System.NotImplementedException();
     }
 }

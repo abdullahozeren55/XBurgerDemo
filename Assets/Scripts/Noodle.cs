@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Cookable;
 
 public class Noodle : MonoBehaviour, IGrabable
 {
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
-    private bool isGrabbed;
+    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
+    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
+    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
+    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
 
-    public float HandLerp { get => handLerp; set => handLerp = value; }
-    [SerializeField] private float handLerp;
+    private bool isGrabbed;
 
     public bool IsGettingPutOnHologram;
 
@@ -266,5 +267,15 @@ public class Noodle : MonoBehaviour, IGrabable
         IsGettingPutOnHologram = false;
 
         putOnHologramCoroutine = null;
+    }
+
+    public void OnUseHold()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnUseRelease()
+    {
+        throw new System.NotImplementedException();
     }
 }

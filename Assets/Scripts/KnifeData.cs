@@ -5,8 +5,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewKnifeData", menuName = "Data/Knife")]
 public class KnifeData : ScriptableObject
 {
-    public float trashSpaceValue = 1f;
-    public float followingSpeed = 40f;
-    public float timeToPutOnTrash = 0.3f;
+    public Vector3 grabPositionOffset;
+    public Vector3 grabRotationOffset;
+    public Vector3 grabScaleOffset;
+    [Space]
+    public Vector3 stabPositionOffset;
+    public Vector3 stabRotationOffset;
+    public Vector3 stabScaleOffset;
+    [Space]
+    public float timeToStab = 0.3f;
     public AudioClip[] audioClips;
 }

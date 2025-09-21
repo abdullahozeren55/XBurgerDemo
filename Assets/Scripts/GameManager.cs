@@ -289,6 +289,22 @@ public class GameManager : MonoBehaviour
         characterController.Move(moveForce);
     }
 
+    public void SetPlayerAnimBool(string boolName, bool value)
+    {
+        firstPersonController.SetAnimBool(boolName, value);
+    }
+
+    public void SetPlayerUseHandLerp(Vector3 targetPos, Vector3 targetRot, float timeToDo)
+    {
+        firstPersonController.SetUseHandLerp(targetPos, targetRot, timeToDo);
+    }
+
+    public void SetPlayerIsUsingItemXY(bool xValue, bool yValue)
+    {
+        firstPersonController.IsUsingItemX = xValue;
+        firstPersonController.IsUsingItemY = yValue;
+    }
+
     public void AddSauceToTray(SauceBottle.SauceType type)
     {
         tray.AddSauce(type);

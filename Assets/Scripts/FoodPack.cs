@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Cookable;
 
 public class FoodPack : MonoBehaviour, IGrabable
 {
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
-    private bool isGrabbed;
+    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
+    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
+    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
+    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
 
-    public float HandLerp { get => handLerp; set => handLerp = value; }
-    [SerializeField] private float handLerp;
+    private bool isGrabbed;
 
     public FoodPackData data;
 
@@ -55,8 +56,9 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         ChangeLayer(ungrabableLayer);
 
-        PlayAudioWithRandomPitch(0);
+        col.enabled = false;
 
+        PlayAudioWithRandomPitch(0);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -86,6 +88,8 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.1f);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -96,6 +100,8 @@ public class FoodPack : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.1f);
 
         transform.SetParent(null);
 
@@ -147,6 +153,11 @@ public class FoodPack : MonoBehaviour, IGrabable
         }
     }
 
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
+    }
+
     private void OnDestroy()
     {
         HandleText(false);
@@ -192,5 +203,15 @@ public class FoodPack : MonoBehaviour, IGrabable
 
         }
 
+    }
+
+    public void OnUseHold()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnUseRelease()
+    {
+        throw new System.NotImplementedException();
     }
 }
