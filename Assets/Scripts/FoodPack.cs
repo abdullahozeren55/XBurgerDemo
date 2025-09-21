@@ -88,7 +88,7 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.1f);
+        Invoke("TurnOnCollider", 0.05f);
 
         transform.SetParent(null);
 
@@ -101,7 +101,7 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.1f);
+        Invoke("TurnOnCollider", 0.05f);
 
         transform.SetParent(null);
 

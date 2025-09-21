@@ -12,6 +12,7 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
     [Header("Noodle Settings")]
@@ -24,11 +25,15 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     private void Awake()
     {
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         childs = new GameObject[transform.childCount];
@@ -43,7 +48,7 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     public void OnFocus()
     {
         grabNoodleText.SetActive(true);
-        ChangeLayer(interactableOutlinedLayer);
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnInteract()
@@ -65,6 +70,18 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     {
         grabNoodleText.SetActive(false);
         ChangeLayer(interactableLayer);
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedRedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedLayer);
+        }
     }
 
     public void ChangeLayer(int layerIndex)

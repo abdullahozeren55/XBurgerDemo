@@ -18,6 +18,7 @@ public class Keys : MonoBehaviour, IInteractable
     [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
 
     [Header("Random Place Settings")]
     [SerializeField] private Transform[] keyPossiblePositions;
@@ -27,6 +28,9 @@ public class Keys : MonoBehaviour, IInteractable
 
     public GameManager.HandRigTypes HandRigType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -35,6 +39,7 @@ public class Keys : MonoBehaviour, IInteractable
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
 
         int place = Random.Range(0, keyPossiblePositions.Length);
         transform.position = keyPossiblePositions[place].position;
@@ -57,13 +62,25 @@ public class Keys : MonoBehaviour, IInteractable
     public void OnFocus()
     {
         pickUpText.SetActive(true);
-        gameObject.layer = interactableOutlinedLayer;
+        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
     }
 
     public void OnLoseFocus()
     {
         pickUpText.SetActive(false);
         gameObject.layer = interactableLayer;
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedRedLayer;
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedLayer;
+        }
     }
 
     private void OnDestroy()

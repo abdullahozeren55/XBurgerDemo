@@ -6,6 +6,7 @@ public class ShopSeller : MonoBehaviour, IInteractable
 {
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
     private int grabableLayer;
 
@@ -33,10 +34,14 @@ public class ShopSeller : MonoBehaviour, IInteractable
 
     public GameManager.HandRigTypes HandRigType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     private void Awake()
     {
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         anim = GetComponent<Animator>();
@@ -49,7 +54,7 @@ public class ShopSeller : MonoBehaviour, IInteractable
     }
     public void OnFocus()
     {
-        gameObject.layer = interactableOutlinedLayer;
+        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
         talkWithSellerText.SetActive(true);
     }
 
@@ -74,6 +79,18 @@ public class ShopSeller : MonoBehaviour, IInteractable
     {
         gameObject.layer = interactableLayer;
         talkWithSellerText.SetActive(false);
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedRedLayer;
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedLayer;
+        }
     }
 
     public void HandleFinishDialogue()

@@ -9,6 +9,9 @@ public class ToiletChild : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     private void Awake()
     {
         parentToilet = GetComponentInParent<Toilet>();
@@ -27,5 +30,10 @@ public class ToiletChild : MonoBehaviour, IInteractable
     public void OnLoseFocus()
     {
         parentToilet.OnLoseFocus();
+    }
+
+    public void OutlineChangeCheck()
+    {
+        parentToilet.OutlineChangeCheck();
     }
 }

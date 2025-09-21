@@ -24,11 +24,15 @@ public class Cooler : MonoBehaviour, IInteractable
     [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
 
     private GameObject[] coolerParts;
 
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
+
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
 
     void Awake()
     {
@@ -53,12 +57,13 @@ public class Cooler : MonoBehaviour, IInteractable
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
     }
 
     public void OnFocus()
     {
         HandleText(true);
-        ChangeLayer(interactableOutlinedLayer);
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnInteract()
@@ -70,6 +75,18 @@ public class Cooler : MonoBehaviour, IInteractable
     {
         HandleText(false);
         ChangeLayer(interactableLayer);
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedRedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedLayer);
+        }
     }
 
     private void HandleText(bool isFocused)

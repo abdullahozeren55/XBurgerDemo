@@ -62,6 +62,9 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     [SerializeField] private Transform restaurantDestination; //destinationToArrive
     [SerializeField] private Transform homeDestination; //destinationToDisappear
     [SerializeField] private Transform playerTransform;
@@ -79,6 +82,7 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
     private int interactableLayer;
     private int uninteractableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
     private int customerLayer;
 
     [Header("Footstep Parameters")]
@@ -108,6 +112,7 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
         interactableLayer = LayerMask.NameToLayer("Interactable");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         customerLayer = LayerMask.NameToLayer("Customer");
 
         StartPathFollow(restaurantDestination);
@@ -303,13 +308,25 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
     public void OnFocus()
     {
         HandleText(true);
-        ChangeLayer(interactableOutlinedLayer);
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
         HandleText(false);
         ChangeLayer(interactableLayer);
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedRedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            ChangeLayer(interactableOutlinedLayer);
+        }
     }
 
     private void HandleText(bool isFocused)

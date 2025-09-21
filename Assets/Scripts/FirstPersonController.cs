@@ -121,6 +121,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private LayerMask grabableLayers;
     [SerializeField] private Image crosshairImage;
     [SerializeField] private Color grabCrosshairColor;
+    [SerializeField] private Color useCrosshairColor;
     [SerializeField] private float maxThrowForce = 1.3f;
     [SerializeField] private float minThrowForce = 0.3f;
     [SerializeField] private float throwMaxChargeTime = 1.5f;
@@ -479,30 +480,53 @@ public class FirstPersonController : MonoBehaviour
         cameraFollow.position = eyeLevel.position;
     }
 
+    private void DecideInteractableOutlineColor()
+    { 
+        if (isUsingGrabbedItem ||
+            (currentGrabable != null && currentGrabable.IsGrabbed && currentInteractable.HandRigType == GameManager.HandRigTypes.SingleHandGrab))
+        {
+            currentInteractable.OutlineShouldBeRed = true;
+            ChangeCrosshairColor(useCrosshairColor);
+        }
+        else
+        {
+            currentInteractable.OutlineShouldBeRed = false;
+            ChangeCrosshairColor(currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
+        }
+    }
+
     private void HandleInteractionCheck()
     {
         if (Physics.Raycast(mainCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, interactionLayers))
         {
             if (hit.collider)
             {
-                if ((hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable") || hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlined")) && (currentGrabable == null || !currentGrabable.IsGrabbed || hit.collider.gameObject.GetComponent<IInteractable>().HandRigType != GameManager.HandRigTypes.SingleHandGrab))
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Interactable") ||
+                    hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlined") ||
+                    hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlinedRed"))
                 {
 
                     if (currentInteractable == null)
                     {
                         currentInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
                         ChangeCrosshairSize(interactableCrosshairSize);
+                        DecideInteractableOutlineColor();
+                        currentInteractable.OutlineChangeCheck();
                         currentInteractable.OnFocus();
                     }
                     else if (currentInteractable != hit.collider.gameObject.GetComponent<IInteractable>())
                     {
+                        ChangeCrosshairColor((isUsingGrabbedItem || (currentGrabable != null && currentInteractable != null && currentGrabable.IsGrabbed && currentInteractable.HandRigType == GameManager.HandRigTypes.SingleHandGrab)) ? useCrosshairColor : currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
                         currentInteractable.OnLoseFocus();
                         currentInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
+                        DecideInteractableOutlineColor();
+                        currentInteractable.OutlineChangeCheck();
                         currentInteractable.OnFocus();
                     }
                 }
                 else if (currentInteractable != null)
                 {
+                    ChangeCrosshairColor(isUsingGrabbedItem ? useCrosshairColor : currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
                     currentInteractable.OnLoseFocus();
                     currentInteractable = null;
                     ChangeCrosshairSize(defaultCrosshairSize);
@@ -510,6 +534,7 @@ public class FirstPersonController : MonoBehaviour
             }
             else if (currentInteractable != null)
             {
+                ChangeCrosshairColor(isUsingGrabbedItem ? useCrosshairColor : currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
                 currentInteractable.OnLoseFocus();
                 currentInteractable = null;
                 ChangeCrosshairSize(defaultCrosshairSize);
@@ -517,6 +542,7 @@ public class FirstPersonController : MonoBehaviour
         }
         else if (currentInteractable != null)
         {
+            ChangeCrosshairColor(isUsingGrabbedItem ? useCrosshairColor : currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
             currentInteractable.OnLoseFocus();
             currentInteractable = null;
             ChangeCrosshairSize(defaultCrosshairSize);
@@ -545,6 +571,14 @@ public class FirstPersonController : MonoBehaviour
                     // threshold’u geçtiði an kullanmaya baþla
                     currentGrabable.OnUseHold();
                     isUsingGrabbedItem = true;
+
+                    ChangeCrosshairColor(useCrosshairColor);
+
+                    if (currentInteractable != null)
+                    {
+                        DecideInteractableOutlineColor();
+                        currentInteractable.OutlineChangeCheck();
+                    }
                 }
             }
 
@@ -559,10 +593,18 @@ public class FirstPersonController : MonoBehaviour
                 {
                     // uzun basma býrakýldý kullaným bitti
                     currentGrabable.OnUseRelease();
+
+                    ChangeCrosshairColor((currentGrabable != null && currentInteractable != null && currentGrabable.IsGrabbed && currentInteractable.HandRigType == GameManager.HandRigTypes.SingleHandGrab) ? useCrosshairColor : currentGrabable != null ? grabCrosshairColor : defaultCrosshairColor);
                 }
 
                 interactChargeTimer = 0f;
                 isUsingGrabbedItem = false;
+
+                if (currentInteractable != null)
+                {
+                    DecideInteractableOutlineColor();
+                    currentInteractable.OutlineChangeCheck();
+                }
             }
         }
         else
@@ -576,7 +618,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void TryToInteract()
     {
-        if (currentInteractable != null && Physics.Raycast(mainCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, interactionLayers))
+        if (currentInteractable != null && Physics.Raycast(mainCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, interactionLayers) && !currentInteractable.OutlineShouldBeRed)
         {
             if (hit.collider.gameObject.GetComponent<IInteractable>() == currentInteractable)
             {
@@ -680,6 +722,12 @@ public class FirstPersonController : MonoBehaviour
 
                 anim.SetBool("chargingThrowRight", true);
 
+                if (currentInteractable != null)
+                {
+                    DecideInteractableOutlineColor();
+                    currentInteractable.OutlineChangeCheck();
+                }
+
                 if (singleHandThrowCoroutine != null)
                 {
                     StopCoroutine(singleHandThrowCoroutine);
@@ -743,6 +791,12 @@ public class FirstPersonController : MonoBehaviour
                 }
 
                 throwChargeTimer = 0f;
+
+                if (currentInteractable != null)
+                {
+                    DecideInteractableOutlineColor();
+                    currentInteractable.OutlineChangeCheck();
+                }
             }
         }
         else if (Input.GetKeyDown(interactKey) && currentGrabable != null && Physics.Raycast(mainCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, grabableLayers))
@@ -770,6 +824,12 @@ public class FirstPersonController : MonoBehaviour
 
                 rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
                 leftHandRigLerpCoroutine = StartCoroutine(LerpLeftHandRig(false, false));
+
+                if (currentInteractable != null)
+                {
+                    DecideInteractableOutlineColor();
+                    currentInteractable.OutlineChangeCheck();
+                }
             }
         }
     }
@@ -1016,7 +1076,7 @@ public class FirstPersonController : MonoBehaviour
 
         IsUsingItemX = false;
         IsUsingItemY = false;
-
+        
         anim.SetBool("stabRight", false);
     }
         

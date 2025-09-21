@@ -15,10 +15,10 @@ MonoBehaviour:
   trashSpaceValue: 35
   followingSpeed: 40
   timeToPutOnTray: 0.2
-  grabPositionOffsetForOpen: {x: 0.0005, y: 0.0012, z: -0.0006}
-  grabRotationOffsetForOpen: {x: -10, y: 280, z: -250}
-  grabPositionOffsetForClose: {x: 0.0002, y: 0.0008, z: 0.001}
-  grabRotationOffsetForClose: {x: 15, y: 85, z: 200}
+  grabPositionOffsetForOpen: {x: 0.000518071, y: 0.0014042542, z: -0.00068737916}
+  grabRotationOffsetForOpen: {x: 349.99747, y: 279.99942, z: 109.99848}
+  grabPositionOffsetForClose: {x: 0.0002522376, y: 0.0013608449, z: 0.0010735289}
+  grabRotationOffsetForClose: {x: 7.543798, y: 87.808014, z: 161.67326}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}

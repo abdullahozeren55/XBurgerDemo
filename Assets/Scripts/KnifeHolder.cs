@@ -7,12 +7,16 @@ public class KnifeHolder : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     [Header("Text Settings")]
     public GameObject grabKnifeText;
 
     [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
 
     [Header("Knife Settings")]
     [SerializeField] private GameObject knife;
@@ -24,18 +28,31 @@ public class KnifeHolder : MonoBehaviour, IInteractable
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
     }
 
     public void OnFocus()
     {
         grabKnifeText.SetActive(true);
-        gameObject.layer = interactableOutlinedLayer;
+        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
     }
 
     public void OnLoseFocus()
     {
         grabKnifeText.SetActive(false);
         gameObject.layer = interactableLayer;
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedRedLayer;
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedLayer;
+        }
     }
 
     public void OnInteract()

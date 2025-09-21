@@ -24,6 +24,7 @@ public class Door : MonoBehaviour, IInteractable
     [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
+    private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
     [Header("Lock Settings")]
@@ -38,6 +39,9 @@ public class Door : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     private void Awake()
     {
         isOpened = false;
@@ -49,6 +53,7 @@ public class Door : MonoBehaviour, IInteractable
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         inLockRotate = false;
@@ -71,7 +76,7 @@ public class Door : MonoBehaviour, IInteractable
             else
                 HandleText(true);
 
-            gameObject.layer = interactableOutlinedLayer;
+            gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
         }
         
     }
@@ -88,6 +93,18 @@ public class Door : MonoBehaviour, IInteractable
             gameObject.layer = interactableLayer;
         }
         
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedRedLayer;
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        {
+            gameObject.layer = interactableOutlinedLayer;
+        }
     }
 
     private void HandleText(bool isFocused)

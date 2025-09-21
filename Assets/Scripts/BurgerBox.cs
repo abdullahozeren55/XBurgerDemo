@@ -109,6 +109,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
         tray.currentBox = this;
         tray.TurnOnBoxHologram();
 
+        col.enabled = false;
+
         PlayAudioWithRandomPitch(0);
 
         rb.isKinematic = false;
@@ -152,6 +154,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.05f);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -164,6 +168,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
         tray.TurnOffAllHolograms();
 
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.05f);
 
         transform.SetParent(null);
 
@@ -228,6 +234,11 @@ public class BurgerBox : MonoBehaviour, IGrabable
             child.layer = layer; 
 
         gameObject.layer = layer;
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnDisable()

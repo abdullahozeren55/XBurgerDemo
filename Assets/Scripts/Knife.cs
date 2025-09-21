@@ -66,6 +66,8 @@ public class Knife : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.05f);
+
         if (stabCoroutine != null)
         {
             StopCoroutine(stabCoroutine);
@@ -96,6 +98,7 @@ public class Knife : MonoBehaviour, IGrabable
             Unstick();
 
         triggerCol.enabled = false;
+        col.enabled = false;
 
         PlayAudioWithRandomPitch(0);
 
@@ -125,6 +128,8 @@ public class Knife : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.05f);
 
         if (stabCoroutine != null)
         {
@@ -215,6 +220,11 @@ public class Knife : MonoBehaviour, IGrabable
         audioLastPlayedTime = Time.time;
         audioSource.pitch = Random.Range(0.85f, 1.15f);
         audioSource.PlayOneShot(data.audioClips[index]);
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnCollisionEnter(Collision collision)

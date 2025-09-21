@@ -7,6 +7,9 @@ public class CoolerChild : MonoBehaviour, IInteractable
     private Cooler parentCooler;
 
     public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    [SerializeField] private bool outlineShouldBeRed;
+
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
     private void Awake()
@@ -27,5 +30,10 @@ public class CoolerChild : MonoBehaviour, IInteractable
     public void OnLoseFocus()
     {
         parentCooler.OnLoseFocus();
+    }
+
+    public void OutlineChangeCheck()
+    {
+        parentCooler.OutlineChangeCheck();
     }
 }
