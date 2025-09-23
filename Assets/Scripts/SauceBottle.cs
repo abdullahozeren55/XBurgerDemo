@@ -218,6 +218,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         GameManager.Instance.SetPlayerUseHandLerp(stabPositionOffset, stabRotationOffset, data.timeToStab);
         GameManager.Instance.SetPlayerIsUsingItemXY(false, true);
 
+        currentPourPrefab = Instantiate(pourParticlePrefab, pourInstantiatePoint);
+
         if (stabCoroutine != null)
         {
             StopCoroutine(stabCoroutine);
@@ -232,6 +234,12 @@ public class SauceBottle : MonoBehaviour, IGrabable
         GameManager.Instance.SetPlayerAnimBool("stabRight", false);
         GameManager.Instance.SetPlayerUseHandLerp(grabPositionOffset, grabRotationOffset, data.timeToStab / 2f);
         GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
+
+        if (currentPourPrefab != null)
+        {
+            currentPourPrefab.Stop();
+            currentPourPrefab = null;
+        }
 
         if (stabCoroutine != null)
         {
