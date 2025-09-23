@@ -214,7 +214,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     public void OnUseHold()
     {
-        GameManager.Instance.SetPlayerAnimBool("stabRight", true);
         GameManager.Instance.SetPlayerUseHandLerp(stabPositionOffset, stabRotationOffset, data.timeToStab);
         GameManager.Instance.SetPlayerIsUsingItemXY(false, true);
 
@@ -229,13 +228,14 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     public void OnUseRelease()
     {
-        GameManager.Instance.SetPlayerAnimBool("stabRight", false);
         GameManager.Instance.SetPlayerUseHandLerp(grabPositionOffset, grabRotationOffset, data.timeToStab / 2f);
         GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
         if (currentPourPrefab != null)
         {
-            Destroy(currentPourPrefab);
+            var main = currentPourPrefab.main;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            currentPourPrefab.Stop();
             currentPourPrefab = null;
         }
 

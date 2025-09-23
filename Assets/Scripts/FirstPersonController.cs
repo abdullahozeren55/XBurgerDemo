@@ -574,6 +574,10 @@ public class FirstPersonController : MonoBehaviour
                     }
                     else if (currentInteractable != hit.collider.gameObject.GetComponent<IInteractable>())
                     {
+
+                        currentInteractable.OnLoseFocus();
+                        currentInteractable = null;
+
                         currentInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
 
                         if (currentInteractable != null)

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36c543d467ec6245ac010065e9af8fc, type: 3}
   m_Name: MUSTARD
   m_EditorClassIdentifier: 
-  grabPositionOffset: {x: 0.0003, y: 0.00075, z: 0.0004}
-  grabRotationOffset: {x: 75, y: -130, z: -50}
-  stabPositionOffset: {x: 0, y: 0, z: 0}
-  stabRotationOffset: {x: 0, y: 0, z: 0}
+  grabPositionOffset: {x: -0.0002587364, y: 0.0008513732, z: 0.0005009067}
+  grabRotationOffset: {x: 74.99857, y: 230.00604, z: 310.00656}
+  stabPositionOffset: {x: -0.0002587364, y: 0.0008513732, z: 0.0005009067}
+  stabRotationOffset: {x: 74.99857, y: 230.00604, z: 310.00656}
   timeToStab: 0.2
   audioClips:
   - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
