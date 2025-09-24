@@ -38,11 +38,11 @@ public class SauceBottle : MonoBehaviour, IGrabable
     [SerializeField] private GameObject grabText;
     [SerializeField] private GameObject dropText;
     [Space]
-    [SerializeField] private Transform pourInstantiatePoint;
-    [SerializeField] private ParticleSystem pourParticlePrefab;
+    [SerializeField] private ParticleSystem pourParticle;
     [Space]
     [SerializeField] private SauceType sauceType;
-    private ParticleSystem currentPourPrefab;
+
+    private bool isPlayingParticles;
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -119,6 +119,15 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         Invoke("TurnOnCollider", 0.05f);
 
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
+        pourParticle.Stop();
+        isPlayingParticles = false;
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -133,6 +142,12 @@ public class SauceBottle : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         Invoke("TurnOnCollider", 0.05f);
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
 
         transform.SetParent(null);
 
@@ -197,6 +212,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         {
             if (isJustThrowed)
             {
+                pourParticle.Stop();
+                isPlayingParticles = false;
 
                 PlayAudioWithRandomPitch(2);
 
@@ -215,7 +232,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
     public void OnUseHold()
     {
         GameManager.Instance.SetPlayerUseHandLerp(stabPositionOffset, stabRotationOffset, data.timeToStab);
-        GameManager.Instance.SetPlayerIsUsingItemXY(false, true);
+        GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
         if (stabCoroutine != null)
         {
@@ -231,13 +248,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         GameManager.Instance.SetPlayerUseHandLerp(grabPositionOffset, grabRotationOffset, data.timeToStab / 2f);
         GameManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
-        if (currentPourPrefab != null)
-        {
-            var main = currentPourPrefab.main;
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-            currentPourPrefab.Stop();
-            currentPourPrefab = null;
-        }
+        pourParticle.Stop();
+        isPlayingParticles = false;
 
         if (stabCoroutine != null)
         {
@@ -266,9 +278,10 @@ public class SauceBottle : MonoBehaviour, IGrabable
             transform.localPosition = Vector3.Lerp(startPos, endPos, value);
             transform.localRotation = Quaternion.Lerp(startRot, endRot, value);
 
-            if (shouldStab && currentPourPrefab == null && value > 0.6f)
+            if (shouldStab && !isPlayingParticles && value > 0.6f)
             {
-                currentPourPrefab = Instantiate(pourParticlePrefab, pourInstantiatePoint);
+                pourParticle.Play();
+                isPlayingParticles = true;
             }
 
             elapsedTime += Time.deltaTime;

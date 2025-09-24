@@ -1,13 +1,18 @@
+﻿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class ChoiceManager : MonoBehaviour
 {
     private enum CurrentCoroutine
     {
+        NONE,
         PRESSA,
         NOTPRESSA,
         PRESSD,
@@ -24,7 +29,8 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private TMP_Text optionDText;
     [SerializeField] private GameObject visualPart;
     [SerializeField] private Image timer;
-    [SerializeField] private GameObject blackAndWhiteEffect;
+    [SerializeField] private Volume volume;
+    private ColorAdjustments colorAdjust;
     [SerializeField] private float bwFadeInMultiplier = 0.1f;
     [SerializeField] private float bwFadeOutMultiplier = 0.9f;
     [SerializeField] private float slowedDownTimeSpeed = 0.25f;
@@ -51,8 +57,6 @@ public class ChoiceManager : MonoBehaviour
     private Vector3 startScale;
     private bool isAPressed;
     private bool isDPressed;
-    private float aPressedTime;
-    private float dPressedTime;
 
     private float bwFadeInTime;
     private float bwFadeOutTime;
@@ -61,14 +65,14 @@ public class ChoiceManager : MonoBehaviour
 
     private ICustomer currentCustomer;
 
-    private Material bwEffectMat;
-
-    private Coroutine pressACoroutine;
-    private Coroutine pressDCoroutine;
+    private Tween pressATween;
+    private Tween notPressATween;
+    private Tween pressDTween;
+    private Tween notPressDTween;
 
     private void Awake()
     {
-        // E�er Instance zaten varsa, bu nesneyi yok et
+        // Eğer Instance zaten varsa, bu nesneyi yok et
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -77,24 +81,19 @@ public class ChoiceManager : MonoBehaviour
 
         Instance = this;
 
+        volume.profile.TryGet(out colorAdjust);
+
         isSlowMoEndsStarted = false;
 
         startScale = optionAText.transform.localScale;
         startColor = optionAText.color;
-
-        aPressedTime = 0f;
-        dPressedTime = 0f;
 
         currentCustomer = null;
 
         originalCameraFov = Camera.main.fieldOfView;
         changedCameraFov = originalCameraFov * cameraFovMultiplier;
 
-        bwEffectMat = blackAndWhiteEffect.GetComponent<Renderer>().material;
-
         visualPart.SetActive(false);
-        bwEffectMat.SetFloat("_Alpha", 0f);
-        blackAndWhiteEffect.SetActive(false);
 
     }
 
@@ -107,32 +106,96 @@ public class ChoiceManager : MonoBehaviour
 
             if (isAPressed && currentCoroutine != CurrentCoroutine.PRESSA)
             {
-                if (pressACoroutine != null)
-                    StopCoroutine(pressACoroutine);
+                currentCoroutine = CurrentCoroutine.PRESSA;
 
-                pressACoroutine = StartCoroutine(APress());
+                if (pressATween != null)
+                {
+                    pressATween.Kill();
+                    pressATween = null;
+                }
+
+                if (notPressATween != null)
+                {
+                    notPressATween.Kill();
+                    notPressATween = null;
+                }
+
+                pressATween = DOTween.Sequence()
+                   .Append(optionAText.transform.DOScale(pressDownScale, timeToPressDown))
+                   .Join(optionAText.DOColor(pressDownColor, timeToPressDown))
+                   .OnComplete(() =>
+                   {
+                       FinishChoice();
+                       currentCustomer.CurrentAction = ICustomer.Action.GotAnswerA;
+                       DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
+                   });
             }
-            else if (!isAPressed && currentCoroutine != CurrentCoroutine.NOTPRESSA)
+            else if (!isAPressed && !isDPressed && currentCoroutine == CurrentCoroutine.PRESSA)
             {
-                if (pressACoroutine != null)
-                    StopCoroutine(pressACoroutine);
+                currentCoroutine = CurrentCoroutine.NOTPRESSA;
 
-                pressACoroutine = StartCoroutine(ANotPress());
+                if (pressATween != null)
+                {
+                    pressATween.Kill();
+                    pressATween = null;
+                }
+
+                if (notPressATween != null)
+                {
+                    notPressATween.Kill();
+                    notPressATween = null;
+                }
+
+                notPressATween = DOTween.Sequence()
+                    .Append(optionAText.transform.DOScale(startScale, timeToPressDown))
+                    .Join(optionAText.DOColor(startColor, timeToPressDown));
             }
 
             if (isDPressed && !isAPressed && currentCoroutine != CurrentCoroutine.PRESSD)
             {
-                if (pressDCoroutine != null)
-                    StopCoroutine(pressDCoroutine);
+                currentCoroutine = CurrentCoroutine.PRESSD;
 
-                pressDCoroutine = StartCoroutine(DPress());
+                if (pressDTween != null)
+                {
+                    pressDTween.Kill();
+                    pressDTween = null;
+                }
+
+                if (notPressDTween != null)
+                {
+                    notPressDTween.Kill();
+                    notPressDTween = null;
+                }
+
+                pressDTween = DOTween.Sequence()
+                   .Append(optionDText.transform.DOScale(pressDownScale, timeToPressDown))
+                   .Join(optionDText.DOColor(pressDownColor, timeToPressDown))
+                   .OnComplete(() =>
+                   {
+                       FinishChoice();
+                       currentCustomer.CurrentAction = ICustomer.Action.GotAnswerD;
+                       DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionDDialogueData);
+                   });
             }
-            else if (!isDPressed && currentCoroutine != CurrentCoroutine.NOTPRESSD)
+            else if (!isDPressed && !isAPressed && currentCoroutine == CurrentCoroutine.PRESSD)
             {
-                if (pressDCoroutine != null)
-                    StopCoroutine(pressDCoroutine);
+                currentCoroutine = CurrentCoroutine.NOTPRESSD;
 
-                pressDCoroutine = StartCoroutine(DNotPress());
+                if (pressDTween != null)
+                {
+                    pressDTween.Kill();
+                    pressDTween = null;
+                }
+
+                if (notPressDTween != null)
+                {
+                    notPressDTween.Kill();
+                    notPressDTween = null;
+                }
+
+                notPressDTween = DOTween.Sequence()
+                    .Append(optionDText.transform.DOScale(startScale, timeToPressDown))
+                    .Join(optionDText.DOColor(startColor, timeToPressDown));
             }
 
         }
@@ -152,6 +215,8 @@ public class ChoiceManager : MonoBehaviour
         notAnsweringDialogueData = notAnsweringDialogue;
         currentCustomer = customer;
 
+        currentCoroutine = CurrentCoroutine.NONE;
+
         visualPart.SetActive(true);
 
         StartCoroutine(FadeInAndOut());
@@ -167,7 +232,7 @@ public class ChoiceManager : MonoBehaviour
 
     private IEnumerator FastOut()
     {
-        float startAlpha = bwEffectMat.GetFloat("_Alpha");
+        float startAlpha = colorAdjust.saturation.value;
         float currentFov = Camera.main.fieldOfView;
         float currentTimeScale = Time.timeScale;
 
@@ -176,21 +241,23 @@ public class ChoiceManager : MonoBehaviour
 
         float elapsedTime = 0f;
         float fastOutTime = 5f;
+        float value = 0f;
 
         while (elapsedTime < fastOutTime)
         {
-            bwEffectMat.SetFloat("_Alpha", Mathf.Lerp(bwEffectMat.GetFloat("_Alpha"), 0f, elapsedTime / fastOutTime));
-            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, originalCameraFov, elapsedTime / fastOutTime);
-            Time.timeScale = Mathf.Lerp(Time.timeScale, 1f, elapsedTime / fastOutTime);
-            if (slowMoBeginSource.isPlaying) slowMoBeginSource.volume = Mathf.Lerp(slowMoBeginSource.volume, 0f, elapsedTime / fastOutTime);
-            if (clockTickingSource.isPlaying) clockTickingSource.volume = Mathf.Lerp(clockTickingSource.volume, 0f, elapsedTime / fastOutTime);
+            value = elapsedTime / fastOutTime;
+
+            colorAdjust.saturation.value = Mathf.Lerp(startAlpha, 0f, value);
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, originalCameraFov, value);
+            Time.timeScale = Mathf.Lerp(Time.timeScale, 1f, value);
+            if (slowMoBeginSource.isPlaying) slowMoBeginSource.volume = Mathf.Lerp(slowMoBeginSource.volume, 0f, value);
+            if (clockTickingSource.isPlaying) clockTickingSource.volume = Mathf.Lerp(clockTickingSource.volume, 0f, value);
 
             elapsedTime += Time.unscaledDeltaTime;
             yield return null;
         }
 
-        bwEffectMat.SetFloat("_Alpha", 0f);
-        blackAndWhiteEffect.SetActive(false);
+        colorAdjust.saturation.value = 0f;
 
         Camera.main.fieldOfView = originalCameraFov;
 
@@ -205,129 +272,29 @@ public class ChoiceManager : MonoBehaviour
 
     }
 
-    private IEnumerator APress()
-    {
-
-        currentCoroutine = CurrentCoroutine.PRESSA;
-
-        Vector3 beginScale = optionAText.transform.localScale;
-
-        Color beginColor = optionAText.color;
-
-        while (aPressedTime < timeToPressDown)
-        {
-            optionAText.transform.localScale = Vector3.Lerp(beginScale, pressDownScale, aPressedTime / timeToPressDown);
-            optionAText.color = Color.Lerp(beginColor, pressDownColor, aPressedTime / timeToPressDown);
-            aPressedTime += Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        optionAText.transform.localScale = pressDownScale;
-        optionAText.color = pressDownColor;
-
-        FinishChoice();
-
-        currentCustomer.CurrentAction = ICustomer.Action.GotAnswerA;
-
-        DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
-    }
-
-    private IEnumerator ANotPress()
-    {
-
-        currentCoroutine = CurrentCoroutine.NOTPRESSA;
-
-        Vector3 beginScale = optionAText.transform.localScale;
-
-        Color beginColor = optionAText.color;
-
-        while (aPressedTime > 0f)
-        {
-            optionAText.transform.localScale = Vector3.Lerp(beginScale, startScale, 1 - (aPressedTime / timeToPressDown));
-            optionAText.color = Color.Lerp(beginColor, startColor, 1 - (aPressedTime / timeToPressDown));
-            aPressedTime -= Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        aPressedTime = 0f;
-        optionAText.transform.localScale = startScale;
-        optionAText.color = startColor;
-
-        pressACoroutine = null;
-    }
-
-    private IEnumerator DPress()
-    {
-
-        currentCoroutine = CurrentCoroutine.PRESSD;
-
-        Vector3 beginScale = optionDText.transform.localScale;
-
-        Color beginColor = optionDText.color;
-
-        while (dPressedTime < timeToPressDown)
-        {
-            optionDText.transform.localScale = Vector3.Lerp(beginScale, pressDownScale, dPressedTime / timeToPressDown);
-            optionDText.color = Color.Lerp(beginColor, pressDownColor, dPressedTime / timeToPressDown);
-            dPressedTime += Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        optionDText.transform.localScale = pressDownScale;
-        optionDText.color = pressDownColor;
-
-        FinishChoice();
-
-        currentCustomer.CurrentAction = ICustomer.Action.GotAnswerD;
-
-        DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionDDialogueData);
-    }
-
-    private IEnumerator DNotPress()
-    {
-
-        currentCoroutine = CurrentCoroutine.NOTPRESSD;
-
-        Vector3 beginScale = optionDText.transform.localScale;
-
-        Color beginColor = optionDText.color;
-
-        while (dPressedTime > 0f)
-        {
-            optionDText.transform.localScale = Vector3.Lerp(beginScale, startScale, 1 - (dPressedTime / timeToPressDown));
-            optionDText.color = Color.Lerp(beginColor, startColor, 1 - (dPressedTime / timeToPressDown));
-            dPressedTime -= Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        dPressedTime = 0f;
-        optionDText.transform.localScale = startScale;
-        optionDText.color = startColor;
-
-        pressDCoroutine = null;
-    }
-
     private IEnumerator FadeInAndOut()
     {
-        bwEffectMat.SetFloat("_Alpha", 0f);
-        blackAndWhiteEffect.SetActive(true);
 
         float startCameraFov = Camera.main.fieldOfView;
 
         slowMoBeginSource.PlayOneShot(slowMoBeginSound);
 
         float timeElapsed = 0f;
+        float value = 0f;
 
         while (timeElapsed < bwFadeInTime)
         {
-            bwEffectMat.SetFloat("_Alpha", Mathf.Lerp(0f, 1f, timeElapsed / bwFadeInTime));
-            Time.timeScale = Mathf.Lerp(1f, slowedDownTimeSpeed, timeElapsed / bwFadeInTime);
-            Camera.main.fieldOfView = Mathf.Lerp(startCameraFov, changedCameraFov, timeElapsed / bwFadeInTime);
+            value = timeElapsed / bwFadeInTime;
+
+            colorAdjust.saturation.value = Mathf.Lerp(0f, -100f, value);
+            Time.timeScale = Mathf.Lerp(1f, slowedDownTimeSpeed, value);
+            Camera.main.fieldOfView = Mathf.Lerp(startCameraFov, changedCameraFov, value);
+
             timeElapsed += Time.unscaledDeltaTime;
             yield return null;
         }
 
-        bwEffectMat.SetFloat("_Alpha", 1f);
+        colorAdjust.saturation.value = -100f;
         Time.timeScale = slowedDownTimeSpeed;
         Camera.main.fieldOfView = changedCameraFov;
 
@@ -336,13 +303,16 @@ public class ChoiceManager : MonoBehaviour
         startCameraFov = Camera.main.fieldOfView;
 
         timeElapsed = 0f;
+        value = 0f;
 
         while (timeElapsed < bwFadeOutTime)
         {
-            bwEffectMat.SetFloat("_Alpha", Mathf.Lerp(1f, 0f, timeElapsed / bwFadeOutTime));
-            Time.timeScale = Mathf.Lerp(slowedDownTimeSpeed, 1f, timeElapsed / bwFadeOutTime);
-            Camera.main.fieldOfView = Mathf.Lerp(startCameraFov, originalCameraFov, timeElapsed / bwFadeOutTime);
-            timer.fillAmount = Mathf.Lerp(1f, 0f, timeElapsed / bwFadeOutTime);
+            value = timeElapsed / bwFadeOutTime;
+
+            colorAdjust.saturation.value = Mathf.Lerp(-100f, 0f, value);
+            Time.timeScale = Mathf.Lerp(slowedDownTimeSpeed, 1f, value);
+            Camera.main.fieldOfView = Mathf.Lerp(startCameraFov, originalCameraFov, value);
+            timer.fillAmount = Mathf.Lerp(1f, 0f, value);
 
             if (bwFadeOutTime - timeElapsed < 1f && !isSlowMoEndsStarted)
             {
@@ -354,7 +324,7 @@ public class ChoiceManager : MonoBehaviour
             yield return null;
         }
 
-        bwEffectMat.SetFloat("_Alpha", 0f);
+        colorAdjust.saturation.value = 0f;
         Time.timeScale = 1f;
         Camera.main.fieldOfView = originalCameraFov;
         timer.fillAmount = 0f;
