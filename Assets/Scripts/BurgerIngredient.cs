@@ -47,6 +47,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     private bool isStuck;
     public bool canStick;
 
+    private Cookable cookable;
     public Cookable.CookAmount cookAmount;
 
     private float audioLastPlayedTime;
@@ -58,6 +59,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+        cookable = GetComponent<Cookable>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -116,6 +118,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         tray.currentIngredient = this;
         tray.TurnOnHologram(data.ingredientType);
+
+        col.enabled = false;
+
+        if (cookable != null)
+            cookable.StopCooking();
 
         if (isStuck)
             Unstick();
@@ -179,6 +186,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.05f);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -191,6 +200,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         tray.TurnOffAllHolograms();
 
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.05f);
 
         transform.SetParent(null);
 
@@ -225,6 +236,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             if (grabText.activeSelf) grabText.SetActive(false);
             if (dropText.activeSelf) dropText.SetActive(false);
         }
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void StickToSurface(Collision collision)

@@ -300,10 +300,7 @@ public class FirstPersonController : MonoBehaviour
     }
 
     private void LateUpdate()
-    {
-        if (canUseHeadbob)
-            HandleHeadbob();
-
+    {   
         if (CanMove)
         {
             HandleMouseAndHandControl();
@@ -340,6 +337,9 @@ public class FirstPersonController : MonoBehaviour
 
         // Horizontal look (Yaw)
         transform.Rotate(Vector3.up * mouseX * horizSpeed);
+
+        if (canUseHeadbob)
+            HandleHeadbob();
 
         // --- El Hareketi ---
         if (IsUsingItemX || IsUsingItemY)

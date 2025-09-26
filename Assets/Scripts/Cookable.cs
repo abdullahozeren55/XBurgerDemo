@@ -104,6 +104,20 @@ public class Cookable : MonoBehaviour
         StartCoroutine(FadeOut(audioSource, cookableData.audioFadeOutDuration));
     }
 
+    public void StopCooking()
+    {
+        if (isCooking)
+        {
+            isCooking = false;
+
+            if (currentCookingParticles != null)
+                DestroyCookingParticles();
+
+            if (audioSource.isPlaying)
+                audioSource.Pause();
+        }
+    }
+
     private IEnumerator FadeOut(AudioSource audioSource, float duration)
     {
         float startVolume = audioSource.volume;
@@ -141,13 +155,7 @@ public class Cookable : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Grill") && isActiveAndEnabled)
         {
-            isCooking = false;
-
-            if (currentCookingParticles != null)
-                DestroyCookingParticles();
-
-            if (audioSource.isPlaying)
-                audioSource.Pause();
+            StopCooking();
         }
     }
 }
