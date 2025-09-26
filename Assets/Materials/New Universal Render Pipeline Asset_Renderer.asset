@@ -27,7 +27,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 270336
     _renderingLayerMask: 1
-  _renderPassEvent: 600
+  _renderPassEvent: 550
   _shaderPassNames: []
 --- !u!114 &-7567198193887053959
 MonoBehaviour:
@@ -46,7 +46,7 @@ MonoBehaviour:
   _outlineLayers: {fileID: 0}
   _outlineSettings:
     _outlineSettings: {fileID: 0}
-    _outlineColor: {r: 1024, g: 1024, b: 1024, a: 1}
+    _outlineColor: {r: 1, g: 1, b: 1, a: 1}
     _outlineWidth: 6
     _outlineIntensity: 2
     _outlineAlphaCutoff: 0.9
@@ -56,7 +56,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 512
     _renderingLayerMask: 1
-  _renderPassEvent: 600
+  _renderPassEvent: 550
   _shaderPassNames: []
 --- !u!114 &11400000
 MonoBehaviour:
@@ -147,7 +147,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 65536
     _renderingLayerMask: 1
-  _renderPassEvent: 600
+  _renderPassEvent: 550
   _shaderPassNames: []
 --- !u!114 &5139355353767270345
 MonoBehaviour:
