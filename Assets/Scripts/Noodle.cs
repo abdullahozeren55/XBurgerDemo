@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Noodle : MonoBehaviour, IGrabable
 {
@@ -20,8 +21,9 @@ public class Noodle : MonoBehaviour, IGrabable
 
     [SerializeField] private GameObject[] childObjects;
     [SerializeField] private GameObject hologramPart;
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -83,7 +85,6 @@ public class Noodle : MonoBehaviour, IGrabable
         ChangeChildLayers(ungrabableLayer);
 
         IsGrabbed = false;
-        HandleText(false);
 
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
@@ -116,8 +117,6 @@ public class Noodle : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -127,7 +126,6 @@ public class Noodle : MonoBehaviour, IGrabable
     {
         if (!IsGettingPutOnHologram)
         {
-            HandleText(true);
             gameObject.layer = grabableOutlinedLayer;
 
             ChangeChildLayers(grabableOutlinedLayer);
@@ -138,8 +136,6 @@ public class Noodle : MonoBehaviour, IGrabable
     {
         if (!IsGettingPutOnHologram)
         {
-
-            HandleText(false);
             gameObject.layer = grabableLayer;
 
             ChangeChildLayers(ungrabableLayer);
@@ -200,20 +196,6 @@ public class Noodle : MonoBehaviour, IGrabable
         {
             gameObject.layer = grabableOutlinedLayer;
             ChangeChildLayers(grabableOutlinedLayer);
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 

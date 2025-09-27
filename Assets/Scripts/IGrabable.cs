@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface IGrabable
 {
@@ -18,4 +19,5 @@ public interface IGrabable
 
     public bool IsGrabbed {  get; set; }
     public bool OutlineShouldBeRed { get; set; }
+    public Image FocusImage { get; set; }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -94,9 +95,9 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
     private bool shouldPlayFootstep;
     private Material currentGroundMaterial;
     private AudioClip lastPlayedFootstep;
-
-    [Header("Text Settings")]
-    [SerializeField] private GameObject talkWithCustomerText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Hikmet Settings")]
     [SerializeField] private float normalWalkSpeed = 1.2f;
@@ -365,7 +366,6 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
 
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
 
         if (burgerBox.burgerType == BurgerType)
             HandleBurgerTrue();
@@ -378,7 +378,6 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.Customer0);
 
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
 
         if (drink.data.drinkType == DrinkType)
             HandleDrinkTrue(drink.data.drinkType);
@@ -403,18 +402,15 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
         }
 
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
     }
 
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(interactableLayer);
     }
 
@@ -428,14 +424,6 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
         {
             ChangeLayer(interactableOutlinedLayer);
         }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-            talkWithCustomerText.SetActive(true);
-        else
-            talkWithCustomerText.SetActive(false);
     }
 
     private void ChangeLayer(int layer)

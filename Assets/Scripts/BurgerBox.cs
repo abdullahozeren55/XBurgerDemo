@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BurgerBox : MonoBehaviour, IGrabable
 {
@@ -26,8 +27,9 @@ public class BurgerBox : MonoBehaviour, IGrabable
     [HideInInspector] public bool canAddToTray;
 
     [SerializeField] private Tray tray;
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     public List<BurgerIngredientData.IngredientType> allBurgerIngredientTypes = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> allSauces = new List<SauceBottle.SauceType>();
@@ -126,8 +128,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
 
@@ -144,12 +144,10 @@ public class BurgerBox : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(grabableLayer);
     }
 
@@ -197,20 +195,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
-        }
-    }
-
     private void PlayAudioWithRandomPitch(int index)
     {
         audioLastPlayedTime = Time.time;
@@ -225,10 +209,11 @@ public class BurgerBox : MonoBehaviour, IGrabable
         GameManager.Instance.CheckBurgerType(allBurgerIngredientTypes, allSauces, this);
 
         gameObject.tag = "BurgerBoxClosed";
-        if (grabText.activeSelf)
+        
+        /*if (grabText.activeSelf)
             ChangeLayer(grabableOutlinedLayer);
         else
-            ChangeLayer(grabableLayer);
+            ChangeLayer(grabableLayer);*/
     }
 
     private void TrySquashingBurger() //Gets called in animator
@@ -238,10 +223,10 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public void ChangeText(GameObject newText, GameManager.BurgerTypes type)
     {
-        bool isActive = grabText.activeSelf;
+        /*bool isActive = grabText.activeSelf;
         grabText.SetActive(false);
         grabText = newText;
-        grabText.SetActive(isActive);
+        grabText.SetActive(isActive);*/
         burgerType = type;
     }
 

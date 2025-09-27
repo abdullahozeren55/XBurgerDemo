@@ -22,15 +22,14 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private bool isGettingPutOnTray;
 
-    private bool isGettingPutOnTrash;
-
     public BurgerIngredientData data;
 
     [SerializeField] private AudioSource audioSource;
 
     [SerializeField] private Tray tray;
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [HideInInspector] public bool canAddToTray;
 
@@ -154,8 +153,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -163,21 +160,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        if (!isGettingPutOnTrash)
-        {
-            HandleText(true);
-            gameObject.layer = grabableOutlinedLayer;
-        }
-        
+        gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        if (!isGettingPutOnTrash)
-        {
-            HandleText(false);
-            gameObject.layer = grabableLayer;
-        }
-        
+        gameObject.layer = grabableLayer;
     }
 
     public void OnDrop(Vector3 direction, float force)
@@ -221,20 +208,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 
@@ -338,7 +311,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public void ChangeGrabText(GameObject newText)
     {
-        bool wasGrabTextActive = false;
+        /*bool wasGrabTextActive = false;
         if (grabText.activeSelf)
         {
             wasGrabTextActive = true;
@@ -348,7 +321,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         grabText = newText;
 
         if (wasGrabTextActive)
-            grabText.SetActive(true);
+            grabText.SetActive(true);*/
     }
 
     private void OnDestroy()

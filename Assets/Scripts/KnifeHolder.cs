@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class KnifeHolder : MonoBehaviour, IInteractable
 {
@@ -10,8 +11,9 @@ public class KnifeHolder : MonoBehaviour, IInteractable
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     [SerializeField] private bool outlineShouldBeRed;
 
-    [Header("Text Settings")]
-    public GameObject grabKnifeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Layer Settings")]
     private int interactableLayer;
@@ -33,13 +35,11 @@ public class KnifeHolder : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        grabKnifeText.SetActive(true);
         gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
     }
 
     public void OnLoseFocus()
     {
-        grabKnifeText.SetActive(false);
         gameObject.layer = interactableLayer;
     }
 

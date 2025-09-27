@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BroomHolder : MonoBehaviour, IInteractable
 {
 
-    [Header("Text Settings")]
-    public GameObject grabBroomText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Layer Settings")]
     private int interactableLayer;
@@ -31,13 +33,11 @@ public class BroomHolder : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        grabBroomText.SetActive(true);
         gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
     }
 
     public void OnLoseFocus()
     {
-        grabBroomText.SetActive(false);
         gameObject.layer = interactableLayer;
     }
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WholeIngredient : MonoBehaviour, IGrabable
 {
@@ -18,8 +19,9 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     public WholeIngredientData data;
 
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Instantiate Settings")]
     [SerializeField] private GameObject[] instantiateObjects;
@@ -69,8 +71,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -78,12 +78,10 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -172,22 +170,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     private void OnDestroy()
     {
-        HandleText(false);
         GameManager.Instance.ResetPlayerGrab(this);
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
-        }
     }
 
     private void PlayAudioWithRandomPitch(int index)

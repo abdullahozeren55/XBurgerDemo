@@ -30,22 +30,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb2952b95454955ba507c3d96778a76, type: 3}
   m_Name: VhsVol
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   _weight:
     m_OverrideState: 1
     m_Value: 1
   _bleed:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 1
   _rocking:
     m_OverrideState: 0
     m_Value: 0
   _tape:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.5
   _noise:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.5
   _flickering:
     m_OverrideState: 0
     m_Value: 0.5
@@ -92,16 +92,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
   m_Name: FilmGrain
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   type:
     m_OverrideState: 1
     m_Value: 8
   intensity:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.5
   response:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.5
   texture:
     m_OverrideState: 0
     m_Value: {fileID: 0}

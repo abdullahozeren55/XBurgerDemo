@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class JumpscareDoor : MonoBehaviour, IInteractable
 {
@@ -11,9 +12,9 @@ public class JumpscareDoor : MonoBehaviour, IInteractable
     [SerializeField] private AudioSource doorAudioSource;
     [SerializeField] private AudioSource jumpscareAudioSource;
 
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Open Close Settings")]
     [SerializeField] private float timeToRotate = 0.3f;
@@ -76,7 +77,6 @@ public class JumpscareDoor : MonoBehaviour, IInteractable
     {
         if (!isHandlingJumpscareDoor)
         {
-            HandleText(true);
             gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
         }
         
@@ -86,7 +86,6 @@ public class JumpscareDoor : MonoBehaviour, IInteractable
     {
         if (!isHandlingJumpscareDoor)
         {
-            HandleText(false);
             gameObject.layer = interactableLayer;
         }
             
@@ -104,38 +103,9 @@ public class JumpscareDoor : MonoBehaviour, IInteractable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
-        }
-    }
-
     public void HandleRotation()
     {
         isOpened = !isOpened;
-
-        if (isOpened)
-        {
-            if (openText.activeSelf)
-            {
-                HandleText(true);
-            }
-        }
-        else
-        {
-            if (closeText.activeSelf)
-            {
-                HandleText(true);
-            }
-        }
 
         if (rotateCoroutine != null)
         {
@@ -152,22 +122,6 @@ public class JumpscareDoor : MonoBehaviour, IInteractable
         isHandlingJumpscareDoor = true;
         isOpened = !isOpened;
         gameObject.layer = uninteractableLayer;
-        HandleText(false);
-
-        if (isOpened)
-        {
-            if (openText.activeSelf)
-            {
-                HandleText(true);
-            }
-        }
-        else
-        {
-            if (closeText.activeSelf)
-            {
-                HandleText(true);
-            }
-        }
 
         if (rotateCoroutine != null)
         {

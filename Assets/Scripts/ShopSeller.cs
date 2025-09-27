@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopSeller : MonoBehaviour, IInteractable
 {
@@ -8,15 +9,15 @@ public class ShopSeller : MonoBehaviour, IInteractable
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
-    private int grabableLayer;
 
     [SerializeField] private DialogueData firstDialogueData;
     [SerializeField] private DialogueData secondDialogueData;
     [SerializeField] private DialogueData noodleBuyDialogueData;
     [SerializeField] private DialogueData noodleBuyDialoguePartTwoData;
     [SerializeField] private float waitingTime = 1f;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
     [Space]
-    [SerializeField] private GameObject talkWithSellerText;
     [SerializeField] private GameObject storeBlocker;
     [Space]
     [SerializeField] private AudioClip sellerJumpscareSound;
@@ -55,12 +56,10 @@ public class ShopSeller : MonoBehaviour, IInteractable
     public void OnFocus()
     {
         gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
-        talkWithSellerText.SetActive(true);
     }
 
     public void OnInteract()
     {
-        talkWithSellerText.SetActive(false);
 
         if (isNoodlePlaced)
         {
@@ -78,7 +77,6 @@ public class ShopSeller : MonoBehaviour, IInteractable
     public void OnLoseFocus()
     {
         gameObject.layer = interactableLayer;
-        talkWithSellerText.SetActive(false);
     }
 
     public void OutlineChangeCheck()

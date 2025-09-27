@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NoodleInteractable : MonoBehaviour, IInteractable
 {
@@ -9,9 +10,9 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     private bool isOpened;
 
@@ -56,7 +57,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
@@ -96,7 +96,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(interactableLayer);
     }
 
@@ -109,20 +108,6 @@ public class NoodleInteractable : MonoBehaviour, IInteractable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             ChangeLayer(interactableOutlinedLayer);
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
         }
     }
 

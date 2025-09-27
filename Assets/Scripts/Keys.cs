@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Keys : MonoBehaviour, IInteractable
 {
@@ -8,8 +9,9 @@ public class Keys : MonoBehaviour, IInteractable
     public AudioClip pickUpSound;
     private AudioSource audioSource;
 
-    [Header("Text Settings")]
-    public GameObject pickUpText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Lock Settings")]
     [SerializeField] private Door[] lockedDoors;
@@ -61,13 +63,11 @@ public class Keys : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        pickUpText.SetActive(true);
         gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
     }
 
     public void OnLoseFocus()
     {
-        pickUpText.SetActive(false);
         gameObject.layer = interactableLayer;
     }
 
@@ -85,7 +85,6 @@ public class Keys : MonoBehaviour, IInteractable
 
     private void OnDestroy()
     {
-        pickUpText.SetActive(false);
         GameManager.Instance.ResetPlayerGrabAndInteract();
     }
 }

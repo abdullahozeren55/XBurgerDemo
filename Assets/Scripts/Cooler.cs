@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Cooler : MonoBehaviour, IInteractable
 {
@@ -9,9 +10,9 @@ public class Cooler : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Open Close Settings")]
     [SerializeField] private float timeToOpen = 0.3f;
@@ -32,6 +33,8 @@ public class Cooler : MonoBehaviour, IInteractable
     [SerializeField] private GameManager.HandRigTypes handRigType;
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    
+
     [SerializeField] private bool outlineShouldBeRed;
 
     void Awake()
@@ -62,7 +65,6 @@ public class Cooler : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
@@ -73,7 +75,6 @@ public class Cooler : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(interactableLayer);
     }
 
@@ -89,24 +90,9 @@ public class Cooler : MonoBehaviour, IInteractable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
-        }
-    }
-
     public void HandleRotation()
     {
         isOpened = !isOpened;
-        HandleText(true);
 
         if (rotateCoroutine != null)
         {

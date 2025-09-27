@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WindowChild : MonoBehaviour, IInteractable
 {
@@ -9,6 +10,7 @@ public class WindowChild : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => parentWindow.HandRigType; set => parentWindow.HandRigType = value; }
 
     public bool OutlineShouldBeRed { get => parentWindow.OutlineShouldBeRed; set => parentWindow.OutlineShouldBeRed = value; }
+    public Image FocusImage { get => parentWindow.FocusImage; set => parentWindow.FocusImage = value; }
 
     private void Awake()
     {

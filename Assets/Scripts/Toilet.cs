@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Toilet : MonoBehaviour, IInteractable
 {
@@ -9,9 +10,9 @@ public class Toilet : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Open Close Settings")]
     [SerializeField] private float timeToRotate = 0.3f;
@@ -51,7 +52,6 @@ public class Toilet : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
@@ -62,7 +62,6 @@ public class Toilet : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(interactableLayer);
     }
 
@@ -77,24 +76,10 @@ public class Toilet : MonoBehaviour, IInteractable
             ChangeLayer(interactableOutlinedLayer);
         }
     }
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
-        }
-    }
 
     public void HandleRotation()
     {
         isOpened = !isOpened;
-        HandleText(true);
 
         if (rotateCoroutine != null)
         {

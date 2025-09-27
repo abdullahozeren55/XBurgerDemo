@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Drink : MonoBehaviour, IGrabable
 {
@@ -16,8 +17,9 @@ public class Drink : MonoBehaviour, IGrabable
 
     public DrinkData data;
 
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -60,8 +62,6 @@ public class Drink : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -69,12 +69,10 @@ public class Drink : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -111,20 +109,6 @@ public class Drink : MonoBehaviour, IGrabable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 

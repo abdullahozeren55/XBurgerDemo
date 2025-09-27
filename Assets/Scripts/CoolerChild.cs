@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CoolerChild : MonoBehaviour, IInteractable
 {
@@ -8,6 +9,7 @@ public class CoolerChild : MonoBehaviour, IInteractable
 
     public GameManager.HandRigTypes HandRigType { get => parentCooler.HandRigType; set => parentCooler.HandRigType = value; }
     public bool OutlineShouldBeRed { get => parentCooler.OutlineShouldBeRed; set => parentCooler.OutlineShouldBeRed = value; }
+    public Image FocusImage { get => parentCooler.FocusImage; set => parentCooler.FocusImage = value; }
 
     private void Awake()
     {

@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NoodleShelf : MonoBehaviour, IInteractable
 {
     private GameObject[] childs;
 
-    [Header("Text Settings")]
-    public GameObject grabNoodleText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Layer Settings")]
     private int interactableLayer;
@@ -47,7 +49,6 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     }
     public void OnFocus()
     {
-        grabNoodleText.SetActive(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
@@ -68,7 +69,6 @@ public class NoodleShelf : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
-        grabNoodleText.SetActive(false);
         ChangeLayer(interactableLayer);
     }
 

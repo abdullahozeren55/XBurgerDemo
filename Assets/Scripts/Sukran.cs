@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -96,8 +97,9 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     private Material currentGroundMaterial;
     private AudioClip lastPlayedFootstep;
 
-    [Header("Text Settings")]
-    [SerializeField] private GameObject talkWithCustomerText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Þükran Settings")]
     [SerializeField] private float ascendTime = 0.5f;
@@ -410,7 +412,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     public void ReceiveBurger(BurgerBox burgerBox)
     {
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
 
         if (IsOnlyPicklesInside(burgerBox.allBurgerIngredientTypes))
             HandleBurgerTrue();
@@ -421,7 +422,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     public void ReceiveDrink(Drink drink)
     {
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
         
         HandleDrinkFalse(drink.data.drinkType);
     }
@@ -429,7 +429,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     public void OnInteract()
     {
         ChangeLayer(uninteractableLayer);
-        HandleText(false);
 
         if (CurrentAction == ICustomer.Action.ReadyToOrder)
         {
@@ -444,13 +443,11 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(interactableLayer);
     }
 
@@ -464,14 +461,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
         {
             ChangeLayer(interactableOutlinedLayer);
         }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-            talkWithCustomerText.SetActive(true);
-        else
-            talkWithCustomerText.SetActive(false);
     }
 
     private void ChangeLayer(int layer)

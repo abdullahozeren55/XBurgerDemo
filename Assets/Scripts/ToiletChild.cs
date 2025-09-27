@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ToiletChild : MonoBehaviour, IInteractable
 {
@@ -9,6 +10,7 @@ public class ToiletChild : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => parentToilet.HandRigType; set => parentToilet.HandRigType = value; }
 
     public bool OutlineShouldBeRed { get => parentToilet.OutlineShouldBeRed; set => parentToilet.OutlineShouldBeRed = value; }
+    public Image FocusImage { get => parentToilet.FocusImage; set => parentToilet.FocusImage = value; }
 
     private void Awake()
     {

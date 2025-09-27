@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Door : MonoBehaviour, IInteractable
 {
@@ -8,10 +9,9 @@ public class Door : MonoBehaviour, IInteractable
     public AudioClip openSound;
     public AudioClip closeSound;
     private AudioSource audioSource;
-
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Open Close Settings")]
     [SerializeField] private float timeToRotate = 0.3f;
@@ -30,7 +30,6 @@ public class Door : MonoBehaviour, IInteractable
     [Header("Lock Settings")]
     public bool IsLocked;
     public AudioClip lockedSound;
-    public GameObject lockedText;
     [SerializeField] private float timeToLockRotate = 0.1f;
     [SerializeField] private float lockOpenYRotation = 10.0f;
     private Quaternion lockedOpenRotation;
@@ -71,11 +70,6 @@ public class Door : MonoBehaviour, IInteractable
     {
         if (!inLockRotate)
         {
-            if (IsLocked)
-                lockedText.SetActive(true);
-            else
-                HandleText(true);
-
             gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
         }
         
@@ -85,11 +79,6 @@ public class Door : MonoBehaviour, IInteractable
     {
         if (!inLockRotate)
         {
-            if (IsLocked)
-                lockedText.SetActive(false);
-            else
-                HandleText(false);
-
             gameObject.layer = interactableLayer;
         }
         
@@ -107,38 +96,9 @@ public class Door : MonoBehaviour, IInteractable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
-        }
-    }
-
     public void HandleRotation()
     {
         isOpened = !isOpened;
-
-        if (isOpened)
-        {
-            if (openText.activeSelf)
-            {
-                HandleText(true);
-            }       
-        }
-        else
-        {
-            if (closeText.activeSelf)
-            {
-                HandleText(true);
-            }
-        }
 
         if (rotateCoroutine != null)
         {
@@ -155,9 +115,6 @@ public class Door : MonoBehaviour, IInteractable
         inLockRotate = true;
 
         gameObject.layer = uninteractableLayer;
-
-        HandleText(false);
-        lockedText.SetActive(false);
 
         audioSource.Stop();
 

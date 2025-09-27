@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Knife : MonoBehaviour, IGrabable
 {
@@ -22,9 +23,8 @@ public class Knife : MonoBehaviour, IGrabable
     [Space]
 
     public KnifeData data;
-    [Space]
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
     [Space]
     [SerializeField] private float throwMultiplier;
     [Space]
@@ -90,7 +90,6 @@ public class Knife : MonoBehaviour, IGrabable
 
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
 
@@ -114,8 +113,6 @@ public class Knife : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -125,7 +122,6 @@ public class Knife : MonoBehaviour, IGrabable
 
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -177,20 +173,6 @@ public class Knife : MonoBehaviour, IGrabable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 

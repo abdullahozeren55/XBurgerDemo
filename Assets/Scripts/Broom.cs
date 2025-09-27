@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Broom : MonoBehaviour, IGrabable
 {
@@ -14,8 +15,8 @@ public class Broom : MonoBehaviour, IGrabable
     public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
     [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
 
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
     [Space]
     [SerializeField] private AudioClip[] audioClips;
 
@@ -69,8 +70,6 @@ public class Broom : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = grabPositionOffset;
@@ -78,12 +77,10 @@ public class Broom : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -120,20 +117,6 @@ public class Broom : MonoBehaviour, IGrabable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 

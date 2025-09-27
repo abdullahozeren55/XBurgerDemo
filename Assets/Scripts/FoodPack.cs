@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FoodPack : MonoBehaviour, IGrabable
 {
@@ -16,8 +17,9 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public FoodPackData data;
 
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [SerializeField] private Rigidbody[] allRB;
     [SerializeField] private Collider[] allCollider;
@@ -70,8 +72,6 @@ public class FoodPack : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -79,12 +79,10 @@ public class FoodPack : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         ChangeLayer(grabableLayer);
     }
 
@@ -176,22 +174,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     private void OnDestroy()
     {
-        HandleText(false);
         GameManager.Instance.ResetPlayerGrab(this);
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
-        }
     }
 
     private void PlayAudioWithRandomPitch(int index)

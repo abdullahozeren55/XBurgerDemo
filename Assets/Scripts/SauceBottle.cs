@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SauceBottle : MonoBehaviour, IGrabable
 {
@@ -34,9 +35,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         Water
     }
 
-    [Header("Regular Settings")]
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
     [Space]
     [SerializeField] private ParticleSystem pourParticle;
     [Space]
@@ -93,8 +93,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -102,12 +100,10 @@ public class SauceBottle : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -167,20 +163,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-        }
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
         }
     }
 

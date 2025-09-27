@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Window : MonoBehaviour, IInteractable
 {
@@ -9,9 +10,9 @@ public class Window : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    [Header("Text Settings")]
-    public GameObject openText;
-    public GameObject closeText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     [Header("Open Close Settings")]
     [SerializeField] private float timeToOpen = 0.3f;
@@ -30,7 +31,6 @@ public class Window : MonoBehaviour, IInteractable
     [Header("Lock Settings")]
     public bool IsLocked;
     public AudioClip lockedSound;
-    public GameObject lockedText;
     [SerializeField] private float timeToLockOpen = 0.12f;
     [SerializeField] private float lockOpenZPosition = 0.1f;
     private Vector3 lockedOpenPosition;
@@ -79,11 +79,6 @@ public class Window : MonoBehaviour, IInteractable
     {
         if (!inLockOpen)
         {
-            if (IsLocked)
-                lockedText.SetActive(true);
-            else
-                HandleText(true);
-
             ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
         }
         
@@ -101,11 +96,6 @@ public class Window : MonoBehaviour, IInteractable
     {
         if (!inLockOpen)
         {
-            if (IsLocked)
-                lockedText.SetActive(false);
-            else
-                HandleText(false);
-
             ChangeLayer(interactableLayer);
         }
         
@@ -123,24 +113,9 @@ public class Window : MonoBehaviour, IInteractable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            openText.SetActive(!isOpened);
-            closeText.SetActive(isOpened);
-        }
-        else
-        {
-            if (openText.activeSelf) openText.SetActive(false);
-            if (closeText.activeSelf) closeText.SetActive(false);
-        }
-    }
-
     public void HandlePosition()
     {
         isOpened = !isOpened;
-        HandleText(true);
 
         if (openCoroutine != null)
         {
@@ -158,9 +133,6 @@ public class Window : MonoBehaviour, IInteractable
         inLockOpen = true;
 
         ChangeLayer(uninteractableLayer);
-
-        HandleText(false);
-        lockedText.SetActive(false);
 
         audioSource.Stop();
 

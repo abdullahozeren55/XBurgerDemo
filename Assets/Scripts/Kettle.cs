@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Kettle : MonoBehaviour, IGrabable
 {
@@ -20,8 +21,9 @@ public class Kettle : MonoBehaviour, IGrabable
 
     [Header("Regular Settings")]
     [SerializeField] private GameObject hologramPart;
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
     [Space]
     [SerializeField] private Transform pourInstantiatePoint;
     [SerializeField] private ParticleSystem pourParticlePrefab;
@@ -74,7 +76,6 @@ public class Kettle : MonoBehaviour, IGrabable
         gameObject.layer = ungrabableLayer;
 
         IsGrabbed = false;
-        HandleText(false);
 
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
@@ -95,8 +96,6 @@ public class Kettle : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = grabPositionOffset;
@@ -104,12 +103,10 @@ public class Kettle : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        HandleText(true);
         gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        HandleText(false);
         gameObject.layer = grabableLayer;
     }
 
@@ -152,20 +149,6 @@ public class Kettle : MonoBehaviour, IGrabable
     public void SetGrabable()
     {
         gameObject.layer = grabableLayer;
-    }
-
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
-        }
     }
 
     private void PlayAudioWithRandomPitch(int index)

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public interface IInteractable
 {
@@ -11,5 +12,7 @@ public interface IInteractable
     public GameManager.HandRigTypes HandRigType {  get; set; }
 
     public bool OutlineShouldBeRed {  get; set; }
+
+    public Image FocusImage { get; set; }
 
 }

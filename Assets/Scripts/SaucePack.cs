@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SaucePack : MonoBehaviour, IGrabable
 {
@@ -19,8 +20,9 @@ public class SaucePack : MonoBehaviour, IGrabable
     public NoodleData data;
 
     [SerializeField] private GameObject hologramPart;
-    [SerializeField] private GameObject grabText;
-    [SerializeField] private GameObject dropText;
+    public Image FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Image focusImage;
+    [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
@@ -79,7 +81,6 @@ public class SaucePack : MonoBehaviour, IGrabable
         gameObject.layer = ungrabableLayer;
 
         IsGrabbed = false;
-        HandleText(false);
 
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
@@ -111,8 +112,6 @@ public class SaucePack : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
-        HandleText(true);
-
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabPositionOffset;
@@ -122,7 +121,6 @@ public class SaucePack : MonoBehaviour, IGrabable
     {
         if (!IsGettingPutOnHologram)
         {
-            HandleText(true);
             gameObject.layer = grabableOutlinedLayer;
         }
 
@@ -131,7 +129,6 @@ public class SaucePack : MonoBehaviour, IGrabable
     {
         if (!IsGettingPutOnHologram)
         {
-            HandleText(false);
             gameObject.layer = grabableLayer;
         }
 
@@ -191,20 +188,6 @@ public class SaucePack : MonoBehaviour, IGrabable
         }
     }
 
-    private void HandleText(bool isFocused)
-    {
-        if (isFocused)
-        {
-            grabText.SetActive(!IsGrabbed);
-            dropText.SetActive(IsGrabbed);
-        }
-        else
-        {
-            if (grabText.activeSelf) grabText.SetActive(false);
-            if (dropText.activeSelf) dropText.SetActive(false);
-        }
-    }
-
     private void PlayAudioWithRandomPitch(int index)
     {
         audioLastPlayedTime = Time.time;
@@ -241,7 +224,6 @@ public class SaucePack : MonoBehaviour, IGrabable
 
     private void OnDestroy()
     {
-        HandleText(false);
         GameManager.Instance.ResetPlayerGrab(this);
     }
 
