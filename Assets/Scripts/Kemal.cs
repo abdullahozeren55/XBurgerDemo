@@ -96,8 +96,8 @@ public class Kemal : MonoBehaviour, ICustomer, IInteractable
     private Material currentGroundMaterial;
     private AudioClip lastPlayedFootstep;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Push Player Settings")]

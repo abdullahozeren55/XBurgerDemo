@@ -86,17 +86,14 @@ public class Cookable : MonoBehaviour
         else if (index == 1)
         {
             cookAmount = CookAmount.REGULAR;
-            if (burgerIngredient.canStick) burgerIngredient.canStick = false;
         }
         else if (index == 2)
         {
             cookAmount = CookAmount.BURNT;
-            if (burgerIngredient.canStick) burgerIngredient.canStick = false;  
         }
 
-        burgerIngredient.cookAmount = cookAmount;
         meshRenderer.material = cookableData.materials[index];
-        burgerIngredient.ChangeGrabText(cookTexts[index]);
+        burgerIngredient.ChangeCookAmount(index);
     }
 
     private void AudioStopWithFadeOut()

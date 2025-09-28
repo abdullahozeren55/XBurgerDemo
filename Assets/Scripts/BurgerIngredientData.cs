@@ -12,6 +12,9 @@ public class BurgerIngredientData : ScriptableObject
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
+    [Space]
+    public Sprite[] focusImages;
+    [Space]
 
 
     public AudioClip[] audioClips;

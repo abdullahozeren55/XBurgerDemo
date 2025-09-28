@@ -23,8 +23,7 @@ public class Knife : MonoBehaviour, IGrabable
     [Space]
 
     public KnifeData data;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => data.focusImage; set => data.focusImage = value; }
     [Space]
     [SerializeField] private float throwMultiplier;
     [Space]
@@ -70,7 +69,7 @@ public class Knife : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         if (stabCoroutine != null)
         {
@@ -129,7 +128,7 @@ public class Knife : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         if (stabCoroutine != null)
         {

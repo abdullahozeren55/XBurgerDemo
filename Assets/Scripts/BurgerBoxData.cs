@@ -14,6 +14,8 @@ public class BurgerBoxData : ScriptableObject
     [Space]
     public Vector3 grabPositionOffsetForClose;
     public Vector3 grabRotationOffsetForClose;
+    [Space]
+    public Sprite[] focusImages;
 
     public AudioClip[] audioClips;
 }

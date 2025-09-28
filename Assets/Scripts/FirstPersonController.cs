@@ -182,6 +182,7 @@ public class FirstPersonController : MonoBehaviour
     [Space]
     [Header("Grab Parameters")]
     [SerializeField] private Transform grabPoint;
+    [SerializeField] private Image focusText;
     private Coroutine grabbedUseCoroutine;
 
     [Header("HandControlSettings")]
@@ -189,6 +190,10 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField, Range(0, 10)] private float handControlSpeedY = 0.2f;
     private Vector3 handUseStartOffset;
     private Vector3 handUseDelta; // mouse hareketlerini biriktirecek
+
+    [Header("UI Settings")]
+    [SerializeField] private GameObject interactUseDropThrowUI;
+    [SerializeField] private GameObject grabInteractUI;
 
     private Coroutine singleHandThrowCoroutine;
     private Coroutine throwVisualEffectsCoroutine;
@@ -542,11 +547,43 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    private void DecideFocusText()
+    {
+        if (currentInteractable != null)
+        {
+            focusText.sprite = currentInteractable.FocusImage;
+            focusText.color = crosshairImage.color;
+        }
+        else if (currentGrabable != null && !currentGrabable.IsGrabbed)
+        {
+            focusText.sprite = currentGrabable.FocusImage;
+            focusText.color = crosshairImage.color;
+        }
+        else if (otherGrabable != null)
+        {
+            focusText.sprite = otherGrabable.FocusImage;
+            focusText.color = crosshairImage.color;
+        }
+        else
+        {
+            focusText.sprite = null;
+            focusText.color = Color.clear;
+        }
+    }
+
+    private void DecideUIText()
+    {
+        interactUseDropThrowUI.SetActive(currentGrabable != null && currentGrabable.IsGrabbed);
+        grabInteractUI.SetActive((currentGrabable != null && !currentGrabable.IsGrabbed) || (currentInteractable != null && (currentGrabable == null || !currentGrabable.IsGrabbed)));
+    }
+
     private void DecideOutlineAndCrosshair()
     {
         DecideInteractableOutlineColor();
         DecideGrabableOutlineColor();
         DecideCrosshairColor();
+        DecideFocusText();
+        DecideUIText();
         DecideCrosshairSize();
     }
 
@@ -960,6 +997,15 @@ public class FirstPersonController : MonoBehaviour
             }
         }
 
+        if (otherGrabable != null)
+        {
+            if (otherGrabable == grabable)
+            {
+                otherGrabable.OnLoseFocus();
+                otherGrabable = null;
+            }
+        }
+
         DecideOutlineAndCrosshair();
     }
 
@@ -1138,6 +1184,22 @@ public class FirstPersonController : MonoBehaviour
         }
 
 
+    }
+
+    public void TryChangingFocusText(IInteractable interactable, Sprite sprite)
+    {
+        if (currentInteractable != null && currentInteractable == interactable)
+        {
+            focusText.sprite = sprite;
+        }
+    }
+
+    public void TryChangingFocusText(IGrabable grabable, Sprite sprite)
+    {
+        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable)
+        {
+            focusText.sprite = sprite;
+        }
     }
 
     public void SetAnimBool(string boolName, bool value)

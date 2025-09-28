@@ -27,8 +27,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
     [HideInInspector] public bool canAddToTray;
 
     [SerializeField] private Tray tray;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => data.focusImages[burgerNo]; set => data.focusImages[burgerNo] = value; }
+    [HideInInspector] public int burgerNo = 0;
     [Space]
 
     public List<BurgerIngredientData.IngredientType> allBurgerIngredientTypes = new List<BurgerIngredientData.IngredientType>();
@@ -157,7 +157,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -172,7 +172,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -210,10 +210,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         gameObject.tag = "BurgerBoxClosed";
         
-        /*if (grabText.activeSelf)
-            ChangeLayer(grabableOutlinedLayer);
-        else
-            ChangeLayer(grabableLayer);*/
+        ChangeLayer(grabableLayer);
     }
 
     private void TrySquashingBurger() //Gets called in animator
@@ -221,13 +218,12 @@ public class BurgerBox : MonoBehaviour, IGrabable
         tray.TrySquashingBurger();
     }
 
-    public void ChangeText(GameObject newText, GameManager.BurgerTypes type)
+    public void SetBurgerType(GameManager.BurgerTypes type)
     {
-        /*bool isActive = grabText.activeSelf;
-        grabText.SetActive(false);
-        grabText = newText;
-        grabText.SetActive(isActive);*/
+        burgerNo = (int) type + 1;
         burgerType = type;
+
+        GameManager.Instance.TryChangingFocusText(this, FocusImage);
     }
 
     private void ChangeLayer(int layer)

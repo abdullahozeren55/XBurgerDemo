@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54297c192cc8fd04db9196d1e0642bea, type: 3}
+  m_Name: KitchenDoor
+  m_EditorClassIdentifier: 
+  focusImages:
+  - {fileID: 21300000, guid: 9cf297524c93ac94aa285ade128ce791, type: 3}
+  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
+  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
+  handRigType: 0
+  timeToRotate: 0.3
+  openYRotation: 90
+  lockShakeStrength: 5
+  jumpscareMoveAmount: {x: 0, y: 0, z: 0}
+  dialogueAfterInteraction: {fileID: 0}
+  dialoguePlayDelay: 0
+  openSound: {fileID: 8300000, guid: 0591ea5b39e45cf4b9ab524c220df57b, type: 3}
+  closeSound: {fileID: 8300000, guid: 2078d84eeddc2674d9cfd0d9d5393a5d, type: 3}
+  lockedSound: {fileID: 0}
+  jumpscareSound: {fileID: 0}

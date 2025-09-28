@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class BroomHolder : MonoBehaviour, IInteractable
 {
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Layer Settings")]

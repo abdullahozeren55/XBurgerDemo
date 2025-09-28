@@ -17,8 +17,8 @@ public class Trash : MonoBehaviour, IGrabable
 
     public TrashData data;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
 

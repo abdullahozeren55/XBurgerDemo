@@ -20,12 +20,13 @@ public class SaucePack : MonoBehaviour, IGrabable
     public NoodleData data;
 
     [SerializeField] private GameObject hologramPart;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
     private Renderer hologramRenderer;
 
     private int grabableLayer;
@@ -46,6 +47,7 @@ public class SaucePack : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
         hologramRenderer = hologramPart.GetComponent<Renderer>();
 
         foreach (Material material in hologramRenderer.materials)
@@ -138,6 +140,8 @@ public class SaucePack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.08f);
+
         transform.SetParent(null);
 
         foreach (Material material in hologramRenderer.materials)
@@ -157,6 +161,8 @@ public class SaucePack : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -220,6 +226,11 @@ public class SaucePack : MonoBehaviour, IGrabable
             NoodleManager.Instance.AddSauceToWater();
             Destroy(gameObject);
         }
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnDestroy()

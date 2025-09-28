@@ -17,8 +17,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public FoodPackData data;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => data.focusImage; set => data.focusImage = value; }
     [Space]
 
     [SerializeField] private Rigidbody[] allRB;
@@ -90,7 +89,7 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -103,7 +102,7 @@ public class FoodPack : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 

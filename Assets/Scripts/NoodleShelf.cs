@@ -7,8 +7,8 @@ public class NoodleShelf : MonoBehaviour, IInteractable
 {
     private GameObject[] childs;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Layer Settings")]

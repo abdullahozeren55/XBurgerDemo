@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54297c192cc8fd04db9196d1e0642bea, type: 3}
+  m_Name: FrontDoorRight
+  m_EditorClassIdentifier: 
+  focusImages:
+  - {fileID: 21300000, guid: 9cf297524c93ac94aa285ade128ce791, type: 3}
+  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
+  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
+  handRigType: 0
+  timeToRotate: 0.3
+  openYRotation: 90
+  lockShakeStrength: 5
+  jumpscareMoveAmount: {x: 0, y: 0, z: 0}
+  dialogueAfterInteraction: {fileID: 0}
+  dialoguePlayDelay: 0
+  openSound: {fileID: 8300000, guid: 7db4d5ddcbe9db141813f5fed9a116ee, type: 3}
+  closeSound: {fileID: 8300000, guid: 4b36b119b250b0f479ca75901104b58a, type: 3}
+  lockedSound: {fileID: 8300000, guid: 193d8600df8fa7846946eda88f6cc1ad, type: 3}
+  jumpscareSound: {fileID: 0}

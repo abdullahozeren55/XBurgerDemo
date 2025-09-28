@@ -10,7 +10,7 @@ public class WindowChild : MonoBehaviour, IInteractable
     public GameManager.HandRigTypes HandRigType { get => parentWindow.HandRigType; set => parentWindow.HandRigType = value; }
 
     public bool OutlineShouldBeRed { get => parentWindow.OutlineShouldBeRed; set => parentWindow.OutlineShouldBeRed = value; }
-    public Image FocusImage { get => parentWindow.FocusImage; set => parentWindow.FocusImage = value; }
+    public Sprite FocusImage { get => parentWindow.FocusImage; set => parentWindow.FocusImage = value; }
 
     private void Awake()
     {

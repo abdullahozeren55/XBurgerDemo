@@ -13,6 +13,6 @@ public interface IInteractable
 
     public bool OutlineShouldBeRed {  get; set; }
 
-    public Image FocusImage { get; set; }
+    public Sprite FocusImage { get; set; }
 
 }

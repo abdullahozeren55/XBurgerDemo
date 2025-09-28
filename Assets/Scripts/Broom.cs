@@ -15,8 +15,8 @@ public class Broom : MonoBehaviour, IGrabable
     public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
     [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
     [SerializeField] private AudioClip[] audioClips;
 
@@ -30,13 +30,7 @@ public class Broom : MonoBehaviour, IGrabable
     private int ungrabableLayer;
 
     private bool isJustThrowed;
-
-    private Quaternion cameraForward;
-    private Vector3 cameraForwardEuler;
-
     private float audioLastPlayedTime;
-    private float distance;
-    private float rotationDistance;
 
     private void Awake()
     {

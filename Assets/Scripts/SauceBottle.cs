@@ -35,8 +35,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         Water
     }
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
     [SerializeField] private ParticleSystem pourParticle;
     [Space]
@@ -113,7 +113,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         if (stabCoroutine != null)
         {
@@ -137,7 +137,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         if (stabCoroutine != null)
         {

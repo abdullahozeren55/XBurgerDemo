@@ -9,8 +9,8 @@ public class Keys : MonoBehaviour, IInteractable
     public AudioClip pickUpSound;
     private AudioSource audioSource;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Lock Settings")]
@@ -54,7 +54,7 @@ public class Keys : MonoBehaviour, IInteractable
         audioSource.PlayOneShot(pickUpSound);
 
         foreach (Door door in lockedDoors)
-            door.IsLocked = false;
+            //door.IsLocked = false;
 
         window.IsLocked = false;
 

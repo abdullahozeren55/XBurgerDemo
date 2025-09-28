@@ -97,17 +97,6 @@ public class GameManager : MonoBehaviour
     public List<SauceBottle.SauceType> ertanFullMixedBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
 
-    [Header("Burger Texts")]
-    public GameObject classicBurgerText;
-    public GameObject cheeseBurgerText;
-    public GameObject doubleCheeseBurgerText;
-    public GameObject fullMixedBurgerText;
-    public GameObject studentBurgerText;
-    public GameObject economicalStudentBurgerText;
-    public GameObject goutBurgerText;
-    public GameObject bigSifadBurgerText;
-    public GameObject randomBullshitBurgerText;
-
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
     private List<List<SauceBottle.SauceType>> allBurgerSauces;
 
@@ -305,6 +294,16 @@ public class GameManager : MonoBehaviour
         firstPersonController.IsUsingItemY = yValue;
     }
 
+    public void TryChangingFocusText(IInteractable interactable, Sprite sprite)
+    {
+        firstPersonController.TryChangingFocusText(interactable, sprite);
+    }
+
+    public void TryChangingFocusText(IGrabable grabable, Sprite sprite)
+    {
+        firstPersonController.TryChangingFocusText(grabable, sprite);
+    }
+
     public void AddSauceToTray(SauceBottle.SauceType type)
     {
         tray.AddSauce(type);
@@ -380,7 +379,6 @@ public class GameManager : MonoBehaviour
     {
         BurgerTypes matchedType = BurgerTypes.RandomBullShitBurger;
         burgerMatched = false;
-        GameObject textToChange = randomBullshitBurgerText;
 
         foreach (var menu in allBurgerMenus)
         {
@@ -388,16 +386,16 @@ public class GameManager : MonoBehaviour
             {
                 burgerMatched = true;
 
-                box.ChangeText(classicBurgerText, BurgerTypes.ClassicBurger);
-                box.ChangeText(cheeseBurgerText, BurgerTypes.CheeseBurger);
-                box.ChangeText(doubleCheeseBurgerText, BurgerTypes.DoubleCheeseBurger);
-                box.ChangeText(fullMixedBurgerText, BurgerTypes.FullMixedBurger);
-                box.ChangeText(studentBurgerText, BurgerTypes.StudentBurger);
-                box.ChangeText(economicalStudentBurgerText, BurgerTypes.EconomicalStudentBurger);
-                box.ChangeText(goutBurgerText, BurgerTypes.GoutBurger);
-                box.ChangeText(bigSifadBurgerText, BurgerTypes.BigSifadBurger);
-                box.ChangeText(randomBullshitBurgerText, BurgerTypes.RandomBullShitBurger);
-                box.ChangeText(randomBullshitBurgerText, BurgerTypes.ErtanFullMixedBurger);
+                box.SetBurgerType(BurgerTypes.ClassicBurger);
+                box.SetBurgerType(BurgerTypes.CheeseBurger);
+                box.SetBurgerType(BurgerTypes.DoubleCheeseBurger);
+                box.SetBurgerType(BurgerTypes.FullMixedBurger);
+                box.SetBurgerType(BurgerTypes.StudentBurger);
+                box.SetBurgerType(BurgerTypes.EconomicalStudentBurger);
+                box.SetBurgerType(BurgerTypes.GoutBurger);
+                box.SetBurgerType(BurgerTypes.BigSifadBurger);
+                box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
+                box.SetBurgerType(BurgerTypes.ErtanFullMixedBurger);
 
                 if (menu == classicBurger)
                     matchedType = BurgerTypes.ClassicBurger;
@@ -439,64 +437,55 @@ public class GameManager : MonoBehaviour
             if (matchedType == BurgerTypes.ClassicBurger)
             {
                 requiredSauces = classicBurgerSauces;
-                textToChange = classicBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.CheeseBurger)
             {
                 requiredSauces = cheeseBurgerSauces;
-                textToChange = cheeseBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.DoubleCheeseBurger)
             {
                 requiredSauces = doubleCheeseBurgerSauces;
-                textToChange = doubleCheeseBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.FullMixedBurger)
             {
                 requiredSauces = fullMixedBurgerSauces;
-                textToChange = fullMixedBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.StudentBurger)
             {
                 requiredSauces = studentBurgerSauces;
-                textToChange = studentBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.EconomicalStudentBurger)
             {
                 requiredSauces = economicalStudentBurgerSauces;
-                textToChange = economicalStudentBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.GoutBurger)
             {
                 requiredSauces = goutBurgerSauces;
-                textToChange = goutBurgerText;
             }
                 
             else if (matchedType == BurgerTypes.BigSifadBurger)
             {
                 requiredSauces = bigSifadBurgerSauces;
-                textToChange = bigSifadBurgerText;
             }
             else if (matchedType == BurgerTypes.ErtanFullMixedBurger)
             {
                 requiredSauces = ertanFullMixedBurgerSauces;
-                textToChange = randomBullshitBurgerText;
             }
 
 
             if (AreSaucesEqual(sauces, requiredSauces))
-                box.ChangeText(textToChange, matchedType);
+                box.SetBurgerType(matchedType);
             else
-                box.ChangeText(randomBullshitBurgerText, BurgerTypes.RandomBullShitBurger);
+                box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
         }
         else
-            box.ChangeText(randomBullshitBurgerText, BurgerTypes.RandomBullShitBurger);
+            box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
     }
 
     private bool AreListsEqual(List<BurgerIngredientData.IngredientType> list1, List<BurgerIngredientData.IngredientType> list2)

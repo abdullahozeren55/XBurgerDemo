@@ -17,6 +17,10 @@ MonoBehaviour:
   timeToPutOnTray: 0.2
   grabPositionOffset: {x: 0.0002, y: 0.0008, z: 0.0004}
   grabRotationOffset: {x: -50, y: 0, z: 0}
+  focusImages:
+  - {fileID: 21300000, guid: 659e653658efba54b9be34920fddfaa6, type: 3}
+  - {fileID: 21300000, guid: 2493de85424f59f43bd267d9c03a9532, type: 3}
+  - {fileID: 21300000, guid: 3fa5a68e9d7bffe45ba1d1c08441cfd4, type: 3}
   audioClips:
   - {fileID: 8300000, guid: 4b125dc5bc95ec04e867f0357eff41bf, type: 3}
   - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}

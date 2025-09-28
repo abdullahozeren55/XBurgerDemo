@@ -1,10 +1,13 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using static Cookable;
+using Random = UnityEngine.Random;
 
 public class BurgerIngredient : MonoBehaviour, IGrabable
 {
@@ -27,8 +30,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     [SerializeField] private AudioSource audioSource;
 
     [SerializeField] private Tray tray;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => data.focusImages[(int)cookAmount]; set => data.focusImages[(int)cookAmount] = value; }
     [Space]
 
     [HideInInspector] public bool canAddToTray;
@@ -99,16 +101,24 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 PlayAudioWithRandomPitch(7);
         }
 
-        col.enabled = false;
         rb.isKinematic = true;
 
         transform.parent = parentTray;
 
         Quaternion randomRot = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
 
-        transform.DOMove(trayPos, data.timeToPutOnTray).SetEase(Ease.OutQuad);
+        var moveTween = transform.DOMove(trayPos, data.timeToPutOnTray).SetEase(Ease.OutQuad);
+        var rotateTween = transform.DORotateQuaternion(randomRot, data.timeToPutOnTray).SetEase(Ease.OutCubic);
 
-        transform.DORotateQuaternion(randomRot, data.timeToPutOnTray).SetEase(Ease.OutCubic);
+        Sequence seq = DOTween.Sequence();
+        seq.Join(moveTween);
+        seq.Join(rotateTween);
+
+        seq.OnComplete(() => {
+            
+            col.enabled = false;
+
+        });
     }
 
     public void OnGrab(Transform grabPoint)
@@ -173,7 +183,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -188,7 +198,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.05f);
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -309,19 +319,28 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         audioSource.PlayOneShot(data.audioClips[index]);
     }
 
-    public void ChangeGrabText(GameObject newText)
+    public void ChangeCookAmount(int value)
     {
-        /*bool wasGrabTextActive = false;
-        if (grabText.activeSelf)
+
+        if (value == 0)
         {
-            wasGrabTextActive = true;
-            grabText.SetActive(false);
+            cookAmount = CookAmount.RAW;
+            canStick = true;
+
+            
+        }
+        else if (value == 1)
+        {
+            cookAmount = CookAmount.REGULAR;
+            canStick = false;
+        }
+        else
+        {
+            cookAmount = CookAmount.BURNT;
+            canStick = false;
         }
 
-        grabText = newText;
-
-        if (wasGrabTextActive)
-            grabText.SetActive(true);*/
+        GameManager.Instance.TryChangingFocusText(this, FocusImage);
     }
 
     private void OnDestroy()

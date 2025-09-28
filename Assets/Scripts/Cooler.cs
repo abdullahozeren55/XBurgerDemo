@@ -10,8 +10,8 @@ public class Cooler : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Open Close Settings")]

@@ -19,8 +19,8 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     public WholeIngredientData data;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     [Header("Instantiate Settings")]
@@ -29,6 +29,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -43,6 +44,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -62,8 +64,9 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     {
         gameObject.layer = ungrabableLayer;
 
-        PlayAudioWithRandomPitch(0);
+        col.enabled = false;
 
+        PlayAudioWithRandomPitch(0);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -89,6 +92,8 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.08f);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -99,6 +104,8 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -166,6 +173,11 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     private void TurnOnSlice()
     {
         CanGetSliced = true;
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnDestroy()

@@ -14,5 +14,7 @@ public class KnifeData : ScriptableObject
     public Vector3 stabScaleOffset;
     [Space]
     public float timeToStab = 0.3f;
+    [Space]
+    public Sprite focusImage;
     public AudioClip[] audioClips;
 }

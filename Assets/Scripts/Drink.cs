@@ -17,12 +17,13 @@ public class Drink : MonoBehaviour, IGrabable
 
     public DrinkData data;
 
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -37,6 +38,7 @@ public class Drink : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -53,6 +55,8 @@ public class Drink : MonoBehaviour, IGrabable
     public void OnGrab(Transform grabPoint)
     {
         gameObject.layer = ungrabableLayer;
+
+        col.enabled = false;
 
         PlayAudioWithRandomPitch(0);
 
@@ -80,6 +84,8 @@ public class Drink : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.08f);
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -90,6 +96,8 @@ public class Drink : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -110,6 +118,11 @@ public class Drink : MonoBehaviour, IGrabable
         {
             gameObject.layer = grabableOutlinedLayer;
         }
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnDisable()

@@ -21,12 +21,13 @@ public class Noodle : MonoBehaviour, IGrabable
 
     [SerializeField] private GameObject[] childObjects;
     [SerializeField] private GameObject hologramPart;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
     private Renderer hologramRenderer;
 
     private int grabableLayer;
@@ -50,6 +51,7 @@ public class Noodle : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
         hologramRenderer = hologramPart.GetComponent<Renderer>();
 
         foreach (Material material in hologramRenderer.materials)
@@ -95,6 +97,8 @@ public class Noodle : MonoBehaviour, IGrabable
     public void OnGrab(Transform grabPoint)
     {
         gameObject.layer = ungrabableLayer;
+
+        col.enabled = false;
 
         audioSource.enabled = true;
 
@@ -147,6 +151,8 @@ public class Noodle : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.08f);
+
         transform.SetParent(null);
 
         foreach (Material material in hologramRenderer.materials)
@@ -166,6 +172,8 @@ public class Noodle : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.08f);
 
         transform.SetParent(null);
 
@@ -205,6 +213,11 @@ public class Noodle : MonoBehaviour, IGrabable
         {
             childObjects[i].layer = layer;
         }
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void PlayAudioWithRandomPitch(int index)

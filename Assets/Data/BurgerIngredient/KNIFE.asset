@@ -19,6 +19,7 @@ MonoBehaviour:
   stabRotationOffset: {x: 9.527423, y: 61.804817, z: 280.1402}
   stabScaleOffset: {x: 0.013, y: 0.013, z: 0.013}
   timeToStab: 0.3
+  focusImage: {fileID: 21300000, guid: 024fd260b4aadef4fa5c29e140c0aeb2, type: 3}
   audioClips:
   - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
   - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}

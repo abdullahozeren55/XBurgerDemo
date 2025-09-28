@@ -21,8 +21,8 @@ public class Kettle : MonoBehaviour, IGrabable
 
     [Header("Regular Settings")]
     [SerializeField] private GameObject hologramPart;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
     [Space]
     [SerializeField] private Transform pourInstantiatePoint;

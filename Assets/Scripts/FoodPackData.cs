@@ -12,6 +12,9 @@ public class FoodPackData : ScriptableObject
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
+    [Space]
+    public Sprite focusImage;
+    [Space]
 
     public AudioClip[] audioClips;
 }

@@ -1,218 +1,179 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class Door : MonoBehaviour, IInteractable
 {
-    [Header("Audio Settings")]
-    public AudioClip openSound;
-    public AudioClip closeSound;
-    private AudioSource audioSource;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
-    [Space]
+    public DoorData data;
 
-    [Header("Open Close Settings")]
-    [SerializeField] private float timeToRotate = 0.3f;
-    [SerializeField] private float openYRotation = 90.0f;
-    private Quaternion closeRotation;
-    private Quaternion openRotation;
-    private Coroutine rotateCoroutine;
+    public enum DoorState
+    {
+        Normal,
+        Locked,
+        Jumpscare
+    }
+
+    public DoorState doorState = DoorState.Normal;
+
+    [Header("Settings")] 
+    [SerializeField] private GameObject jumpscareGO;
+    public bool shouldPlayDialogueAfterInteraction;
+    private bool isDialoguePlayed = false;
+    private bool isLockedAnimating = false;
+
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource doorAudioSource;
+    [SerializeField] private AudioSource jumpscareAudioSource;
+    
+    public Sprite FocusImage { get => data.focusImages[doorStateNum]; set => data.focusImages[doorStateNum] = value; }
+    [HideInInspector] public int doorStateNum = 0;
+    public GameManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
+
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    private bool outlineShouldBeRed;
+
     [HideInInspector] public bool isOpened;
+    private Vector3 closeEuler;
+    private Vector3 openEuler;
+    private Collider col;
 
-    [Header("Layer Settings")]
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
-    [Header("Lock Settings")]
-    public bool IsLocked;
-    public AudioClip lockedSound;
-    [SerializeField] private float timeToLockRotate = 0.1f;
-    [SerializeField] private float lockOpenYRotation = 10.0f;
-    private Quaternion lockedOpenRotation;
-    private bool inLockRotate;
-
-    public GameManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
-    [SerializeField] private GameManager.HandRigTypes handRigType;
-
-    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
-    [SerializeField] private bool outlineShouldBeRed;
-
     private void Awake()
     {
         isOpened = false;
-        closeRotation = transform.parent.localRotation;
-        openRotation = Quaternion.Euler(closeRotation.x, openYRotation, closeRotation.z);
-        lockedOpenRotation = Quaternion.Euler(closeRotation.x, lockOpenYRotation, closeRotation.z);
+        col = GetComponent<Collider>();
 
-        audioSource = GetComponent<AudioSource>();
+        closeEuler = transform.parent.localRotation.eulerAngles;
+        openEuler = new Vector3(closeEuler.x, closeEuler.y + data.openYRotation, closeEuler.z);
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
-
-        inLockRotate = false;
     }
 
     public void OnInteract()
     {
-        if (!IsLocked)
-            HandleRotation();
-        else
-            HandleLocked();
+        switch (doorState)
+        {
+            case DoorState.Normal:
+                HandleRotation();
+                break;
+
+            case DoorState.Locked:
+                HandleLocked();
+                break;
+
+            case DoorState.Jumpscare:
+                HandleJumpscare();
+                break;
+        }
+
+        if (shouldPlayDialogueAfterInteraction && !isDialoguePlayed)
+        {
+            Invoke("PlayDialogue", data.dialoguePlayDelay);
+            isDialoguePlayed = true;
+        }
     }
 
-    public void OnFocus()
+    private void PlayDialogue()
     {
-        if (!inLockRotate)
-        {
-            gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
-        }
-        
-    }
-
-    public void OnLoseFocus()
-    {
-        if (!inLockRotate)
-        {
-            gameObject.layer = interactableLayer;
-        }
-        
-    }
-
-    public void OutlineChangeCheck()
-    {
-        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
-        {
-            gameObject.layer = interactableOutlinedRedLayer;
-        }
-        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
-        {
-            gameObject.layer = interactableOutlinedLayer;
-        }
+        DialogueManager.Instance.StartSelfDialogue(data.dialogueAfterInteraction);
     }
 
     public void HandleRotation()
     {
         isOpened = !isOpened;
+        PlaySound(isOpened);
 
-        if (rotateCoroutine != null)
-        {
-            StopCoroutine(rotateCoroutine);
-            rotateCoroutine = null;
-        }
-
-        PlaySound(!isOpened);
-        rotateCoroutine = StartCoroutine(ToggleRotate(isOpened));
+        transform.parent.DOKill();
+        transform.parent.DOLocalRotate(isOpened ? openEuler : closeEuler, data.timeToRotate)
+            .SetEase(Ease.InOutSine);
     }
 
     private void HandleLocked()
     {
-        inLockRotate = true;
+        if (isLockedAnimating) return;
+        isLockedAnimating = true;
 
         gameObject.layer = uninteractableLayer;
+        doorAudioSource.PlayOneShot(data.lockedSound);
 
-        audioSource.Stop();
+        transform.parent.DOKill();
+        transform.parent.localRotation = Quaternion.Euler(closeEuler);
 
-        audioSource.PlayOneShot(lockedSound);
-
-        if (rotateCoroutine != null)
-        {
-            StopCoroutine(rotateCoroutine);
-            rotateCoroutine = null;
-        }
-
-        rotateCoroutine = StartCoroutine(ToggleLockRotate());
+        Sequence seq = DOTween.Sequence();
+        seq.Append(transform.parent.DOLocalRotate(new Vector3(closeEuler.x, closeEuler.y + data.lockShakeStrength, closeEuler.z), 0.1f))
+           .Append(transform.parent.DOLocalRotate(closeEuler, 0.1f))
+           .Append(transform.parent.DOLocalRotate(new Vector3(closeEuler.x, closeEuler.y + data.lockShakeStrength * 0.5f, closeEuler.z), 0.1f))
+           .Append(transform.parent.DOLocalRotate(closeEuler, 0.1f))
+           .OnComplete(() =>
+           {
+               gameObject.layer = interactableLayer;
+               isLockedAnimating = false;
+           });
     }
 
-    private void PlaySound(bool isOpen)
+    private void HandleJumpscare()
     {
-        audioSource.Stop();
+        gameObject.layer = uninteractableLayer;
+        isOpened = true;
 
-        if (isOpen)
+        PlaySound(isOpened);
+
+        // Baþlangýç pozisyonu
+        Vector3 startPos = jumpscareGO.transform.position;
+        Vector3 targetPos = startPos + transform.TransformDirection(data.jumpscareMoveAmount);
+
+        // Kapý açýlma tweener'ý
+        Tween doorTween = transform.parent.DOLocalRotate(openEuler, data.timeToRotate)
+            .SetEase(Ease.InOutSine);
+
+        // Jumpscare tweener'ý
+        Tween jumpscareTween = jumpscareGO.transform.DOMove(targetPos, data.timeToJumpscare)
+            .SetEase(Ease.OutBack);
+
+        // Sequence ile birleþtirme
+        Sequence seq = DOTween.Sequence();
+        seq.Append(doorTween);
+        seq.Insert(data.timeToRotate * data.jumpscareDoorRotatePercentValue, jumpscareTween); // Kapý animasyonunun %x'inde baþlasýn
+
+        seq.InsertCallback(data.jumpscareAudioDelay, () => jumpscareAudioSource.PlayOneShot(data.jumpscareSound));
+
+        // Bitince state normal'e dönsün
+        seq.OnComplete(() =>
         {
-            audioSource.PlayOneShot(closeSound);
-        }
-        else
-        {
-            audioSource.PlayOneShot(openSound);
-        }
+            doorState = DoorState.Normal;
+            gameObject.layer = interactableLayer;
+        });
     }
 
-    private IEnumerator ToggleRotate(bool shouldOpen)
+    private void PlaySound(bool opened)
     {
-
-        Quaternion targetRotation = shouldOpen ? openRotation : closeRotation;
-        Quaternion startingRotation = transform.parent.localRotation;
-
-        float timeElapsed = 0f;
-
-        while (timeElapsed < timeToRotate)
-        {
-            transform.parent.localRotation = Quaternion.Slerp(startingRotation, targetRotation, timeElapsed / timeToRotate);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.parent.localRotation = targetRotation;
-        rotateCoroutine = null;
+        doorAudioSource.Stop();
+        doorAudioSource.PlayOneShot(opened ? data.openSound : data.closeSound);
     }
 
-    private IEnumerator ToggleLockRotate()
+    public void OnFocus()
     {
+        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
+    }
 
-        float timeElapsed = 0f;
-
-        while (timeElapsed < timeToLockRotate)
-        {
-            transform.parent.localRotation = Quaternion.Slerp(closeRotation, lockedOpenRotation, timeElapsed / timeToLockRotate);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.parent.localRotation = lockedOpenRotation;
-
-        timeElapsed = 0f;
-
-        while (timeElapsed < timeToLockRotate)
-        {
-            transform.parent.localRotation = Quaternion.Slerp(lockedOpenRotation, closeRotation, timeElapsed / timeToLockRotate);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.parent.localRotation = closeRotation;
-
-        timeElapsed = 0f;
-
-        while (timeElapsed < timeToLockRotate)
-        {
-            transform.parent.localRotation = Quaternion.Slerp(closeRotation, lockedOpenRotation, timeElapsed / timeToLockRotate);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.parent.localRotation = lockedOpenRotation;
-
-        timeElapsed = 0f;
-
-        while (timeElapsed < timeToLockRotate)
-        {
-            transform.parent.localRotation = Quaternion.Slerp(lockedOpenRotation, closeRotation, timeElapsed / timeToLockRotate);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        transform.parent.localRotation = closeRotation;
-
-        inLockRotate = false;
-
+    public void OnLoseFocus()
+    {
         gameObject.layer = interactableLayer;
+    }
 
-        rotateCoroutine = null;
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
+            gameObject.layer = interactableOutlinedRedLayer;
+        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+            gameObject.layer = interactableOutlinedLayer;
     }
 }

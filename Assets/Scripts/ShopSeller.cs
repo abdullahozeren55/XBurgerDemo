@@ -15,8 +15,8 @@ public class ShopSeller : MonoBehaviour, IInteractable
     [SerializeField] private DialogueData noodleBuyDialogueData;
     [SerializeField] private DialogueData noodleBuyDialoguePartTwoData;
     [SerializeField] private float waitingTime = 1f;
-    public Image FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Image focusImage;
+    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
+    [SerializeField] private Sprite focusImage;
     [Space]
     [SerializeField] private GameObject storeBlocker;
     [Space]
