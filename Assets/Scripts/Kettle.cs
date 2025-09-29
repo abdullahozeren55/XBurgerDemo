@@ -46,6 +46,7 @@ public class Kettle : MonoBehaviour, IGrabable
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -65,6 +66,7 @@ public class Kettle : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -100,6 +102,8 @@ public class Kettle : MonoBehaviour, IGrabable
     {
         gameObject.layer = ungrabableLayer;
 
+        col.enabled = false;
+
         PlayAudioWithRandomPitch(0);
 
         rb.isKinematic = false;
@@ -127,6 +131,14 @@ public class Kettle : MonoBehaviour, IGrabable
     {
         IsGrabbed = false;
 
+        Invoke("TurnOnCollider", 0.1f);
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
+
         transform.SetParent(null);
 
         rb.useGravity = true;
@@ -137,6 +149,14 @@ public class Kettle : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         IsGrabbed = false;
+
+        Invoke("TurnOnCollider", 0.1f);
+
+        if (stabCoroutine != null)
+        {
+            StopCoroutine(stabCoroutine);
+            stabCoroutine = null;
+        }
 
         transform.SetParent(null);
 
@@ -169,6 +189,11 @@ public class Kettle : MonoBehaviour, IGrabable
         audioLastPlayedTime = Time.time;
         audioSource.pitch = Random.Range(0.85f, 1.15f);
         audioSource.PlayOneShot(audioClips[index]);
+    }
+
+    private void TurnOnCollider()
+    {
+        col.enabled = true;
     }
 
     private void OnCollisionEnter(Collision collision)

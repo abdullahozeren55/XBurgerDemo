@@ -115,7 +115,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.08f);
+        Invoke("TurnOnCollider", 0.1f);
 
         if (stabCoroutine != null)
         {
@@ -139,7 +139,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.08f);
+        Invoke("TurnOnCollider", 0.1f);
 
         if (stabCoroutine != null)
         {
