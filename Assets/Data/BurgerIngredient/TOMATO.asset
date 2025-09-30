@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7283705b9a48eed4cafef7f670eb71e3, type: 3}
   m_Name: TOMATO
   m_EditorClassIdentifier: 
+  isUseable: 0
   ingredientType: 4
+  handGrabType: 0
   yHeight: 0.005
   timeToPutOnTray: 0.15
   grabPositionOffset: {x: 0.0002, y: 0.0007, z: 0.0001}
   grabRotationOffset: {x: 140, y: 0, z: 0}
   focusImages:
-  - {fileID: 21300000, guid: d086b220e4487a7499d0b039f148c529, type: 3}
+  - {fileID: 21300000, guid: a3d4a5f9a5efb3c488d57f94303ebcf8, type: 3}
   audioClips:
   - {fileID: 8300000, guid: 6bb232783a14c814eafe9995837763fd, type: 3}
   - {fileID: 8300000, guid: 5ae132e105a2fdb4b9d2a24417df0a6f, type: 3}

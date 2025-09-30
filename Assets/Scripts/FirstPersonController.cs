@@ -793,8 +793,10 @@ public class FirstPersonController : MonoBehaviour
                         }
 
                         currentGrabable.OnLoseFocus();
+                        DecideOutlineAndCrosshair();
                         currentGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
                         currentGrabable.OnFocus();
+                        DecideOutlineAndCrosshair();
                     }
                 }
                 else

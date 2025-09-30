@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: WHOLEONION
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: 70a503ecd2717464abe4caaba10110c2, type: 3}
+  focusImage: {fileID: 21300000, guid: a8e5ab752c1c6d747a67a8b831cc3077, type: 3}
+  isUseable: 0
+  handGrabType: 0
   minForce: 0.25
   maxForce: 0.35
   objectAmount: 4

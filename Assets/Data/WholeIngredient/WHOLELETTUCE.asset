@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: WHOLELETTUCE
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: a6058814c04a42c4f95093706247cc4e, type: 3}
+  focusImage: {fileID: 21300000, guid: e1618ae9d0e4237458044ee891aa845e, type: 3}
+  isUseable: 0
+  handGrabType: 0
   minForce: 0.3
   maxForce: 0.5
   objectAmount: 6

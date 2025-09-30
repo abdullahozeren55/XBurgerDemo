@@ -7,6 +7,7 @@ public class WholeIngredientData : ScriptableObject
 {
     public GameObject destroyParticle;
     [Space]
+    public Sprite focusImage;
     public bool isUseable = false;
     public PlayerManager.HandGrabTypes handGrabType;
     [Space]

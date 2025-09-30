@@ -12,15 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7283705b9a48eed4cafef7f670eb71e3, type: 3}
   m_Name: TOPBUN
   m_EditorClassIdentifier: 
+  isUseable: 0
   ingredientType: 7
+  handGrabType: 0
   yHeight: 0.024
   timeToPutOnTray: 0.2
   grabPositionOffset: {x: 0.0002, y: 0.0008, z: 0.0004}
   grabRotationOffset: {x: 130, y: 0, z: 0}
   focusImages:
-  - {fileID: 21300000, guid: 894876796c56b7747bcf5ea30aff1ea0, type: 3}
-  - {fileID: 21300000, guid: 1db84138acafbc94193eacdf99e3bc97, type: 3}
-  - {fileID: 21300000, guid: a62d502f51756ee4bb6cfb55a8a988de, type: 3}
+  - {fileID: 21300000, guid: 09e5f50e03e3f4b4f9bdb635202f8c50, type: 3}
+  - {fileID: 21300000, guid: e852d1db45f24864a8cab23ab4df0d5a, type: 3}
+  - {fileID: 21300000, guid: 2de9db3b294a13048b642dc5e28cfd92, type: 3}
   audioClips:
   - {fileID: 8300000, guid: 4b125dc5bc95ec04e867f0357eff41bf, type: 3}
   - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}

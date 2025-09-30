@@ -20,7 +20,7 @@ MonoBehaviour:
   grabPositionOffset: {x: 0.00028948102, y: 0.00090738846, z: 0.00026371676}
   grabRotationOffset: {x: 68.09051, y: 180.00795, z: 180.00955}
   focusImages:
-  - {fileID: 21300000, guid: a94ca0431e86b0845b48b556d4d525d4, type: 3}
+  - {fileID: 21300000, guid: b928abc80186d8046959a032e9a7b2a2, type: 3}
   audioClips:
   - {fileID: 8300000, guid: f90ad78c871ee8941881b549564a2341, type: 3}
   - {fileID: 8300000, guid: 7d6e09aa374a296429fab7f0b51cda27, type: 3}

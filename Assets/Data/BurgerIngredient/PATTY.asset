@@ -12,15 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7283705b9a48eed4cafef7f670eb71e3, type: 3}
   m_Name: PATTY
   m_EditorClassIdentifier: 
+  isUseable: 0
   ingredientType: 1
+  handGrabType: 0
   yHeight: 0.01
   timeToPutOnTray: 0.2
   grabPositionOffset: {x: 0.0002, y: 0.001, z: 0.0003}
   grabRotationOffset: {x: 130, y: 0, z: 0}
   focusImages:
-  - {fileID: 21300000, guid: 5b498a44801b57d4ab5dfed4f7ee7dc3, type: 3}
-  - {fileID: 21300000, guid: 0acbcff80869fb747bcb574150c83717, type: 3}
-  - {fileID: 21300000, guid: d262075c1b58dde448fab5db482b2e9b, type: 3}
+  - {fileID: 21300000, guid: 38a8a5c7b3426414cb26f2509c99cde2, type: 3}
+  - {fileID: 21300000, guid: 09d2efd854e86dc4fb4af4079dbcea94, type: 3}
+  - {fileID: 21300000, guid: 66530508d139ff94facb3c683732c65f, type: 3}
   audioClips:
   - {fileID: 8300000, guid: b93dbdd756280f6419be6d697d852f4f, type: 3}
   - {fileID: 8300000, guid: 3e28540a4e7b19447a5cf58012f58e56, type: 3}

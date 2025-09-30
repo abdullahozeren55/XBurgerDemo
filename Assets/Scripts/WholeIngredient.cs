@@ -23,8 +23,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     public WholeIngredientData data;
 
-    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Sprite focusImage;
+    public Sprite FocusImage { get => data.focusImage; set => data.focusImage = value; }
     [Space]
 
     [Header("Instantiate Settings")]
