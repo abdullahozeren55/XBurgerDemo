@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: KitchenBackDoor
   m_EditorClassIdentifier: 
   focusImages:
-  - {fileID: 21300000, guid: 9cf297524c93ac94aa285ade128ce791, type: 3}
-  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
-  - {fileID: 21300000, guid: ee0a228ecb0c8ea468712f87130f3422, type: 3}
+  - {fileID: 21300000, guid: 62604fa540e6620409aac127bc0721b0, type: 3}
+  - {fileID: 21300000, guid: 8ee07199899208d4ea49779099f3dbfe, type: 3}
+  - {fileID: 21300000, guid: c892cfd900747c04585836591b03fa2d, type: 3}
   handRigType: 0
   timeToRotate: 0.3
   openYRotation: 90

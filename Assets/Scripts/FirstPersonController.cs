@@ -195,6 +195,12 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject interactUseDropThrowUI;
     [SerializeField] private GameObject grabInteractUI;
 
+    [Header("Layers")]
+    private int interactableLayer;
+    private int interactableOutlinedLayer;
+    private int grabableLayer;
+    private int grabableOutlinedLayer;
+
     private Coroutine singleHandThrowCoroutine;
     private Coroutine throwVisualEffectsCoroutine;
     private CinemachineBasicMultiChannelPerlin perlin;
@@ -224,6 +230,11 @@ public class FirstPersonController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        interactableLayer = LayerMask.NameToLayer("Interactable");
+        interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
+        grabableLayer = LayerMask.NameToLayer("Grabable");
+        grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
     }
 
     void Start()
@@ -1060,6 +1071,14 @@ public class FirstPersonController : MonoBehaviour
         }
 
         DecideOutlineAndCrosshair();
+    }
+
+    public void SetTurningBackToInteractable(IInteractable interactable)
+    {
+        if (currentInteractable != null && currentInteractable == interactable)
+        {
+            //interactable. TODO
+        }
     }
 
     public void ChangeCurrentGrabable(IGrabable grabObject)

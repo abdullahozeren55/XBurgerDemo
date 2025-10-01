@@ -27,7 +27,7 @@ public class Door : MonoBehaviour, IInteractable
     [SerializeField] private AudioSource jumpscareAudioSource;
     
     public Sprite FocusImage { get => data.focusImages[doorStateNum]; set => data.focusImages[doorStateNum] = value; }
-    [HideInInspector] public int doorStateNum = 0;
+    private int doorStateNum = 0;
     public PlayerManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
@@ -91,6 +91,10 @@ public class Door : MonoBehaviour, IInteractable
         isOpened = !isOpened;
         PlaySound(isOpened);
 
+        doorStateNum = isOpened ? 1 : 0;
+
+        PlayerManager.Instance.TryChangingFocusText(this, FocusImage);
+
         transform.parent.DOKill();
         transform.parent.DOLocalRotate(isOpened ? openEuler : closeEuler, data.timeToRotate)
             .SetEase(Ease.InOutSine);
@@ -115,6 +119,15 @@ public class Door : MonoBehaviour, IInteractable
            .OnComplete(() =>
            {
                gameObject.layer = interactableLayer;
+
+               doorStateNum = 2;
+
+               OutlineShouldBeRed = true;
+
+               OutlineChangeCheck();
+
+               PlayerManager.Instance.TryChangingFocusText(this, FocusImage);
+
                isLockedAnimating = false;
            });
     }
