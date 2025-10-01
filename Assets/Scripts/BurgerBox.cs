@@ -15,11 +15,11 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
-    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
-    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
-    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
-    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
+    public Vector3 GrabPositionOffset { get => data.grabPositionOffset[boxSituation]; set => data.grabPositionOffset[boxSituation] = value; }
+    public Vector3 GrabRotationOffset { get => data.grabRotationOffset[boxSituation]; set => data.grabRotationOffset[boxSituation] = value; }
 
+    public Vector3 GrabLocalPositionOffset { get => data.grabLocalPositionOffset[boxSituation]; set => data.grabLocalPositionOffset[boxSituation] = value; }
+    public Vector3 GrabLocalRotationOffset { get => data.grabLocalRotationOffset[boxSituation]; set => data.grabLocalRotationOffset[boxSituation] = value; }
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
     private bool isGettingPutOnTray;
@@ -30,7 +30,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     [SerializeField] private Tray tray;
     public Sprite FocusImage { get => data.focusImages[burgerNo]; set => data.focusImages[burgerNo] = value; }
-    [HideInInspector] public int burgerNo = 0;
+    [HideInInspector] public int burgerNo = 0; //0 for "Burger Box" text, rest is for menu names in order
+    private int boxSituation = 0; //0 for open, 1 for close
     [Space]
 
     public List<BurgerIngredientData.IngredientType> allBurgerIngredientTypes = new List<BurgerIngredientData.IngredientType>();
@@ -56,6 +57,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
     private GameObject[] childObjects;
 
     [HideInInspector] public GameManager.BurgerTypes burgerType;
+
+    
 
     private void Awake()
     {
@@ -133,16 +136,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
 
-        if (gameObject.CompareTag("BurgerBoxClosed"))
-        {
-            transform.localPosition = data.grabPositionOffsetForClose;
-            transform.localRotation = Quaternion.Euler(data.grabRotationOffsetForClose);
-        }
-        else
-        {
-            transform.localPosition = data.grabPositionOffsetForOpen;
-            transform.localRotation = Quaternion.Euler(data.grabRotationOffsetForOpen);
-        }
+        transform.localPosition = GrabLocalPositionOffset;
+        transform.localRotation = Quaternion.Euler(GrabLocalRotationOffset);
     }
     public void OnFocus()
     {
@@ -211,6 +206,8 @@ public class BurgerBox : MonoBehaviour, IGrabable
         GameManager.Instance.CheckBurgerType(allBurgerIngredientTypes, allSauces, this);
 
         gameObject.tag = "BurgerBoxClosed";
+
+        boxSituation = 1;
         
         ChangeLayer(grabableLayer);
     }

@@ -12,13 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54339c9dde0476f4fabd14e44eb823a4, type: 3}
   m_Name: BURGERBOX
   m_EditorClassIdentifier: 
+  isUseable: 0
+  handGrabType: 0
   trashSpaceValue: 35
   followingSpeed: 40
   timeToPutOnTray: 0.2
-  grabPositionOffsetForOpen: {x: 0.000518071, y: 0.0014042542, z: -0.00068737916}
-  grabRotationOffsetForOpen: {x: 349.99747, y: 279.99942, z: 109.99848}
-  grabPositionOffsetForClose: {x: 0.0002522376, y: 0.0013608449, z: 0.0010735289}
-  grabRotationOffsetForClose: {x: 7.543798, y: 87.808014, z: 161.67326}
+  grabPositionOffset:
+  - {x: 0.4, y: 0.5, z: 2}
+  - {x: 0.4, y: 0.5, z: 2}
+  grabRotationOffset:
+  - {x: -5, y: -70, z: -70}
+  - {x: -5, y: -70, z: -70}
+  grabLocalPositionOffset:
+  - {x: 0.000518071, y: 0.0014042542, z: -0.00068737916}
+  - {x: 0.0002522376, y: 0.0013608449, z: 0.0010735289}
+  grabLocalRotationOffset:
+  - {x: 349.99747, y: 279.99942, z: 109.99848}
+  - {x: 7.543798, y: 87.808014, z: 161.67326}
+  grabPositionOffsetForOpen: {x: 0.4, y: 0.5, z: 2}
+  grabRotationOffsetForOpen: {x: -5, y: -70, z: -70}
+  grabLocalPositionOffsetForOpen: {x: 0.000518071, y: 0.0014042542, z: -0.00068737916}
+  grabLocalRotationOffsetForOpen: {x: 349.99747, y: 279.99942, z: 109.99848}
+  grabPositionOffsetForClose: {x: 0.4, y: 0.5, z: 2}
+  grabRotationOffsetForClose: {x: -5, y: -70, z: -70}
+  grabLocalPositionOffsetForClose: {x: 0.0002522376, y: 0.0013608449, z: 0.0010735289}
+  grabLocalRotationOffsetForClose: {x: 7.543798, y: 87.808014, z: 161.67326}
   focusImages:
   - {fileID: 21300000, guid: 1e6c2e59b17aa974887e47b8ba0e0fc9, type: 3}
   - {fileID: 21300000, guid: 68d2669bbed5fc14c87548e47f22c392, type: 3}
