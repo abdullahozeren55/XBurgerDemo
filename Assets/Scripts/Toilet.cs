@@ -10,8 +10,9 @@ public class Toilet : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Sprite focusImage;
+    public Sprite FocusImage { get => focusImages[toiletStateNum]; set => focusImages[toiletStateNum] = value; }
+    [SerializeField] private Sprite[] focusImages;
+    private int toiletStateNum = 0;
     [Space]
 
     [Header("Open Close Settings")]
@@ -80,6 +81,8 @@ public class Toilet : MonoBehaviour, IInteractable
     public void HandleRotation()
     {
         isOpened = !isOpened;
+
+        toiletStateNum = isOpened ? 1 : 0;
 
         if (rotateCoroutine != null)
         {

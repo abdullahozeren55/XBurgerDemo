@@ -311,6 +311,9 @@ public class FirstPersonController : MonoBehaviour
             HandleMouseAndHandControl();
             HandleHandTargetPositions();
         }
+
+        if (canUseHeadbob)
+            HandleHeadbob();
     }
 
     private void HandleMouseAndHandControl()
@@ -342,9 +345,6 @@ public class FirstPersonController : MonoBehaviour
 
         // Horizontal look (Yaw)
         transform.Rotate(Vector3.up * mouseX * horizSpeed);
-
-        if (canUseHeadbob)
-            HandleHeadbob();
 
         // --- El Hareketi ---
         if (IsUsingItemX || IsUsingItemY)

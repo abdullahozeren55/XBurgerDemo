@@ -10,8 +10,9 @@ public class Window : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    public Sprite FocusImage { get => focusImage; set => focusImage = value; }
-    [SerializeField] private Sprite focusImage;
+    public Sprite FocusImage { get => focusImages[windowStateNum]; set => focusImages[windowStateNum] = value; }
+    [SerializeField] private Sprite[] focusImages;
+    private int windowStateNum = 0;
     [Space]
 
     [Header("Open Close Settings")]
