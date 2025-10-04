@@ -256,7 +256,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && !isGettingPutOnTray && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door")))
+        if (!IsGrabbed && !isGettingPutOnTray && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {

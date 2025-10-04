@@ -191,7 +191,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {

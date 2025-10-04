@@ -360,7 +360,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && !isGettingPutOnTray && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !isGettingPutOnTray && !collision.gameObject.CompareTag("Player"))
         {
 
             if (decalParent != null && decalParent.childCount > 0)

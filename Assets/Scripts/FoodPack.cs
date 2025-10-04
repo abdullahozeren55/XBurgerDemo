@@ -37,6 +37,7 @@ public class FoodPack : MonoBehaviour, IGrabable
     private int ungrabableLayer;
 
     private bool isJustThrowed;
+    private bool isJustDropped;
 
     private float audioLastPlayedTime;
 
@@ -55,6 +56,7 @@ public class FoodPack : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         isJustThrowed = false;
+        isJustDropped = false;
 
         audioLastPlayedTime = 0f;
     }
@@ -80,31 +82,35 @@ public class FoodPack : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        ChangeLayer(grabableOutlinedLayer);
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
-        ChangeLayer(grabableLayer);
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(grabableLayer);
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
-        IsGrabbed = false;
+        col.enabled = true;
 
-        Invoke("TurnOnCollider", 0.08f);
+        IsGrabbed = false;
 
         transform.SetParent(null);
 
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
+
+        isJustDropped = true;
     }
 
     public void OnThrow(Vector3 direction, float force)
     {
-        IsGrabbed = false;
+        col.enabled = true;
 
-        Invoke("TurnOnCollider", 0.08f);
+        IsGrabbed = false;
 
         transform.SetParent(null);
 
@@ -168,11 +174,6 @@ public class FoodPack : MonoBehaviour, IGrabable
         }
     }
 
-    private void TurnOnCollider()
-    {
-        col.enabled = true;
-    }
-
     private void OnDestroy()
     {
         PlayerManager.Instance.ResetPlayerGrab(this);
@@ -187,14 +188,25 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
 
                 PlayAudioWithRandomPitch(2);
 
+                ChangeLayer(grabableLayer);
+
                 isJustThrowed = false;
+            }
+            else if (isJustDropped)
+            {
+                ChangeLayer(grabableLayer);
+
+                if (Time.time > audioLastPlayedTime + 0.1f)
+                    PlayAudioWithRandomPitch(1);
+
+                isJustDropped = false;
             }
             else if (Time.time > audioLastPlayedTime + 0.1f)
             {

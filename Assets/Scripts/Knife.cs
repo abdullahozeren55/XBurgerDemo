@@ -19,8 +19,6 @@ public class Knife : MonoBehaviour, IGrabable
     public KnifeData data;
     public Sprite FocusImage { get => data.focusImage; set => data.focusImage = value; }
     [Space]
-    [SerializeField] private float throwMultiplier;
-    [Space]
     [SerializeField] private Collider triggerCol; 
 
     private AudioSource audioSource;
@@ -33,6 +31,7 @@ public class Knife : MonoBehaviour, IGrabable
     private int ungrabableLayer;
 
     private bool isJustThrowed;
+    private bool isJustDropped;
     private bool isStuck;
 
     private float audioLastPlayedTime;
@@ -54,6 +53,7 @@ public class Knife : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         isJustThrowed = false;
+        isJustDropped = false;
         isStuck = false;
 
         audioLastPlayedTime = 0f;
@@ -61,6 +61,8 @@ public class Knife : MonoBehaviour, IGrabable
 
     public void OnDrop(Vector3 direction, float force)
     {
+        col.enabled = true;
+
         IsGrabbed = false;
 
         Invoke("TurnOnCollider", 0.08f);
@@ -80,11 +82,14 @@ public class Knife : MonoBehaviour, IGrabable
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
+
+        isJustDropped = true;
     }
 
     public void OnFocus()
     {
-        gameObject.layer = grabableOutlinedLayer;
+        if (!isJustDropped && !isJustThrowed)
+            gameObject.layer = grabableOutlinedLayer;
     }
 
     public void OnGrab(Transform grabPoint)
@@ -115,11 +120,14 @@ public class Knife : MonoBehaviour, IGrabable
 
     public void OnLoseFocus()
     {
-        gameObject.layer = grabableLayer;
+        if (!isJustDropped && !isJustThrowed)
+            gameObject.layer = grabableLayer;
     }
 
     public void OnThrow(Vector3 direction, float force)
     {
+        col.enabled = true;
+
         IsGrabbed = false;
 
         Invoke("TurnOnCollider", 0.08f);
@@ -151,7 +159,7 @@ public class Knife : MonoBehaviour, IGrabable
 
         rb.useGravity = true;
 
-        rb.AddForce(direction * throwMultiplier * force, ForceMode.Impulse);
+        rb.AddForce(direction * force, ForceMode.Impulse);
 
         isJustThrowed = true;
     }
@@ -219,7 +227,7 @@ public class Knife : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
@@ -229,7 +237,18 @@ public class Knife : MonoBehaviour, IGrabable
 
                 triggerCol.enabled = false;
 
+                gameObject.layer = grabableLayer;
+
                 isJustThrowed = false;
+            }
+            else if (isJustDropped)
+            {
+                gameObject.layer = grabableLayer;
+
+                if (Time.time > audioLastPlayedTime + 0.1f)
+                    PlayAudioWithRandomPitch(1);
+
+                isJustDropped = false;
             }
             else if (Time.time > audioLastPlayedTime + 0.1f)
             {

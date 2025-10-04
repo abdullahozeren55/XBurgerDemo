@@ -45,8 +45,7 @@ public class Noodle : MonoBehaviour, IGrabable
     private Quaternion hologramRotation;
 
     private bool isJustThrowed;
-
-    private Coroutine putOnHologramCoroutine;
+    private bool isJustDropped;
 
     private float audioLastPlayedTime;
 
@@ -77,6 +76,7 @@ public class Noodle : MonoBehaviour, IGrabable
         IsGettingPutOnHologram = false;
 
         isJustThrowed = false;
+        isJustDropped = false;
 
         audioLastPlayedTime = 0f;
     }
@@ -95,7 +95,7 @@ public class Noodle : MonoBehaviour, IGrabable
         this.hologramPos = hologramPos;
         this.hologramRotation = hologramRotation;
 
-        putOnHologramCoroutine = StartCoroutine(PutOnHologram());
+        StartCoroutine(PutOnHologram());
     }
 
     public void OnGrab(Transform grabPoint)
@@ -132,7 +132,7 @@ public class Noodle : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        if (!IsGettingPutOnHologram)
+        if (!IsGettingPutOnHologram && !isJustDropped && !isJustThrowed)
         {
             gameObject.layer = grabableOutlinedLayer;
 
@@ -142,7 +142,7 @@ public class Noodle : MonoBehaviour, IGrabable
     }
     public void OnLoseFocus()
     {
-        if (!IsGettingPutOnHologram)
+        if (!IsGettingPutOnHologram && !isJustDropped && !isJustThrowed)
         {
             gameObject.layer = grabableLayer;
 
@@ -153,9 +153,9 @@ public class Noodle : MonoBehaviour, IGrabable
 
     public void OnDrop(Vector3 direction, float force)
     {
-        IsGrabbed = false;
+        col.enabled = true;
 
-        Invoke("TurnOnCollider", 0.08f);
+        IsGrabbed = false;
 
         transform.SetParent(null);
 
@@ -171,13 +171,15 @@ public class Noodle : MonoBehaviour, IGrabable
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
+
+        isJustDropped = true;
     }
 
     public void OnThrow(Vector3 direction, float force)
     {
-        IsGrabbed = false;
+        col.enabled = true;
 
-        Invoke("TurnOnCollider", 0.08f);
+        IsGrabbed = false;
 
         transform.SetParent(null);
 
@@ -219,11 +221,6 @@ public class Noodle : MonoBehaviour, IGrabable
         }
     }
 
-    private void TurnOnCollider()
-    {
-        col.enabled = true;
-    }
-
     private void PlayAudioWithRandomPitch(int index)
     {
         audioLastPlayedTime = Time.time;
@@ -233,14 +230,29 @@ public class Noodle : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && !IsGettingPutOnHologram && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !IsGettingPutOnHologram && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
 
                 PlayAudioWithRandomPitch(2);
 
+                gameObject.layer = grabableLayer;
+
+                ChangeChildLayers(ungrabableLayer);
+
                 isJustThrowed = false;
+            }
+            else if (isJustDropped)
+            {
+                gameObject.layer = grabableLayer;
+
+                ChangeChildLayers(ungrabableLayer);
+
+                if (Time.time > audioLastPlayedTime + 0.1f)
+                    PlayAudioWithRandomPitch(1);
+
+                isJustDropped = false;
             }
             else if (Time.time > audioLastPlayedTime + 0.1f)
             {
@@ -282,8 +294,6 @@ public class Noodle : MonoBehaviour, IGrabable
         ChangeChildLayers(interactableLayer);
 
         IsGettingPutOnHologram = false;
-
-        putOnHologramCoroutine = null;
     }
 
     public void OnUseHold()

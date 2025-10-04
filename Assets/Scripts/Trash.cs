@@ -26,6 +26,7 @@ public class Trash : MonoBehaviour, IGrabable
 
     private AudioSource audioSource;
     private Rigidbody rb;
+    private Collider col;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -33,6 +34,7 @@ public class Trash : MonoBehaviour, IGrabable
     private int ungrabableLayer;
 
     private bool isJustThrowed;
+    private bool isJustDropped;
 
     private float audioLastPlayedTime;
 
@@ -40,6 +42,7 @@ public class Trash : MonoBehaviour, IGrabable
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -49,6 +52,7 @@ public class Trash : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         isJustThrowed = false;
+        isJustDropped = false;
 
         audioLastPlayedTime = 0f;
 
@@ -58,6 +62,8 @@ public class Trash : MonoBehaviour, IGrabable
     public void OnGrab(Transform grabPoint)
     {
         gameObject.layer = ungrabableLayer;
+
+        col.enabled = false;
 
         PlayAudioWithRandomPitch(0);
 
@@ -75,15 +81,19 @@ public class Trash : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        gameObject.layer = grabableOutlinedLayer;
+        if (!isJustDropped && !isJustThrowed)
+            gameObject.layer = grabableOutlinedLayer;
     }
     public void OnLoseFocus()
     {
-        gameObject.layer = grabableLayer;
+        if (!isJustDropped && !isJustThrowed)
+            gameObject.layer = grabableLayer;
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
+        col.enabled = true;
+
         IsGrabbed = false;
 
         transform.SetParent(null);
@@ -91,10 +101,14 @@ public class Trash : MonoBehaviour, IGrabable
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
+
+        isJustDropped = true;
     }
 
     public void OnThrow(Vector3 direction, float force)
     {
+        col.enabled = true;
+
         IsGrabbed = false;
 
         transform.SetParent(null);
@@ -132,14 +146,25 @@ public class Trash : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
 
                 PlayAudioWithRandomPitch(2);
 
+                gameObject.layer = grabableLayer;
+
                 isJustThrowed = false;
+            }
+            else if (isJustDropped)
+            {
+                gameObject.layer = grabableLayer;
+
+                if (Time.time > audioLastPlayedTime + 0.1f)
+                    PlayAudioWithRandomPitch(1);
+
+                isJustDropped = false;
             }
             else if (Time.time > audioLastPlayedTime + 0.1f)
             {
