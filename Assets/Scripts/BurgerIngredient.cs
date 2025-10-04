@@ -304,6 +304,14 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             child.transform.position = spawnPoint;
             child.transform.rotation = finalRotation;
         }
+
+        if (decalParent.childCount > 0)
+        {
+            for (int i = 0; i < decalParent.childCount; i++)
+            {
+                Destroy(decalParent.GetChild(i).gameObject);
+            }
+        }
     }
 
     private void Unstick()

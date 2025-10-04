@@ -19,8 +19,8 @@ MonoBehaviour:
   timeToPutOnTray: 0.2
   grabPositionOffset: {x: 0.4, y: 0.3, z: 2}
   grabRotationOffset: {x: -30, y: -80, z: -80}
-  grabLocalPositionOffset: {x: 0.00028948102, y: 0.00090738846, z: 0.00026371676}
-  grabLocalRotationOffset: {x: 68.09051, y: 180.00795, z: 180.00955}
+  grabLocalPositionOffset: {x: 0.00028700283, y: 0.00088999077, z: 0.00031317494}
+  grabLocalRotationOffset: {x: 61.406578, y: 170.88994, z: 171.5047}
   focusImages:
   - {fileID: 21300000, guid: b928abc80186d8046959a032e9a7b2a2, type: 3}
   audioClips:

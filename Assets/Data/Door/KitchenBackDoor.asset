@@ -23,8 +23,8 @@ MonoBehaviour:
   lockShakeStrength: 5
   jumpscareMoveAmount: {x: 1.3, y: 0, z: 0}
   timeToJumpscare: 0.3
-  jumpscareEffectPercentValue: 0.2
-  jumpscareSoundEffectPercentValue: 0.3
+  jumpscareEffectPercentValue: 0.1
+  jumpscareSoundEffectPercentValue: 0.2
   jumpscareDoorRotatePercentValue: 0.4
   dialogueAfterInteraction: {fileID: 11400000, guid: 300d758f177c519489f23c777568dbbe, type: 2}
   dialoguePlayDelay: 1.5

@@ -12,10 +12,8 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
-    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
-    [SerializeField] private Vector3 grabPositionOffset = new Vector3(0.4f, 0.1f, 2f);
-    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
-    [SerializeField] private Vector3 grabRotationOffset = new Vector3(-5f, -70f, -70f);
+    public Vector3 GrabPositionOffset { get => data.grabPositionOffset; set => data.grabPositionOffset = value; }
+    public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
 
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
@@ -77,8 +75,8 @@ public class FoodPack : MonoBehaviour, IGrabable
 
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
-        transform.localPosition = data.grabPositionOffset;
-        transform.localRotation = Quaternion.Euler(data.grabRotationOffset);
+        transform.localPosition = data.grabLocalPositionOffset;
+        transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
     }
     public void OnFocus()
     {

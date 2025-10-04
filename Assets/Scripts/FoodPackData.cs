@@ -17,6 +17,9 @@ public class FoodPackData : ScriptableObject
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]
+    public Vector3 grabLocalPositionOffset;
+    public Vector3 grabLocalRotationOffset;
+    [Space]
     public Sprite focusImage;
     [Space]
 

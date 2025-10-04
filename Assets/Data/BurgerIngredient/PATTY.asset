@@ -19,8 +19,8 @@ MonoBehaviour:
   timeToPutOnTray: 0.2
   grabPositionOffset: {x: 0.4, y: 0.3, z: 2}
   grabRotationOffset: {x: -30, y: -80, z: -80}
-  grabLocalPositionOffset: {x: 0.00019289182, y: 0.0009522523, z: 0.00036012585}
-  grabLocalRotationOffset: {x: 49.997948, y: 179.99948, z: 170.60645}
+  grabLocalPositionOffset: {x: 0.000029034101, y: 0.00093181024, z: 0.00039220246}
+  grabLocalRotationOffset: {x: 49.996616, y: 180.00002, z: 170.60837}
   focusImages:
   - {fileID: 21300000, guid: 38a8a5c7b3426414cb26f2509c99cde2, type: 3}
   - {fileID: 21300000, guid: 09d2efd854e86dc4fb4af4079dbcea94, type: 3}

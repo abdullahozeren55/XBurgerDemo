@@ -24,7 +24,10 @@ public class PlayerManager : MonoBehaviour
         RegularBurgerIngredientGrab,
         ThickBurgerIngredientGrab,
         NoodleGrab,
-        KettleGrab
+        KettleGrab,
+        WholeIngredientGrab,
+        BigWholeIngredientGrab,
+        WholeBunGrab
     }
 
     private FirstPersonController firstPersonController;
