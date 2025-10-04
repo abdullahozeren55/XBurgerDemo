@@ -886,7 +886,7 @@ public class FirstPersonController : MonoBehaviour
                 Vector3 targetPoint;
                 Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-                if (Physics.Raycast(ray, out RaycastHit hit, 50f))
+                if (Physics.Raycast(ray, out RaycastHit hit, 50f, ~LayerMask.GetMask("Player")))
                     targetPoint = hit.point; // crosshair neye bakýyorsa
                 else
                     targetPoint = ray.GetPoint(50f); // boþluða doðru uzaða

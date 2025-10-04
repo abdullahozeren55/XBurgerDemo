@@ -117,16 +117,6 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private void ChangeDialogueBar(bool isSelfTalk)
-    {
-        personText.alpha = isSelfTalk ? 0f : 1f;
-        dialogueText.fontStyle = isSelfTalk ? FontStyles.Italic : FontStyles.Normal;
-
-        Vector3 dialogueTransform = dialogueRectTransform.localPosition;
-        dialogueTransform.y = isSelfTalk ? dialogueTextSelfTalkYValue : dialogueTextNormalYValue;
-        dialogueRectTransform.localPosition = dialogueTransform;
-    }
-
     public void StartCustomerDialogue(ICustomer customer, DialogueData data)
     {
         GameManager.Instance.SetOrderThrowArea(false);
@@ -143,8 +133,6 @@ public class DialogueManager : MonoBehaviour
         currentCustomer = customer;
 
         currentCoroutineTime = coroutineTimeBeforeSkip;
-
-        ChangeDialogueBar(false);
 
         visualPart.SetActive(true);
 
@@ -189,8 +177,6 @@ public class DialogueManager : MonoBehaviour
 
         currentCoroutineTime = coroutineTimeBeforeSkip;
 
-        ChangeDialogueBar(false);
-
         visualPart.SetActive(true);
 
         StartCoroutine(PlayDialogue(dialogueData.dialogueSegments[dialogueIndex]));
@@ -222,8 +208,6 @@ public class DialogueManager : MonoBehaviour
 
         currentCoroutineTime = coroutineTimeBeforeSkip;
 
-        ChangeDialogueBar(false);
-
         visualPart.SetActive(true);
 
         StartCoroutine(PlayDialogue(dialogueData.dialogueSegments[dialogueIndex]));
@@ -252,8 +236,6 @@ public class DialogueManager : MonoBehaviour
         dialogueIndex = 0;
 
         currentCoroutineTime = coroutineTimeBeforeSkip;
-
-        ChangeDialogueBar(true);
 
         visualPart.SetActive(true);
 
@@ -285,8 +267,6 @@ public class DialogueManager : MonoBehaviour
         dialogueIndex = 0;
 
         currentCoroutineTime = coroutineTimeBeforeSkip;
-
-        ChangeDialogueBar(true);
 
         visualPart.SetActive(true);
 

@@ -65,8 +65,6 @@ public class Knife : MonoBehaviour, IGrabable
 
         IsGrabbed = false;
 
-        Invoke("TurnOnCollider", 0.08f);
-
         if (useCoroutine != null)
         {
             StopCoroutine(useCoroutine);
@@ -129,8 +127,6 @@ public class Knife : MonoBehaviour, IGrabable
         col.enabled = true;
 
         IsGrabbed = false;
-
-        Invoke("TurnOnCollider", 0.08f);
 
         if (useCoroutine != null)
         {
@@ -220,9 +216,9 @@ public class Knife : MonoBehaviour, IGrabable
         audioSource.PlayOneShot(data.audioClips[index]);
     }
 
-    private void TurnOnCollider()
+    private void TurnOffTriggerCol()
     {
-        col.enabled = true;
+        triggerCol.enabled = false;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -235,7 +231,7 @@ public class Knife : MonoBehaviour, IGrabable
 
                 PlayAudioWithRandomPitch(2);
 
-                triggerCol.enabled = false;
+                Invoke("TurnOffTriggerCol", 0.1f);
 
                 gameObject.layer = grabableLayer;
 

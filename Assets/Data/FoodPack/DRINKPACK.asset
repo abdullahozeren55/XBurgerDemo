@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: b1aa171ede49dd14ca4966340bcad396, type: 3}
   isUseable: 0
-  handGrabType: 0
+  handGrabType: 10
   minForce: 0.2
   maxForce: 0.4
   haveWholeIngredient: 0
   grabPositionOffset: {x: 0.4, y: 0.5, z: 2}
   grabRotationOffset: {x: -5, y: -70, z: -70}
-  grabLocalPositionOffset: {x: 0.00006911071, y: 0.0014496867, z: 0.0014480879}
-  grabLocalRotationOffset: {x: 72.61873, y: 285.24048, z: 271.03705}
+  grabLocalPositionOffset: {x: -0.0000097852135, y: 0.00009741553, z: 0.0011173027}
+  grabLocalRotationOffset: {x: 76.84228, y: 349.46463, z: 330.60822}
   focusImage: {fileID: 0}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
