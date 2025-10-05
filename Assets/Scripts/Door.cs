@@ -126,10 +126,6 @@ public class Door : MonoBehaviour, IInteractable
            {
                doorStateNum = 2;
 
-               OutlineShouldBeRed = true;
-
-               OutlineChangeCheck();
-
                PlayerManager.Instance.TryChangingFocusText(this, FocusImage);
 
                isLockedAnimating = false;
