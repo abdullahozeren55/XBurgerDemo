@@ -93,8 +93,6 @@ public class GameManager : MonoBehaviour
 
     private bool burgerMatched;
 
-    [SerializeField] private GameObject crosshair;
-
     private BurgerBox lastThrowedBurgerBox;
     private Drink lastThrowedDrink;
     private MeshRenderer[] lastThrowedBurgerBoxMeshRenderers;
@@ -227,8 +225,6 @@ public class GameManager : MonoBehaviour
         afterFirstNoodleCutsceneTrigger.SetActive(true);
         DialogueManager.Instance.StartSelfDialogue(afterFirstNoodleSelfTalk);
     }
-
-    public void TurnCrosshairOnOff(bool shouldTurnOn) => crosshair.SetActive(shouldTurnOn);
 
     public void SetCurrentCustomer(ICustomer customer) => currentCustomer = customer;
 

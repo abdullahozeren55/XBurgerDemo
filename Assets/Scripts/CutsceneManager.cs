@@ -1,7 +1,7 @@
 using Cinemachine;
 using UnityEngine;
 using UnityEngine.Playables;
-
+using DG.Tweening;
 public enum CutsceneType
 {
     AfterFirstNoodleP1,
@@ -24,6 +24,12 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera dollyCam;
     [Space]
     [SerializeField] private CutsceneEntry[] cutscenes;
+    [Space]
+    [Header("UI Settings")]
+    [SerializeField] private GameObject crosshair;
+    [SerializeField] private GameObject focusText;
+    [SerializeField] private GameObject UITexts;
+    [SerializeField] private GameObject[] cutsceneBars; //0 top, 1 bottom
 
     private PlayableAsset currentCutscene;
 
@@ -45,7 +51,8 @@ public class CutsceneManager : MonoBehaviour
     public void PlayCutscene(CutsceneType type)
     {
         PlayerManager.Instance.ChangePlayerCanMove(false);
-        GameManager.Instance.TurnCrosshairOnOff(false);
+
+        GetReadyForCutscene(true);
 
         if (playableDirector.state == PlayState.Playing)
             StopCutscene();
@@ -69,8 +76,43 @@ public class CutsceneManager : MonoBehaviour
     public void StopCutscene()
     {
         PlayerManager.Instance.ChangePlayerCanMove(true);
-        GameManager.Instance.TurnCrosshairOnOff(true);
+
+        GetReadyForCutscene(false);
+
         playableDirector.Stop();
+    }
+
+    public void GetReadyForCutscene(bool shouldGetReady)
+    {
+        TurnCrosshairOnOff(!shouldGetReady);
+
+        // --- Letterbox bar animasyonu ---
+        if (cutsceneBars.Length >= 2)
+        {
+            RectTransform topBar = cutsceneBars[0].GetComponent<RectTransform>();
+            RectTransform bottomBar = cutsceneBars[1].GetComponent<RectTransform>();
+
+            float barHeight = topBar.sizeDelta.y;
+            float duration = 0.5f;
+
+            // Barlarýn anchored position’larýný hedef pozisyonlara göre ayarla
+            Vector2 topTarget = shouldGetReady ? Vector2.zero : new Vector2(0, barHeight);
+            Vector2 bottomTarget = shouldGetReady ? Vector2.zero : new Vector2(0, -barHeight);
+
+            // Tweene baþlamadan önce eski tween’leri iptal et
+            topBar.DOKill();
+            bottomBar.DOKill();
+
+            topBar.DOAnchorPos(topTarget, duration).SetEase(Ease.OutQuad);
+            bottomBar.DOAnchorPos(bottomTarget, duration).SetEase(Ease.OutQuad);
+        }
+    }
+
+    public void TurnCrosshairOnOff(bool value)
+    {
+        crosshair.SetActive(value);
+        focusText.SetActive(value);
+        UITexts.SetActive(value);
     }
 
     public bool IsPlaying()
