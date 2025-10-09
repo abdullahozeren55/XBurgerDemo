@@ -49,9 +49,9 @@ public class DialogueManager : MonoBehaviour
     [Space]
     [SerializeField] private FirstPersonController firstPersonController;
     [Space]
-    [SerializeField] private TAnimPlayerBase sinanTextAnim;
-    [SerializeField] private TAnimPlayerBase customer0TextAnim;
-    [SerializeField] private TAnimPlayerBase customer1TextAnim;
+    [SerializeField] private TypewriterCore sinanTextAnim;
+    [SerializeField] private TypewriterCore customer0TextAnim;
+    [SerializeField] private TypewriterCore customer1TextAnim;
     [Space]
     [SerializeField] private AudioClip defaultDialogueAudio;
     [Space]
@@ -63,7 +63,7 @@ public class DialogueManager : MonoBehaviour
 
     private DialogueData currentDialogueData;
     private TMP_Text currentDialogueText;
-    private TAnimPlayerBase currentTextAnim;
+    private TypewriterCore currentTextAnim;
 
     private int dialogueIndex = 0;
     private TalkType talkType;
@@ -112,7 +112,9 @@ public class DialogueManager : MonoBehaviour
             {
                 if (!IsSkipped && !IsDialogueComplete)
                 {
-                    currentTextAnim.SkipTypewriter();
+                    sinanTextAnim.SkipTypewriter();
+                    customer0TextAnim.SkipTypewriter();
+                    customer1TextAnim.SkipTypewriter(); //WE SKIP ALL INDIVIDUALLY BECAUSE SKIP MAKES IT FINISH IMMEDIATELY DOESNT MATTER IF ITS SHOWING OR DISAPPEARING. SO THEY ALL IMMEDIATELY FINISHES. IF WE ONLY USE CURRENTTEXTANIM DISAPPEARING OCCURS NORMALLY AND STAYS UNNECESSERILY.
                     IsSkipped = true;
                 }
                 else if (IsSkipped || IsDialogueComplete)

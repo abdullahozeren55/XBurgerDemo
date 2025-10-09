@@ -1,14 +1,18 @@
 {
     "name": "Febucci.TextAnimator.Runtime",
+    "rootNamespace": "",
     "references": [
-        "Unity.TextMeshPro"
+        "GUID:448b0b55421917e4784a8f2f7449081f"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Febucci.TextUtils.dll"
+    ],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

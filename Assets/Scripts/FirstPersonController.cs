@@ -177,6 +177,8 @@ public class FirstPersonController : MonoBehaviour
     [Header("Grab Parameters")]
     [SerializeField] private Transform grabPoint;
     [SerializeField] private TMP_Text focusText;
+    [SerializeField] private TypewriterCore focusTextAnim;
+    private bool focusTextComplete;
     private Coroutine grabbedUseCoroutine;
 
     [Header("HandControlSettings")]
@@ -544,36 +546,50 @@ public class FirstPersonController : MonoBehaviour
         if (currentInteractable != null)
         {
             focusText.color = crosshairText.color;
+            focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != currentInteractable.FocusText)
+            if (focusText.text != ("<noparse></noparse>") + currentInteractable.FocusText)
             {
+                SetFocusTextComplete(false);
                 focusText.text = currentInteractable.FocusText;
-            }   
+            }     
+            else if (!focusTextComplete)
+                focusTextAnim.StartShowingText();
+            
         }
         else if (currentGrabable != null && !currentGrabable.IsGrabbed)
         {
             focusText.color = crosshairText.color;
+            focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != currentGrabable.FocusText)
+            if (focusText.text != ("<noparse></noparse>") + currentGrabable.FocusText)
             {
+                SetFocusTextComplete(false);
                 focusText.text = currentGrabable.FocusText;
             }
+            else if (!focusTextComplete)
+                focusTextAnim.StartShowingText();
+
         }
         else if (otherGrabable != null)
         {
             focusText.color = crosshairText.color;
+            focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != otherGrabable.FocusText)
+            if (focusText.text != ("<noparse></noparse>") + otherGrabable.FocusText)
             {
+                SetFocusTextComplete(false);
                 focusText.text = otherGrabable.FocusText;
             }
+            else if (!focusTextComplete)
+                focusTextAnim.StartShowingText();
+
         }
         else
         {
-            if (focusText.text != null)
-            {
-                focusText.text = null;
-            }
+            SetFocusTextComplete(false);
+            focusTextAnim.StopShowingText();
+            focusTextAnim.StartDisappearingText();
         }
     }
 
@@ -791,20 +807,25 @@ public class FirstPersonController : MonoBehaviour
                     }
                     else if (currentGrabable.IsGrabbed)
                     {
-                        if (otherGrabable != null)
+                        if (otherGrabable != null && hit.collider.gameObject.GetComponent<IGrabable>() != otherGrabable)
                         {
                             otherGrabable.OnLoseFocus();
                             otherGrabable = null;
                             DecideOutlineAndCrosshair();
                         }
 
-                        otherGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
-
-                        if (otherGrabable != null)
+                        if (otherGrabable == null)
                         {
-                            otherGrabable.OnFocus();
-                            DecideOutlineAndCrosshair();   
+                            otherGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
+
+                            if (otherGrabable != null)
+                            {
+                                otherGrabable.OnFocus();
+                                DecideOutlineAndCrosshair();
+                            }
                         }
+
+                        
                     }
                     else if (currentGrabable != hit.collider.gameObject.GetComponent<IGrabable>())
                     {
@@ -957,9 +978,8 @@ public class FirstPersonController : MonoBehaviour
         {
             if (hit.collider.gameObject.GetComponent<IGrabable>() == currentGrabable)
             {
-                
-                DecideOutlineAndCrosshair();
                 currentGrabable.OnGrab(grabPoint);
+                DecideOutlineAndCrosshair();
                 DecideGrabAnimBool();
 
                 if (rightHandRigLerpCoroutine != null)
@@ -1330,6 +1350,8 @@ public class FirstPersonController : MonoBehaviour
 
     public IInteractable GetCurrentInteractable() { return currentInteractable; }
     public IGrabable GetCurrentGrabable() { return currentGrabable; }
+
+    public void SetFocusTextComplete(bool value) => focusTextComplete = value; //GETS TRUE IN TYPEWRITTER ACTIONS WHEN ITS COMPLETE. GETS FALSE WHENEVER TEXT GETS CHANGED ON DECIDEFOCUSTEXT()
 
     private void ResetHandAnim()
     {
