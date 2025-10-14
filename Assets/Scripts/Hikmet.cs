@@ -1,4 +1,5 @@
 using Cinemachine;
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -69,7 +70,7 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
     [SerializeField] private Transform restaurantDestination; //destinationToArrive
     [SerializeField] private Transform homeDestination; //destinationToDisappear
-    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform facingDirectionTransform;
     [SerializeField] private GameObject[] ordersInRightHand;
     [SerializeField] private GameObject[] ordersInLeftHand;
 
@@ -103,13 +104,13 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
     [Header("Hikmet Settings")]
     [SerializeField] private float normalWalkSpeed = 1.2f;
     [SerializeField] private float sadWalkSpeed = 0.8f;
-    [SerializeField] private Tarik tarik;
     [SerializeField] private Material hikmetOutfit1Angry;
 
     [Header("Push Player Settings")]
     [SerializeField] private Transform rayPointForPushingPlayer;
 
     private int day;
+    private Tween rotateTween;
 
     private void Awake()
     {
@@ -168,8 +169,6 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
             HandleFootsteps();
             HandlePushingPlayer();
         }
-        else
-            RotateCustomer();
     }
 
     public void HandleIdle()
@@ -197,6 +196,7 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
             if (currentDestination == restaurantDestination)
             {
                 CurrentAction = ICustomer.Action.ReadyToOrder;
+                RotateCustomer();
                 HandleIdle();
             }
             else
@@ -343,16 +343,12 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
         }
         else if (CurrentAction == ICustomer.Action.GotAnswerD || CurrentAction == ICustomer.Action.NotGotAnswer)
         {
-            tarik.didHikmetGetBurger = false;
-            tarik.gameObject.SetActive(true);
             skinnedMeshRenderer.material = hikmetOutfit1Angry;
             anim.SetBool("giveOtherBack", true);
             anim.SetTrigger("giveBack");
         }
         else if (CurrentAction == ICustomer.Action.GotAnswerA)
         {
-            tarik.didHikmetGetBurger = true;
-            tarik.gameObject.SetActive(true);
             HandleHeadHome();
         }
 
@@ -515,12 +511,19 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
     private void RotateCustomer()
     {
-        Vector3 direction = playerTransform.position - transform.position;
-        direction.y = 0f; // Ignore vertical difference
+        Vector3 direction = facingDirectionTransform.position - transform.position;
+        direction.y = 0f; // Y eksenini yok say
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, CustomerData.rotationSpeed * Time.deltaTime);
+
+            // Önceki tween'i iptal et (aksi halde üst üste biner)
+            rotateTween?.Kill();
+
+            // DOTween ile dönüþ animasyonu
+            rotateTween = transform
+                .DORotateQuaternion(targetRotation, CustomerData.rotationDuration)
+                .SetEase(Ease.OutQuad); // Yumuþak yavaþlama efekti
         }
     }
 
@@ -544,14 +547,15 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
     private void GiveOrderBack()
     {
+
         if (ordersInRightHand[0].activeSelf)
         {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * transform.forward);
             ordersInRightHand[0].SetActive(false);
         }
         else
         {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * transform.forward);
             ordersInRightHand[1].SetActive(false);
             ordersInRightHand[2].SetActive(false);
             ordersInRightHand[3].SetActive(false);
@@ -563,12 +567,12 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
     {
         if (ordersInLeftHand[0].activeSelf)
         {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInLeftHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackBurger(ordersInLeftHand[0].transform, customerData.throwForce * transform.forward);
             ordersInLeftHand[0].SetActive(false);
         }
         else
         {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInLeftHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackDrink(ordersInLeftHand[1].transform, customerData.throwForce * transform.forward);
             ordersInLeftHand[1].SetActive(false);
             ordersInLeftHand[2].SetActive(false);
             ordersInLeftHand[3].SetActive(false);

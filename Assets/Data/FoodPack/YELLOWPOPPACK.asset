@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f1ea6c3ffc8a942b17df31987d356e, type: 3}
+  m_Name: YELLOWPOPPACK
+  m_EditorClassIdentifier: 
+  destroyParticle: {fileID: 939900511580441035, guid: b1aa171ede49dd14ca4966340bcad396, type: 3}
+  isUseable: 0
+  handGrabType: 10
+  minForce: 0.2
+  maxForce: 0.4
+  haveWholeIngredient: 0
+  grabPositionOffset: {x: 0.4, y: 0.5, z: 2}
+  grabRotationOffset: {x: -5, y: -70, z: -70}
+  grabLocalPositionOffset: {x: -0.0000097852135, y: 0.00009741553, z: 0.0011173027}
+  grabLocalRotationOffset: {x: 76.84228, y: 349.46463, z: 330.60822}
+  focusText: "Sar\u0131 Kula Paketi"
+  audioClips:
+  - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
+  - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}
+  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}

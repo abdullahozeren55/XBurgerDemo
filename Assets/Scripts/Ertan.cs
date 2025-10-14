@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -67,7 +68,7 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     [SerializeField] private Transform restaurantDestination; //destinationToArrive
     [SerializeField] private Transform homeDestination; //destinationToDisappear
-    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform facingDirectionTransform;
     [SerializeField] private GameObject[] ordersInRightHand;
     [SerializeField] private GameObject[] ordersInLeftHand;
 
@@ -100,6 +101,7 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     [Header("Push Player Settings")]
     [SerializeField] private Transform rayPointForPushingPlayer;
+    private Tween rotateTween;
 
     private void Awake()
     {
@@ -142,8 +144,6 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
             HandleFootsteps();
             HandlePushingPlayer();
         }
-        else
-            RotateCustomer();
     }
 
     public void HandleIdle()
@@ -171,6 +171,7 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
             if (currentDestination == restaurantDestination)
             {
                 CurrentAction = ICustomer.Action.ReadyToOrder;
+                RotateCustomer();
                 HandleIdle();
             }
             else
@@ -475,12 +476,19 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     private void RotateCustomer()
     {
-        Vector3 direction = playerTransform.position - transform.position;
-        direction.y = 0f; // Ignore vertical difference
+        Vector3 direction = facingDirectionTransform.position - transform.position;
+        direction.y = 0f; // Y eksenini yok say
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, CustomerData.rotationSpeed * Time.deltaTime);
+
+            // Önceki tween'i iptal et (aksi halde üst üste biner)
+            rotateTween?.Kill();
+
+            // DOTween ile dönüþ animasyonu
+            rotateTween = transform
+                .DORotateQuaternion(targetRotation, CustomerData.rotationDuration)
+                .SetEase(Ease.OutQuad); // Yumuþak yavaþlama efekti
         }
     }
 

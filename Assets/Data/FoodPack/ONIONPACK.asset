@@ -22,7 +22,7 @@ MonoBehaviour:
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.00015583044, y: -0.00013078304, z: 0.0003149108}
   grabLocalRotationOffset: {x: 84.02929, y: 271.9369, z: 355.09735}
-  focusImage: {fileID: 21300000, guid: edf9a521258a6774ca48f7945e9b5893, type: 3}
+  focusText: "So\u011Fan Paketi"
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}

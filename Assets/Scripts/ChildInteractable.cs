@@ -26,6 +26,8 @@ public class ChildInteractable : MonoBehaviour, IInteractable
     public void OnInteract()
     {
         parent.OnInteract();
+
+        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
     }
 
     public void OnLoseFocus()

@@ -22,7 +22,7 @@ MonoBehaviour:
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.0008647744, y: -0.0004038523, z: 0.00057858275}
   grabLocalRotationOffset: {x: 80.05537, y: 273.77078, z: 356.9674}
-  focusImage: {fileID: 21300000, guid: fc18dc76eb81e9544bec319c35ee219e, type: 3}
+  focusText: Marul Paketi
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}

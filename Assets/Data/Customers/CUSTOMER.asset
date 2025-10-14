@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minDistance: 0.6
   pushForce: 1.8
-  rotationSpeed: 4
-  throwForce: 0.7
+  rotationDuration: 0.5
+  throwForce: 3
   woodClips:
   - {fileID: 8300000, guid: 8e001351cd7065543a068386cde4c960, type: 3}
   - {fileID: 8300000, guid: c41fb169b2991c247a5466e00faa6639, type: 3}

@@ -548,10 +548,10 @@ public class FirstPersonController : MonoBehaviour
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != ("<noparse></noparse>") + currentInteractable.FocusText)
+            if (focusText.text != currentInteractable.FocusText)
             {
                 SetFocusTextComplete(false);
-                focusText.text = currentInteractable.FocusText;
+                focusTextAnim.ShowText(currentInteractable.FocusText);
             }     
             else if (!focusTextComplete)
                 focusTextAnim.StartShowingText();
@@ -562,10 +562,10 @@ public class FirstPersonController : MonoBehaviour
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != ("<noparse></noparse>") + currentGrabable.FocusText)
+            if (focusText.text != currentGrabable.FocusText)
             {
                 SetFocusTextComplete(false);
-                focusText.text = currentGrabable.FocusText;
+                focusTextAnim.ShowText(currentGrabable.FocusText);
             }
             else if (!focusTextComplete)
                 focusTextAnim.StartShowingText();
@@ -576,10 +576,10 @@ public class FirstPersonController : MonoBehaviour
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != ("<noparse></noparse>") + otherGrabable.FocusText)
+            if (focusText.text != otherGrabable.FocusText)
             {
                 SetFocusTextComplete(false);
-                focusText.text = otherGrabable.FocusText;
+                focusTextAnim.ShowText(otherGrabable.FocusText);
             }
             else if (!focusTextComplete)
                 focusTextAnim.StartShowingText();
@@ -801,9 +801,11 @@ public class FirstPersonController : MonoBehaviour
                         }
 
                         currentGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
-                        DecideOutlineAndCrosshair();
+                        
                         if (currentGrabable != null)
                             currentGrabable.OnFocus();
+
+                        DecideOutlineAndCrosshair();
                     }
                     else if (currentGrabable.IsGrabbed)
                     {
@@ -1318,17 +1320,21 @@ public class FirstPersonController : MonoBehaviour
 
     public void TryChangingFocusText(IInteractable interactable, string text)
     {
-        if (currentInteractable != null && currentInteractable == interactable)
+        if (currentInteractable != null && currentInteractable == interactable && focusText.text != text)
         {
-            focusText.text = text;
+            focusTextAnim.ShowText(text);
+            focusTextAnim.SkipTypewriter();
+            SetFocusTextComplete(true);
         }
     }
 
     public void TryChangingFocusText(IGrabable grabable, string text)
     {
-        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable)
+        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable && focusText.text != text)
         {
-            focusText.text = text;
+            focusTextAnim.ShowText(text);
+            focusTextAnim.SkipTypewriter();
+            SetFocusTextComplete(true);
         }
     }
 

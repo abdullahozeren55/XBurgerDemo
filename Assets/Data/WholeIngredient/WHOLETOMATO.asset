@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WHOLETOMATO
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: b177dc38e30a5d746bf5bceed40353b7, type: 3}
-  focusImage: {fileID: 21300000, guid: c057d5a4a4bb4144a9f22e28bdb636f4, type: 3}
+  focusText: Domates
   isUseable: 0
   handGrabType: 9
   minForce: 0.25

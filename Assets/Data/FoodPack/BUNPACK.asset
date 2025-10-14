@@ -22,7 +22,7 @@ MonoBehaviour:
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.0010250397, y: 0.00027026192, z: 0.00049356977}
   grabLocalRotationOffset: {x: 74.62547, y: 8.055894, z: 90.28455}
-  focusImage: {fileID: 21300000, guid: 64d804b3a179714499dbb79668053344, type: 3}
+  focusText: Ekmek Paketi
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}

@@ -1,4 +1,5 @@
 using Cinemachine;
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -73,7 +74,7 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     [SerializeField] private Transform restaurantDestination; //destinationToArrive
     [SerializeField] private Transform homeDestination; //destinationToDisappear
-    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform facingDirectionTransform;
     [SerializeField] private GameObject[] ordersInRightHand;
 
     private Transform currentDestination;
@@ -121,6 +122,7 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     private float pingPongTime = 0f;
     private Material[] glowMats;
     private bool shouldGlow = false;
+    private Tween rotateTween;
 
     private void Awake()
     {
@@ -154,8 +156,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
             HandleFootsteps();
             HandlePushingPlayer();
         }
-        else
-            RotateCustomer();
 
         if (shouldGlow)
             HandleGlow();
@@ -237,6 +237,7 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
             if (currentDestination == restaurantDestination)
             {
                 CurrentAction = ICustomer.Action.ReadyToOrder;
+                RotateCustomer();
                 HandleIdle();
             }
             else
@@ -512,12 +513,19 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     private void RotateCustomer()
     {
-        Vector3 direction = playerTransform.position - transform.position;
-        direction.y = 0f; // Ignore vertical difference
+        Vector3 direction = facingDirectionTransform.position - transform.position;
+        direction.y = 0f; // Y eksenini yok say
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, CustomerData.rotationSpeed * Time.deltaTime);
+
+            // Önceki tween'i iptal et (aksi halde üst üste biner)
+            rotateTween?.Kill();
+
+            // DOTween ile dönüþ animasyonu
+            rotateTween = transform
+                .DORotateQuaternion(targetRotation, CustomerData.rotationDuration)
+                .SetEase(Ease.OutQuad); // Yumuþak yavaþlama efekti
         }
     }
 
@@ -525,12 +533,12 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     {
         if (ordersInRightHand[0].activeSelf)
         {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
             ordersInRightHand[0].SetActive(false);
         }
         else
         {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)));
+            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
             ordersInRightHand[1].SetActive(false);
             ordersInRightHand[2].SetActive(false);
             ordersInRightHand[3].SetActive(false);

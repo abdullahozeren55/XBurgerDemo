@@ -7,7 +7,7 @@ public class CustomerData : ScriptableObject
 {
     public float minDistance = 1.2f; //min distance to count as in destination
     public float pushForce = 1f; //for pushing player
-    public float rotationSpeed = 4f; //for looking at player while waiting order etc.
+    public float rotationDuration = 0.3f;
     public float throwForce = 0.8f;
 
     [Header("Footstep Parameters")]

@@ -1,5 +1,6 @@
 ﻿using Cinemachine;
 using DG.Tweening;
+using Febucci.UI.Core;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -21,12 +22,17 @@ public class ChoiceManager : MonoBehaviour
 
     public static ChoiceManager Instance;
 
+    public bool IsInChoice;
+
     private CurrentCoroutine currentCoroutine;
 
     [SerializeField] private TMP_Text questionText;
     [SerializeField] private TMP_Text optionAText;
     [SerializeField] private TMP_Text optionDText;
-    [SerializeField] private GameObject visualPart;
+    [Space]
+    [SerializeField] private TypewriterCore questionTextAnim;
+    [SerializeField] private TypewriterCore optionATextAnim;
+    [SerializeField] private TypewriterCore optionDTextAnim;
     [SerializeField] private Image timer;
     [SerializeField] private Volume volume;
     private ColorAdjustments colorAdjust;
@@ -53,9 +59,11 @@ public class ChoiceManager : MonoBehaviour
     private bool isSlowMoEndsStarted;
 
     private Color startColor;
+    private Color timerStartColor;
     private Vector3 startScale;
     private bool isAPressed;
     private bool isDPressed;
+    private bool isFinishingChoice;
 
     private float bwFadeInTime;
     private float bwFadeOutTime;
@@ -69,6 +77,8 @@ public class ChoiceManager : MonoBehaviour
     private Tween notPressATween;
     private Tween pressDTween;
     private Tween notPressDTween;
+
+    private Coroutine fadeInAndOutCoroutine;
 
     private void Awake()
     {
@@ -90,13 +100,16 @@ public class ChoiceManager : MonoBehaviour
 
         currentCustomer = null;
 
-        visualPart.SetActive(false);
+        IsInChoice = false;
+
+        timerStartColor = timer.color;
+        timer.color = Color.clear;
 
     }
 
     private void Update()
     {
-        if (visualPart.activeSelf)
+        if (IsInChoice)
         {
             isAPressed = Input.GetKey(KeyCode.A);
             isDPressed = Input.GetKey(KeyCode.D);
@@ -122,10 +135,8 @@ public class ChoiceManager : MonoBehaviour
                    .Join(optionAText.DOColor(pressDownColor, timeToPressDown))
                    .OnComplete(() =>
                    {
-                       FinishChoice();
-                       currentCustomer.CurrentAction = ICustomer.Action.GotAnswerA;
-                       DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
-                   });
+                       FinishChoice(ICustomer.Action.GotAnswerA);
+                   }).SetUpdate(true);
             }
             else if (!isAPressed && !isDPressed && currentCoroutine == CurrentCoroutine.PRESSA)
             {
@@ -145,7 +156,7 @@ public class ChoiceManager : MonoBehaviour
 
                 notPressATween = DOTween.Sequence()
                     .Append(optionAText.transform.DOScale(startScale, timeToPressDown))
-                    .Join(optionAText.DOColor(startColor, timeToPressDown));
+                    .Join(optionAText.DOColor(startColor, timeToPressDown)).SetUpdate(true);
             }
 
             if (isDPressed && !isAPressed && currentCoroutine != CurrentCoroutine.PRESSD)
@@ -169,10 +180,8 @@ public class ChoiceManager : MonoBehaviour
                    .Join(optionDText.DOColor(pressDownColor, timeToPressDown))
                    .OnComplete(() =>
                    {
-                       FinishChoice();
-                       currentCustomer.CurrentAction = ICustomer.Action.GotAnswerD;
-                       DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionDDialogueData);
-                   });
+                       FinishChoice(ICustomer.Action.GotAnswerD);
+                   }).SetUpdate(true);
             }
             else if (!isDPressed && !isAPressed && currentCoroutine == CurrentCoroutine.PRESSD)
             {
@@ -192,7 +201,7 @@ public class ChoiceManager : MonoBehaviour
 
                 notPressDTween = DOTween.Sequence()
                     .Append(optionDText.transform.DOScale(startScale, timeToPressDown))
-                    .Join(optionDText.DOColor(startColor, timeToPressDown));
+                    .Join(optionDText.DOColor(startColor, timeToPressDown)).SetUpdate(true);
             }
 
         }
@@ -210,9 +219,9 @@ public class ChoiceManager : MonoBehaviour
         CameraManager.CameraName camToSwitch
         )
     {
-        questionText.text = question;
-        optionAText.text = "[A]\n" + optionA;
-        optionDText.text = "[D]\n" + optionD;
+        questionTextAnim.ShowText(question);
+        optionATextAnim.ShowText("[A]\n" + optionA);
+        optionDTextAnim.ShowText("[D]\n" + optionD);
         bwFadeInTime = timeToChoose * bwFadeInMultiplier;
         bwFadeOutTime = timeToChoose * bwFadeOutMultiplier;
         timer.fillAmount = 1f;
@@ -231,20 +240,50 @@ public class ChoiceManager : MonoBehaviour
         originalCameraFov = virtualCamera.m_Lens.FieldOfView;
         changedCameraFov = originalCameraFov * cameraFovMultiplier;
 
-        visualPart.SetActive(true);
+        IsInChoice = true;
+        isFinishingChoice = false;
 
-        StartCoroutine(FadeInAndOut());
+        StartCoroutine(TimerColorLerp(true));
+
+        fadeInAndOutCoroutine = StartCoroutine(FadeInAndOut());
     }
 
-    private void FinishChoice()
+    private void FinishChoice(ICustomer.Action action)
     {
-        StopAllCoroutines();
-        StartCoroutine(FastOut());
+        if (isFinishingChoice) return;
+        isFinishingChoice = true;
 
-        visualPart.SetActive(false);
+        IsInChoice = false;
+
+        if (fadeInAndOutCoroutine != null)
+        {
+            StopCoroutine(fadeInAndOutCoroutine);
+            fadeInAndOutCoroutine = null;
+        }
+        StartCoroutine(TimerColorLerp(false));
+        StartCoroutine(FastOut(action));     
     }
 
-    private IEnumerator FastOut()
+    private IEnumerator TimerColorLerp(bool shouldIncrease)
+    {
+        Color startColor = timer.color;
+        Color endColor = shouldIncrease ? timerStartColor : Color.clear;
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < 0.5f)
+        {
+            timer.color = Color.Lerp(startColor, endColor, elapsedTime / 0.5f);
+
+            elapsedTime += Time.deltaTime;
+
+            yield return null;
+        }
+
+        timer.color = endColor;
+    }
+
+    private IEnumerator FastOut(ICustomer.Action action)
     {
         float startAlpha = colorAdjust.saturation.value;
         float currentFov = virtualCamera.m_Lens.FieldOfView;
@@ -252,9 +291,12 @@ public class ChoiceManager : MonoBehaviour
 
         if (!slowMoEndsSource.isPlaying) slowMoEndsSource.PlayOneShot(slowMoEndsSound);
 
+        questionTextAnim.StartDisappearingText();
+        optionATextAnim.StartDisappearingText();
+        optionDTextAnim.StartDisappearingText();
 
         float elapsedTime = 0f;
-        float fastOutTime = 5f;
+        float fastOutTime = 0.5f;
         float value = 0f;
 
         while (elapsedTime < fastOutTime)
@@ -283,6 +325,14 @@ public class ChoiceManager : MonoBehaviour
         slowMoBeginSource.volume = 1f;
         clockTickingSource.volume = 1f;
 
+        yield return new WaitForSecondsRealtime(0.05f);
+
+        currentCustomer.CurrentAction = action;
+
+        if (action == ICustomer.Action.GotAnswerA)
+            DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
+        else if (action == ICustomer.Action.GotAnswerD)
+            DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionDDialogueData);
 
     }
 
@@ -338,6 +388,8 @@ public class ChoiceManager : MonoBehaviour
             yield return null;
         }
 
+        IsInChoice = false;
+
         colorAdjust.saturation.value = 0f;
         Time.timeScale = 1f;
         virtualCamera.m_Lens.FieldOfView = originalCameraFov;
@@ -345,7 +397,9 @@ public class ChoiceManager : MonoBehaviour
 
         isSlowMoEndsStarted = false;
 
-        FinishChoice();
+        questionTextAnim.StartDisappearingText();
+        optionATextAnim.StartDisappearingText();
+        optionDTextAnim.StartDisappearingText();
 
         currentCustomer.CurrentAction = ICustomer.Action.NotGotAnswer;
 

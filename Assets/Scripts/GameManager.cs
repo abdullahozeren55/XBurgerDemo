@@ -274,7 +274,7 @@ public class GameManager : MonoBehaviour
 
         lastThrowedDrink.GetComponent<MeshRenderer>().enabled = true;
         lastThrowedDrink.GetComponent<MeshCollider>().enabled = true;
-        lastThrowedDrink.GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse); 
+        lastThrowedDrink.GetComponent<Rigidbody>().velocity = force; 
     }
 
     public void CustomerGiveBackBurger(Transform throwPoint, Vector3 force)
@@ -292,7 +292,7 @@ public class GameManager : MonoBehaviour
             mr.enabled = true;
         }
         lastThrowedBurgerBox.GetComponent<BoxCollider>().enabled = true;
-        lastThrowedBurgerBox.GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse);
+        lastThrowedBurgerBox.GetComponent<Rigidbody>().velocity = force;
     }
 
     public void SetOrderThrowArea(bool shouldReceive) => orderThrowArea.ShouldReceive = shouldReceive;

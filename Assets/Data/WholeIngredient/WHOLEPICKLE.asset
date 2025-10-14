@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WHOLEPICKLE
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 939900511580441035, guid: 50c3fc7e83a5ec643b86ae10043b30d4, type: 3}
-  focusImage: {fileID: 21300000, guid: 7ac8c6c91bdea5b45b0894244f166cf1, type: 3}
+  focusText: "Tur\u015Fu"
   isUseable: 0
   handGrabType: 6
   minForce: 0.3
