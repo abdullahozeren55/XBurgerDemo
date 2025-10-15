@@ -7,15 +7,16 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class ChoiceManager : MonoBehaviour
 {
-    private enum CurrentCoroutine
+    private enum CurrentTween
     {
         NONE,
         PRESSA,
-        NOTPRESSA,
         PRESSD,
+        NOTPRESSA,
         NOTPRESSD
     }
 
@@ -24,7 +25,8 @@ public class ChoiceManager : MonoBehaviour
 
     public bool IsInChoice;
 
-    private CurrentCoroutine currentCoroutine;
+    private CurrentTween currentATween;
+    private CurrentTween currentDTween;
 
     [SerializeField] private TMP_Text questionText;
     [SerializeField] private TMP_Text optionAText;
@@ -33,17 +35,26 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private TypewriterCore questionTextAnim;
     [SerializeField] private TypewriterCore optionATextAnim;
     [SerializeField] private TypewriterCore optionDTextAnim;
-    [SerializeField] private Image timer;
+    [Space]
+    [SerializeField] private Image timerImage;
+    [SerializeField] private Image timerBackgroundImage;
+    [SerializeField] private Image keyboardAImage;
+    [SerializeField] private Image keyboardDImage;
+    [Space]
+    [SerializeField] private Sprite[] keyboardASprites; //0 not pressed, 1 pressed
+    [SerializeField] private Sprite[] keyboardDSprites;
+    [Space]
     [SerializeField] private Volume volume;
     private ColorAdjustments colorAdjust;
-    [SerializeField] private float bwFadeInMultiplier = 0.1f;
-    [SerializeField] private float bwFadeOutMultiplier = 0.9f;
+    [SerializeField] private float fadeTime = 0.5f;
     [SerializeField] private float slowedDownTimeSpeed = 0.25f;
     [SerializeField] private float cameraFovMultiplier = 2f;
     [SerializeField] private float timeToChoose = 5f;
     [SerializeField] private float timeToPressDown = 0.3f;
-    [SerializeField] Color pressDownColor;
-    [SerializeField] Vector3 pressDownScale;
+    [Space]
+    [SerializeField] Color optionPressDownColor;
+    [SerializeField] Vector3 optionPressDownScale;
+    [Space]
     [SerializeField] private AudioSource slowMoBeginSource;
     [SerializeField] private AudioSource slowMoEndsSource;
     [SerializeField] private AudioSource clockTickingSource;
@@ -56,17 +67,17 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private DialogueData optionDDialogueData;
     [SerializeField] private DialogueData notAnsweringDialogueData;
 
-    private bool isSlowMoEndsStarted;
+    private Color timerImageStartColor;
+    private Color timerBackgroundImageStartColor;
+    private Color keyboardImageStartColor;
 
-    private Color startColor;
-    private Color timerStartColor;
-    private Vector3 startScale;
+    private Color optionStartColor;
+    private Vector3 optionStartScale;
+
     private bool isAPressed;
     private bool isDPressed;
-    private bool isFinishingChoice;
+    private bool isInAnim;
 
-    private float bwFadeInTime;
-    private float bwFadeOutTime;
     private float originalCameraFov;
     private float changedCameraFov;
     private CinemachineVirtualCamera virtualCamera;
@@ -93,30 +104,40 @@ public class ChoiceManager : MonoBehaviour
 
         volume.profile.TryGet(out colorAdjust);
 
-        isSlowMoEndsStarted = false;
-
-        startScale = optionAText.transform.localScale;
-        startColor = optionAText.color;
+        optionStartScale = optionAText.transform.localScale;
+        optionStartColor = optionAText.color;
 
         currentCustomer = null;
 
         IsInChoice = false;
 
-        timerStartColor = timer.color;
-        timer.color = Color.clear;
+        timerImageStartColor = timerImage.color;
+        timerBackgroundImageStartColor = timerBackgroundImage.color;
+        keyboardImageStartColor = keyboardAImage.color;
+
+        timerImage.color = Color.clear;
+        timerBackgroundImage.color = Color.clear;
+        keyboardAImage.color = Color.clear;
+        keyboardDImage.color = Color.clear;
+
+        questionText.text = null;
+        optionAText.text = null;
+        optionDText.text = null;
 
     }
 
     private void Update()
     {
-        if (IsInChoice)
+        if (IsInChoice && !isInAnim)
         {
             isAPressed = Input.GetKey(KeyCode.A);
             isDPressed = Input.GetKey(KeyCode.D);
 
-            if (isAPressed && currentCoroutine != CurrentCoroutine.PRESSA)
+            HandleKeyboardImages();
+
+            if (isAPressed && !isDPressed && currentATween != CurrentTween.PRESSA)
             {
-                currentCoroutine = CurrentCoroutine.PRESSA;
+                currentATween = CurrentTween.PRESSA;
 
                 if (pressATween != null)
                 {
@@ -131,16 +152,17 @@ public class ChoiceManager : MonoBehaviour
                 }
 
                 pressATween = DOTween.Sequence()
-                   .Append(optionAText.transform.DOScale(pressDownScale, timeToPressDown))
-                   .Join(optionAText.DOColor(pressDownColor, timeToPressDown))
+                   .Append(keyboardAImage.transform.DOScale(optionPressDownScale, timeToPressDown))
+                   .Join(keyboardAImage.DOColor(optionPressDownColor, timeToPressDown))
+                   .Join(optionAText.DOColor(optionPressDownColor, timeToPressDown))
                    .OnComplete(() =>
                    {
                        FinishChoice(ICustomer.Action.GotAnswerA);
                    }).SetUpdate(true);
             }
-            else if (!isAPressed && !isDPressed && currentCoroutine == CurrentCoroutine.PRESSA)
+            else if (!isAPressed && currentATween != CurrentTween.NOTPRESSA)
             {
-                currentCoroutine = CurrentCoroutine.NOTPRESSA;
+                currentATween = CurrentTween.NOTPRESSA;
 
                 if (pressATween != null)
                 {
@@ -155,13 +177,14 @@ public class ChoiceManager : MonoBehaviour
                 }
 
                 notPressATween = DOTween.Sequence()
-                    .Append(optionAText.transform.DOScale(startScale, timeToPressDown))
-                    .Join(optionAText.DOColor(startColor, timeToPressDown)).SetUpdate(true);
+                    .Append(keyboardAImage.transform.DOScale(optionStartScale, timeToPressDown/5f))
+                    .Join(keyboardAImage.DOColor(optionStartColor, timeToPressDown)).SetUpdate(true)
+                    .Join(optionAText.DOColor(optionStartColor, timeToPressDown)).SetUpdate(true);
             }
 
-            if (isDPressed && !isAPressed && currentCoroutine != CurrentCoroutine.PRESSD)
+            if (isDPressed && !isAPressed && currentDTween != CurrentTween.PRESSD)
             {
-                currentCoroutine = CurrentCoroutine.PRESSD;
+                currentDTween = CurrentTween.PRESSD;
 
                 if (pressDTween != null)
                 {
@@ -176,16 +199,17 @@ public class ChoiceManager : MonoBehaviour
                 }
 
                 pressDTween = DOTween.Sequence()
-                   .Append(optionDText.transform.DOScale(pressDownScale, timeToPressDown))
-                   .Join(optionDText.DOColor(pressDownColor, timeToPressDown))
+                   .Append(keyboardDImage.transform.DOScale(optionPressDownScale, timeToPressDown))
+                   .Join(keyboardDImage.DOColor(optionPressDownColor, timeToPressDown))
+                   .Join(optionDText.DOColor(optionPressDownColor, timeToPressDown))
                    .OnComplete(() =>
                    {
                        FinishChoice(ICustomer.Action.GotAnswerD);
                    }).SetUpdate(true);
             }
-            else if (!isDPressed && !isAPressed && currentCoroutine == CurrentCoroutine.PRESSD)
+            else if (!isDPressed && currentDTween != CurrentTween.NOTPRESSD)
             {
-                currentCoroutine = CurrentCoroutine.NOTPRESSD;
+                currentDTween = CurrentTween.NOTPRESSD;
 
                 if (pressDTween != null)
                 {
@@ -200,11 +224,30 @@ public class ChoiceManager : MonoBehaviour
                 }
 
                 notPressDTween = DOTween.Sequence()
-                    .Append(optionDText.transform.DOScale(startScale, timeToPressDown))
-                    .Join(optionDText.DOColor(startColor, timeToPressDown)).SetUpdate(true);
+                    .Append(keyboardDImage.transform.DOScale(optionStartScale, timeToPressDown/5f))
+                    .Join(keyboardDImage.DOColor(optionStartColor, timeToPressDown)).SetUpdate(true)
+                    .Join(optionDText.DOColor(optionStartColor, timeToPressDown)).SetUpdate(true);
             }
 
         }
+    }
+
+    private void HandleKeyboardImages()
+    {
+        if (isAPressed && !isDPressed && keyboardAImage.sprite != keyboardASprites[1])
+        {
+            keyboardAImage.sprite = keyboardASprites[1];
+        }
+        else if (isDPressed && !isAPressed && keyboardDImage.sprite != keyboardDSprites[1])
+        {
+            keyboardDImage.sprite = keyboardDSprites[1];
+        }
+
+        if (!isAPressed && keyboardAImage.sprite != keyboardASprites[0])
+            keyboardAImage.sprite = keyboardASprites[0];
+
+        if (!isDPressed && keyboardDImage.sprite != keyboardDSprites[0])
+            keyboardDImage.sprite = keyboardDSprites[0];
     }
 
     public void StartTheCustomerChoice
@@ -220,18 +263,18 @@ public class ChoiceManager : MonoBehaviour
         )
     {
         questionTextAnim.ShowText(question);
-        optionATextAnim.ShowText("[A]\n" + optionA);
-        optionDTextAnim.ShowText("[D]\n" + optionD);
-        bwFadeInTime = timeToChoose * bwFadeInMultiplier;
-        bwFadeOutTime = timeToChoose * bwFadeOutMultiplier;
-        timer.fillAmount = 1f;
+        optionATextAnim.ShowText(optionA);
+        optionDTextAnim.ShowText(optionD);
+
+        timerImage.fillAmount = 1f;
 
         optionADialogueData = optionADialogue;
         optionDDialogueData = optionDDialogue;
         notAnsweringDialogueData = notAnsweringDialogue;
         currentCustomer = customer;
 
-        currentCoroutine = CurrentCoroutine.NONE;
+        currentATween = CurrentTween.NONE;
+        currentDTween = CurrentTween.NONE;
 
         CameraManager.Instance.SwitchToCamera(camToSwitch);
 
@@ -241,53 +284,42 @@ public class ChoiceManager : MonoBehaviour
         changedCameraFov = originalCameraFov * cameraFovMultiplier;
 
         IsInChoice = true;
-        isFinishingChoice = false;
-
-        StartCoroutine(TimerColorLerp(true));
 
         fadeInAndOutCoroutine = StartCoroutine(FadeInAndOut());
     }
 
     private void FinishChoice(ICustomer.Action action)
     {
-        if (isFinishingChoice) return;
-        isFinishingChoice = true;
+        if (isInAnim) return;
+        isInAnim = true;
 
         IsInChoice = false;
+
+        isAPressed = false;
+        isDPressed = false;
+
+        pressATween?.Kill();
+        notPressATween?.Kill();
+        pressDTween?.Kill();
+        notPressDTween?.Kill();
 
         if (fadeInAndOutCoroutine != null)
         {
             StopCoroutine(fadeInAndOutCoroutine);
             fadeInAndOutCoroutine = null;
         }
-        StartCoroutine(TimerColorLerp(false));
         StartCoroutine(FastOut(action));     
-    }
-
-    private IEnumerator TimerColorLerp(bool shouldIncrease)
-    {
-        Color startColor = timer.color;
-        Color endColor = shouldIncrease ? timerStartColor : Color.clear;
-
-        float elapsedTime = 0f;
-
-        while (elapsedTime < 0.5f)
-        {
-            timer.color = Color.Lerp(startColor, endColor, elapsedTime / 0.5f);
-
-            elapsedTime += Time.deltaTime;
-
-            yield return null;
-        }
-
-        timer.color = endColor;
     }
 
     private IEnumerator FastOut(ICustomer.Action action)
     {
-        float startAlpha = colorAdjust.saturation.value;
         float currentFov = virtualCamera.m_Lens.FieldOfView;
         float currentTimeScale = Time.timeScale;
+
+        Color timerImageColor = timerImage.color;
+        Color timerBackgroundImageColor = timerBackgroundImage.color;
+        Color keyboardAImageColor = keyboardAImage.color;
+        Color keyboardDImageColor = keyboardDImage.color;
 
         if (!slowMoEndsSource.isPlaying) slowMoEndsSource.PlayOneShot(slowMoEndsSound);
 
@@ -296,27 +328,29 @@ public class ChoiceManager : MonoBehaviour
         optionDTextAnim.StartDisappearingText();
 
         float elapsedTime = 0f;
-        float fastOutTime = 0.5f;
         float value = 0f;
 
-        while (elapsedTime < fastOutTime)
+        while (elapsedTime < fadeTime)
         {
-            value = elapsedTime / fastOutTime;
+            value = elapsedTime / fadeTime;
 
-            colorAdjust.saturation.value = Mathf.Lerp(startAlpha, 0f, value);
+            colorAdjust.saturation.value = Mathf.Lerp(-100f, 0f, value);
             virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(currentFov, originalCameraFov, value);
             Time.timeScale = Mathf.Lerp(Time.timeScale, 1f, value);
             if (slowMoBeginSource.isPlaying) slowMoBeginSource.volume = Mathf.Lerp(slowMoBeginSource.volume, 0f, value);
             if (clockTickingSource.isPlaying) clockTickingSource.volume = Mathf.Lerp(clockTickingSource.volume, 0f, value);
+
+            timerImage.color = Color.Lerp(timerImageColor, Color.clear, value);
+            timerBackgroundImage.color = Color.Lerp(timerBackgroundImageColor, Color.clear, value);
+            keyboardAImage.color = Color.Lerp(keyboardAImageColor, Color.clear, value);
+            keyboardDImage.color = Color.Lerp(keyboardDImageColor, Color.clear, value);
 
             elapsedTime += Time.unscaledDeltaTime;
             yield return null;
         }
 
         colorAdjust.saturation.value = 0f;
-
         virtualCamera.m_Lens.FieldOfView = originalCameraFov;
-
         Time.timeScale = 1f;
 
         if (slowMoBeginSource.isPlaying) slowMoBeginSource.Stop();
@@ -325,9 +359,16 @@ public class ChoiceManager : MonoBehaviour
         slowMoBeginSource.volume = 1f;
         clockTickingSource.volume = 1f;
 
+        timerImage.color = Color.clear;
+        timerBackgroundImage.color = Color.clear;
+        keyboardAImage.color = Color.clear;
+        keyboardDImage.color = Color.clear;
+
         yield return new WaitForSecondsRealtime(0.05f);
 
         currentCustomer.CurrentAction = action;
+
+        isInAnim = false;
 
         if (action == ICustomer.Action.GotAnswerA)
             DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
@@ -339,20 +380,32 @@ public class ChoiceManager : MonoBehaviour
     private IEnumerator FadeInAndOut()
     {
 
+        isInAnim = true;
+
         float startCameraFov = virtualCamera.m_Lens.FieldOfView;
+
+        Color timerImageColor = timerImage.color;
+        Color timerBackgroundImageColor = timerBackgroundImage.color;
+        Color keyboardAImageColor = keyboardAImage.color;
+        Color keyboardDImageColor = keyboardDImage.color;
 
         slowMoBeginSource.PlayOneShot(slowMoBeginSound);
 
         float timeElapsed = 0f;
         float value = 0f;
 
-        while (timeElapsed < bwFadeInTime)
+        while (timeElapsed < fadeTime)
         {
-            value = timeElapsed / bwFadeInTime;
+            value = timeElapsed / fadeTime;
 
             colorAdjust.saturation.value = Mathf.Lerp(0f, -100f, value);
             Time.timeScale = Mathf.Lerp(1f, slowedDownTimeSpeed, value);
             virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(startCameraFov, changedCameraFov, value);
+
+            timerImage.color = Color.Lerp(timerImageColor, timerImageStartColor, value);
+            timerBackgroundImage.color = Color.Lerp(timerBackgroundImageColor, timerBackgroundImageStartColor, value);
+            keyboardAImage.color = Color.Lerp(keyboardAImageColor, keyboardImageStartColor, value);
+            keyboardDImage.color = Color.Lerp(keyboardDImageColor, keyboardImageStartColor, value);
 
             timeElapsed += Time.unscaledDeltaTime;
             yield return null;
@@ -362,48 +415,104 @@ public class ChoiceManager : MonoBehaviour
         Time.timeScale = slowedDownTimeSpeed;
         virtualCamera.m_Lens.FieldOfView = changedCameraFov;
 
-        clockTickingSource.PlayOneShot(clockTickingSoundFx);
+        timerImage.color = timerImageStartColor;
+        timerBackgroundImage.color = timerBackgroundImageStartColor;
+        keyboardAImage.color = keyboardImageStartColor;
+        keyboardDImage.color = keyboardImageStartColor;
 
-        startCameraFov = virtualCamera.m_Lens.FieldOfView;
+        isInAnim = false;
+
+        clockTickingSource.PlayOneShot(clockTickingSoundFx);
 
         timeElapsed = 0f;
         value = 0f;
 
-        while (timeElapsed < bwFadeOutTime)
+        while (timeElapsed < timeToChoose)
         {
-            value = timeElapsed / bwFadeOutTime;
+            value = timeElapsed / timeToChoose;
 
-            colorAdjust.saturation.value = Mathf.Lerp(-100f, 0f, value);
-            Time.timeScale = Mathf.Lerp(slowedDownTimeSpeed, 1f, value);
-            virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(startCameraFov, originalCameraFov, value);
-            timer.fillAmount = Mathf.Lerp(1f, 0f, value);
-
-            if (bwFadeOutTime - timeElapsed < 1f && !isSlowMoEndsStarted)
-            {
-                slowMoEndsSource.PlayOneShot(slowMoEndsSound);
-                isSlowMoEndsStarted = true;
-            }
+            timerImage.fillAmount = Mathf.Lerp(1f, 0f, value);
 
             timeElapsed += Time.unscaledDeltaTime;
             yield return null;
         }
 
+        timerImage.fillAmount = 0f;
+
         IsInChoice = false;
 
-        colorAdjust.saturation.value = 0f;
-        Time.timeScale = 1f;
-        virtualCamera.m_Lens.FieldOfView = originalCameraFov;
-        timer.fillAmount = 0f;
+        IsInChoice = false;
 
-        isSlowMoEndsStarted = false;
+        isAPressed = false;
+        isDPressed = false;
+
+        bool pressAIsAboveThreshold = (pressATween != null && pressATween.ElapsedPercentage() > 0.4f) && (pressDTween == null || pressDTween.ElapsedPercentage() < 0.4f);
+        bool pressDIsAboveThreshold = (pressDTween != null && pressDTween.ElapsedPercentage() > 0.4f) && (pressATween == null || pressATween.ElapsedPercentage() < 0.4f);
+
+        pressATween.Kill();
+        notPressATween.Kill();
+        pressDTween.Kill();
+        notPressDTween.Kill();
 
         questionTextAnim.StartDisappearingText();
         optionATextAnim.StartDisappearingText();
         optionDTextAnim.StartDisappearingText();
 
-        currentCustomer.CurrentAction = ICustomer.Action.NotGotAnswer;
+        isInAnim = true;
 
-        DialogueManager.Instance.StartCustomerDialogue(currentCustomer, notAnsweringDialogueData);
+        timeElapsed = 0f;
+        value = 0f;
+
+        timerImageColor = timerImage.color;
+        timerBackgroundImageColor = timerBackgroundImage.color;
+        keyboardAImageColor = keyboardAImage.color;
+        keyboardDImageColor = keyboardDImage.color;
+
+        slowMoEndsSource.PlayOneShot(slowMoEndsSound);
+
+        while (timeElapsed < fadeTime)
+        {
+            value = timeElapsed / fadeTime;
+
+            colorAdjust.saturation.value = Mathf.Lerp(-100f, 0f, value);
+            Time.timeScale = Mathf.Lerp(slowedDownTimeSpeed, 1f, value);
+            virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(startCameraFov, originalCameraFov, value);
+
+            timerImage.color = Color.Lerp(timerImageColor, Color.clear, value);
+            timerBackgroundImage.color = Color.Lerp(timerBackgroundImageColor, Color.clear, value);
+            keyboardAImage.color = Color.Lerp(keyboardAImageColor, Color.clear, value);
+            keyboardDImage.color = Color.Lerp(keyboardDImageColor, Color.clear, value);
+
+            timeElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        colorAdjust.saturation.value = 0f;
+        Time.timeScale = 1f;
+        virtualCamera.m_Lens.FieldOfView = originalCameraFov;
+
+        timerImage.color = Color.clear;
+        timerBackgroundImage.color = Color.clear;
+        keyboardAImage.color = Color.clear;
+        keyboardDImage.color = Color.clear;
+
+        if (pressAIsAboveThreshold)
+        {
+            currentCustomer.CurrentAction = ICustomer.Action.GotAnswerA;
+            DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionADialogueData);
+        }
+        else if (pressDIsAboveThreshold)
+        {
+            currentCustomer.CurrentAction = ICustomer.Action.GotAnswerD;
+            DialogueManager.Instance.StartCustomerDialogue(currentCustomer, optionDDialogueData);
+        }
+        else
+        {
+            currentCustomer.CurrentAction = ICustomer.Action.NotGotAnswer;
+            DialogueManager.Instance.StartCustomerDialogue(currentCustomer, notAnsweringDialogueData);
+        }
+
+            
 
     }
 }
