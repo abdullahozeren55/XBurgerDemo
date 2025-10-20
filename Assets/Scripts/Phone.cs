@@ -52,6 +52,8 @@ public class Phone : MonoBehaviour, IGrabable
         audioSource = GetComponent<AudioSource>();
         meshRenderer = GetComponent<MeshRenderer>();
 
+        meshRenderer.enabled = false;
+
         IsGrabbed = false;
     }
 
@@ -63,7 +65,6 @@ public class Phone : MonoBehaviour, IGrabable
 
         PlayAudioWithRandomPitch(0);
 
-        Debug.Log("grabbed");
     }
     public void OnFocus()
     {
@@ -81,9 +82,7 @@ public class Phone : MonoBehaviour, IGrabable
     public void OnDrop(Vector3 direction, float force)
     {
 
-        Debug.Log("dropped");
-
-        Invoke("TurnOffMeshRenderer", 0.2f);
+        Invoke("TurnOffMeshRenderer", 0.15f);
 
         if (useCoroutine != null)
         {

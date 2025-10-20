@@ -191,6 +191,8 @@ public class FirstPersonController : MonoBehaviour
     [Header("Phone Settings")]
     [SerializeField] GameObject phoneGO;
     private IGrabable phoneGrabable;
+    private bool canUsePhone;
+    private float lastPhoneKeyPressedTime;
 
     [Header("UI Settings")]
     [SerializeField] private GameObject interactUI;
@@ -223,6 +225,8 @@ public class FirstPersonController : MonoBehaviour
         defaultCrosshairSize = crosshairText.fontSize;
         defaultCrosshairPosition = crosshairText.rectTransform.localPosition;
         defaultCrosshairColor = crosshairText.color;
+
+        canUsePhone = true;
 
         DecideFocusText();
 
@@ -278,10 +282,13 @@ public class FirstPersonController : MonoBehaviour
             if (useFootsteps)
                 HandleFootsteps();
 
-            if (Input.GetKeyDown(phoneKey) && (currentGrabable == null || !currentGrabable.IsGrabbed))
+            if (Input.GetKeyDown(phoneKey))
             {
-                if (!phoneGrabable.IsGrabbed)
+                lastPhoneKeyPressedTime = Time.time;
+
+                if (!phoneGrabable.IsGrabbed && canUsePhone)
                 {
+                    phoneGrabable.IsUseable = true;
                     ChangeCurrentGrabable(phoneGrabable);
                 }
                     
@@ -497,7 +504,7 @@ public class FirstPersonController : MonoBehaviour
         if (currentInteractable != null)
         {
             if (isUsingGrabbedItem ||
-            (currentGrabable != null && currentGrabable.IsGrabbed && currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab))
+            (((currentGrabable != null && currentGrabable.IsGrabbed) || phoneGrabable.IsGrabbed) && currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab))
             {
                 currentInteractable.OutlineShouldBeRed = true;
             }
@@ -518,6 +525,11 @@ public class FirstPersonController : MonoBehaviour
             otherGrabable.OutlineShouldBeRed = true;
             otherGrabable.OutlineChangeCheck();
         }
+        else if (phoneGrabable.IsGrabbed && currentGrabable != null && currentGrabable != phoneGrabable)
+        {
+            currentGrabable.OutlineShouldBeRed = true;
+            currentGrabable.OutlineChangeCheck();
+        }
         else
         {
             if (otherGrabable != null)
@@ -525,7 +537,13 @@ public class FirstPersonController : MonoBehaviour
                 otherGrabable.OutlineShouldBeRed = false;
                 otherGrabable.OutlineChangeCheck();
             }
-                
+
+            if (currentGrabable != null && currentGrabable != phoneGrabable)
+            {
+                currentGrabable.OutlineShouldBeRed = false;
+                currentGrabable.OutlineChangeCheck();
+            }
+
         }
     }
 
@@ -537,7 +555,7 @@ public class FirstPersonController : MonoBehaviour
         }
         else if (currentGrabable != null)
         {
-            ChangeCrosshairColor(!currentGrabable.IsGrabbed ? grabCrosshairColor : otherGrabable != null ? useCrosshairColor : defaultCrosshairColor);
+            ChangeCrosshairColor(phoneGrabable.IsGrabbed && currentGrabable != phoneGrabable ? useCrosshairColor : !currentGrabable.IsGrabbed ? grabCrosshairColor : otherGrabable != null ? useCrosshairColor : defaultCrosshairColor);
         }
         else
         {
@@ -705,7 +723,7 @@ public class FirstPersonController : MonoBehaviour
         if (currentGrabable == null || !currentGrabable.IsGrabbed || !currentGrabable.IsUseable)
         {
             // EL BOS normal interact (tap)
-            if (Input.GetKeyDown(interactKey))
+            if (Input.GetKeyDown(interactKey) && !phoneGrabable.IsGrabbed)
             {
                 TryToInteract();
             }
@@ -729,7 +747,7 @@ public class FirstPersonController : MonoBehaviour
 
             if (Input.GetKeyUp(interactKey))
             {
-                if (!isUsingGrabbedItem)
+                if (!isUsingGrabbedItem && !phoneGrabable.IsGrabbed)
                 {
                     // kýsa týk interact
                     TryToInteract();
@@ -748,7 +766,7 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyUp(interactKey))
+            if (Input.GetKeyUp(interactKey) && !phoneGrabable.IsGrabbed)
             {
                 TryToInteract();
             }
@@ -768,9 +786,16 @@ public class FirstPersonController : MonoBehaviour
 
                     anim.SetTrigger("talk");
                 }
-                else if (currentGrabable == null || !currentGrabable.IsGrabbed)
+                else if ((currentGrabable == null || !currentGrabable.IsGrabbed))
                 {
-                    if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
+                    canUsePhone = false;
+
+                    if (rightHandRigLerpCoroutine != null)
+                    {
+                        StopCoroutine(rightHandRigLerpCoroutine);
+
+                        rightHandRigLerpCoroutine = null;
+                    }
 
                     if (currentInteractable.HandRigType == PlayerManager.HandRigTypes.Interaction)
                     {
@@ -920,8 +945,10 @@ public class FirstPersonController : MonoBehaviour
         {
             if (phoneGrabable.IsGrabbed)
             {
-                if (Input.GetKeyDown(phoneKey))
+                if (Input.GetKeyDown(phoneKey) || Input.GetKeyDown(throwKey))
                 {
+                    phoneGrabable.IsUseable = false;
+
                     if (rightHandRigLerpCoroutine != null)
                     {
                         StopCoroutine(rightHandRigLerpCoroutine);
@@ -938,7 +965,7 @@ public class FirstPersonController : MonoBehaviour
 
                     currentGrabable = null;
 
-                    DecideOutlineAndCrosshair();
+                    Invoke("DecideOutlineAndCrosshair", 0.16f);
                 }
                 
             }
@@ -1014,6 +1041,8 @@ public class FirstPersonController : MonoBehaviour
                     anim.SetBool("throw", false);
 
                     currentGrabable = null;
+                    
+                    SetHandAnimBoolsOff();
 
                     DecideOutlineAndCrosshair();
                 }
@@ -1022,8 +1051,10 @@ public class FirstPersonController : MonoBehaviour
         }
         else if (Input.GetKeyDown(interactKey) && currentGrabable != null && Physics.Raycast(mainCamera.ViewportPointToRay(interactionRayPoint), out RaycastHit hit, interactionDistance, grabableLayers))
         {
-            if (hit.collider.gameObject.GetComponent<IGrabable>() == currentGrabable)
+            if (hit.collider.gameObject.GetComponent<IGrabable>() == currentGrabable && !phoneGrabable.IsGrabbed)
             {
+                canUsePhone = false;
+
                 currentGrabable.OnGrab(grabPoint);
                 DecideOutlineAndCrosshair();
                 DecideGrabAnimBool();
@@ -1177,6 +1208,8 @@ public class FirstPersonController : MonoBehaviour
 
     public void ChangeCurrentGrabable(IGrabable grabObject)
     {
+        canUsePhone = false;
+
         currentGrabable = grabObject;
         currentGrabable.OnGrab(grabPoint);
         DecideGrabAnimBool();
@@ -1443,6 +1476,9 @@ public class FirstPersonController : MonoBehaviour
 
     private IEnumerator LerpRightHandRig(bool shouldReach, bool shouldGoBack)
     {
+
+        float coyoteTimeForPhone = shouldGoBack ? 0.35f : 0.19f;
+
         float startWeight = twoBoneIKConstraintRightHand.weight;
         float targetWeight = shouldReach ? 1.0f : 0.0f;
 
@@ -1456,6 +1492,21 @@ public class FirstPersonController : MonoBehaviour
         }
 
         twoBoneIKConstraintRightHand.weight = targetWeight;
+
+        if (targetWeight == 0f)
+        {
+            canUsePhone = true;
+
+            if (lastPhoneKeyPressedTime + coyoteTimeForPhone > Time.time)
+            {
+                if (!phoneGrabable.IsGrabbed && canUsePhone)
+                {
+                    phoneGrabable.IsUseable = true;
+                    ChangeCurrentGrabable(phoneGrabable);
+                }
+            }
+        }
+
         rightHandRigLerpCoroutine = null;
 
         if (shouldGoBack)
