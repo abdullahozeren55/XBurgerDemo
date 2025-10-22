@@ -235,8 +235,8 @@ public class FirstPersonController : MonoBehaviour
 
         DecideFocusText();
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
     }
 
     void Start()
