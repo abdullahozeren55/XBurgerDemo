@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +16,9 @@ public class PhoneManager : MonoBehaviour
     {
         MainMenu,
         IncomingCallMenu,
-        FlashlightMenu
+        FlashlightMenu,
+        AnsweredCallMenu,
+        Null
     }
 
     [System.Serializable]
@@ -27,12 +30,23 @@ public class PhoneManager : MonoBehaviour
     }
 
     public PhoneMenu[] phoneMenus;
+    [Space]
+    public DialogueData[] dialogueDatasForPhoneCalls;
+    private int dialogueDataNumToPlay;
+
+    private PhoneMenuType currentMenu;
+    private PhoneMenuType previousMenu;
 
     [Header("Flashlight App Settings")]
     public Image[] flashlightPowerButtonImages; //0 ui, 1 world
     public Sprite[] flashlightPowerButtonSprites; //0 off, 1 on
     public GameObject flashlightGO; //The light
-    private bool flashlightIsOn;
+    public bool FlashlightIsOn;
+
+    [Header("Answered Call Settings")]
+    public TMP_Text callTimerText;
+    private float currentCallTime;
+    private bool isInCall;
 
     private void Awake()
     {
@@ -46,7 +60,13 @@ public class PhoneManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        flashlightIsOn = false;
+        FlashlightIsOn = false;
+        isInCall = false;
+
+        dialogueDataNumToPlay = 0;
+
+        currentMenu = PhoneMenuType.MainMenu;
+        previousMenu = PhoneMenuType.Null;
     }
 
     private void Update()
@@ -58,11 +78,31 @@ public class PhoneManager : MonoBehaviour
                 PhoneSC.FinishPhoneUI();
                 IsFocused = false;
             }
+
+            if (isInCall)
+            {
+                currentCallTime += Time.deltaTime;
+                UpdateCallTimeText();
+            }
         }
+    }
+
+    private void UpdateCallTimeText()
+    {
+        int hours = Mathf.FloorToInt(currentCallTime / 3600);
+        int minutes = Mathf.FloorToInt((currentCallTime % 3600) / 60);
+        int seconds = Mathf.FloorToInt(currentCallTime % 60);
+
+        callTimerText.text = $"{hours:00}:{minutes:00}:{seconds:00}";
     }
 
     public void HandleMainMenuButton()
     {
+        if (currentMenu == PhoneMenuType.MainMenu) return;
+
+        previousMenu = currentMenu;
+        currentMenu = PhoneMenuType.MainMenu;
+
         foreach (PhoneMenu menu in phoneMenus)
         {
             if (menu.type != PhoneMenuType.MainMenu)
@@ -78,8 +118,34 @@ public class PhoneManager : MonoBehaviour
         }
     }
 
+    public void HandleBackButton()
+    {
+        if (previousMenu == PhoneMenuType.Null) return;
+
+        PhoneMenuType curMen = currentMenu;
+        currentMenu = previousMenu;
+        previousMenu = curMen;
+
+        foreach (PhoneMenu menu in phoneMenus)
+        {
+            if (menu.type != currentMenu)
+            {
+                menu.uiGO.SetActive(false);
+                menu.worldGO.SetActive(false);
+            }
+            else
+            {
+                menu.uiGO.SetActive(true);
+                menu.worldGO.SetActive(true);
+            }
+        }
+    }
+
     public void HandleFlashlightMenuButton()
     {
+        previousMenu = currentMenu;
+        currentMenu = PhoneMenuType.FlashlightMenu;
+
         foreach (PhoneMenu menu in phoneMenus)
         {
             if (menu.type != PhoneMenuType.FlashlightMenu)
@@ -97,11 +163,69 @@ public class PhoneManager : MonoBehaviour
 
     public void HandleFlashlightPowerButton()
     {
-        flashlightIsOn = !flashlightIsOn;
+        FlashlightIsOn = !FlashlightIsOn;
 
-        flashlightPowerButtonImages[0].sprite = flashlightPowerButtonSprites[flashlightIsOn ? 1 : 0];
-        flashlightPowerButtonImages[1].sprite = flashlightPowerButtonSprites[flashlightIsOn ? 1 : 0];
+        PhoneSC.PhoneState = FlashlightIsOn ? 1 : 0;
 
-        flashlightGO.SetActive(flashlightIsOn);
+        flashlightPowerButtonImages[0].sprite = flashlightPowerButtonSprites[FlashlightIsOn ? 1 : 0];
+        flashlightPowerButtonImages[1].sprite = flashlightPowerButtonSprites[FlashlightIsOn ? 1 : 0];
+
+        flashlightGO.SetActive(FlashlightIsOn);
+    }
+
+    public void HandleAcceptTheCallButton()
+    {
+        foreach (PhoneMenu menu in phoneMenus)
+        {
+            if (menu.type != PhoneMenuType.AnsweredCallMenu)
+            {
+                menu.uiGO.SetActive(false);
+                menu.worldGO.SetActive(false);
+            }
+            else
+            {
+                menu.uiGO.SetActive(true);
+                menu.worldGO.SetActive(true);
+            }
+        }
+
+        currentCallTime = 0f;
+        isInCall = true;
+
+        StartCoroutine(StartPhoneDialogue());
+    }
+
+    public void HandleFinishingTheCall()
+    {
+        isInCall = false;
+
+        StartCoroutine(FinishCallScreen());
+    }
+
+    private IEnumerator StartPhoneDialogue()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        DialogueManager.Instance.StartPhoneDialogue(dialogueDatasForPhoneCalls[dialogueDataNumToPlay]);
+        dialogueDataNumToPlay++;
+    }
+
+    private IEnumerator FinishCallScreen()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        foreach (PhoneMenu menu in phoneMenus)
+        {
+            if (menu.type != currentMenu)
+            {
+                menu.uiGO.SetActive(false);
+                menu.worldGO.SetActive(false);
+            }
+            else
+            {
+                menu.uiGO.SetActive(true);
+                menu.worldGO.SetActive(true);
+            }
+        }
     }
 }

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02eb87e73e22d8241af6e84e70b394ab, type: 3}
+  m_Name: PhoneCallWithBoss
+  m_EditorClassIdentifier: 
+  dialogueSegments:
+  - fontType: 3
+    talkingPerson: 1
+    DialogueToPrint: Efendim?
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 1
+    audioClip: {fileID: 0}
+    cam: 0
+  - fontType: 1
+    talkingPerson: 0
+    DialogueToPrint: "Ha alo patron \u015Fey... Bu arka odada palya\xE7o gibi br
+      \u015Fey var da..."
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 1
+    audioClip: {fileID: 0}
+    cam: 0
+  - fontType: 3
+    talkingPerson: 1
+    DialogueToPrint: ...
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 1
+    audioClip: {fileID: 0}
+    cam: 0
+  - fontType: 1
+    talkingPerson: 0
+    DialogueToPrint: "\u015Eey yapay\u0131m m\u0131- d\u0131\u015Far\u0131 koyay\u0131m
+      m\u0131 belki m\xFC\u015Fteri \xE7eke-"
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 0
+    audioClip: {fileID: 0}
+    cam: 0
+  - fontType: 3
+    talkingPerson: 1
+    DialogueToPrint: "<shake>Koy koy d\u0131\u015Far\u0131 koy onu</shake>"
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 0
+    audioClip: {fileID: 0}
+    cam: 0
+  type: 0
+  question: 
+  optionA: 
+  optionD: 
+  choiceCam: 0
+  cutsceneType: 0

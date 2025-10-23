@@ -16,11 +16,13 @@ public class Phone : MonoBehaviour, IGrabable
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
 
-    public Vector3 GrabPositionOffset { get => grabPositionOffset; set => grabPositionOffset = value; }
-    [SerializeField] private Vector3 grabPositionOffset;
+    public int PhoneState; // 0 regular, 1 flashlight
 
-    public Vector3 GrabRotationOffset { get => grabRotationOffset; set => grabRotationOffset = value; }
-    [SerializeField] private Vector3 grabRotationOffset;
+    public Vector3 GrabPositionOffset { get => grabPositionOffsets[PhoneState]; set => grabPositionOffsets[PhoneState] = value; }
+    [SerializeField] private Vector3[] grabPositionOffsets;
+
+    public Vector3 GrabRotationOffset { get => grabRotationOffsets[PhoneState]; set => grabRotationOffsets[PhoneState] = value; }
+    [SerializeField] private Vector3[] grabRotationOffsets;
 
     public bool IsUseable { get => isUseable; set => isUseable = value; }
     [SerializeField] private bool isUseable = true;
@@ -55,6 +57,8 @@ public class Phone : MonoBehaviour, IGrabable
 
         lastGrabbedTime = 0f;
 
+        PhoneState = 0;
+
         IsGrabbed = false;
     }
 
@@ -78,6 +82,8 @@ public class Phone : MonoBehaviour, IGrabable
 
     private void TurnOffMeshRenderer()
     {
+        if (PhoneManager.Instance.FlashlightIsOn)
+            PhoneManager.Instance.HandleFlashlightPowerButton();
         meshRenderer.enabled = false;
         IsGrabbed = false;
     }

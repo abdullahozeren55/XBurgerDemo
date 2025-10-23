@@ -21,7 +21,8 @@ public class DialogueManager : MonoBehaviour
         TalkWithYourself,
         TalkWithMascott,
         TalkWithYourselfInCutscene,
-        TalkWithYourselfAfterInteraction
+        TalkWithYourselfAfterInteraction,
+        TalkWithPhone
     }
 
     public enum TalkingPerson
@@ -35,7 +36,8 @@ public class DialogueManager : MonoBehaviour
     {
         Default,
         Sinan,
-        Hikmet
+        Hikmet,
+        Phone
     }
     public static DialogueManager Instance { get; private set; }
     [Space]
@@ -124,6 +126,8 @@ public class DialogueManager : MonoBehaviour
                             EndSelfDialogue();
                         else if (talkType == TalkType.TalkWithYourselfInCutscene)
                             EndSelfDialogueInCutscene();
+                        else if (talkType == TalkType.TalkWithPhone)
+                            EndPhoneDialogue();
                     }
                     else
                     {
@@ -241,6 +245,8 @@ public class DialogueManager : MonoBehaviour
 
         currentTextAnim.StartDisappearingText();
 
+        currentCustomer = null;
+
         PlayerManager.Instance.SetPlayerCanHeadBob(true);
     }
 
@@ -312,6 +318,37 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.Instance.SetPlayerCanHeadBob(true);
 
         PlayerManager.Instance.SetPlayerCanPlay(true);
+    }
+
+    public void StartPhoneDialogue(DialogueData data)
+    {
+        currentDialogueData = data;
+
+        IsInDialogue = true;
+
+        talkType = TalkType.TalkWithPhone;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        dialogueIndex = 0;
+
+        HandleDialogue();
+    }
+
+    private void EndPhoneDialogue()
+    {
+        IsSkipped = false;
+        IsDialogueComplete = false;
+
+        IsInDialogue = false;
+
+        currentTextAnim.StartDisappearingText();
+
+        PhoneManager.Instance.HandleFinishingTheCall();
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void StartSelfDialogueInCutscene(DialogueData data)
