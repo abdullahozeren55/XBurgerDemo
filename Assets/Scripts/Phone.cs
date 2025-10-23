@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -33,7 +34,8 @@ public class Phone : MonoBehaviour, IGrabable
     public Vector3 useRotationOffset;
     [Space]
     public float timeToUse = 0.3f;
-    public float targetCameraFOV = 40f;
+    [SerializeField] private GameObject phoneUI;
+    [SerializeField] private RectTransform phoneUIRectTransform;
     [Space]
     public AudioClip[] audioClips;
 
@@ -41,6 +43,8 @@ public class Phone : MonoBehaviour, IGrabable
     private MeshRenderer meshRenderer;
 
     private float lastGrabbedTime;
+
+    private Tween phoneUITween;
 
     private void Awake()
     {
@@ -109,12 +113,54 @@ public class Phone : MonoBehaviour, IGrabable
         audioSource.PlayOneShot(audioClips[index]);
     }
 
+    private void HandlePhoneUI()
+    {
+        phoneUI.SetActive(true);
+
+        PhoneManager.Instance.IsFocused = true;
+
+        phoneUITween?.Kill();
+
+        phoneUITween = phoneUIRectTransform.DOScale(Vector3.one, timeToUse / 1.2f)
+        .SetEase(Ease.OutBack)
+        .SetUpdate(true)
+        .OnComplete(() =>
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        });
+    }
+
+    public void FinishPhoneUI()
+    {
+        phoneUITween?.Kill();
+
+        phoneUITween = phoneUIRectTransform.DOScale(new Vector3(0.75f, 0.75f, 0.75f), timeToUse / 1.2f)
+        .SetEase(Ease.OutBack)
+        .SetUpdate(true);
+
+        Invoke("FinishPhoneUIP2", timeToUse / 3f);
+    }
+
+    private void FinishPhoneUIP2()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        phoneUI.SetActive(false);
+        OnUseRelease();
+        PlayerManager.Instance.PlayerStopUsingObject();
+    }
+
     public void OnUseHold()
     {
         PlayerManager.Instance.SetPlayerUseHandLerp(usePositionOffset, useRotationOffset, timeToUse);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
-        CameraManager.Instance.ChangeFirstPersonCameraFOVForPhone(targetCameraFOV, timeToUse);
+        PlayerManager.Instance.SetPlayerBasicMovements(false);
+
+        CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.PhoneLook);
+
+        Invoke("HandlePhoneUI", timeToUse / 1.2f);
     }
 
     public void OnUseRelease()
@@ -122,7 +168,9 @@ public class Phone : MonoBehaviour, IGrabable
         PlayerManager.Instance.SetPlayerUseHandLerp(GrabPositionOffset, GrabRotationOffset, timeToUse / 2f);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
-        CameraManager.Instance.ResetFirstPersonCameraFOV(timeToUse / 2f);
+        CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.FirstPerson);
+
+        PlayerManager.Instance.SetPlayerBasicMovements(true);
     }
 
     public void OutlineChangeCheck()

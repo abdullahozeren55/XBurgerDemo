@@ -7,6 +7,10 @@ public class PhoneManager : MonoBehaviour
 {
     public static PhoneManager Instance { get; private set; }
 
+    public bool IsFocused;
+
+    public Phone PhoneSC;
+
     public enum PhoneMenuType
     {
         MainMenu,
@@ -43,6 +47,18 @@ public class PhoneManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         flashlightIsOn = false;
+    }
+
+    private void Update()
+    {
+        if (IsFocused)
+        {
+            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Mouse1))
+            {
+                PhoneSC.FinishPhoneUI();
+                IsFocused = false;
+            }
+        }
     }
 
     public void HandleMainMenuButton()

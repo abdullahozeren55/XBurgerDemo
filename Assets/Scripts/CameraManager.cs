@@ -48,6 +48,7 @@ public class CameraManager : MonoBehaviour
         FirstPerson,
         Monitor,
         CustomerDialogue,
+        PhoneLook
     }
 
     [System.Serializable]
@@ -77,10 +78,6 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private Color throwChargeColor;
     [SerializeField] private float releaseSpeedMultiplier = 4f;
     private float normalFOV;
-
-    [Header("Phone UI Settings")]
-    [SerializeField] private GameObject phoneUI;
-    [SerializeField] private RectTransform phoneUIRectTransform;
 
     private CinemachineVirtualCamera firstPersonCam;
     private CinemachineVirtualCamera customerDialogueCam;
@@ -164,39 +161,6 @@ public class CameraManager : MonoBehaviour
                 break;
             }
         }
-    }
-
-    public void ChangeFirstPersonCameraFOVForPhone(float targetFOV, float duration)
-    {
-        firstPersonCamFOVTween?.Kill();
-
-        firstPersonCamFOVTween = DOTween.To(
-            () => firstPersonCam.m_Lens.FieldOfView,
-            x => firstPersonCam.m_Lens.FieldOfView = x,
-            targetFOV,
-            duration
-        )
-        .SetEase(Ease.OutBack)
-        .SetUpdate(true)
-        .OnComplete(() =>
-        {
-            PlayerManager.Instance.SetPlayerBasicMovements(false);
-            phoneUI.SetActive(true);
-
-            phoneUIRectTransform.DOScale(Vector3.one, duration/2f)
-            .SetEase(Ease.OutBack)
-            .SetUpdate(true)
-            .OnComplete(() =>
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            });
-        });
-    }
-
-    public void ResetFirstPersonCameraFOVForPhone(float duration, float delay)
-    {
-        firstPersonCamFOVTween?.Kill();
     }
 
     public void ChangeFirstPersonCameraFOV(float targetFOV, float duration, float delay)

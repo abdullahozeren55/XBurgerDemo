@@ -140,6 +140,11 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.SetUseHandLerp(targetPos, targetRot, timeToDo);
     }
 
+    public void PlayerStopUsingObject()
+    {
+        firstPersonController.StopUsingObject();
+    }
+
     public void SetPlayerIsUsingItemXY(bool xValue, bool yValue)
     {
         firstPersonController.IsUsingItemX = xValue;

@@ -54,6 +54,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField, Range(1, 10)] private float lookSpeedY = 2.0f;
     [SerializeField, Range(1, 100)] private float upperLookLimit = 80.0f;
     [SerializeField, Range(1, 100)] private float lowerLookLimit = 45.0f;
+    private float controlWeight = 1f;
     private float horizSpeed;
     private float vertSpeed;
 
@@ -130,7 +131,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float minThrowForce = 0.3f;
     [SerializeField] private float throwMaxChargeTime = 1.5f;
     [SerializeField] private float quickTapThreshold = 0.2f;
-    private bool isUsingGrabbedItem = false;
+    public bool isUsingGrabbedItem = false;
     private float throwChargeTimer = 0f;
     private float currentThrowForce = 0f;
     private float defaultCrosshairSize;
@@ -259,9 +260,16 @@ public class FirstPersonController : MonoBehaviour
         {
             if (CanMove)
                 HandleMovementInput();
+            else
+                anim.SetFloat("speed", 0f, 0.15f, Time.deltaTime);
 
             if (CanJump)
                 HandleJump();
+            else if (!characterController.isGrounded)
+            {
+                moveDirection.y -= gravity * Time.deltaTime;
+                characterController.Move(moveDirection * Time.deltaTime);
+            }
 
             if (!characterController.isGrounded)
                 HandleLand();
@@ -279,6 +287,12 @@ public class FirstPersonController : MonoBehaviour
             {
                 HandleInteractionInput();
                 HandleInteractionCheck();
+            }
+            else if (currentInteractable != null)
+            {
+                currentInteractable.OnLoseFocus();
+                currentInteractable = null;
+                DecideOutlineAndCrosshair();
             }
 
             if (CanGrab)
@@ -302,8 +316,8 @@ public class FirstPersonController : MonoBehaviour
                     
             }
                 
-
-            ApplyFinalMovements();
+            if (CanMove)
+                ApplyFinalMovements();
         }
 
         else
@@ -320,7 +334,7 @@ public class FirstPersonController : MonoBehaviour
             {
                 currentInteractable.OnLoseFocus();
                 currentInteractable = null;
-                ChangeCrosshairSize(defaultCrosshairSize, defaultCrosshairPosition);
+                DecideOutlineAndCrosshair();
             }
 
             anim.SetFloat("speed", 0f, 0.15f, Time.deltaTime);
@@ -333,8 +347,7 @@ public class FirstPersonController : MonoBehaviour
     {   
         if (CanPlay)
         {
-            if (CanLook)
-                HandleMouseAndHandControl();
+            HandleMouseAndHandControl();
 
             HandleHandTargetPositions();
         }
@@ -345,8 +358,11 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleMouseAndHandControl()
     {
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
+        float targetWeight = CanLook ? 1f : 0f;
+        controlWeight = Mathf.Lerp(controlWeight, targetWeight, Time.deltaTime * 10f);
+
+        float mouseX = Input.GetAxis("Mouse X") * controlWeight;
+        float mouseY = Input.GetAxis("Mouse Y") * controlWeight;
 
         // --- Kamera Hareketi ---
         horizSpeed = lookSpeedX;
@@ -1176,6 +1192,14 @@ public class FirstPersonController : MonoBehaviour
             otherGrabable.OnLoseFocus();
             otherGrabable = null;
         }
+
+        DecideOutlineAndCrosshair();
+    }
+
+    public void StopUsingObject()
+    {
+        interactChargeTimer = 0f;
+        isUsingGrabbedItem = false;
 
         DecideOutlineAndCrosshair();
     }
