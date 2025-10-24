@@ -13,19 +13,24 @@ MonoBehaviour:
   m_Name: Day1_NPCCustomer0_FalseBurger
   m_EditorClassIdentifier: 
   dialogueSegments:
-  - PersonName: "M\xDC\u015ETER\u0130"
-    DialogueToPrint: "Ben Duble \xC7izburger istemi\u015Ftim. Bir yanl\u0131\u015Fl\u0131k
-      oldu san\u0131r\u0131m."
+  - fontType: 4
+    talkingPerson: 1
+    DialogueToPrint: "Babo\u015F ben X Burger istemi\u015Ftim."
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
-  - PersonName: BEN
-    DialogueToPrint: "\xC7ok \xF6z\xFCr dilerim efendim. Yenisini haz\u0131rl\u0131yorum
-      hemen."
+    cam: 3
+  - fontType: 1
+    talkingPerson: 0
+    DialogueToPrint: "\xC7ok \xF6z\xFCr dilerim b-babo\u015F... Yanl\u0131\u015F
+      olmu\u015F yenisini haz\u0131rl\u0131yorum hemen."
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
+    cam: 0
   type: 0
   question: 
   optionA: 
   optionD: 
+  choiceCam: 0
+  cutsceneType: 0

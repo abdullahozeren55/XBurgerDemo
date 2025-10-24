@@ -145,15 +145,15 @@ public class DialogueManager : MonoBehaviour
 
     private void DecideCurrentText()
     {
+        if (currentTextAnim != null)
+            currentTextAnim.StartDisappearingText();
+
         switch (currentDialogueData.dialogueSegments[dialogueIndex].talkingPerson)
         {
             case TalkingPerson.Sinan:
 
                 if (currentDialogueText != sinanDialogueText)
                 {
-                    if (currentDialogueText != null)
-                        currentTextAnim.StartDisappearingText();
-
                     currentDialogueText = sinanDialogueText;
                     currentTextAnim = sinanTextAnim;
                 }
@@ -164,9 +164,6 @@ public class DialogueManager : MonoBehaviour
 
                 if (currentDialogueText != customer0DialogueText)
                 {
-                    if (currentDialogueText != null)
-                        currentTextAnim.StartDisappearingText();
-
                     currentDialogueText = customer0DialogueText;
                     currentTextAnim = customer0TextAnim;
                 }
@@ -177,15 +174,14 @@ public class DialogueManager : MonoBehaviour
 
                 if (currentDialogueText != customer1DialogueText)
                 {
-                    if (currentDialogueText != null)
-                        currentTextAnim.StartDisappearingText();
-
                     currentDialogueText = customer1DialogueText;
                     currentTextAnim = customer1TextAnim;
                 }
                 
                 break;
         }
+
+        currentDialogueText.fontStyle = (FontStyles)currentDialogueData.dialogueSegments[dialogueIndex].fontStyle;
     }
 
     private void HandleDialogue()
@@ -250,6 +246,8 @@ public class DialogueManager : MonoBehaviour
 
         currentCustomer = null;
 
+        CameraManager.Instance.SwitchToFirstPersonCamera();
+        PlayerManager.Instance.SetPlayerCanPlay(true);
         PlayerManager.Instance.SetPlayerCanHeadBob(true);
     }
 

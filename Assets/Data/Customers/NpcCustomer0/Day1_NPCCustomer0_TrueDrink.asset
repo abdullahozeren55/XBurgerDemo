@@ -13,18 +13,23 @@ MonoBehaviour:
   m_Name: Day1_NPCCustomer0_TrueDrink
   m_EditorClassIdentifier: 
   dialogueSegments:
-  - PersonName: "M\xDC\u015ETER\u0130"
-    DialogueToPrint: "Sa\u011Folas\u0131n delikanl\u0131. Bir de Duble \xC7izburger
-      vard\u0131."
+  - fontType: 4
+    talkingPerson: 1
+    DialogueToPrint: "Eyyyvalllah dostum. Bi de X Burger vard\u0131."
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
-  - PersonName: BEN
-    DialogueToPrint: "Hemen haz\u0131rl\u0131yorum efendim."
+    cam: 3
+  - fontType: 1
+    talkingPerson: 0
+    DialogueToPrint: Hallediyorum.. Dostum...
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
+    cam: 0
   type: 0
   question: 
   optionA: 
   optionD: 
+  choiceCam: 0
+  cutsceneType: 0

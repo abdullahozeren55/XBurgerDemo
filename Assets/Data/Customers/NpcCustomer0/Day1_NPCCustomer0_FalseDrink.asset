@@ -13,17 +13,23 @@ MonoBehaviour:
   m_Name: Day1_NPCCustomer0_FalseDrink
   m_EditorClassIdentifier: 
   dialogueSegments:
-  - PersonName: "M\xDC\u015ETER\u0130"
-    DialogueToPrint: "Siyah Kula istemi\u015Ftim gen\xE7."
+  - fontType: 4
+    talkingPerson: 1
+    DialogueToPrint: "Ben Siyah Kula istemi\u015Ftim hac\u0131."
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
-  - PersonName: BEN
-    DialogueToPrint: "\xC7ok pardon. Kafam kar\u0131\u015Ft\u0131 da."
+    cam: 3
+  - fontType: 1
+    talkingPerson: 0
+    DialogueToPrint: "Pardon hac\u0131."
+    DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    LettersPerSecond: 32
     audioClip: {fileID: 0}
+    cam: 0
   type: 0
   question: 
   optionA: 
   optionD: 
+  choiceCam: 0
+  cutsceneType: 0

@@ -20,7 +20,7 @@ MonoBehaviour:
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
-    cam: 0
+    cam: 3
   - fontType: 1
     talkingPerson: 0
     DialogueToPrint: Afiyet olsun. 500 OP toplam a- Ee... Kanka.

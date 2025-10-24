@@ -357,9 +357,6 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
             HandleHeadHome();
         }
 
-        CameraManager.Instance.SwitchToFirstPersonCamera();
-        PlayerManager.Instance.SetPlayerCanPlay(true);
-
     }
 
     public void ReceiveBurger(BurgerBox burgerBox)

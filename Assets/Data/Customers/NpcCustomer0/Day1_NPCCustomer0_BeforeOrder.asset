@@ -19,7 +19,7 @@ MonoBehaviour:
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
-    cam: 0
+    cam: 3
   - fontType: 1
     talkingPerson: 0
     DialogueToPrint: "Tamamd\u0131r ab- Eee... K-kral..."

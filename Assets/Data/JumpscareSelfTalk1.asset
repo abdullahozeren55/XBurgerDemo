@@ -15,6 +15,7 @@ MonoBehaviour:
   dialogueSegments:
   - fontType: 1
     talkingPerson: 0
+    fontStyle: 2
     DialogueToPrint: Bu ne ya?
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
@@ -22,6 +23,7 @@ MonoBehaviour:
     cam: 0
   - fontType: 1
     talkingPerson: 1
+    fontStyle: 2
     DialogueToPrint: "D\xFCkkan\u0131n maskotu falan herhalde. Patron bundan bahsetmemi\u015Fti."
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
@@ -29,6 +31,7 @@ MonoBehaviour:
     cam: 0
   - fontType: 1
     talkingPerson: 0
+    fontStyle: 2
     DialogueToPrint: "Bunu da \xE7\xF6pe atmam gerekiyor mu acaba?"
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
@@ -36,6 +39,7 @@ MonoBehaviour:
     cam: 0
   - fontType: 1
     talkingPerson: 1
+    fontStyle: 2
     DialogueToPrint: "En iyisi patrona soray\u0131m ya \u015Fimdi atar\u0131m k\u0131ymete
       biner falan. Durduk yere ba\u015F\u0131ma i\u015F almayay\u0131m."
     DialogueOffset: {x: 0, y: 0}

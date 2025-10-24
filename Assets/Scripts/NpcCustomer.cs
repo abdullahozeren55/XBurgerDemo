@@ -339,8 +339,6 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
             HandleHeadHome();
         }
 
-        PlayerManager.Instance.SetPlayerCanPlay(true);
-
     }
 
     public void ReceiveBurger(BurgerBox burgerBox)
@@ -381,7 +379,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
-        ChangeLayer(interactableLayer);
+        ChangeLayer(interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
@@ -423,13 +421,13 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
         if (TrueDrinkReceived)
         {
-            ordersInLeftHand[0].SetActive(true);
+            ordersInRightHand[0].SetActive(true);
             CurrentAction = ICustomer.Action.ReceivedAllOrder;
             DialogueManager.Instance.StartCustomerDialogue(this, CompleteOrderDialogueData);
         }
         else
         {
-            ordersInRightHand[0].SetActive(true);
+            ordersInLeftHand[0].SetActive(true);
             CurrentAction = ICustomer.Action.ReceivedTrueBurger;
             DialogueManager.Instance.StartCustomerDialogue(this, TrueBurgerDialogueData);
         }
@@ -437,7 +435,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     private void HandleBurgerFalse()
     {
-        ordersInLeftHand[0].SetActive(true);
+        ordersInRightHand[0].SetActive(true);
         CurrentAction = ICustomer.Action.ReceivedFalseBurger;
         anim.SetTrigger("giveBack");
         DialogueManager.Instance.StartCustomerDialogue(this, FalseBurgerDialogueData);
@@ -449,13 +447,13 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
         if (TrueBurgerReceived)
         {
-            ordersInLeftHand[(int)drinkType + 1].SetActive(true);
+            ordersInRightHand[(int)drinkType + 1].SetActive(true);
             CurrentAction = ICustomer.Action.ReceivedAllOrder;
             DialogueManager.Instance.StartCustomerDialogue(this, CompleteOrderDialogueData);
         }
         else
         {
-            ordersInRightHand[(int)drinkType + 1].SetActive(true);
+            ordersInLeftHand[(int)drinkType + 1].SetActive(true);
             CurrentAction = ICustomer.Action.ReceivedTrueDrink;
             DialogueManager.Instance.StartCustomerDialogue(this, TrueDrinkDialogueData);
         }
@@ -463,7 +461,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     private void HandleDrinkFalse(GameManager.DrinkTypes drinkType)
     {
-        ordersInLeftHand[(int)drinkType + 1].SetActive(true);
+        ordersInRightHand[(int)drinkType + 1].SetActive(true);
         CurrentAction = ICustomer.Action.ReceivedFalseDrink;
         anim.SetTrigger("giveBack");
         DialogueManager.Instance.StartCustomerDialogue(this, FalseDrinkDialogueData);
@@ -518,17 +516,17 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     private void GiveOrderBack()
     {
-        if (ordersInLeftHand[0].activeSelf)
+        if (ordersInRightHand[0].activeSelf)
         {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInLeftHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInLeftHand[0].SetActive(false);
+            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * transform.forward);
+            ordersInRightHand[0].SetActive(false);
         }
         else
         {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInLeftHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInLeftHand[1].SetActive(false);
-            ordersInLeftHand[2].SetActive(false);
-            ordersInLeftHand[3].SetActive(false);
+            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * transform.forward);
+            ordersInRightHand[1].SetActive(false);
+            ordersInRightHand[2].SetActive(false);
+            ordersInRightHand[3].SetActive(false);
         }
 
     }
