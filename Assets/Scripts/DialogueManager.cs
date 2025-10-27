@@ -40,6 +40,7 @@ public class DialogueManager : MonoBehaviour
         Phone,
         NPCCustomer0,
         NPCCustomer1,
+        NPCCustomer2,
     }
     public static DialogueManager Instance { get; private set; }
     [Space]

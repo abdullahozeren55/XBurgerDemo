@@ -40,6 +40,7 @@ public interface ICustomer
         KEKO,
         NPCCUSTOMER0,
         NPCCUSTOMER1,
+        NPCCUSTOMER2,
     }
 
     [System.Serializable]

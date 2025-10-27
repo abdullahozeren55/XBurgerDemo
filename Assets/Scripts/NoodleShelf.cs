@@ -16,12 +16,14 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
-    private int uninteractableLayer;
 
     [Header("Noodle Settings")]
     [SerializeField] private GameObject noodle;
     [SerializeField] private Transform pointToSpawnNoodle;
-    [SerializeField] private GameObject storeBlocker;
+
+    [Header("Block Settings")]
+    [SerializeField] private Door[] storeDoors;
+    [SerializeField] private GameObject storeExitBlocker;
 
     private GameObject instantiatedNoodle;
 
@@ -37,7 +39,6 @@ public class NoodleShelf : MonoBehaviour, IInteractable
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
-        uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         childs = new GameObject[transform.childCount];
 
@@ -70,7 +71,12 @@ public class NoodleShelf : MonoBehaviour, IInteractable
         PlayerManager.Instance.ResetPlayerGrabAndInteract();
         PlayerManager.Instance.ChangePlayerCurrentGrabable(instantiatedNoodle.GetComponent<IGrabable>());
 
-        storeBlocker.SetActive(true);
+        storeExitBlocker.SetActive(true);
+
+        foreach (Door door in storeDoors)
+        {
+            door.SetLayerUninteractable(true);
+        }
     }
 
     public void OnLoseFocus()

@@ -197,4 +197,9 @@ public class Door : MonoBehaviour, IInteractable
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
             gameObject.layer = interactableOutlinedLayer;
     }
+
+    public void SetLayerUninteractable(bool should)
+    {
+        gameObject.layer = should ? uninteractableLayer : interactableLayer;
+    }
 }
