@@ -32,6 +32,7 @@ public class Noodle : MonoBehaviour, IGrabable
     [SerializeField] private Collider[] closeLidColliders;
     [SerializeField] private Collider[] openLidColliders;
 
+    private SkinnedMeshRenderer skinnedMeshRederer;
     private AudioSource audioSource;
     private Rigidbody rb;
     private Renderer hologramRenderer;
@@ -54,6 +55,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
     private void Awake()
     {
+        skinnedMeshRederer = GetComponent<SkinnedMeshRenderer>();
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         hologramRenderer = hologramPart.GetComponent<Renderer>();
@@ -296,6 +298,8 @@ public class Noodle : MonoBehaviour, IGrabable
         PlayerManager.Instance.SetPlayerUseHandLerp(data.usePositionOffset, data.useRotationOffset, data.timeToUse);
         PlayerManager.Instance.SetPlayerLeftUseHandLerp(data.useLeftPositionOffset, data.useLeftRotationOffset);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
+
+        skinnedMeshRederer.SetBlendShapeWeight(0, 0F);
     }
 
     public void OnUseRelease()

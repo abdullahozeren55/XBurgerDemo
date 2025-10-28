@@ -19,9 +19,9 @@ MonoBehaviour:
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.00017081886, y: 0.00048341294, z: 0.0002936248}
   grabLocalRotationOffset: {x: 6.024242, y: 269.62048, z: 90.63723}
-  usePositionOffset: {x: 0.2, y: 0.3, z: 2}
+  usePositionOffset: {x: -0.2, y: 0, z: 2}
   useRotationOffset: {x: -5, y: -70, z: -70}
-  useLeftPositionOffset: {x: 0.7, y: 0.5, z: 2}
+  useLeftPositionOffset: {x: 0.4, y: 0.2, z: 2}
   useLeftRotationOffset: {x: 45, y: 100, z: 70}
   useLocalPositionOffset: {x: 0.00017081886, y: 0.00048341294, z: 0.0002936248}
   useLocalRotationOffset: {x: 6.024242, y: 269.62048, z: 90.63723}
