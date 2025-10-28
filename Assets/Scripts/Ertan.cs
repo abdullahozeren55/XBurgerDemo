@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using static ICustomer;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -513,7 +514,7 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     }
 
-    public void HandleTalk()
+    public void HandleDialogueAnim(DialogueAnim dialogueAnim)
     {
         throw new System.NotImplementedException();
     }

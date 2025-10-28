@@ -43,6 +43,13 @@ public interface ICustomer
         NPCCUSTOMER2,
     }
 
+    public enum DialogueAnim
+    {
+        NONE,
+        TALK,
+        LAUGH
+    }
+
     [System.Serializable]
     public class CustomerDayChangesSegment
     {
@@ -87,7 +94,7 @@ public interface ICustomer
     public void HandlePathFollow(Transform destination);
     public void HandleFootsteps();
     public void HandleIdle();
-    public void HandleTalk();
+    public void HandleDialogueAnim(DialogueAnim dialogueAnim);
 
     public void ChangeLayer(int layer);
 

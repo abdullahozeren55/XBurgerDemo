@@ -22,6 +22,8 @@ public class DialogueData : ScriptableObject
         public AudioClip audioClip;
         [Space]
         public CameraManager.CameraName cam;
+        [Space]
+        public ICustomer.DialogueAnim dialogueAnim;
     }
 
     public enum DialogueType

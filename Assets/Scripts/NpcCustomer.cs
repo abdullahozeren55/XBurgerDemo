@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using static ICustomer;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.Rendering.DebugUI;
 
@@ -417,7 +418,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
         }
     }
 
-    public void HandleTalk()
+    public void HandleDialogueAnim(DialogueAnim dialogueAnim)
     {
         if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Talk") && CurrentAction != ICustomer.Action.ReceivedFalseDrink && CurrentAction != ICustomer.Action.ReceivedFalseBurger)
             anim.SetTrigger("talk");

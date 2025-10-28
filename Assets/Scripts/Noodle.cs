@@ -24,23 +24,24 @@ public class Noodle : MonoBehaviour, IGrabable
 
     public NoodleData data;
 
-    [SerializeField] private GameObject[] childObjects;
     [SerializeField] private GameObject hologramPart;
     public string FocusText { get => focusText; set => focusText = value; }
     [SerializeField] private string focusText;
     [Space]
 
+    [Header("Collider Settings")]
+    [SerializeField] private Collider[] bodyColliders;
+    [SerializeField] private Collider[] closeLidColliders;
+    [SerializeField] private Collider[] openLidColliders;
+
     private AudioSource audioSource;
     private Rigidbody rb;
-    private Collider col;
     private Renderer hologramRenderer;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int ungrabableLayer;
-
-    private int interactableLayer;
 
     private Vector3 hologramPos;
     private Quaternion hologramRotation;
@@ -50,12 +51,13 @@ public class Noodle : MonoBehaviour, IGrabable
 
     private float audioLastPlayedTime;
 
+    private bool isOpened;
+
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
         hologramRenderer = hologramPart.GetComponent<Renderer>();
 
         foreach (Material material in hologramRenderer.materials)
@@ -71,7 +73,6 @@ public class Noodle : MonoBehaviour, IGrabable
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
-        interactableLayer = LayerMask.NameToLayer("Interactable");
 
         IsGrabbed = false;
         IsGettingPutOnHologram = false;
@@ -89,7 +90,6 @@ public class Noodle : MonoBehaviour, IGrabable
         hologramPart.SetActive(false);
 
         gameObject.layer = ungrabableLayer;
-        ChangeChildLayers(ungrabableLayer);
 
         IsGrabbed = false;
 
@@ -103,13 +103,11 @@ public class Noodle : MonoBehaviour, IGrabable
     {
         gameObject.layer = ungrabableLayer;
 
-        col.enabled = false;
+        SetColliders(false);
 
         audioSource.enabled = true;
 
         PlayAudioWithRandomPitch(0);
-
-        ChangeChildLayers(ungrabableLayer);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -136,8 +134,6 @@ public class Noodle : MonoBehaviour, IGrabable
         if (!IsGettingPutOnHologram && !isJustDropped && !isJustThrowed)
         {
             gameObject.layer = grabableOutlinedLayer;
-
-            ChangeChildLayers(grabableOutlinedLayer);
         }
 
     }
@@ -146,15 +142,13 @@ public class Noodle : MonoBehaviour, IGrabable
         if (!IsGettingPutOnHologram && !isJustDropped && !isJustThrowed)
         {
             gameObject.layer = grabableLayer;
-
-            ChangeChildLayers(ungrabableLayer);
         }
 
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
-        col.enabled = true;
+        SetColliders(true);
 
         IsGrabbed = false;
 
@@ -178,7 +172,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
     public void OnThrow(Vector3 direction, float force)
     {
-        col.enabled = true;
+        SetColliders(true);
 
         IsGrabbed = false;
 
@@ -205,20 +199,10 @@ public class Noodle : MonoBehaviour, IGrabable
         if (gameObject.layer == grabableOutlinedLayer && OutlineShouldBeRed)
         {
             gameObject.layer = interactableOutlinedRedLayer;
-            ChangeChildLayers(interactableOutlinedRedLayer);
         }
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
             gameObject.layer = grabableOutlinedLayer;
-            ChangeChildLayers(grabableOutlinedLayer);
-        }
-    }
-
-    private void ChangeChildLayers(int layer)
-    {
-        for (int i = 0; i < childObjects.Length; i++)
-        {
-            childObjects[i].layer = layer;
         }
     }
 
@@ -227,6 +211,24 @@ public class Noodle : MonoBehaviour, IGrabable
         audioLastPlayedTime = Time.time;
         audioSource.pitch = Random.Range(0.85f, 1.15f);
         audioSource.PlayOneShot(data.audioClips[index]);
+    }
+
+    private void SetColliders(bool value)
+    {
+        foreach (Collider col in bodyColliders)
+        {
+            col.enabled = value;
+        }
+
+        foreach (Collider col in closeLidColliders)
+        {
+            col.enabled = value == false ? false : !isOpened;
+        }
+
+        foreach (Collider col in openLidColliders)
+        {
+            col.enabled = value == false ? false : isOpened;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -240,15 +242,11 @@ public class Noodle : MonoBehaviour, IGrabable
 
                 gameObject.layer = grabableLayer;
 
-                ChangeChildLayers(ungrabableLayer);
-
                 isJustThrowed = false;
             }
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
-
-                ChangeChildLayers(ungrabableLayer);
 
                 if (Time.time > audioLastPlayedTime + 0.1f)
                     PlayAudioWithRandomPitch(1);
@@ -291,8 +289,6 @@ public class Noodle : MonoBehaviour, IGrabable
 
         NoodleManager.Instance.SetCurrentNoodle(gameObject);
 
-        gameObject.layer = interactableLayer;
-        ChangeChildLayers(interactableLayer);
 
         IsGettingPutOnHologram = false;
     }

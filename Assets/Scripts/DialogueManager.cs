@@ -198,6 +198,8 @@ public class DialogueManager : MonoBehaviour
         RectTransform rect = currentDialogueText.rectTransform;
         rect.anchoredPosition += currentDialogueData.dialogueSegments[dialogueIndex].DialogueOffset;
 
+        currentCustomer?.HandleDialogueAnim(currentDialogueData.dialogueSegments[dialogueIndex].dialogueAnim);
+
         DecideFontType(currentDialogueData.dialogueSegments[dialogueIndex].fontType);
         currentDialogueText.SetText(currentDialogueData.dialogueSegments[dialogueIndex].DialogueToPrint);
 
@@ -222,8 +224,6 @@ public class DialogueManager : MonoBehaviour
         dialogueIndex = 0;
 
         currentCustomer = customer;
-
-        currentCustomer.HandleTalk();
 
         HandleDialogue();
     }
