@@ -41,6 +41,13 @@ public class NoodleManager : MonoBehaviour
     [SerializeField] private Color saucedWaterColor;
     [SerializeField] private float timeToSauceWater = 0.3f;
 
+    [Header("Cooking Settings")]
+    [SerializeField] private Mesh cookedNoodleMesh;
+    [SerializeField] private Mesh finishedNoodleMesh;
+    [Space]
+    [SerializeField] private Material cookedNoodleMat;
+    [SerializeField] private Material finishedNoodleMat;
+
     [HideInInspector] public GameObject currentNoodleGO;
     [HideInInspector] public GameObject currentSmokeGO;
     [HideInInspector] public GameObject currentWaterGO;
@@ -57,6 +64,7 @@ public class NoodleManager : MonoBehaviour
     private Material hologramSaucePackMat;
     private Material hologramKettleMat;
 
+    private SkinnedMeshRenderer currentNoodleSkinnedMeshRenderer;
     private SkinnedMeshRenderer hologramHouseNoodleSkinnedMeshRenderer;
 
     private ParticleSystem currentSmokePS;
@@ -205,6 +213,8 @@ public class NoodleManager : MonoBehaviour
 
         currentSmokePS = currentSmokeGO.GetComponent<ParticleSystem>();
 
+        currentNoodleSkinnedMeshRenderer = currentNoodleGO.GetComponent<SkinnedMeshRenderer>();
+
         waterStartPos = currentWaterGO.transform.localPosition;
         waterStartScale = currentWaterGO.transform.localScale;
     }
@@ -213,6 +223,19 @@ public class NoodleManager : MonoBehaviour
     {
         currentSaucePackGO = saucePack;
         currentSaucePackScript = saucePack.GetComponent<SaucePack>();
+    }
+
+    public void CookNoodle()
+    {
+        currentNoodleSkinnedMeshRenderer.sharedMesh = cookedNoodleMesh;
+        currentNoodleSkinnedMeshRenderer.material = cookedNoodleMat;
+        currentWaterGO.SetActive(false);
+
+        currentNoodleScript.NoodleStatus = NoodleStatus.Ready;
+        currentNoodleScript.CookAmount = Cookable.CookAmount.REGULAR;
+        currentNoodleScript.IsUseable = true;
+        currentNoodleGO.layer = grabableLayer;
+        currentNoodleScript.CanGetFocused = true;
     }
 
     public void AddWaterToNoodle()

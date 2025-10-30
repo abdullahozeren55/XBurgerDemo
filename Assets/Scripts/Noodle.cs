@@ -10,6 +10,7 @@ public class Noodle : MonoBehaviour, IGrabable
     private bool isGrabbed;
 
     public NoodleManager.NoodleStatus NoodleStatus;
+    public Cookable.CookAmount CookAmount; //RAW USED FOR RAW, REGULAR USED FOR COOKED, BURNT USED FOR FINISHED
 
     public PlayerManager.HandGrabTypes HandGrabType { get => data.handGrabType; set => data.handGrabType = value; }
 
@@ -348,7 +349,7 @@ public class Noodle : MonoBehaviour, IGrabable
             instantiateSaucePackCoroutine = null;
         }
 
-        if (saucePackInstantiated && NoodleStatus != NoodleManager.NoodleStatus.SauceAdded)
+        if (saucePackInstantiated && NoodleStatus != NoodleManager.NoodleStatus.SauceAdded && CookAmount == Cookable.CookAmount.RAW)
         {
             IsUseable = false;
         }
@@ -400,13 +401,13 @@ public class Noodle : MonoBehaviour, IGrabable
         skinnedMeshRederer.SetBlendShapeWeight(0, endVal);
         NoodleManager.Instance.HandleHologramNoodleLid(endVal);
 
-        NoodleStatus = shouldOpen ? NoodleManager.NoodleStatus.LidOpened : NoodleManager.NoodleStatus.LidClosed;
+        NoodleStatus = CookAmount == Cookable.CookAmount.REGULAR ? NoodleManager.NoodleStatus.Ready : shouldOpen ? NoodleManager.NoodleStatus.LidOpened : NoodleManager.NoodleStatus.LidClosed;
 
         isOpened = shouldOpen;
 
-        if (shouldOpen)
+        if (NoodleStatus == NoodleManager.NoodleStatus.LidOpened)
             PlayerManager.Instance.PlayerOnUseReleaseGrabable(false);
-        else
+        else if (NoodleStatus == NoodleManager.NoodleStatus.LidClosed)
         {
             NoodleManager.Instance.SetHologramHouseNoodle(true);
             NoodleManager.Instance.SetHologramHouseNoodleCollider(true);

@@ -50,7 +50,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void PlayCutscene(CutsceneType type)
     {
-        PlayerManager.Instance.SetPlayerCanPlay(false);
+        PlayerManager.Instance.SetPlayerBasicMovements(false);
 
         GetReadyForCutscene(true);
 
@@ -75,7 +75,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void StopCutscene()
     {
-        PlayerManager.Instance.SetPlayerCanPlay(true);
+        PlayerManager.Instance.SetPlayerBasicMovements(true);
 
         GetReadyForCutscene(false);
 

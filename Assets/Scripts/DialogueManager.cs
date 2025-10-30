@@ -383,16 +383,19 @@ public class DialogueManager : MonoBehaviour
 
         talkType = TalkType.TalkWithYourselfInCutscene;
 
-        PlayerManager.Instance.SetPlayerCanPlay(false);
-        PlayerManager.Instance.SetPlayerCanHeadBob(false);
         dialogueIndex = 0;
+
+        HandleDialogue();
     }
 
     private void EndSelfDialogueInCutscene()
     {
+        IsSkipped = false;
+        IsDialogueComplete = false;
+
         IsInDialogue = false;
 
-        PlayerManager.Instance.SetPlayerCanHeadBob(true);
+        currentTextAnim.StartDisappearingText();
 
         if (currentDialogueData.type == DialogueData.DialogueType.ENDSWITHACUTSCENE)
         {
