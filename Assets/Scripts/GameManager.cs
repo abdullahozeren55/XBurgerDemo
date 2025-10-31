@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class CustomerDaySortSegment
     {
-        [Range(1, 5)]
+        [Range(0, 10)]
         public int Day;
         public ICustomer.CustomerName[] CustomerSort;
     }
@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class DayState
     {
-        [Range(1, 5)]
+        [Range(0, 10)]
         public int Day;
         [Range(1, 8)]
         public int Part;
