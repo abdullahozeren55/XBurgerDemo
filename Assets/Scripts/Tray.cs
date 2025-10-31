@@ -94,7 +94,7 @@ public class Tray : MonoBehaviour
                         type == SauceBottle.SauceType.Mayo ? sauces[1] :
                         type == SauceBottle.SauceType.Mustard ? sauces[2] : sauces[3], sauce.transform.position, sauce.transform.rotation, transform);
 
-            currentLocationToPutBurgerIngredient.y += 0.003f;
+            currentLocationToPutBurgerIngredient.y += 0.006f;
 
             go.transform.parent = ingredientsParent;
 
@@ -139,7 +139,7 @@ public class Tray : MonoBehaviour
         if (allBurgerIngredients.Count != 0 && !allSauces.Contains(type) && !burgerIsDone)
         {
             hologramLocation = currentLocationToPutBurgerIngredient;
-            hologramLocation.y += 0.003f;
+            hologramLocation.y += 0.006f;
 
             sauce.transform.position = hologramLocation;
             sauce.transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);

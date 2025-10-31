@@ -32,15 +32,6 @@ MonoBehaviour:
     audioClip: {fileID: 0}
     cam: 0
     dialogueAnim: 0
-  - fontType: 4
-    talkingPerson: 1
-    fontStyle: 0
-    DialogueToPrint: "Tamamd\u0131r usta bekliyorum."
-    DialogueOffset: {x: 0, y: 0}
-    Skippable: 1
-    audioClip: {fileID: 0}
-    cam: 0
-    dialogueAnim: 0
   type: 0
   question: 
   optionA: 
