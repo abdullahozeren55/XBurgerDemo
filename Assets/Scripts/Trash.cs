@@ -37,8 +37,6 @@ public class Trash : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private float audioLastPlayedTime;
-
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -55,8 +53,6 @@ public class Trash : MonoBehaviour, IGrabable
         isJustThrowed = false;
         isJustDropped = false;
 
-        audioLastPlayedTime = 0f;
-
         transform.rotation = Random.rotation;
     }
 
@@ -66,7 +62,7 @@ public class Trash : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -133,13 +129,6 @@ public class Trash : MonoBehaviour, IGrabable
         }
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void OnDestroy()
     {
         PlayerManager.Instance.ResetPlayerGrab(this);
@@ -152,7 +141,7 @@ public class Trash : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 gameObject.layer = grabableLayer;
 
@@ -162,14 +151,9 @@ public class Trash : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

@@ -54,8 +54,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private float audioLastPlayedTime;
-
     private Coroutine useCoroutine;
 
     private void Awake()
@@ -73,8 +71,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         isJustThrowed = false;
         isJustDropped = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void OnGrab(Transform grabPoint)
@@ -85,7 +81,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         tray.TurnOnSauceHologram(sauceType);
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -183,20 +179,13 @@ public class SauceBottle : MonoBehaviour, IGrabable
         OnLoseFocus();
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 gameObject.layer = grabableLayer;
 
@@ -206,14 +195,9 @@ public class SauceBottle : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

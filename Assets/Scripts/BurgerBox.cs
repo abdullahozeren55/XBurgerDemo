@@ -52,8 +52,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
     [HideInInspector] public bool isJustDropped;
     [HideInInspector] public bool CanBeReceived;
 
-    private float audioLastPlayedTime;
-
     private GameObject[] childObjects;
 
     [HideInInspector] public GameManager.BurgerTypes burgerType;
@@ -82,8 +80,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         canAddToTray = false;
 
-        audioLastPlayedTime = 0f;
-
         // Get all MeshRenderer components in children (including inactive)
         MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>(true);
 
@@ -100,7 +96,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         isGettingPutOnTray = true;
         ChangeLayer(onTrayLayer);
 
-        PlayAudioWithRandomPitch(1);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
         isJustDropped = false;
         isJustThrowed = false;
@@ -130,7 +126,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.isKinematic = false;
 
@@ -203,13 +199,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
         }
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void FinishPutOnTray() //Gets called in animator
     {
         tray.ResetTray();
@@ -260,7 +249,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         {
             if (isJustThrowed)
             {
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 ChangeLayer(grabableLayer);
 
@@ -270,14 +259,9 @@ public class BurgerBox : MonoBehaviour, IGrabable
             {
                 ChangeLayer(grabableLayer);
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

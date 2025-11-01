@@ -55,8 +55,6 @@ public class Noodle : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private float audioLastPlayedTime;
-
     private bool isOpened;
     private bool lidAnimStarted;
     private bool saucePackInstantiated;
@@ -83,8 +81,6 @@ public class Noodle : MonoBehaviour, IGrabable
 
         isJustThrowed = false;
         isJustDropped = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation)
@@ -118,7 +114,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
         audioSource.enabled = true;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.isKinematic = false;
         rb.velocity = Vector3.zero;
@@ -200,13 +196,6 @@ public class Noodle : MonoBehaviour, IGrabable
         }
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void SetColliders(bool value)
     {
         bottomCollider.enabled = value;
@@ -220,7 +209,7 @@ public class Noodle : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 gameObject.layer = grabableLayer;
 
@@ -229,15 +218,10 @@ public class Noodle : MonoBehaviour, IGrabable
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
-
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }
@@ -387,16 +371,25 @@ public class Noodle : MonoBehaviour, IGrabable
         float elapsedTime = 0f;
         float value = startVal;
 
-        while (elapsedTime < data.timeToHandleLid)
+        if (shouldOpen)
         {
-            value = Mathf.Lerp(startVal, endVal, elapsedTime / data.timeToHandleLid);
-
-            skinnedMeshRederer.SetBlendShapeWeight(0, value);
-            NoodleManager.Instance.HandleHologramNoodleLid(value);
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
+            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, 1f, 0.85f, 1.15f);
         }
+        else
+        {
+            SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, 1f, 0.85f, 1.15f);
+        }
+
+            while (elapsedTime < data.timeToHandleLid)
+            {
+                value = Mathf.Lerp(startVal, endVal, elapsedTime / data.timeToHandleLid);
+
+                skinnedMeshRederer.SetBlendShapeWeight(0, value);
+                NoodleManager.Instance.HandleHologramNoodleLid(value);
+
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
 
         skinnedMeshRederer.SetBlendShapeWeight(0, endVal);
         NoodleManager.Instance.HandleHologramNoodleLid(endVal);

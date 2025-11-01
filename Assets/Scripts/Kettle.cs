@@ -58,8 +58,6 @@ public class Kettle : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private float audioLastPlayedTime;
-
     private Coroutine waterPourCoroutine;
 
     private void Awake()
@@ -80,8 +78,6 @@ public class Kettle : MonoBehaviour, IGrabable
 
         isJustThrowed = false;
         isJustDropped = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void PutOnHologram(Vector3 hologramPos, Quaternion hologramRotation)
@@ -110,7 +106,7 @@ public class Kettle : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.isKinematic = false;
         rb.velocity = Vector3.zero;
@@ -181,13 +177,6 @@ public class Kettle : MonoBehaviour, IGrabable
         }
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(audioClips[index]);
-    }
-
     private void TurnOnCollider()
     {
         col.enabled = true;
@@ -201,7 +190,7 @@ public class Kettle : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 isJustThrowed = false;
             }
@@ -209,14 +198,9 @@ public class Kettle : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

@@ -37,7 +37,7 @@ public class Broom : MonoBehaviour, IGrabable
     private int ungrabableLayer;
 
     private bool isJustThrowed;
-    private float audioLastPlayedTime;
+    private bool isJustDropped;
 
     private void Awake()
     {
@@ -53,8 +53,7 @@ public class Broom : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         isJustThrowed = false;
-
-        audioLastPlayedTime = 0f;
+        isJustDropped = false;
 
         transform.rotation = Random.rotation;
     }
@@ -63,7 +62,7 @@ public class Broom : MonoBehaviour, IGrabable
     {
         gameObject.layer = ungrabableLayer;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -78,11 +77,19 @@ public class Broom : MonoBehaviour, IGrabable
     }
     public void OnFocus()
     {
-        gameObject.layer = grabableOutlinedLayer;
+        if (!isJustDropped && !isJustThrowed )
+        {
+            gameObject.layer = grabableOutlinedLayer;
+        }
+
     }
     public void OnLoseFocus()
     {
-        gameObject.layer = grabableLayer;
+        if (!isJustDropped && !isJustThrowed)
+        {
+            gameObject.layer = grabableLayer;
+        }
+
     }
 
     public void OnDrop(Vector3 direction, float force)
@@ -94,6 +101,8 @@ public class Broom : MonoBehaviour, IGrabable
         rb.useGravity = true;
 
         rb.AddForce(direction * force, ForceMode.Impulse);
+
+        isJustDropped = true;
     }
 
     public void OnThrow(Vector3 direction, float force)
@@ -121,13 +130,6 @@ public class Broom : MonoBehaviour, IGrabable
         }
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(audioClips[index]);
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Door") || collision.gameObject.CompareTag("Customer")))
@@ -135,13 +137,19 @@ public class Broom : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(audioClips[2], transform, 1f, 0.85f, 1.15f);
+
+                gameObject.layer = grabableLayer;
 
                 isJustThrowed = false;
             }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
+            else if (isJustDropped)
             {
-                PlayAudioWithRandomPitch(1);
+                gameObject.layer = grabableLayer;
+
+                SoundManager.Instance.PlaySoundFX(audioClips[1], transform, 1f, 0.85f, 1.15f);
+
+                isJustDropped = false;
             }
 
         }

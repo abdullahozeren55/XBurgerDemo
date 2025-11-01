@@ -35,8 +35,6 @@ public class Knife : MonoBehaviour, IGrabable
     private bool isJustDropped;
     private bool isStuck;
 
-    private float audioLastPlayedTime;
-
     private Coroutine useCoroutine;
 
     private void Awake()
@@ -56,8 +54,6 @@ public class Knife : MonoBehaviour, IGrabable
         isJustThrowed = false;
         isJustDropped = false;
         isStuck = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void OnDrop(Vector3 direction, float force)
@@ -101,7 +97,7 @@ public class Knife : MonoBehaviour, IGrabable
         triggerCol.enabled = false;
         col.enabled = false;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         isJustThrowed = false;
 
@@ -210,13 +206,6 @@ public class Knife : MonoBehaviour, IGrabable
         isStuck = false;
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void TurnOffTriggerCol()
     {
         triggerCol.enabled = false;
@@ -230,7 +219,7 @@ public class Knife : MonoBehaviour, IGrabable
             {
                 StickToSurface(collision);
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 Invoke("TurnOffTriggerCol", 0.1f);
 
@@ -242,14 +231,9 @@ public class Knife : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

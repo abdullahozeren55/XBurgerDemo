@@ -52,8 +52,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     private Cookable cookable;
     public Cookable.CookAmount cookAmount;
 
-    private float audioLastPlayedTime;
-
     private Transform decalParent;
 
     private void Awake()
@@ -78,8 +76,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         isStuck = false;
 
         canAddToTray = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void PutOnTray(Vector3 trayPos, Transform parentTray)
@@ -90,17 +86,15 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         // Ses çalma kýsmý ayný kalýyor
         if (data.audioClips.Length < 4)
-        {
-            PlayAudioWithRandomPitch(1);
-        }
+            SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
         else
         {
             if (cookAmount == Cookable.CookAmount.RAW)
-                PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
             else if (cookAmount == Cookable.CookAmount.REGULAR)
-                PlayAudioWithRandomPitch(4);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, 1f, 0.85f, 1.15f);
             else if (cookAmount == Cookable.CookAmount.BURNT)
-                PlayAudioWithRandomPitch(7);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[7], transform, 1f, 0.85f, 1.15f);
         }
 
         rb.velocity = Vector3.zero;
@@ -141,21 +135,21 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         if (data.audioClips.Length < 4)
         {
-            PlayAudioWithRandomPitch(0);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
         }
         else
         {
             if (cookAmount == Cookable.CookAmount.RAW)
             {
-                PlayAudioWithRandomPitch(0);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
             }
             else if (cookAmount == Cookable.CookAmount.REGULAR)
             {
-                PlayAudioWithRandomPitch(3);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, 1f, 0.85f, 1.15f);
             }
             else if (cookAmount == Cookable.CookAmount.BURNT)
             {
-                PlayAudioWithRandomPitch(6);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[6], transform, 1f, 0.85f, 1.15f);
             }
         }
 
@@ -322,13 +316,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         isStuck = false;
     }
 
-    private void PlayAudioWithRandomPitch (int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     public void ChangeCookAmount(int value)
     {
 
@@ -373,21 +360,21 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
                 if (data.audioClips.Length < 4)
                 {
-                    PlayAudioWithRandomPitch(2);
+                    SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
                 }
                 else
                 {
                     if (cookAmount == Cookable.CookAmount.RAW)
                     {
-                        PlayAudioWithRandomPitch(2);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
                     }
                     else if (cookAmount == Cookable.CookAmount.REGULAR)
                     {
-                        PlayAudioWithRandomPitch(5);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[5], transform, 1f, 0.85f, 1.15f);
                     }
                     else if (cookAmount == Cookable.CookAmount.BURNT)
                     {
-                        PlayAudioWithRandomPitch(8);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[8], transform, 1f, 0.85f, 1.15f);
                     }
                 }
 
@@ -398,33 +385,10 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
-
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                if (data.audioClips.Length < 4)
-                {
-                    PlayAudioWithRandomPitch(1);
-                }
-                else
-                {
-                    if (cookAmount == Cookable.CookAmount.RAW)
-                    {
-                        PlayAudioWithRandomPitch(1);
-                    }
-                    else if (cookAmount == Cookable.CookAmount.REGULAR)
-                    {
-                        PlayAudioWithRandomPitch(4);
-                    }
-                    else if (cookAmount == Cookable.CookAmount.BURNT)
-                    {
-                        PlayAudioWithRandomPitch(7);
-                    }
-                }
             }
 
         }

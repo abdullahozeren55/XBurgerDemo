@@ -40,8 +40,6 @@ public class FoodPack : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private float audioLastPlayedTime;
-
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -58,8 +56,6 @@ public class FoodPack : MonoBehaviour, IGrabable
 
         isJustThrowed = false;
         isJustDropped = false;
-
-        audioLastPlayedTime = 0f;
     }
 
     public void OnGrab(Transform grabPoint)
@@ -68,7 +64,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -180,13 +176,6 @@ public class FoodPack : MonoBehaviour, IGrabable
         PlayerManager.Instance.ResetPlayerGrab(this);
     }
 
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioLastPlayedTime = Time.time;
-        audioSource.pitch = Random.Range(0.6f, 0.8f);
-        audioSource.PlayOneShot(data.audioClips[index]);
-    }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
@@ -194,7 +183,7 @@ public class FoodPack : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                PlayAudioWithRandomPitch(2);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
 
                 ChangeLayer(grabableLayer);
 
@@ -204,14 +193,9 @@ public class FoodPack : MonoBehaviour, IGrabable
             {
                 ChangeLayer(grabableLayer);
 
-                if (Time.time > audioLastPlayedTime + 0.1f)
-                    PlayAudioWithRandomPitch(1);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
-            }
-            else if (Time.time > audioLastPlayedTime + 0.1f)
-            {
-                PlayAudioWithRandomPitch(1);
             }
 
         }

@@ -68,7 +68,7 @@ public class Phone : MonoBehaviour, IGrabable
 
         meshRenderer.enabled = true;
 
-        PlayAudioWithRandomPitch(0);
+        SoundManager.Instance.PlaySoundFX(audioClips[0], transform, 1f, 0.85f, 1.15f);
 
         lastGrabbedTime = Time.time;
 
@@ -111,12 +111,6 @@ public class Phone : MonoBehaviour, IGrabable
         IsGrabbed = false;
 
         transform.SetParent(null);
-    }
-
-    private void PlayAudioWithRandomPitch(int index)
-    {
-        audioSource.pitch = Random.Range(0.85f, 1.15f);
-        audioSource.PlayOneShot(audioClips[index]);
     }
 
     private void HandlePhoneUI()
