@@ -8,7 +8,6 @@ public class Keys : MonoBehaviour, IInteractable
 {
     [Header("Audio Settings")]
     public AudioClip pickUpSound;
-    private AudioSource audioSource;
 
     public string FocusText { get => focusText; set => focusText = value; }
     [SerializeField] private string focusText;
@@ -36,7 +35,6 @@ public class Keys : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         meshRenderer = GetComponent<MeshRenderer>();
         meshCollider = GetComponent<MeshCollider>();
 
@@ -57,7 +55,6 @@ public class Keys : MonoBehaviour, IInteractable
     {
         meshRenderer.enabled = false;   
         meshCollider.enabled = false;
-        audioSource.PlayOneShot(pickUpSound);
 
         foreach (Door door in lockedDoors)
             //door.IsLocked = false;

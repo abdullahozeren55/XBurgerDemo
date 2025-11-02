@@ -27,7 +27,6 @@ public class Broom : MonoBehaviour, IGrabable
     [Space]
     [SerializeField] private AudioClip[] audioClips;
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -41,7 +40,6 @@ public class Broom : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 

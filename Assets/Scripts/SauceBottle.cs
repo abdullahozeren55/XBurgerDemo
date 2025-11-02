@@ -42,7 +42,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     private bool isPlayingParticles;
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -58,7 +57,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 

@@ -25,7 +25,6 @@ public class Drink : MonoBehaviour, IGrabable
     public string FocusText { get => data.focusText; set => data.focusText = value; }
     [Space]
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -40,7 +39,6 @@ public class Drink : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 

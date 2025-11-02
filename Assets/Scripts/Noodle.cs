@@ -41,7 +41,6 @@ public class Noodle : MonoBehaviour, IGrabable
     [SerializeField] private GameObject saucePackVisual;
 
     private SkinnedMeshRenderer skinnedMeshRederer;
-    private AudioSource audioSource;
     private Rigidbody rb;
 
     private int grabableLayer;
@@ -66,7 +65,6 @@ public class Noodle : MonoBehaviour, IGrabable
     private void Awake()
     {
         skinnedMeshRederer = GetComponent<SkinnedMeshRenderer>();
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -111,8 +109,6 @@ public class Noodle : MonoBehaviour, IGrabable
         gameObject.layer = ungrabableLayer;
 
         SetColliders(false);
-
-        audioSource.enabled = true;
 
         SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 

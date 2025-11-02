@@ -43,7 +43,6 @@ public class Kettle : MonoBehaviour, IGrabable
 
     private bool isPlayingParticles;
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -62,7 +61,6 @@ public class Kettle : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
@@ -87,8 +85,6 @@ public class Kettle : MonoBehaviour, IGrabable
         isJustDropped = false;
 
         NoodleManager.Instance.SetHologramKettle(false);
-
-        audioSource.enabled = false;
 
         gameObject.layer = ungrabableLayer;
 

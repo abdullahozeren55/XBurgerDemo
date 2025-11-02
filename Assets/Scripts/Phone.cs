@@ -41,7 +41,6 @@ public class Phone : MonoBehaviour, IGrabable
     [Space]
     public AudioClip[] audioClips;
 
-    private AudioSource audioSource;
     private MeshRenderer meshRenderer;
 
     private float lastGrabbedTime;
@@ -50,7 +49,6 @@ public class Phone : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         meshRenderer = GetComponent<MeshRenderer>();
 
         meshRenderer.enabled = false;

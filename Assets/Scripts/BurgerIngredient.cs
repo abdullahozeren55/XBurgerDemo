@@ -27,8 +27,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public BurgerIngredientData data;
 
-    [SerializeField] private AudioSource audioSource;
-
     [SerializeField] private Tray tray;
     public string FocusText { get => data.focusTexts[(int)cookAmount]; set => data.focusTexts[(int)cookAmount] = value; }
     [Space]
@@ -56,7 +54,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         cookable = GetComponent<Cookable>();

@@ -28,8 +28,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     [Header("Instantiate Settings")]
     [SerializeField] private GameObject[] instantiateObjects;
     
-
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -43,7 +41,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 

@@ -37,7 +37,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
     public List<BurgerIngredientData.IngredientType> allBurgerIngredientTypes = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> allSauces = new List<SauceBottle.SauceType>();
 
-    private AudioSource audioSource;
     private Animator anim;
     private Rigidbody rb;
     private Collider col;
@@ -60,7 +59,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();

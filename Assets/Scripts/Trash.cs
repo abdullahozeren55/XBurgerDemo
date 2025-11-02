@@ -24,8 +24,6 @@ public class Trash : MonoBehaviour, IGrabable
     [SerializeField] private string focusText;
     [Space]
 
-
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -39,7 +37,6 @@ public class Trash : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 

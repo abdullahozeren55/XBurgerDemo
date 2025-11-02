@@ -29,7 +29,6 @@ public class SaucePack : MonoBehaviour, IGrabable
     [SerializeField] private string focusText;
     [Space]
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
 
@@ -46,7 +45,6 @@ public class SaucePack : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
@@ -71,8 +69,6 @@ public class SaucePack : MonoBehaviour, IGrabable
 
         NoodleManager.Instance.SetHologramSaucePack(false);
 
-        audioSource.enabled = false;
-
         gameObject.layer = ungrabableLayer;
 
         IsGrabbed = false;
@@ -88,8 +84,6 @@ public class SaucePack : MonoBehaviour, IGrabable
         gameObject.layer = ungrabableLayer;
 
         col.enabled = false;
-
-        audioSource.enabled = true;
 
         SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
 

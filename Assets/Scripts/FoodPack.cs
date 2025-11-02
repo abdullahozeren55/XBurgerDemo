@@ -27,7 +27,6 @@ public class FoodPack : MonoBehaviour, IGrabable
     [SerializeField] private Collider[] allCollider;
     [SerializeField] private Transform[] allTransform;
 
-    private AudioSource audioSource;
     private Rigidbody rb;
     private Collider col;
     private MeshRenderer meshRenderer;
@@ -42,7 +41,6 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         meshRenderer = GetComponent<MeshRenderer>();

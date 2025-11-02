@@ -32,7 +32,6 @@ public class ShopSeller : MonoBehaviour, IInteractable
     private bool firstTalkIsFinished;
 
     private Animator anim;
-    private AudioSource audioSource;
 
     public PlayerManager.HandRigTypes HandRigType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
@@ -47,7 +46,6 @@ public class ShopSeller : MonoBehaviour, IInteractable
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         anim = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
 
         isNoodlePlaced = false;
         isNoodleBought = false;
@@ -103,7 +101,6 @@ public class ShopSeller : MonoBehaviour, IInteractable
     private void StartJumpscareTalk()
     {
         gameObject.layer = uninteractableLayer;
-        audioSource.PlayOneShot(sellerJumpscareSound);
         anim.SetBool("idle", true);
 
         isJumpscared = true;
