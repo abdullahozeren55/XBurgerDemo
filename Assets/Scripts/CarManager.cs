@@ -35,7 +35,7 @@ public class CarManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        SpawnRandomCar0();
+        StartCoroutine(SpawnEachCar());
     }
 
     public Material GetRandomCar0Material() => car0Materials[Random.Range(0, car0Materials.Length)];
@@ -47,6 +47,45 @@ public class CarManager : MonoBehaviour
     public void SpawnRandomCar0()
     {
         currentDestinations = GetRandomDestination();
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+    }
+
+    private IEnumerator SpawnEachCar()
+    {
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[0];
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[1];
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[2];
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[3];
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[4];
+
+        Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
+
+        yield return new WaitForSeconds(3);
+
+        currentDestinations = carDestinations[5];
 
         Instantiate(car0GO, currentDestinations.spawnPoint.position, currentDestinations.spawnQuaternion);
     }

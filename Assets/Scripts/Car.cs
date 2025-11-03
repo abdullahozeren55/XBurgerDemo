@@ -12,7 +12,6 @@ public class Car : MonoBehaviour
     public float stopDistance = 5f;
     public Vector3 boxHalfExtents = new Vector3(1f, 0.5f, 1f);
     public LayerMask obstacleMask;
-    public LayerMask groundMask;
 
     [Header("Animation Settings")]
     private Animator animator;
@@ -50,13 +49,6 @@ public class Car : MonoBehaviour
         HandleObstacleDetection();
         HandleTurnAnimation();
         HandleReachingTarget();
-    }
-
-    void LateUpdate()
-    {
-        Vector3 pos = agent.nextPosition;
-        pos.y = transform.position.y;
-        transform.position = pos;
     }
 
     private void DecideDestinations(CarManager.CarDestinations dest)
