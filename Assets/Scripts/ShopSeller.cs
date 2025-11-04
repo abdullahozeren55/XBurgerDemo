@@ -1,123 +1,91 @@
+using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static CameraManager;
 
 public class ShopSeller : MonoBehaviour, IInteractable
 {
+    [Header("Block Settings")]
+    [SerializeField] private Door[] storeDoors;
+    [SerializeField] private GameObject storeExitBlocker;
+
+    [Header("Dialogue Settings")]
+    [SerializeField] private DialogueData day1BeforeNoodleDialogue;
+
+    private DialogueData beforeNoodleDialogue;
+    private DialogueData afterNoodleDialogue;
+    public string FocusText { get => focusTexts[doorStateNum]; set => focusTexts[doorStateNum] = value; }
+    [SerializeField] private string[] focusTexts;
+
+    private int doorStateNum = 0;
+    public PlayerManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
+    [SerializeField] private PlayerManager.HandRigTypes handRigType;
+
+    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
+    private bool outlineShouldBeRed;
+
+    private SkinnedMeshRenderer skinnedMeshRenderer;
+
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
-    [SerializeField] private DialogueData firstDialogueData;
-    [SerializeField] private DialogueData secondDialogueData;
-    [SerializeField] private DialogueData noodleBuyDialogueData;
-    [SerializeField] private DialogueData noodleBuyDialoguePartTwoData;
-    [SerializeField] private float waitingTime = 1f;
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
-    [Space]
-    [SerializeField] private GameObject storeBlocker;
-    [Space]
-    [SerializeField] private AudioClip sellerJumpscareSound;
-
-
-    [HideInInspector] public bool isNoodlePlaced;
-    [HideInInspector] public Noodle noodle;
-
-    private bool isNoodleBought;
-    private bool isJumpscared;
-    private bool firstTalkIsFinished;
-
-    private Animator anim;
-
-    public PlayerManager.HandRigTypes HandRigType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
-    public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
-    [SerializeField] private bool outlineShouldBeRed;
-
     private void Awake()
     {
+        skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
-        anim = GetComponent<Animator>();
-
-        isNoodlePlaced = false;
-        isNoodleBought = false;
-        isJumpscared = false;
-        firstTalkIsFinished = false;
+        //FOR TEST (TODO: REMOVE)
+        beforeNoodleDialogue = day1BeforeNoodleDialogue;
     }
-    public void OnFocus()
+
+    public void HandleFinishDialogue()
     {
-        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
+
+        NoodleManager.Instance.SetCurrentNoodleStatus(NoodleManager.NoodleStatus.JustBought);
+
+        storeExitBlocker.SetActive(false);
+
+        foreach (Door door in storeDoors)
+        {
+            door.SetLayerUninteractable(false);
+        }
     }
 
     public void OnInteract()
     {
+        //FOR TEST (TODO: REMOVE)
+        DialogueManager.Instance.StartSellerDialogue(beforeNoodleDialogue);
+    }
 
-        if (isNoodlePlaced)
-        {
-            storeBlocker.SetActive(false);
-            isNoodleBought = true;
-            DialogueManager.Instance.StartSellerDialogue(noodleBuyDialogueData);
-            noodle.OnLoseFocus();
-        }  
-        else if (!firstTalkIsFinished)
-            DialogueManager.Instance.StartSellerDialogue(firstDialogueData);
-        else
-            DialogueManager.Instance.StartSellerDialogue(secondDialogueData);
+    public void OnFocus()
+    {
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        gameObject.layer = interactableLayer;
+        ChangeLayer(interactableLayer);
     }
 
     public void OutlineChangeCheck()
     {
         if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
-        {
-            gameObject.layer = interactableOutlinedRedLayer;
-        }
+            ChangeLayer(interactableOutlinedRedLayer);
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
-        {
-            gameObject.layer = interactableOutlinedLayer;
-        }
+            ChangeLayer(interactableOutlinedLayer);
     }
 
-    public void HandleFinishDialogue()
+    private void ChangeLayer(int layer)
     {
-        if (isJumpscared)
-            StartSitBack();
-        else if (isNoodleBought)
-            StartJumpscareTalk();
-    }
-
-    private void StartJumpscareTalk()
-    {
-        gameObject.layer = uninteractableLayer;
-        anim.SetBool("idle", true);
-
-        isJumpscared = true;
-
-        Invoke("StartPartTwoDialogue", waitingTime);
-
-    }
-
-    private void StartSitBack()
-    {
-        gameObject.layer = uninteractableLayer;
-        anim.SetBool("idle", false);
-        anim.SetBool("sit", true);
-    }
-
-    private void StartPartTwoDialogue()
-    {
-        DialogueManager.Instance.StartSellerDialogue(noodleBuyDialoguePartTwoData);
+        gameObject.layer = layer;
+        skinnedMeshRenderer.gameObject.layer = layer;
     }
 }

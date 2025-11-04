@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static NoodleManager;
 
 public class NoodleShelf : MonoBehaviour, IInteractable
 {
@@ -61,13 +62,24 @@ public class NoodleShelf : MonoBehaviour, IInteractable
 
     public void OnInteract()
     {
+        NoodleManager.NoodleStatus status = new NoodleManager.NoodleStatus();
+
         if (instantiatedNoodle != null)
         {
+            status = NoodleManager.Instance.GetCurrentNoodleStatus();
+
             Destroy(instantiatedNoodle);
             instantiatedNoodle = null;
         }
 
         instantiatedNoodle = Instantiate(noodle, pointToSpawnNoodle.position, Quaternion.Euler(0f, 0f, 0f), null);
+        NoodleManager.Instance.SetCurrentNoodle(instantiatedNoodle);
+
+        if (status == NoodleManager.NoodleStatus.JustBought)
+            NoodleManager.Instance.SetCurrentNoodleStatus(status);
+        else
+            NoodleManager.Instance.SetCurrentNoodleStatus(NoodleStatus.JustGrabbed);
+
         PlayerManager.Instance.ResetPlayerGrabAndInteract();
         PlayerManager.Instance.ChangePlayerCurrentGrabable(instantiatedNoodle.GetComponent<IGrabable>());
 

@@ -117,8 +117,6 @@ public class Noodle : MonoBehaviour, IGrabable
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
 
-        NoodleManager.Instance.SetCurrentNoodle(gameObject);
-
         if (NoodleStatus == NoodleManager.NoodleStatus.SaucePackInstantiated || NoodleStatus == NoodleManager.NoodleStatus.LidClosed)
             NoodleManager.Instance.SetHologramHouseNoodle(true);
 

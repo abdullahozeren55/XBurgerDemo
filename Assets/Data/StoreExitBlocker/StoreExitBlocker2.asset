@@ -15,12 +15,13 @@ MonoBehaviour:
   dialogueSegments:
   - fontType: 1
     talkingPerson: 0
-    fontStyle: 0
-    DialogueToPrint: "Noodle\u0131n paras\u0131n\u0131 \xF6demeyi unuttum."
+    fontStyle: 2
+    DialogueToPrint: "Noodle'\u0131n paras\u0131n\u0131 \xF6demeyi unuttum."
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
     cam: 0
+    dialogueAnim: 0
   type: 0
   question: 
   optionA: 

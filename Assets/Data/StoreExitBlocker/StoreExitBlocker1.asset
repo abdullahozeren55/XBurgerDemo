@@ -15,13 +15,14 @@ MonoBehaviour:
   dialogueSegments:
   - fontType: 1
     talkingPerson: 0
-    fontStyle: 0
+    fontStyle: 2
     DialogueToPrint: "Noodle \xE7alacak kadar \xE7aresiz durumda de\u011Filim...
       Hen\xFCz."
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
     cam: 0
+    dialogueAnim: 0
   type: 0
   question: 
   optionA: 

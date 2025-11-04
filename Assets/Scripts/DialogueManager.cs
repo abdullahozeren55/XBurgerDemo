@@ -41,6 +41,7 @@ public class DialogueManager : MonoBehaviour
         NPCCustomer0,
         NPCCustomer1,
         NPCCustomer2,
+        Metin,
     }
     public static DialogueManager Instance { get; private set; }
     [Space]
@@ -296,14 +297,27 @@ public class DialogueManager : MonoBehaviour
 
         PlayerManager.Instance.SetPlayerCanPlay(false);
         PlayerManager.Instance.SetPlayerCanHeadBob(false);
+
+        PlayerManager.Instance.ResetPlayerInteract(currentInteractable);
+
         dialogueIndex = 0;
+
+        HandleDialogue();
     }
 
     private void EndSellerDialogue()
     {
+        IsSkipped = false;
+        IsDialogueComplete = false;
+
         shopSeller.HandleFinishDialogue();
+
         IsInDialogue = false;
 
+        currentTextAnim.StartDisappearingText();
+
+        CameraManager.Instance.SwitchToFirstPersonCamera();
+        PlayerManager.Instance.SetPlayerCanPlay(true);
         PlayerManager.Instance.SetPlayerCanHeadBob(true);
 
     }

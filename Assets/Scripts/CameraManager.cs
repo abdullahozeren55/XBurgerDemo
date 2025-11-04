@@ -48,7 +48,8 @@ public class CameraManager : MonoBehaviour
         FirstPerson,
         Monitor,
         CustomerDialogue,
-        PhoneLook
+        PhoneLook,
+        ShopSellerDialogue
     }
 
     [System.Serializable]

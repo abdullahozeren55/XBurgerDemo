@@ -8,8 +8,8 @@ public class NoodleManager : MonoBehaviour
 
     public enum NoodleStatus
     {
+        OnShelf,
         JustGrabbed,
-        OnStoreHologram,
         JustBought,
         ReadyToPrepare,
         LidOpened,
@@ -47,6 +47,9 @@ public class NoodleManager : MonoBehaviour
     [Space]
     [SerializeField] private Material cookedNoodleMat;
     [SerializeField] private Material finishedNoodleMat;
+
+    [Header("ShopSeller")]
+    [SerializeField] private ShopSeller shopSeller;
 
     [HideInInspector] public GameObject currentNoodleGO;
     [HideInInspector] public GameObject currentSmokeGO;
@@ -119,6 +122,15 @@ public class NoodleManager : MonoBehaviour
 
         SetHologramKettleCollider(false);
     }
+
+    public void SetCurrentNoodleStatus(NoodleStatus status)
+    {
+        if (currentNoodleScript == null) return;
+
+        currentNoodleScript.NoodleStatus = status;
+    }
+
+    public NoodleStatus GetCurrentNoodleStatus() => currentNoodleScript.NoodleStatus;
 
     public void HandleHologramNoodleLid(float value)
     {

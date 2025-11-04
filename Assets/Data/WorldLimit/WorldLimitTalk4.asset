@@ -15,11 +15,13 @@ MonoBehaviour:
   dialogueSegments:
   - fontType: 1
     talkingPerson: 0
+    fontStyle: 2
     DialogueToPrint: Geri al... Geri al...
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
     cam: 0
+    dialogueAnim: 0
   type: 0
   question: 
   optionA: 

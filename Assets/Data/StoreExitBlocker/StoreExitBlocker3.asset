@@ -15,13 +15,14 @@ MonoBehaviour:
   dialogueSegments:
   - fontType: 1
     talkingPerson: 0
-    fontStyle: 0
+    fontStyle: 2
     DialogueToPrint: "Dalm\u0131\u015F\u0131m paras\u0131n\u0131 \xF6demeden gidiyorum
       ya..."
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     audioClip: {fileID: 0}
     cam: 0
+    dialogueAnim: 0
   type: 0
   question: 
   optionA: 

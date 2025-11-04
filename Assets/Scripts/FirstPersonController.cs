@@ -250,6 +250,8 @@ public class FirstPersonController : MonoBehaviour
         }
 
         CameraManager.Instance.InitializeCamera(CameraManager.CameraName.FirstPerson);
+
+        PhoneManager.Instance.SetMissionText("Merhaba! Ben Volkan Konak!");
     }
 
     private void Update()
