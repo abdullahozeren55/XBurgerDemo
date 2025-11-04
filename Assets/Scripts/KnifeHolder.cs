@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class KnifeHolder : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
     public PlayerManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private PlayerManager.HandRigTypes handRigType;
 
@@ -34,6 +36,11 @@ public class KnifeHolder : MonoBehaviour, IInteractable
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
     }
 
+    public void ChangeLayer(int layerIndex)
+    {
+        gameObject.layer = layerIndex;
+    }
+
     public void HandleFinishDialogue()
     {
 
@@ -41,28 +48,34 @@ public class KnifeHolder : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        gameObject.layer = interactableLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(interactableLayer);
     }
 
     public void OutlineChangeCheck()
     {
         if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
         {
-            gameObject.layer = interactableOutlinedRedLayer;
+            ChangeLayer(interactableOutlinedRedLayer);
         }
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
-            gameObject.layer = interactableOutlinedLayer;
+            ChangeLayer(interactableOutlinedLayer);
         }
     }
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         GameObject instantiatedKnife = Instantiate(knife, pointToSpawnKnife.position, Quaternion.Euler(0f, -90f, 180f), null);
         PlayerManager.Instance.ResetPlayerGrabAndInteract();
         PlayerManager.Instance.ChangePlayerCurrentGrabable(instantiatedKnife.GetComponent<IGrabable>());

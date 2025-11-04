@@ -13,6 +13,9 @@ using static UnityEngine.Rendering.DebugUI;
 public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 {
     //WARNING: NEVZAT CANT HAVE FALSE BURGER OR DRINK. HE ACCEPTS ALL. HIS WRONG BURGER DIALOGUE BAR IS USED FOR FIRST TIME TALK. WRONG DRINK IS USED FOR BAD LEAVING. COMPLETE USED FOR PICKLE BURGER.
+
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
     public ICustomer.CustomerDayChangesSegment[] CustomerDayChanges { get => customerDayChanges; set => customerDayChanges = value; }
     [SerializeField] private ICustomer.CustomerDayChangesSegment[] customerDayChanges;
     public CustomerData CustomerData { get => customerData; set => customerData = value; }
@@ -380,6 +383,8 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(uninteractableLayer);
 
         if (CurrentAction == ICustomer.Action.ReadyToOrder)
@@ -396,11 +401,15 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 

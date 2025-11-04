@@ -281,7 +281,7 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.Instance.SetPlayerCanHeadBob(true);
     }
 
-    public void StartAfterInteractionSelfDialogue(IInteractable interactable, DialogueData data)
+    public void StartAfterInteractionSelfDialogue(IInteractable interactable, bool shouldBeUninteractable, DialogueData data)
     {
         currentDialogueData = data;
 
@@ -291,7 +291,7 @@ public class DialogueManager : MonoBehaviour
 
         currentInteractable = interactable;
 
-        PlayerManager.Instance.ResetPlayerInteract(currentInteractable);
+        PlayerManager.Instance.ResetPlayerInteract(currentInteractable, shouldBeUninteractable);
 
         dialogueIndex = 0;
 
@@ -315,7 +315,7 @@ public class DialogueManager : MonoBehaviour
         currentInteractable = null;
     }
 
-    public void StartSellerDialogue(DialogueData data)
+    public void StartSellerDialogue(DialogueData data, bool shouldBeUninteractable)
     {
         currentDialogueData = data;
 
@@ -326,7 +326,7 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.Instance.SetPlayerCanPlay(false);
         PlayerManager.Instance.SetPlayerCanHeadBob(false);
 
-        PlayerManager.Instance.ResetPlayerInteract(currentInteractable);
+        PlayerManager.Instance.ResetPlayerInteract(currentInteractable, shouldBeUninteractable);
 
         dialogueIndex = 0;
 

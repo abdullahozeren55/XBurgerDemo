@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class Keys : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     [Header("Audio Settings")]
     public AudioClip pickUpSound;
 
@@ -51,8 +54,15 @@ public class Keys : MonoBehaviour, IInteractable
 
     }
 
+    public void ChangeLayer(int layerIndex)
+    {
+        gameObject.layer = layerIndex;
+    }
+
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         meshRenderer.enabled = false;   
         meshCollider.enabled = false;
 
@@ -66,23 +76,27 @@ public class Keys : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        gameObject.layer = interactableLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(interactableLayer);
     }
 
     public void OutlineChangeCheck()
     {
         if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
         {
-            gameObject.layer = interactableOutlinedRedLayer;
+            ChangeLayer(interactableOutlinedRedLayer);
         }
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
-            gameObject.layer = interactableOutlinedLayer;
+            ChangeLayer(interactableOutlinedLayer);
         }
     }
 

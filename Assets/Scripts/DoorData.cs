@@ -20,9 +20,6 @@ public class DoorData : ScriptableObject
     public float jumpscareSoundEffectPercentValue = 0.3f;
     public float jumpscareDoorRotatePercentValue = 0.4f; //when door gets opened %40, jumpscare starts
     [Space]
-    public DialogueData dialogueAfterInteraction;
-    public float dialoguePlayDelay;
-    [Space]
     public AudioClip openSound;
     public AudioClip closeSound;
     public AudioClip lockedSound;

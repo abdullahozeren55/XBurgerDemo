@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class Window : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     [Header("Audio Settings")]
     public AudioClip openSound;
     public AudioClip closeSound;
@@ -84,6 +87,8 @@ public class Window : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         if (!inLockOpen)
         {
             ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
@@ -93,6 +98,8 @@ public class Window : MonoBehaviour, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         if (!IsLocked)
             HandlePosition();
         else
@@ -101,6 +108,8 @@ public class Window : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         if (!inLockOpen)
         {
             ChangeLayer(interactableLayer);
@@ -168,7 +177,7 @@ public class Window : MonoBehaviour, IInteractable
         }
     }
 
-    private void ChangeLayer(int layerIndex)
+    public void ChangeLayer(int layerIndex)
     {
         gameObject.layer = layerIndex;
         foreach (GameObject child in windowParts)

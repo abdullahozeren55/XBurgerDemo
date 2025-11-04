@@ -74,9 +74,9 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.ResetGrab(grabable);
     }
 
-    public void ResetPlayerInteract(IInteractable interactable)
+    public void ResetPlayerInteract(IInteractable interactable, bool shouldBeUninteractable)
     {
-        firstPersonController.ResetInteract(interactable);
+        firstPersonController.ResetInteract(interactable, shouldBeUninteractable);
     }
 
     public void PlayerOnUseReleaseGrabable(bool shouldDecideOutlineAndCrosshair)

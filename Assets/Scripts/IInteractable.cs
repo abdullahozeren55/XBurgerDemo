@@ -11,9 +11,11 @@ public interface IInteractable
     public void OnLoseFocus();
     public void OutlineChangeCheck();
     public void HandleFinishDialogue();
+    public void ChangeLayer(int layer);
     public PlayerManager.HandRigTypes HandRigType {  get; set; }
 
     public bool OutlineShouldBeRed {  get; set; }
+    public bool CanInteract {  get; set; }
 
     public string FocusText { get; set; }
 

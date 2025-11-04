@@ -7,6 +7,9 @@ using static CameraManager;
 
 public class Door : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     public DoorData data;
 
     public enum DoorState
@@ -16,22 +19,15 @@ public class Door : MonoBehaviour, IInteractable
         Jumpscare
     }
 
-    public enum SpecialDoorState
-    {
-        None,
-        ShouldTurnUninteractableAfterClosing
-    }
-
     public DoorState doorState = DoorState.Normal;
-    [Space]
-    public SpecialDoorState specialDoorState = SpecialDoorState.None;
-
-    [Header("Special Settings")]
-    public DialogueData shouldTurnUninteractableAfterClosingDialogue;
 
     [Header("Settings")] 
     [SerializeField] private GameObject jumpscareGO;
+    public bool shouldBeUninteractableAfterInteraction;
     public bool shouldPlayDialogueAfterInteraction;
+    [Space]
+    public DialogueData dialogueAfterInteraction;
+    public float dialoguePlayDelay;
     private bool isDialoguePlayed = false;
     private bool isLockedAnimating = false;
 
@@ -68,14 +64,19 @@ public class Door : MonoBehaviour, IInteractable
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
     }
 
+    public void ChangeLayer(int layerIndex)
+    {
+        gameObject.layer = layerIndex;
+    }
+
     public void HandleFinishDialogue()
     {
-        if (specialDoorState == SpecialDoorState.None)
-            gameObject.layer = interactableLayer;
     }
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         switch (doorState)
         {
             case DoorState.Normal:
@@ -93,7 +94,7 @@ public class Door : MonoBehaviour, IInteractable
 
         if (shouldPlayDialogueAfterInteraction && !isDialoguePlayed)
         {
-            StartCoroutine(PlayDialogueWithDelay(data.dialoguePlayDelay));
+            StartCoroutine(PlayDialogueWithDelay(dialoguePlayDelay));
             isDialoguePlayed = true;
         }
     }
@@ -101,7 +102,7 @@ public class Door : MonoBehaviour, IInteractable
     private IEnumerator PlayDialogueWithDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, data.dialogueAfterInteraction);
+        DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, shouldBeUninteractableAfterInteraction, dialogueAfterInteraction);
     }
 
     public void HandleRotation()
@@ -116,12 +117,6 @@ public class Door : MonoBehaviour, IInteractable
         transform.parent.DOKill();
         transform.parent.DOLocalRotate(isOpened ? openEuler : closeEuler, data.timeToRotate)
             .SetEase(Ease.InOutSine);
-
-        if (!isOpened && specialDoorState == SpecialDoorState.ShouldTurnUninteractableAfterClosing)
-        {
-            gameObject.layer = uninteractableLayer;
-            DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, shouldTurnUninteractableAfterClosingDialogue);
-        }
     }
 
     private void HandleLocked()
@@ -152,7 +147,7 @@ public class Door : MonoBehaviour, IInteractable
     private void HandleJumpscare()
     {
 
-        gameObject.layer = uninteractableLayer;
+        ChangeLayer(uninteractableLayer);
         isOpened = true;
 
         PlaySound(isOpened);
@@ -200,24 +195,28 @@ public class Door : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
-        gameObject.layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        gameObject.layer = interactableLayer;
+        if (!CanInteract) return;
+
+        ChangeLayer(interactableLayer);
     }
 
     public void OutlineChangeCheck()
     {
         if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
-            gameObject.layer = interactableOutlinedRedLayer;
+            ChangeLayer(interactableOutlinedRedLayer);
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
-            gameObject.layer = interactableOutlinedLayer;
+            ChangeLayer(interactableOutlinedLayer);
     }
 
     public void SetLayerUninteractable(bool should)
     {
-        gameObject.layer = should ? uninteractableLayer : interactableLayer;
+        ChangeLayer(should ? uninteractableLayer : interactableLayer);
     }
 }

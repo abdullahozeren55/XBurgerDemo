@@ -14,6 +14,9 @@ using static UnityEngine.Rendering.DebugUI;
 public class Sukran : MonoBehaviour, ICustomer, IInteractable
 {
     //WARNING: SUKRAN TRUE DRINK USED FOR HER EPIC SPEAK PART 2 BEFORE SHE ASCENDS. SHE DOES NOT GET DRINK.
+
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
     public ICustomer.CustomerDayChangesSegment[] CustomerDayChanges { get => customerDayChanges; set => customerDayChanges = value; }
     [SerializeField] private ICustomer.CustomerDayChangesSegment[] customerDayChanges;
     public CustomerData CustomerData { get => customerData; set => customerData = value; }
@@ -437,6 +440,8 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(uninteractableLayer);
 
         if (CurrentAction == ICustomer.Action.ReadyToOrder)
@@ -452,11 +457,15 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 

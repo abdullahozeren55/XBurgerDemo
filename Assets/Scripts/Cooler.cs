@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class Cooler : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     [Header("Audio Settings")]
     public AudioClip openSound;
     public AudioClip closeSound;
@@ -72,16 +75,22 @@ public class Cooler : MonoBehaviour, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         HandleRotation();
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 
@@ -129,7 +138,7 @@ public class Cooler : MonoBehaviour, IInteractable
         }
     }
 
-    private void ChangeLayer(int layerIndex)
+    public void ChangeLayer(int layerIndex)
     {
         gameObject.layer = layerIndex;
         foreach (GameObject child in coolerParts)

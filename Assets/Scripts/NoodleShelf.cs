@@ -7,6 +7,9 @@ using static NoodleManager;
 
 public class NoodleShelf : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     private GameObject[] childs;
 
     public string FocusText { get => focusText; set => focusText = value; }
@@ -57,11 +60,15 @@ public class NoodleShelf : MonoBehaviour, IInteractable
     }
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         NoodleManager.NoodleStatus status = new NoodleManager.NoodleStatus();
 
         if (instantiatedNoodle != null)
@@ -93,6 +100,8 @@ public class NoodleShelf : MonoBehaviour, IInteractable
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 

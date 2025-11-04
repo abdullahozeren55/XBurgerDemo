@@ -12,6 +12,8 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class Ertan : MonoBehaviour, ICustomer, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
     public ICustomer.CustomerDayChangesSegment[] CustomerDayChanges { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     public CustomerData CustomerData { get => customerData; set => customerData = value; }
     [SerializeField] private CustomerData customerData;
@@ -364,6 +366,8 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(uninteractableLayer);
 
         if (CurrentAction == ICustomer.Action.ReadyToOrder)
@@ -380,11 +384,15 @@ public class Ertan : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 

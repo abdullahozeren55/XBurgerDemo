@@ -13,6 +13,9 @@ using static UnityEngine.Rendering.DebugUI;
 public class Tarik : MonoBehaviour, ICustomer, IInteractable
 {
     //WARNING: AFERORDERDIALOGUE USED FOR HIKMET THING DIALOGUE CHANGE ON DAY 1
+
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
     public ICustomer.CustomerDayChangesSegment[] CustomerDayChanges { get => customerDayChanges; set => customerDayChanges = value; }
     [SerializeField] private ICustomer.CustomerDayChangesSegment[] customerDayChanges;
     public CustomerData CustomerData { get => customerData; set => customerData = value; }
@@ -303,6 +306,8 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(uninteractableLayer);
 
         if (CurrentAction == ICustomer.Action.ReadyToTalk)
@@ -318,11 +323,15 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 

@@ -7,6 +7,9 @@ using static CameraManager;
 
 public class ShopSeller : MonoBehaviour, IInteractable
 {
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
+    [SerializeField] private bool canInteract;
+
     [Header("Block Settings")]
     [SerializeField] private Door[] storeDoors;
     [SerializeField] private GameObject storeExitBlocker;
@@ -61,17 +64,22 @@ public class ShopSeller : MonoBehaviour, IInteractable
 
     public void OnInteract()
     {
+        if (!CanInteract) return;
         //FOR TEST (TODO: REMOVE)
-        DialogueManager.Instance.StartSellerDialogue(beforeNoodleDialogue);
+        DialogueManager.Instance.StartSellerDialogue(beforeNoodleDialogue, true);
     }
 
     public void OnFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
+        if (!CanInteract) return;
+
         ChangeLayer(interactableLayer);
     }
 
@@ -83,7 +91,7 @@ public class ShopSeller : MonoBehaviour, IInteractable
             ChangeLayer(interactableOutlinedLayer);
     }
 
-    private void ChangeLayer(int layer)
+    public void ChangeLayer(int layer)
     {
         gameObject.layer = layer;
         skinnedMeshRenderer.gameObject.layer = layer;

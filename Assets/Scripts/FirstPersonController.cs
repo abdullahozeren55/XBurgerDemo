@@ -217,6 +217,8 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 moveDirection;
     private Vector2 currentInput;
 
+    private int uninteractableLayer;
+
     private float rotationX = 0f;
 
     private void Awake()
@@ -233,6 +235,8 @@ public class FirstPersonController : MonoBehaviour
         defaultCrosshairColor = crosshairText.color;
 
         canUsePhone = true;
+
+        uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
         DecideFocusText();
 
@@ -1237,11 +1241,18 @@ public class FirstPersonController : MonoBehaviour
         DecideOutlineAndCrosshair();
     }
 
-    public void ResetInteract(IInteractable interactable)
+    public void ResetInteract(IInteractable interactable, bool shouldBeUninteractable)
     {
         if (currentInteractable == interactable)
         {
             currentInteractable.OnLoseFocus();
+
+            if (shouldBeUninteractable)
+            {
+                currentInteractable.CanInteract = false;
+                currentInteractable.ChangeLayer(uninteractableLayer);
+            }   
+
             currentInteractable = null;
             DecideOutlineAndCrosshair();
         }     
