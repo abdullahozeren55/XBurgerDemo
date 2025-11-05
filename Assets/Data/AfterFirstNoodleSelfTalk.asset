@@ -19,7 +19,8 @@ MonoBehaviour:
     DialogueToPrint: "Bir ka\xE7 dakikaya haz\u0131r olur."
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
-    autoSkipTime: 4
+    autoSkipTime: 3
+    delay: 0
     audioClip: {fileID: 0}
     cam: 0
     dialogueAnim: 0
@@ -30,6 +31,7 @@ MonoBehaviour:
     DialogueOffset: {x: 0, y: 0}
     Skippable: 1
     autoSkipTime: 4
+    delay: 0
     audioClip: {fileID: 0}
     cam: 0
     dialogueAnim: 0

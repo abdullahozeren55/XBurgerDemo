@@ -19,7 +19,8 @@ public class PhoneManager : MonoBehaviour
         FlashlightMenu,
         AnsweredCallMenu,
         Null,
-        NotesMenu
+        NotesMenu,
+        MessagesMenu
     }
 
     [System.Serializable]
@@ -198,6 +199,25 @@ public class PhoneManager : MonoBehaviour
         }
     }
 
+    public void HandleMessagesMenuButton()
+    {
+        previousMenu = currentMenu;
+        currentMenu = PhoneMenuType.MessagesMenu;
+
+        foreach (PhoneMenu menu in phoneMenus)
+        {
+            if (menu.type != PhoneMenuType.MessagesMenu)
+            {
+                menu.uiGO.SetActive(false);
+                menu.worldGO.SetActive(false);
+            }
+            else
+            {
+                menu.uiGO.SetActive(true);
+                menu.worldGO.SetActive(true);
+            }
+        }
+    }
     public void SetMissionText(string text)
     {
         missionTextUI.text = text;

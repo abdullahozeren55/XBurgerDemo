@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 2
@@ -72,7 +72,6 @@ MonoBehaviour:
   - {fileID: 6770239675424065819}
   - {fileID: 1909003474405396193}
   - {fileID: 4149979450419901097}
-  - {fileID: 905858814827649814}
   - {fileID: 2744744095710626989}
   - {fileID: -3041724447047092936}
   - {fileID: -6921460830251701598}
