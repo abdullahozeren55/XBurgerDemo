@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6f1ea6c3ffc8a942b17df31987d356e, type: 3}
   m_Name: CHEESEPACK
   m_EditorClassIdentifier: 
-  destroyParticle: {fileID: 939900511580441035, guid: b1aa171ede49dd14ca4966340bcad396, type: 3}
+  destroyParticle: {fileID: 3451705259810622206, guid: ac5c7e4fe2c1bad49bd9ddd47fb1fbec, type: 3}
   isUseable: 0
   handGrabType: 6
   minForce: 0.3

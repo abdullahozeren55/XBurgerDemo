@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f8b42ae27ab51449898ba8fe526e87, type: 3}
   m_Name: WHOLEONION
   m_EditorClassIdentifier: 
-  destroyParticle: {fileID: 939900511580441035, guid: 70a503ecd2717464abe4caaba10110c2, type: 3}
+  destroyParticle: {fileID: 3451705259810622206, guid: 6fa55c3561c008b4dbf18488feafb5df, type: 3}
   focusText: "So\u011Fan"
   isUseable: 0
   handGrabType: 9

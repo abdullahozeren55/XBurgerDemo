@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f8b42ae27ab51449898ba8fe526e87, type: 3}
   m_Name: WHOLETOMATO
   m_EditorClassIdentifier: 
-  destroyParticle: {fileID: 939900511580441035, guid: b177dc38e30a5d746bf5bceed40353b7, type: 3}
+  destroyParticle: {fileID: 3451705259810622206, guid: 3563ddfbd416f7a4ea221db036f7ea1b, type: 3}
   focusText: Domates
   isUseable: 0
   handGrabType: 9
