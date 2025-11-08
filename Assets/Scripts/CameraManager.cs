@@ -75,16 +75,33 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float maxFrequencyGain = 0.4f;
     [SerializeField] private float maxFOV = 50f;
     [SerializeField] private float throwMaxChargeTime = 1.5f;
-    [SerializeField] private float vignetteIntensity = 0.25f;
+    [SerializeField] private float vignetteIntensityForThrowCharge = 0.25f;
     [SerializeField] private Color throwChargeColor;
     [SerializeField] private float releaseSpeedMultiplier = 4f;
+
+    [Header("Player Cold Room Enter Effect Settings")]
+    [SerializeField] private float vignetteIntensityForColdRoom = 0.25f;
+    [SerializeField] private Color coldRoomVignetteColor;
+    [SerializeField] private float vigIncreaseTimeForColdRoom = 0.3f;
+    [SerializeField] private float vigDecreaseTimeForColdRoom = 0.2f;
+    [Space]
+    [SerializeField] private float colorAdjustmentsPostExposureForColdRoom = -0.5f;
+    [SerializeField] private Color coldRoomColorAdjustmentsColor;
+    [SerializeField] private float colorAdjustmentsIncreaseTimeForColdRoom = 1f;
+    [SerializeField] private float colorAdjustmentsDecreaseTimeForColdRoom = 0.5f;
+
     private float normalFOV;
+    private float normalVignetteValue;
+    private Color normalVignetteColor;
+    private float normalColorAdjustmentsPostExposureValue;
+    private Color normalColorAdjustmentsColor;
 
     private CinemachineVirtualCamera firstPersonCam;
     private CinemachineVirtualCamera customerDialogueCam;
 
     private CinemachineBasicMultiChannelPerlin perlin;
     private Vignette vignette;
+    private ColorAdjustments colorAdjustments;
 
     private CameraEntry currentCam;
     private int basePriority = 10;
@@ -124,7 +141,22 @@ public class CameraManager : MonoBehaviour
         }
 
         if (postProcessVolume.profile.TryGet(out Vignette v))
+        {
             vignette = v;
+
+            normalVignetteValue = vignette.intensity.value;
+            normalVignetteColor = vignette.color.value;
+        }
+
+        if (postProcessVolume.profile.TryGet(out ColorAdjustments c))
+        {
+            colorAdjustments = c;
+
+            normalColorAdjustmentsPostExposureValue = colorAdjustments.postExposure.value;
+            normalColorAdjustmentsColor = colorAdjustments.colorFilter.value;
+
+        }
+
 
     }
 
@@ -218,16 +250,62 @@ public class CameraManager : MonoBehaviour
         seq.SetEase(ease);
     }
 
-    public void PlayVignette(float targetIntensity, float duration, Color? color = null, Ease ease = Ease.OutSine, string tweenId = "Vignette")
+    public void PlayVignette(float targetIntensity, float duration, Color targetColor, Ease ease = Ease.OutSine, string tweenId = "Vignette")
     {
+        // Mevcut tweeni öldür
         DOTween.Kill(tweenId);
 
-        if (color.HasValue)
-            vignette.color.value = color.Value;
+        // Başlangıç değerlerini al
+        Color startColor = vignette.color.value;
+        float startIntensity = vignette.intensity.value;
 
-        DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, targetIntensity, duration)
-            .SetEase(ease)
-            .SetId(tweenId);
+        // Sequence oluştur
+        Sequence seq = DOTween.Sequence().SetId(tweenId).SetEase(ease);
+
+        // Color tween
+        seq.Join(DOTween.To(
+            () => startColor,
+            x => vignette.color.value = x,
+            targetColor,
+            duration));
+
+        // Intensity tween
+        seq.Join(DOTween.To(
+            () => startIntensity,
+            x => vignette.intensity.value = x,
+            targetIntensity,
+            duration));
+
+        seq.Play();
+    }
+
+    public void PlayerColorAdjustments(float targetPostExposure, float duration, Color targetColor, Ease ease = Ease.OutSine, string tweenId = "ColorAdjustments")
+    {
+        // Mevcut tweeni öldür
+        DOTween.Kill(tweenId);
+
+        // Başlangıç değerlerini al
+        Color startColor = colorAdjustments.colorFilter.value;
+        float startPostExposure = colorAdjustments.postExposure.value;
+
+        // Sequence oluştur
+        Sequence seq = DOTween.Sequence().SetId(tweenId).SetEase(ease);
+
+        // Color tween
+        seq.Join(DOTween.To(
+            () => startColor,
+            x => colorAdjustments.colorFilter.value = x,
+            targetColor,
+            duration));
+
+        // Intensity tween
+        seq.Join(DOTween.To(
+            () => startPostExposure,
+            x => colorAdjustments.postExposure.value = x,
+            targetPostExposure,
+            duration));
+
+        seq.Play();
     }
 
     public void PlayFOV(float targetFOV, float duration, Ease ease = Ease.OutSine, string tweenId = "FOV")
@@ -239,6 +317,16 @@ public class CameraManager : MonoBehaviour
             .SetId(tweenId);
     }
 
+    public void PlayColdRoomEffects(bool isEntering)
+    {
+        float durationVig = isEntering ? vigIncreaseTimeForColdRoom : vigDecreaseTimeForColdRoom;
+        float durationColorAdjustments = isEntering ? colorAdjustmentsIncreaseTimeForColdRoom : colorAdjustmentsDecreaseTimeForColdRoom;
+        Ease ease = isEntering ? Ease.OutSine : Ease.InSine;
+
+        PlayVignette(isEntering ? vignetteIntensityForColdRoom : normalVignetteValue, durationVig, isEntering ? coldRoomVignetteColor : normalVignetteColor, ease);
+        PlayerColorAdjustments(isEntering ? colorAdjustmentsPostExposureForColdRoom : normalColorAdjustmentsPostExposureValue, durationColorAdjustments, isEntering ? coldRoomColorAdjustmentsColor : normalColorAdjustmentsColor, ease);
+    }
+
     public void PlayThrowEffects(bool isCharging)
     {
         perlin.m_NoiseProfile = wobbleNoise;
@@ -248,13 +336,13 @@ public class CameraManager : MonoBehaviour
 
         PlayScreenShake(isCharging ? maxAmplitudeGain : 0f,
                         isCharging ? maxFrequencyGain : 0f,
-                        duration, ease, "ThrowEffects_Shake");
+                        duration, ease);
 
-        PlayVignette(isCharging ? vignetteIntensity : 0f,
-                     duration, throwChargeColor, ease, "ThrowEffects_Vignette");
+        PlayVignette(isCharging ? vignetteIntensityForThrowCharge : normalVignetteValue,
+                     duration, isCharging ? throwChargeColor : normalVignetteColor, ease);
 
         PlayFOV(isCharging ? maxFOV : normalFOV,
-                duration, ease, "ThrowEffects_FOV");
+                duration, ease);
     }
 
     public void PlayJumpscareEffects(JumpscareType type)
@@ -269,13 +357,13 @@ public class CameraManager : MonoBehaviour
         }
 
         // Screen Shake
-        PlayScreenShake(preset.amplitude, preset.frequency, preset.shakeLerpDuration, Ease.OutBack, $"Jumpscare_{type}_Shake");
+        PlayScreenShake(preset.amplitude, preset.frequency, preset.shakeLerpDuration, Ease.OutBack);
 
         // Vignette
-        PlayVignette(preset.vignetteIntensity, preset.vignetteLerpDuration, preset.vignetteColor, Ease.OutSine, $"Jumpscare_{type}_Vignette");
+        PlayVignette(preset.vignetteIntensity, preset.vignetteLerpDuration, preset.vignetteColor, Ease.OutSine);
 
         // FOV
-        PlayFOV(preset.fov, preset.fovLerpDuration, Ease.OutSine, $"Jumpscare_{type}_FOV");
+        PlayFOV(preset.fov, preset.fovLerpDuration, Ease.OutSine);
 
         StartCoroutine(EndScreenShake(preset.shakeTotalDuration, preset.shakeResetLerpDuration, type));
         StartCoroutine(EndVignette(preset.vignetteTotalDuration, preset.vignetteResetLerpDuration, type));
@@ -288,20 +376,20 @@ public class CameraManager : MonoBehaviour
 
         perlin.m_NoiseProfile = shakeNoise;
 
-        PlayScreenShake(0f, 0f, duration, Ease.OutExpo, $"Jumpscare_{type}_Shake");
+        PlayScreenShake(0f, 0f, duration, Ease.OutExpo);
     }
 
     private IEnumerator EndVignette(float delay, float duration, JumpscareType type)
     {
         yield return new WaitForSeconds(delay);
 
-        PlayVignette(0f, duration, null, Ease.InSine, $"Jumpscare_{type}_Vignette");
+        PlayVignette(normalVignetteValue, duration, normalVignetteColor, Ease.InSine);
     }
 
     private IEnumerator EndFOV(float delay, float duration, JumpscareType type)
     {
         yield return new WaitForSeconds(delay);
 
-        PlayFOV(normalFOV, duration, Ease.InSine, $"Jumpscare_{type}_FOV");
+        PlayFOV(normalFOV, duration, Ease.InSine);
     }
 }

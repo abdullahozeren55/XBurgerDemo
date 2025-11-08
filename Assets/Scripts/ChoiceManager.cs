@@ -46,6 +46,7 @@ public class ChoiceManager : MonoBehaviour
     [Space]
     [SerializeField] private Volume volume;
     private ColorAdjustments colorAdjust;
+    private float normalSaturationValue;
     [SerializeField] private float fadeInTime = 1.5f;
     [SerializeField] private float fadeOutTime = 0.75f;
     [SerializeField] private float slowedDownTimeSpeed = 0.25f;
@@ -109,6 +110,8 @@ public class ChoiceManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         volume.profile.TryGet(out colorAdjust);
+
+        normalSaturationValue = colorAdjust.saturation.value;
 
         optionStartScale = optionAText.transform.localScale;
         optionStartColor = optionAText.color;
@@ -424,6 +427,7 @@ public class ChoiceManager : MonoBehaviour
         isInAnim = true;
 
         float startCameraFov = virtualCamera.m_Lens.FieldOfView;
+        float startSaturation = colorAdjust.saturation.value;
 
         Color timerImageColor = timerImage.color;
         Color timerBackgroundImageColor = timerBackgroundImage.color;
@@ -439,7 +443,7 @@ public class ChoiceManager : MonoBehaviour
         {
             value = timeElapsed / fadeInTime;
 
-            colorAdjust.saturation.value = Mathf.Lerp(0f, -100f, value);
+            colorAdjust.saturation.value = Mathf.Lerp(startSaturation, -100f, value);
             Time.timeScale = Mathf.Lerp(1f, slowedDownTimeSpeed, value);
             virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(startCameraFov, changedCameraFov, value);
 
@@ -505,6 +509,7 @@ public class ChoiceManager : MonoBehaviour
         value = 0f;
 
         startCameraFov = virtualCamera.m_Lens.FieldOfView;
+        startSaturation = colorAdjust.saturation.value;
         timerImageColor = timerImage.color;
         timerBackgroundImageColor = timerBackgroundImage.color;
         keyboardAImageColor = keyboardAImage.color;
@@ -516,7 +521,7 @@ public class ChoiceManager : MonoBehaviour
         {
             value = timeElapsed / fadeOutTime;
 
-            colorAdjust.saturation.value = Mathf.Lerp(-100f, 0f, value);
+            colorAdjust.saturation.value = Mathf.Lerp(startSaturation, normalSaturationValue, value);
             Time.timeScale = Mathf.Lerp(slowedDownTimeSpeed, 1f, value);
             virtualCamera.m_Lens.FieldOfView = Mathf.Lerp(startCameraFov, originalCameraFov, value);
 
@@ -529,7 +534,7 @@ public class ChoiceManager : MonoBehaviour
             yield return null;
         }
 
-        colorAdjust.saturation.value = 0f;
+        colorAdjust.saturation.value = normalSaturationValue;
         Time.timeScale = 1f;
         virtualCamera.m_Lens.FieldOfView = originalCameraFov;
 

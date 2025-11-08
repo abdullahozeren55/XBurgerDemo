@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1765209127861935508}
   - component: {fileID: 1895340056144535257}
   - component: {fileID: 6147384778956276386}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: SinanBreathingEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -222,7 +222,7 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 1, g: 1, b: 1, a: 0.19607843}
+      minColor: {r: 1, g: 1, b: 1, a: 0.88235295}
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
