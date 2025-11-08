@@ -18,39 +18,33 @@ public class SauceCollision : MonoBehaviour
 
     void OnParticleCollision(GameObject other)
     {
-        if (!other.CompareTag("SauceBottle") && !other.CompareTag("Kettle"))
+        if (sauceType != SauceBottle.SauceType.Water && other.CompareTag("BurgerSauceArea"))
         {
-
-            if (sauceType != SauceBottle.SauceType.Water && other.CompareTag("BurgerSauceArea"))
-            {
-                GameManager.Instance.AddSauceToTray(sauceType);
-            }
-            else if (sauceType == SauceBottle.SauceType.Water && other.CompareTag("Noodle"))
-            {
-                NoodleManager.Instance.AddWaterToNoodle();
-            }
-            else
-            {
-                int count = ps.GetCollisionEvents(other, collisionEvents);
-
-                for (int i = 0; i < count; i++)
-                {
-                    Vector3 hitPoint = collisionEvents[i].intersection;
-                    Vector3 normal = collisionEvents[i].normal;
-
-                    // Normal yönüne göre rotation hesapla
-                    Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
-
-                    // Objeyi doðru ebeveyne yerleþtir
-                    Transform decalParent = other.transform.Find("DecalParent");
-                    Transform parentToUse = decalParent != null ? decalParent : other.transform;
-
-                    SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, parentToUse);
-                }
-            }
-                
+            GameManager.Instance.AddSauceToTray(sauceType);
         }
-        
+        else if (sauceType == SauceBottle.SauceType.Water && other.CompareTag("Noodle"))
+        {
+            NoodleManager.Instance.AddWaterToNoodle();
+        }
+        else
+        {
+            int count = ps.GetCollisionEvents(other, collisionEvents);
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 hitPoint = collisionEvents[i].intersection;
+                Vector3 normal = collisionEvents[i].normal;
+
+                // Normal yönüne göre rotation hesapla
+                Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
+
+                // Objeyi doðru ebeveyne yerleþtir
+                Transform decalParent = other.transform.Find("DecalParent");
+                Transform parentToUse = decalParent != null ? decalParent : other.transform;
+
+                SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, parentToUse);
+            }
+        }
     }
 
 }

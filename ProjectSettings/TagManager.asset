@@ -16,7 +16,6 @@ TagManager:
   - Trash
   - Drink
   - Knife
-  - BroomTrigger
   - Noodle
   - NevzatTrigger
   - SauceBottle
@@ -24,6 +23,7 @@ TagManager:
   - SaucePack
   - Kettle
   - FoodPack
+  - Stain
   layers:
   - Default
   - TransparentFX

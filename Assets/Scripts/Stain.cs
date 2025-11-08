@@ -16,12 +16,9 @@ public class Stain : MonoBehaviour
         cleanCoroutine = null;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void Clear()
     {
-        if (other.CompareTag("BroomTrigger") && cleanCoroutine == null)
-        {
-            cleanCoroutine = StartCoroutine(ClearStain(meshRenderer.material.color.a <= 80f / 255f));
-        }
+        cleanCoroutine = StartCoroutine(ClearStain(meshRenderer.material.color.a <= 80f / 255f));
     }
 
     private IEnumerator ClearStain(bool shouldDestroy)

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffafc54a53686654a804b577eb7e81c8, type: 3}
+  m_Name: MOP
+  m_EditorClassIdentifier: 
+  isUseable: 1
+  handGrabType: 3
+  grabPositionOffset: {x: 1, y: 0.3, z: 3}
+  grabRotationOffset: {x: 180, y: 90, z: 150}
+  grabLocalPositionOffset: {x: -0.0008801961, y: 0.00046993024, z: -0.00030053104}
+  grabLocalRotationOffset: {x: 2.9140399, y: 86.16083, z: 103.15331}
+  usePositionOffset: {x: 1, y: 0.3, z: 3}
+  useRotationOffset: {x: 80, y: 100, z: 30}
+  useLocalPositionOffset: {x: -0.0008801961, y: 0.00046993024, z: -0.00030053104}
+  useLocalRotationOffset: {x: 2.9140399, y: 86.16083, z: 103.15331}
+  usingFOV: 70
+  timeToUse: 0.3
+  focusText: "B\u0131\xE7ak"
+  audioClips:
+  - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
+  - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}
+  - {fileID: 8300000, guid: 663ad0518d9d3c04f89c09b876621b22, type: 3}

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffafc54a53686654a804b577eb7e81c8, type: 3}
+  m_Name: KNIFE
+  m_EditorClassIdentifier: 
+  isUseable: 1
+  handGrabType: 3
+  grabPositionOffset: {x: 0.3, y: 0, z: 2}
+  grabRotationOffset: {x: 45, y: -60, z: -90}
+  grabLocalPositionOffset: {x: -0.0000010572512, y: 0.00051305967, z: 0.000011773997}
+  grabLocalRotationOffset: {x: 9.527423, y: 61.804817, z: 280.1402}
+  usePositionOffset: {x: 0.3, y: 0, z: 2}
+  useRotationOffset: {x: 0, y: -70, z: -130}
+  useLocalPositionOffset: {x: -0.0000010572512, y: 0.00051305967, z: 0.000011773997}
+  useLocalRotationOffset: {x: 9.527423, y: 61.804817, z: 280.1402}
+  usingFOV: 70
+  timeToUse: 0.3
+  focusText: "B\u0131\xE7ak"
+  audioClips:
+  - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
+  - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}
+  - {fileID: 8300000, guid: 663ad0518d9d3c04f89c09b876621b22, type: 3}
