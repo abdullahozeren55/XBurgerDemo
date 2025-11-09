@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CarManager : MonoBehaviour
 {
@@ -24,6 +25,10 @@ public class CarManager : MonoBehaviour
     [SerializeField] private Material[] car0Materials;
     [SerializeField] private CarDestinations[] carDestinations;
     [SerializeField] private GameObject car0GO;
+
+    [Header("Walking NPC Settings")]
+    [SerializeField] private NavMeshAgent walking1agent;
+    [SerializeField] private Transform destination;
     private void Awake()
     {
         if (Instance == null)
@@ -41,6 +46,8 @@ public class CarManager : MonoBehaviour
         }
 
         car0SpawnCoroutine = StartCoroutine(SpawnRandomCar0Repeatedly());
+
+        walking1agent.SetDestination(destination.position);
 
     }
 
