@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LightSwitch : MonoBehaviour, IInteractable
@@ -16,9 +17,18 @@ public class LightSwitch : MonoBehaviour, IInteractable
     public string FocusText { get => focusTexts[switchStateNum]; set => focusTexts[switchStateNum] = value; }
     [SerializeField] private string[] focusTexts;
     private int switchStateNum = 0;
-    [Space]
+
+    [System.Serializable]
+    public class LightSettings
+    {
+        public GameObject lightGO;
+        [Range(0, 100)] public int flickerPossibility; 
+    }
 
     [Header("On Off Settings")]
+    [SerializeField] private LightSettings[] lightsToEffect;
+    [SerializeField] private Material lightMatToCopy;
+    [Space]
     [SerializeField] private GameObject switchPart;
     [SerializeField] private float timeToSwitchRotate = 0.2f;
     [SerializeField] private float onSwitchXRotation = 20f;
@@ -26,6 +36,16 @@ public class LightSwitch : MonoBehaviour, IInteractable
     private Quaternion onRotation;
     private Coroutine rotateCoroutine;
     private bool isOn;
+
+    [Header("Flicker Settings")]
+    [SerializeField] private float baseIntensity = 20f;
+    [SerializeField] private float flickerMinDelay = 0.1f;
+    [SerializeField] private float flickerMaxDelay = 0.3f;
+    [SerializeField] private int minFlickerCount = 3;
+    [SerializeField] private int maxFlickerCount = 12;
+    private Color baseEmission; // orijinal emission rengi
+    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
+    private Coroutine flickerLightCoroutine;
 
     [Header("Audio Settings")]
     public AudioClip onSound;
@@ -45,6 +65,13 @@ public class LightSwitch : MonoBehaviour, IInteractable
         isOn = false;
         offRotation = switchPart.transform.localRotation;
         onRotation = Quaternion.Euler(onSwitchXRotation, offRotation.y, offRotation.z);
+
+        baseEmission = lightMatToCopy.GetColor(EmissionColorID);
+
+        foreach (LightSettings settings in lightsToEffect)
+        {
+            settings.lightGO.GetComponent<MeshRenderer>().material = new Material(lightMatToCopy);
+        }
     }
 
     public void ChangeLayer(int layerIndex)
@@ -100,6 +127,8 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
         PlayerManager.Instance.TryChangingFocusText(this, FocusText);
 
+        HandleLights();
+
         if (rotateCoroutine != null)
         {
             StopCoroutine(rotateCoroutine);
@@ -126,5 +155,73 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
         switchPart.transform.localRotation = targetRotation;
         rotateCoroutine = null;
+    }
+
+    private void HandleLights()
+    {
+        if (flickerLightCoroutine != null)
+        {
+            StopCoroutine(flickerLightCoroutine);
+            flickerLightCoroutine = null;
+        }
+
+
+        if (isOn)
+        {
+            foreach (var setting in lightsToEffect)
+            {
+                Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
+                Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+
+                if (lightComp == null || rend == null) continue;
+
+                Material matInstance = rend.material; // kendi kopyasýný alýyoruz
+                matInstance.EnableKeyword("_EMISSION");
+
+                if (Random.Range(0, 100) < setting.flickerPossibility)
+                {
+                    int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
+                    flickerLightCoroutine = StartCoroutine(FlickerLight(lightComp, matInstance, baseEmission, flickerCount));
+                }
+
+                lightComp.enabled = true;
+                lightComp.intensity = baseIntensity;
+                matInstance.SetColor("_EmissionColor", baseEmission);
+            }
+        }
+        else
+        {
+            foreach (var setting in lightsToEffect)
+            {
+                Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
+                Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+
+                if (lightComp != null)
+                    lightComp.enabled = false;
+
+                Material matInstance = rend.material; // kendi kopyasýný alýyoruz
+                matInstance.DisableKeyword("_EMISSION");
+            }
+        }
+    }
+
+    private IEnumerator FlickerLight(Light light, Material mat, Color baseEmission, int flickerCount)
+    {
+        light.enabled = true;
+
+        for (int i = 0; i < flickerCount; i++)
+        {
+            float randomIntensity = Random.Range(0.01f, baseIntensity * 0.3f);
+            float emissionMultiplier = randomIntensity / (baseIntensity * 2);
+            Color flickerEmission = baseEmission * Mathf.LinearToGammaSpace(emissionMultiplier);
+
+            light.intensity = randomIntensity;
+            mat.SetColor("_EmissionColor", flickerEmission);
+            yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
+
+            light.intensity = baseIntensity;
+            mat.SetColor("_EmissionColor", baseEmission);
+            yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
+        }
     }
 }
