@@ -47,15 +47,16 @@ public interface ICustomer
     {
         NONE,
         TALK,
-        LAUGH
+        LAUGH,
+        WAVE
     }
 
     [System.Serializable]
     public class CustomerDayChangesSegment
     {
-        [Range(1, 5)]
+        [Range(0, 5)]
         public int Day;
-        [Range(1, 5)]
+        [Range(0, 5)]
         public int RequiredLevel;
         public bool RequiredBoolean;
         public Material Material;

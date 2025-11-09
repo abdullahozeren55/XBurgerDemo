@@ -527,7 +527,6 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
         CurrentAction = ICustomer.Action.ReadyToTalk;
         agent.enabled = false;
         HandleFootsteps();
-        anim.SetTrigger("wave");
         anim.SetBool("idle", true);
         DialogueManager.Instance.StartCustomerDialogue(this, falseBurgerDialogueData);
     }
@@ -545,7 +544,7 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
     {
         if (other.CompareTag("NevzatTrigger"))
         {
-            if (day == 1)
+            if (day == 0)
             {
                 if (currentDestination == restaurantDestination)
                 {
@@ -566,6 +565,9 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 
     public void HandleDialogueAnim(DialogueAnim dialogueAnim)
     {
-        throw new System.NotImplementedException();
+        if (dialogueAnim == DialogueAnim.WAVE)
+            anim.SetTrigger("wave");
+        else if (dialogueAnim == DialogueAnim.TALK && !anim.GetCurrentAnimatorStateInfo(0).IsName("Talk") && CurrentAction != ICustomer.Action.ReceivedFalseDrink && CurrentAction != ICustomer.Action.ReceivedFalseBurger)
+            anim.SetTrigger("talk");
     }
 }

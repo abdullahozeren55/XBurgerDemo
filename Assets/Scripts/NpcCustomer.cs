@@ -428,7 +428,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     public void HandleDialogueAnim(DialogueAnim dialogueAnim)
     {
-        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Talk") && CurrentAction != ICustomer.Action.ReceivedFalseDrink && CurrentAction != ICustomer.Action.ReceivedFalseBurger)
+        if (dialogueAnim == DialogueAnim.TALK && !anim.GetCurrentAnimatorStateInfo(0).IsName("Talk") && CurrentAction != ICustomer.Action.ReceivedFalseDrink && CurrentAction != ICustomer.Action.ReceivedFalseBurger)
             anim.SetTrigger("talk");
     }
 
