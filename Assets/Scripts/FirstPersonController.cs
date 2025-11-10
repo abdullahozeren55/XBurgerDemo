@@ -842,14 +842,7 @@ public class FirstPersonController : MonoBehaviour
         {
             if (hit.collider.gameObject.GetComponent<IInteractable>() == currentInteractable)
             {
-                if (currentInteractable.HandRigType == PlayerManager.HandRigTypes.Talk)
-                {
-                    if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
-                    if (leftHandRigLerpCoroutine != null) StopCoroutine(leftHandRigLerpCoroutine);
-
-                    anim.SetTrigger("talk");
-                }
-                else if ((currentGrabable == null || !currentGrabable.IsGrabbed) && !phoneGrabable.IsGrabbed)
+                if ((currentGrabable == null || !currentGrabable.IsGrabbed) && !phoneGrabable.IsGrabbed)
                 {
 
                     if (rightHandRigLerpCoroutine != null)

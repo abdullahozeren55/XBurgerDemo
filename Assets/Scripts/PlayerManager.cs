@@ -11,7 +11,6 @@ public class PlayerManager : MonoBehaviour
     {
         Interaction,
         SingleHandGrab,
-        Talk,
         Nothing,
     }
 
