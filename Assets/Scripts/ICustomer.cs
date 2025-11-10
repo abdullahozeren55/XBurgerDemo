@@ -48,7 +48,9 @@ public interface ICustomer
         NONE,
         TALK,
         LAUGH,
-        WAVE
+        WAVE,
+        TURNHEADTOSIDE,
+        TURNHEADBACKTONORMAL
     }
 
     [System.Serializable]

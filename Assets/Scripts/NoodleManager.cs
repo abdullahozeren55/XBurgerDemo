@@ -237,6 +237,8 @@ public class NoodleManager : MonoBehaviour
 
         currentSmokePS = currentSmokeGO.GetComponent<ParticleSystem>();
 
+        shopSeller.CurrentStatus = ShopSeller.ShopSellerStatus.NoodleObtained;
+
         currentNoodleSkinnedMeshRenderer = currentNoodleGO.GetComponent<SkinnedMeshRenderer>();
 
         waterStartPos = currentWaterGO.transform.localPosition;

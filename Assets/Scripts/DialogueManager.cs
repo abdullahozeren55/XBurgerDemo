@@ -502,7 +502,10 @@ public class DialogueManager : MonoBehaviour
         RectTransform rect = currentDialogueText.rectTransform;
         rect.anchoredPosition += currentDialogueData.dialogueSegments[dialogueIndex].DialogueOffset;
 
-        currentCustomer?.HandleDialogueAnim(currentDialogueData.dialogueSegments[dialogueIndex].dialogueAnim);
+        if (talkType == TalkType.TalkWithSeller)
+            shopSeller.HandleDialogueAnim(currentDialogueData.dialogueSegments[dialogueIndex].dialogueAnim);
+        else
+            currentCustomer?.HandleDialogueAnim(currentDialogueData.dialogueSegments[dialogueIndex].dialogueAnim);
 
         DecideFontType(currentDialogueData.dialogueSegments[dialogueIndex].fontType);
         currentTextAnim.ShowText(currentDialogueData.dialogueSegments[dialogueIndex].DialogueToPrint);

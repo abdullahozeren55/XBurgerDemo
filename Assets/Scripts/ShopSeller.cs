@@ -7,6 +7,14 @@ using static CameraManager;
 
 public class ShopSeller : MonoBehaviour, IInteractable
 {
+    public enum ShopSellerStatus
+    {
+        None,
+        Annoyed,
+        NoodleObtained
+    }
+
+    public ShopSellerStatus CurrentStatus;
     public bool CanInteract { get => canInteract; set => canInteract = value; }
     [SerializeField] private bool canInteract;
 
@@ -16,9 +24,8 @@ public class ShopSeller : MonoBehaviour, IInteractable
 
     [Header("Dialogue Settings")]
     [SerializeField] private DialogueData day1BeforeNoodleDialogue;
-
-    private DialogueData beforeNoodleDialogue;
-    private DialogueData afterNoodleDialogue;
+    [SerializeField] private DialogueData day1AfterAnnoyedDialogue;
+    [SerializeField] private DialogueData day1AfterNoodleDialogue;
     public string FocusText { get => focusTexts[doorStateNum]; set => focusTexts[doorStateNum] = value; }
     [SerializeField] private string[] focusTexts;
 
@@ -30,6 +37,7 @@ public class ShopSeller : MonoBehaviour, IInteractable
     private bool outlineShouldBeRed;
 
     private SkinnedMeshRenderer skinnedMeshRenderer;
+    private Animator anim;
 
     private int interactableLayer;
     private int interactableOutlinedLayer;
@@ -39,34 +47,46 @@ public class ShopSeller : MonoBehaviour, IInteractable
     private void Awake()
     {
         skinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        anim = GetComponent<Animator>();
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
-        //FOR TEST (TODO: REMOVE)
-        beforeNoodleDialogue = day1BeforeNoodleDialogue;
+        CurrentStatus = ShopSellerStatus.None;
     }
 
     public void HandleFinishDialogue()
     {
-
-        NoodleManager.Instance.SetCurrentNoodleStatus(NoodleManager.NoodleStatus.JustBought);
-
-        storeExitBlocker.SetActive(false);
-
-        foreach (Door door in storeDoors)
+        if (CurrentStatus == ShopSellerStatus.None)
         {
-            door.SetLayerUninteractable(false);
+            CurrentStatus = ShopSellerStatus.Annoyed;
         }
+        else if (CurrentStatus == ShopSellerStatus.NoodleObtained)
+        {
+            NoodleManager.Instance.SetCurrentNoodleStatus(NoodleManager.NoodleStatus.JustBought);
+
+            storeExitBlocker.SetActive(false);
+
+            foreach (Door door in storeDoors)
+            {
+                door.SetLayerUninteractable(false);
+            }
+        }
+        
     }
 
     public void OnInteract()
     {
         if (!CanInteract) return;
-        //FOR TEST (TODO: REMOVE)
-        DialogueManager.Instance.StartSellerDialogue(beforeNoodleDialogue, true);
+
+        if (CurrentStatus == ShopSellerStatus.None)
+            DialogueManager.Instance.StartSellerDialogue(day1BeforeNoodleDialogue, false);
+        else if (CurrentStatus == ShopSellerStatus.Annoyed)
+            DialogueManager.Instance.StartSelfDialogue(day1AfterAnnoyedDialogue);
+        else if (CurrentStatus == ShopSellerStatus.NoodleObtained)
+            DialogueManager.Instance.StartSellerDialogue(day1AfterNoodleDialogue, true);
     }
 
     public void OnFocus()
@@ -95,5 +115,14 @@ public class ShopSeller : MonoBehaviour, IInteractable
     {
         gameObject.layer = layer;
         skinnedMeshRenderer.gameObject.layer = layer;
+    }
+
+    public void HandleDialogueAnim(ICustomer.DialogueAnim dialogueAnim)
+    {
+        if (dialogueAnim == ICustomer.DialogueAnim.TURNHEADTOSIDE)
+            anim.SetBool("sitTurnHead", true);
+        else if (dialogueAnim == ICustomer.DialogueAnim.TURNHEADBACKTONORMAL)
+            anim.SetBool("sitTurnHead", false);
+
     }
 }

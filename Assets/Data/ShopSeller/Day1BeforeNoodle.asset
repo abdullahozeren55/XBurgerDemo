@@ -19,18 +19,44 @@ MonoBehaviour:
     DialogueToPrint: "Pardon Noodle'lar ne taraftayd\u0131 acaba?"
     DialogueOffset: {x: 0, y: 0}
     Skippable: 0
+    autoSkipTime: 10
+    delay: 0
     audioClip: {fileID: 0}
     cam: 5
     dialogueAnim: 0
   - fontType: 7
     talkingPerson: 1
     fontStyle: 0
-    DialogueToPrint: LUUUAAAAAAAAAAAAANNNNNNNNNNNNNNNN
+    DialogueToPrint: ...
     DialogueOffset: {x: 0, y: 0}
     Skippable: 0
+    autoSkipTime: 10
+    delay: 0
+    audioClip: {fileID: 0}
+    cam: 0
+    dialogueAnim: 4
+  - fontType: 1
+    talkingPerson: 0
+    fontStyle: 0
+    DialogueToPrint: "\u015E-\u015Fakayd\u0131..."
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 0
+    autoSkipTime: 10
+    delay: 0
     audioClip: {fileID: 0}
     cam: 0
     dialogueAnim: 0
+  - fontType: 7
+    talkingPerson: 1
+    fontStyle: 0
+    DialogueToPrint: ...
+    DialogueOffset: {x: 0, y: 0}
+    Skippable: 0
+    autoSkipTime: 10
+    delay: 0
+    audioClip: {fileID: 0}
+    cam: 0
+    dialogueAnim: 5
   type: 0
   question: 
   optionA: 
