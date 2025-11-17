@@ -14,8 +14,8 @@ public class LightSwitch : MonoBehaviour, IInteractable
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     [SerializeField] private bool outlineShouldBeRed;
 
-    public string FocusText { get => focusTexts[switchStateNum]; set => focusTexts[switchStateNum] = value; }
-    [SerializeField] private string[] focusTexts;
+    public string FocusTextKey { get => focusTextKeys[switchStateNum]; set => focusTextKeys[switchStateNum] = value; }
+    [SerializeField] private string[] focusTextKeys;
     private int switchStateNum = 0;
 
     [System.Serializable]
@@ -130,7 +130,7 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
         switchStateNum = isOn ? 1 : 0;
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
         HandleLights();
 

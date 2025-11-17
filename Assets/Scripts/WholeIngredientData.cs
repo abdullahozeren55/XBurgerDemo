@@ -9,7 +9,7 @@ public class WholeIngredientData : ScriptableObject
     public GameObject destroyParticle;
     public Quaternion instantiateRotationOffset;
     [Space]
-    public string focusText;
+    public string focusTextKey;
     public bool isUseable = false;
     public PlayerManager.HandGrabTypes handGrabType;
     [Space]

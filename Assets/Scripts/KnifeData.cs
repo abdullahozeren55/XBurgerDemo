@@ -24,6 +24,6 @@ public class KnifeData : ScriptableObject
     public float usingFOV = 50f;
     public float timeToUse = 0.3f;
     [Space]
-    public string focusText;
+    public string focusTextKey;
     public AudioClip[] audioClips;
 }

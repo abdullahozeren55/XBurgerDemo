@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54297c192cc8fd04db9196d1e0642bea, type: 3}
   m_Name: KitchenBackDoor
   m_EditorClassIdentifier: 
-  focusTexts:
-  - "Kap\u0131y\u0131 A\xE7"
-  - "Kap\u0131y\u0131 Kapat"
-  - "Kap\u0131 Kilitli"
+  focusTextKeys:
+  - INTERACTABLE_OPEN_DOOR
+  - INTERACTABLE_CLOSE_DOOR
+  - INTERACTABLE_LOCKED_DOOR
   handRigType: 0
   jumpscareType: 0
   timeToRotate: 0.3
@@ -26,8 +26,6 @@ MonoBehaviour:
   jumpscareEffectPercentValue: 0.1
   jumpscareSoundEffectPercentValue: 0.2
   jumpscareDoorRotatePercentValue: 0.4
-  dialogueAfterInteraction: {fileID: 11400000, guid: 300d758f177c519489f23c777568dbbe, type: 2}
-  dialoguePlayDelay: 1.5
   openSound: {fileID: 8300000, guid: 010ab9783e67eac4aa944847c83da278, type: 3}
   closeSound: {fileID: 8300000, guid: 62f2949e85267dd4cbbb7a1f02b42b23, type: 3}
   lockedSound: {fileID: 0}

@@ -20,7 +20,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     public BurgerIngredientData data;
 
     [SerializeField] private Tray tray;
-    public string FocusText { get => data.focusTexts[(int)cookAmount]; set => data.focusTexts[(int)cookAmount] = value; }
+    public string FocusTextKey { get => data.focusTextKeys[(int)cookAmount]; set => data.focusTextKeys[(int)cookAmount] = value; }
     [Space]
 
     [HideInInspector] public bool canAddToTray;
@@ -340,7 +340,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             canStick = false;
         }
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
     }
 
     private void OnDestroy()

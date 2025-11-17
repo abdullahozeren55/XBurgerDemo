@@ -22,7 +22,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     public WholeIngredientData data;
 
-    public string FocusText { get => data.focusText; set => data.focusText = value; }
+    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
     [Space]
 
     [Header("Instantiate Settings")]

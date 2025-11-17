@@ -6,7 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewDoorData", menuName = "Data/Door")]
 public class DoorData : ScriptableObject
 {
-    public string[] focusTexts; //0 kapýyý aç, 1 kapýyý kapat, 2 kapý kilitli
+    public string[] focusTextKeys; //0 kapýyý aç, 1 kapýyý kapat, 2 kapý kilitli
     public PlayerManager.HandRigTypes handRigType;
     public CameraManager.JumpscareType jumpscareType;
     [Space]

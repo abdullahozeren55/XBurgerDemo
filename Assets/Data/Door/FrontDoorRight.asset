@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54297c192cc8fd04db9196d1e0642bea, type: 3}
   m_Name: FrontDoorRight
   m_EditorClassIdentifier: 
-  focusTexts:
-  - "Kap\u0131y\u0131 A\xE7"
-  - "Kap\u0131y\u0131 Kapat"
-  - "Kap\u0131 Kilitli"
+  focusTextKeys:
+  - INTERACTABLE_OPEN_DOOR
+  - INTERACTABLE_CLOSE_DOOR
+  - INTERACTABLE_LOCKED_DOOR
   handRigType: 0
   jumpscareType: 0
   timeToRotate: 0.3
@@ -26,8 +26,6 @@ MonoBehaviour:
   jumpscareEffectPercentValue: 0.2
   jumpscareSoundEffectPercentValue: 0.3
   jumpscareDoorRotatePercentValue: 0.4
-  dialogueAfterInteraction: {fileID: 0}
-  dialoguePlayDelay: 0
   openSound: {fileID: 8300000, guid: 7db4d5ddcbe9db141813f5fed9a116ee, type: 3}
   closeSound: {fileID: 8300000, guid: 4b36b119b250b0f479ca75901104b58a, type: 3}
   lockedSound: {fileID: 8300000, guid: 193d8600df8fa7846946eda88f6cc1ad, type: 3}

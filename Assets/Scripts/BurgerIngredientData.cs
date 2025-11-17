@@ -19,7 +19,7 @@ public class BurgerIngredientData : ScriptableObject
     public Vector3 grabLocalPositionOffset;
     public Vector3 grabLocalRotationOffset;
     [Space]
-    public string[] focusTexts;
+    public string[] focusTextKeys;
     [Space]
     public ParticleSystem[] dropParticles;
     public ParticleSystem[] throwParticles;

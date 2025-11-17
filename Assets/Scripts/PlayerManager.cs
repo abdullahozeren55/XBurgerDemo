@@ -13,7 +13,6 @@ public class PlayerManager : MonoBehaviour
     public float knockbackDuration = 0.35f;
 
     private Vector3 knockbackVelocity;
-    private bool isKnockbackActive;
 
     public enum HandRigTypes
     {
@@ -145,7 +144,6 @@ public class PlayerManager : MonoBehaviour
 
     public void ApplyKnockback(Vector3 direction, float force)
     {
-        isKnockbackActive = true;
         knockbackVelocity = direction * force;
 
         StartCoroutine(KnockbackRoutine(knockbackDuration));
@@ -218,7 +216,6 @@ public class PlayerManager : MonoBehaviour
     private IEnumerator KnockbackRoutine(float duration)
     {
         float t = 0f;
-        isKnockbackActive = true;
 
         while (t < duration)
         {
@@ -234,7 +231,5 @@ public class PlayerManager : MonoBehaviour
             t += Time.deltaTime;
             yield return null;
         }
-
-        isKnockbackActive = false;
     }
 }

@@ -102,8 +102,8 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
     private Material currentGroundMaterial;
     private AudioClip lastPlayedFootstep;
 
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
 
     public Transform CameraLookAt { get => cameraLookAt; set => cameraLookAt = value; }
     [SerializeField] private Transform cameraLookAt;

@@ -22,7 +22,7 @@ public class Drink : MonoBehaviour, IGrabable
 
     public DrinkData data;
 
-    public string FocusText { get => data.focusText; set => data.focusText = value; }
+    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
     [Space]
 
     private Rigidbody rb;

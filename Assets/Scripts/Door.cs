@@ -32,10 +32,9 @@ public class Door : MonoBehaviour, IInteractable
 
 
     [Header("Audio")]
-    [SerializeField] private AudioSource doorAudioSource;
     [SerializeField] private AudioSource jumpscareAudioSource;
     
-    public string FocusText { get => data.focusTexts[doorStateNum]; set => data.focusTexts[doorStateNum] = value; }
+    public string FocusTextKey { get => data.focusTextKeys[doorStateNum]; set => data.focusTextKeys[doorStateNum] = value; }
     private int doorStateNum = 0;
     public PlayerManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
 
@@ -101,11 +100,11 @@ public class Door : MonoBehaviour, IInteractable
     public void HandleRotation()
     {
         isOpened = !isOpened;
-        PlaySound(isOpened);
+        SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform);
 
         doorStateNum = isOpened ? 1 : 0;
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
         transform.parent.DOKill();
         transform.parent.DOLocalRotate(isOpened ? openEuler : closeEuler, data.timeToRotate)
@@ -117,7 +116,7 @@ public class Door : MonoBehaviour, IInteractable
         if (isLockedAnimating) return;
         isLockedAnimating = true;
 
-        doorAudioSource.PlayOneShot(data.lockedSound);
+        SoundManager.Instance.PlaySoundFX(data.lockedSound, transform);
 
         transform.parent.DOKill();
         transform.parent.localRotation = Quaternion.Euler(closeEuler);
@@ -131,7 +130,7 @@ public class Door : MonoBehaviour, IInteractable
            {
                doorStateNum = 2;
 
-               PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+               PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
                isLockedAnimating = false;
            });
@@ -143,7 +142,7 @@ public class Door : MonoBehaviour, IInteractable
         ChangeLayer(uninteractableLayer);
         isOpened = true;
 
-        PlaySound(isOpened);
+        SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform);
 
         // Baþlangýç pozisyonu
         Vector3 startPos = jumpscareGO.transform.position;
@@ -178,12 +177,6 @@ public class Door : MonoBehaviour, IInteractable
         {
             doorState = DoorState.Normal;
         });
-    }
-
-    private void PlaySound(bool opened)
-    {
-        doorAudioSource.Stop();
-        doorAudioSource.PlayOneShot(opened ? data.openSound : data.closeSound);
     }
 
     public void OnFocus()

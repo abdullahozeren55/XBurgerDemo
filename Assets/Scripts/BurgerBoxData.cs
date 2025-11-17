@@ -17,7 +17,7 @@ public class BurgerBoxData : ScriptableObject
     public Vector3[] grabLocalPositionOffset; //0 for open, 1 for close
     public Vector3[] grabLocalRotationOffset; //0 for open, 1 for close
     [Space]
-    public string[] focusTexts;
+    public string[] focusTextKeys;
 
     public AudioClip[] audioClips;
 }

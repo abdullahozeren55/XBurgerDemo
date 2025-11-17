@@ -14,8 +14,8 @@ public class Toilet : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    public string FocusText { get => focusTexts[toiletStateNum]; set => focusTexts[toiletStateNum] = value; }
-    [SerializeField] private string[] focusTexts;
+    public string FocusTextKey { get => focusTextKeys[toiletStateNum]; set => focusTextKeys[toiletStateNum] = value; }
+    [SerializeField] private string[] focusTextKeys;
     private int toiletStateNum = 0;
     [Space]
 
@@ -99,7 +99,7 @@ public class Toilet : MonoBehaviour, IInteractable
 
         toiletStateNum = isOpened ? 1 : 0;
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
         if (rotateCoroutine != null)
         {

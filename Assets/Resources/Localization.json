@@ -1,0 +1,71 @@
+{
+  "entries": [
+
+    {
+      "key": "INTERACTABLE_OPEN_DOOR",
+      "tr": "Kapıyı Aç",
+      "en": "Open The Door"
+    },
+
+    {
+      "key": "INTERACTABLE_CLOSE_DOOR",
+      "tr": "Kapıyı Kapat",
+      "en": "Close The Door"
+    },
+
+    {
+      "key": "INTERACTABLE_LOCKED_DOOR",
+      "tr": "Kapı Kilitli",
+      "en": "The Door Is Locked"
+    },
+
+    {
+      "key": "INTERACTABLE_OPEN_WINDOW",
+      "tr": "Pencereyi Aç",
+      "en": "Open The Window"
+    },
+
+    {
+      "key": "INTERACTABLE_CLOSE_WINDOW",
+      "tr": "Pencereyi Kapat",
+      "en": "Close The Window"
+    },
+
+    {
+      "key": "INTERACTABLE_LOCKED_WINDOW",
+      "tr": "Pencere Kilitli",
+      "en": "The Window Is Locked"
+    },
+
+    {
+      "key": "INTERACTABLE_OPEN_COOLER",
+      "tr": "Dolabı Aç",
+      "en": "Open The Cooler"
+    },
+
+    {
+      "key": "INTERACTABLE_CLOSE_COOLER",
+      "tr": "Dolabı Kapat",
+      "en": "Close The Cooler"
+    },
+
+    {
+      "key": "INTERACTABLE_KNIFE_HOLDER",
+      "tr": "Bıçak Al",
+      "en": "Take A Knife"
+    },
+
+    {
+      "key": "INTERACTABLE_TURN_ON_LIGHT",
+      "tr": "Işığı Aç",
+      "en": "Turn On The Light"
+    },
+
+    {
+      "key": "INTERACTABLE_TURN_OFF_LIGHT",
+      "tr": "Işığı Kapat",
+      "en": "Turn Off The Light"
+    }
+
+  ]
+}

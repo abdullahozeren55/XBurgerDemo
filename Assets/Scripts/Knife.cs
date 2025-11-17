@@ -18,7 +18,7 @@ public class Knife : MonoBehaviour, IGrabable
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
     public KnifeData data;
-    public string FocusText { get => data.focusText; set => data.focusText = value; }
+    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
     [Space]
     [SerializeField] private Collider triggerCol; 
 

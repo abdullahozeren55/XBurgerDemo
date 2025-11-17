@@ -21,7 +21,7 @@ public class FoodPackData : ScriptableObject
     public Vector3 grabLocalPositionOffset;
     public Vector3 grabLocalRotationOffset;
     [Space]
-    public string focusText;
+    public string focusTextKey;
     [Space]
 
     public AudioClip[] audioClips;

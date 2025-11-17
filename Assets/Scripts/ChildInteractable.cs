@@ -13,7 +13,7 @@ public class ChildInteractable : MonoBehaviour, IInteractable
     public PlayerManager.HandRigTypes HandRigType { get => parent.HandRigType; set => parent.HandRigType = value; }
 
     public bool OutlineShouldBeRed { get => parent.OutlineShouldBeRed; set => parent.OutlineShouldBeRed = value; }
-    public string FocusText { get => parent.FocusText; set => parent.FocusText = value; }
+    public string FocusTextKey { get => parent.FocusTextKey; set => parent.FocusTextKey = value; }
 
     private void Awake()
     {
@@ -38,7 +38,7 @@ public class ChildInteractable : MonoBehaviour, IInteractable
 
         parent.OnInteract();
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
     }
 
     public void OnLoseFocus()

@@ -26,10 +26,10 @@ public class ShopSeller : MonoBehaviour, IInteractable
     [SerializeField] private DialogueData day1BeforeNoodleDialogue;
     [SerializeField] private DialogueData day1AfterAnnoyedDialogue;
     [SerializeField] private DialogueData day1AfterNoodleDialogue;
-    public string FocusText { get => focusTexts[doorStateNum]; set => focusTexts[doorStateNum] = value; }
-    [SerializeField] private string[] focusTexts;
+    public string FocusTextKey { get => focusTextKeys[stateNum]; set => focusTextKeys[stateNum] = value; }
+    [SerializeField] private string[] focusTextKeys;
 
-    private int doorStateNum = 0;
+    private int stateNum = 0;
     public PlayerManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private PlayerManager.HandRigTypes handRigType;
 

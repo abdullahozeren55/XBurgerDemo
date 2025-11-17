@@ -23,5 +23,5 @@ public interface IGrabable
     public bool IsGrabbed {  get; set; }
     public bool IsUseable { get; set; }
     public bool OutlineShouldBeRed { get; set; }
-    public string FocusText { get; set; }
+    public string FocusTextKey { get; set; }
 }

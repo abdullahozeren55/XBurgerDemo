@@ -105,8 +105,8 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
     private Material currentGroundMaterial;
     private AudioClip lastPlayedFootstep;
 
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     [Space]
 
     [Header("Nevzat Settings")]

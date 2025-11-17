@@ -14,8 +14,8 @@ public class KnifeHolder : MonoBehaviour, IInteractable
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     [SerializeField] private bool outlineShouldBeRed;
 
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     [Space]
 
     [Header("Layer Settings")]

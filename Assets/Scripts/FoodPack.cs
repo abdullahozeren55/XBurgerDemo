@@ -20,7 +20,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public FoodPackData data;
 
-    public string FocusText { get => data.focusText; set => data.focusText = value; }
+    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
     [Space]
 
     [SerializeField] private Rigidbody[] allRB;

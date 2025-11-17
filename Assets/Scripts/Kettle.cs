@@ -31,8 +31,8 @@ public class Kettle : MonoBehaviour, IGrabable
     public bool CanGetFocused;
 
     public AudioClip[] audioClips;
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     [Space]
     [SerializeField] private ParticleSystem pourParticle;
     [SerializeField] private float timeToPutOnHologram = 0.3f;

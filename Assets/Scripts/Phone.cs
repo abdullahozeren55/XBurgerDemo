@@ -27,8 +27,8 @@ public class Phone : MonoBehaviour, IGrabable
     public bool IsUseable { get => isUseable; set => isUseable = value; }
     [SerializeField] private bool isUseable = true;
 
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     [Space]
 
     [Space]

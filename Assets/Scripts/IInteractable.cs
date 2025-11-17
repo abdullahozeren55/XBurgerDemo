@@ -17,6 +17,6 @@ public interface IInteractable
     public bool OutlineShouldBeRed {  get; set; }
     public bool CanInteract {  get; set; }
 
-    public string FocusText { get; set; }
+    public string FocusTextKey { get; set; }
 
 }

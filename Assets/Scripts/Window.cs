@@ -14,8 +14,8 @@ public class Window : MonoBehaviour, IInteractable
     public AudioClip closeSound;
     private AudioSource audioSource;
 
-    public string FocusText { get => focusTexts[windowStateNum]; set => focusTexts[windowStateNum] = value; }
-    [SerializeField] private string[] focusTexts;
+    public string FocusTextKey { get => focusTextKeys[windowStateNum]; set => focusTextKeys[windowStateNum] = value; }
+    [SerializeField] private string[] focusTextKeys;
     private int windowStateNum = 0;
     [Space]
 

@@ -12,10 +12,9 @@ public class Cooler : MonoBehaviour, IInteractable
     [Header("Audio Settings")]
     public AudioClip openSound;
     public AudioClip closeSound;
-    private AudioSource audioSource;
 
-    public string FocusText { get => focusTexts[coolerStateNum]; set => focusTexts[coolerStateNum] = value; }
-    [SerializeField] private string[] focusTexts;
+    public string FocusTextKey { get => focusTextKeys[coolerStateNum]; set => focusTextKeys[coolerStateNum] = value; }
+    [SerializeField] private string[] focusTextKeys;
     private int coolerStateNum = 0;
     [Space]
 
@@ -58,8 +57,6 @@ public class Cooler : MonoBehaviour, IInteractable
         isOpened = false;
         closeRotation = coolerParts[0].transform.localRotation;
         openRotation = Quaternion.Euler(closeRotation.x, openYRotation, closeRotation.z);
-
-        audioSource = coolerParts[0].GetComponent<AudioSource>();
 
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
@@ -112,7 +109,7 @@ public class Cooler : MonoBehaviour, IInteractable
 
         coolerStateNum = isOpened ? 1 : 0;
 
-        PlayerManager.Instance.TryChangingFocusText(this, FocusText);
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
         if (rotateCoroutine != null)
         {

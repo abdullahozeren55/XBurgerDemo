@@ -109,8 +109,8 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     private bool trueBurgerReceived;
     private bool trueDrinkReceived;
 
-    public string FocusText { get => focusText; set => focusText = value; }
-    [SerializeField] private string focusText;
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     [Space]
 
     [Header("Þükran Settings")]

@@ -10,6 +10,7 @@ using UnityEngine.Animations.Rigging;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using static System.Net.Mime.MediaTypeNames;
 
 public class FirstPersonController : MonoBehaviour
 {
@@ -637,48 +638,61 @@ public class FirstPersonController : MonoBehaviour
 
     private void DecideFocusText()
     {
+        // 1 — ÝNTERACTABLE
         if (currentInteractable != null)
         {
+            string localizedText = LocalizationManager.Instance.GetText(currentInteractable.FocusTextKey);
+
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != currentInteractable.FocusText)
+            if (focusText.text != localizedText)
             {
                 SetFocusTextComplete(false);
-                focusTextAnim.ShowText(currentInteractable.FocusText);
-            }     
+                focusTextAnim.ShowText(localizedText);
+            }
             else if (!focusTextComplete)
+            {
                 focusTextAnim.StartShowingText();
-            
+            }
         }
+        // 2 — GRABABLE (elde olmayan)
         else if (currentGrabable != null && !currentGrabable.IsGrabbed)
         {
+            string localizedText = LocalizationManager.Instance.GetText(currentGrabable.FocusTextKey);
+
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != currentGrabable.FocusText)
+            if (focusText.text != localizedText)
             {
                 SetFocusTextComplete(false);
-                focusTextAnim.ShowText(currentGrabable.FocusText);
+                focusTextAnim.ShowText(localizedText);
             }
             else if (!focusTextComplete)
+            {
                 focusTextAnim.StartShowingText();
-
+            }
         }
+        // 3 — OTHER GRABABLE
         else if (otherGrabable != null)
         {
+            string localizedText = LocalizationManager.Instance.GetText(otherGrabable.FocusTextKey);
+
             focusText.color = crosshairText.color;
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != otherGrabable.FocusText)
+            if (focusText.text != localizedText)
             {
                 SetFocusTextComplete(false);
-                focusTextAnim.ShowText(otherGrabable.FocusText);
+                focusTextAnim.ShowText(localizedText);
             }
             else if (!focusTextComplete)
+            {
                 focusTextAnim.StartShowingText();
-
+            }
         }
+        // 4 — NULL / TEMÝZLEME
         else
         {
             SetFocusTextComplete(false);
@@ -1466,21 +1480,25 @@ public class FirstPersonController : MonoBehaviour
 
     }
 
-    public void TryChangingFocusText(IInteractable interactable, string text)
+    public void TryChangingFocusText(IInteractable interactable, string textKey)
     {
-        if (currentInteractable != null && currentInteractable == interactable && focusText.text != text)
+        string localizedText = LocalizationManager.Instance.GetText(textKey);
+
+        if (currentInteractable != null && currentInteractable == interactable && focusText.text != localizedText)
         {
-            focusTextAnim.ShowText(text);
+            focusTextAnim.ShowText(localizedText);
             focusTextAnim.SkipTypewriter();
             SetFocusTextComplete(true);
         }
     }
 
-    public void TryChangingFocusText(IGrabable grabable, string text)
+    public void TryChangingFocusText(IGrabable grabable, string textKey)
     {
-        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable && focusText.text != text)
+        string localizedText = LocalizationManager.Instance.GetText(textKey);
+
+        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable && focusText.text != localizedText)
         {
-            focusTextAnim.ShowText(text);
+            focusTextAnim.ShowText(localizedText);
             focusTextAnim.SkipTypewriter();
             SetFocusTextComplete(true);
         }
