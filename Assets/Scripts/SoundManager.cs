@@ -13,6 +13,8 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private AudioSource soundFXObject;
 
+    private Dictionary<string, AudioSource> taggedSounds = new Dictionary<string, AudioSource>();
+
     private void Awake()
     {
         if (Instance == null)
@@ -30,21 +32,51 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public void PlaySoundFX(AudioClip audioClip, Transform spawnTransform, float volume = 1f, float minPitch = 0.85f, float maxPitch = 1.15f)
+    public void PlaySoundFX(
+    AudioClip audioClip,
+    Transform spawnTransform,
+    float volume = 1f,
+    float minPitch = 0.85f,
+    float maxPitch = 1.15f,
+    string tag = null)
     {
+        // Eðer tag varsa eski sesi durdur
+        if (!string.IsNullOrEmpty(tag))
+        {
+            if (taggedSounds.TryGetValue(tag, out AudioSource existing))
+            {
+                if (existing != null)
+                {
+                    existing.Stop();
+                    Destroy(existing.gameObject);
+                }
+
+                taggedSounds.Remove(tag);
+            }
+        }
+
+        // Yeni ses objesini oluþtur
         AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
 
         audioSource.clip = audioClip;
-
         audioSource.volume = volume;
-
         audioSource.pitch = Random.Range(minPitch, maxPitch);
 
         audioSource.Play();
 
-        float clipLength = audioSource.clip.length;
+        // Pitch’e göre gerçek süre
+        float duration = audioSource.clip.length / audioSource.pitch;
 
-        Destroy(audioSource.gameObject, clipLength);
+        // Eðer tag varsa bu sesi dictionary’e ekle
+        if (!string.IsNullOrEmpty(tag))
+        {
+            taggedSounds[tag] = audioSource;
+
+            // Süre bitince dictionary’den temizle
+            StartCoroutine(RemoveTagAfterDelay(tag, audioSource, duration));
+        }
+
+        Destroy(audioSource.gameObject, duration);
     }
 
     public void PlayRandomSoundFX(AudioClip[] audioClip, Transform spawnTransform, float volume, float minPitch, float maxPitch)
@@ -90,5 +122,16 @@ public class SoundManager : MonoBehaviour
     public void SetTypewriterVolume(float value)
     {
         audioMixer.SetFloat("TypewriterVolume", Mathf.Log10(value) * 20f);
+    }
+
+    private IEnumerator RemoveTagAfterDelay(string tag, AudioSource source, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Eðer o tag hala ayný source'u tutuyorsa temizle
+        if (taggedSounds.TryGetValue(tag, out var current) && current == source)
+        {
+            taggedSounds.Remove(tag);
+        }
     }
 }

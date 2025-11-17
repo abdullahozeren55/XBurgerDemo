@@ -455,6 +455,12 @@
       "key": "GRABABLE_BBQ_SAUCE_BOTTLE",
       "tr": "Barbekü Sosu Şişesi",
       "en": "BBQ Sauce Bottle"
+    },
+
+    {
+      "key": "GRABABLE_NOODLE",
+      "tr": "Zortdomie® Anında Hazır Noodle - Kanser Aromalı™",
+      "en": "Zortdomie® Instant Noodle - Cancer Flavored™"
     }
 
   ]

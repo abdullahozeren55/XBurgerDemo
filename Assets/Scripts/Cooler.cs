@@ -12,6 +12,7 @@ public class Cooler : MonoBehaviour, IInteractable
     [Header("Audio Settings")]
     public AudioClip openSound;
     public AudioClip closeSound;
+    public string audioTag;
 
     public string FocusTextKey { get => focusTextKeys[coolerStateNum]; set => focusTextKeys[coolerStateNum] = value; }
     [SerializeField] private string[] focusTextKeys;
@@ -105,7 +106,7 @@ public class Cooler : MonoBehaviour, IInteractable
     {
         isOpened = !isOpened;
 
-        SoundManager.Instance.PlaySoundFX(isOpened ? openSound : closeSound, transform);
+        SoundManager.Instance.PlaySoundFX(isOpened ? openSound : closeSound, transform, 1f, 0.99f, 1.01f, audioTag);
 
         coolerStateNum = isOpened ? 1 : 0;
 

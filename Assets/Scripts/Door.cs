@@ -96,7 +96,7 @@ public class Door : MonoBehaviour, IInteractable
     public void HandleRotation()
     {
         isOpened = !isOpened;
-        SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform, 1f, 0.98f, 1.02f);
+        SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform, 1f, 0.99f, 1.01f, data.audioTag);
 
         doorStateNum = isOpened ? 1 : 0;
 

@@ -7,6 +7,8 @@ using UnityEngine;
 public class DoorData : ScriptableObject
 {
     public string[] focusTextKeys; //0 kapýyý aç, 1 kapýyý kapat, 2 kapý kilitli
+    [Space]
+    public string audioTag;
     public PlayerManager.HandRigTypes handRigType;
     public CameraManager.JumpscareType jumpscareType;
     [Space]

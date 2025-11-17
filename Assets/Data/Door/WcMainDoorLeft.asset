@@ -16,6 +16,7 @@ MonoBehaviour:
   - INTERACTABLE_OPEN_DOOR
   - INTERACTABLE_CLOSE_DOOR
   - INTERACTABLE_LOCKED_DOOR
+  audioTag: wcMainDoorLeft
   handRigType: 0
   jumpscareType: 0
   timeToRotate: 0.3
