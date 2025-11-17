@@ -28,6 +28,7 @@ public class Tray : MonoBehaviour
     [SerializeField] private GameObject[] sauces; //0 ketchup, 1 mayo, 2 mustard, 3 bbq
 
     private Vector3 currentLocationToPutBurgerIngredient;
+    private Quaternion currentRotationToPutBurgerIngredient;
     private Vector3 hologramLocation;
 
     private List<BurgerIngredient> allBurgerIngredients = new List<BurgerIngredient>();
@@ -153,12 +154,15 @@ public class Tray : MonoBehaviour
         hologramLocation = currentLocationToPutBurgerIngredient;
         hologramLocation.y += currentIngredient.data.yHeight;
 
+        currentRotationToPutBurgerIngredient = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
         if (allBurgerIngredients.Count == 0)
         {
             if (type == BurgerIngredientData.IngredientType.BOTTOMBUN && currentIngredient.cookAmount == Cookable.CookAmount.REGULAR)
             {
                 currentIngredient.canAddToTray = true;
                 bottomBun.transform.position = hologramLocation;
+                bottomBun.transform.rotation = currentRotationToPutBurgerIngredient;
                 bottomBun.SetActive(true);
             }
         }
@@ -168,48 +172,56 @@ public class Tray : MonoBehaviour
             {
                 currentIngredient.canAddToTray = true;
                 pickle.transform.position = hologramLocation;
+                pickle.transform.rotation = currentRotationToPutBurgerIngredient;
                 pickle.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.LETTUCE)
             {
                 currentIngredient.canAddToTray = true;
                 lettuce.transform.position = hologramLocation;
+                lettuce.transform.rotation = currentRotationToPutBurgerIngredient;
                 lettuce.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.ONION)
             {
                 currentIngredient.canAddToTray = true;
                 onion.transform.position = hologramLocation;
+                onion.transform.rotation = currentRotationToPutBurgerIngredient;
                 onion.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.TOMATO)
             {
                 currentIngredient.canAddToTray = true;
                 tomato.transform.position = hologramLocation;
+                tomato.transform.rotation = currentRotationToPutBurgerIngredient;
                 tomato.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.CHEESE)
             {
                 currentIngredient.canAddToTray = true;
                 cheese.transform.position = hologramLocation;
+                cheese.transform.rotation = currentRotationToPutBurgerIngredient;
                 cheese.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.PATTY && currentIngredient.cookAmount == Cookable.CookAmount.REGULAR)
             {
                 currentIngredient.canAddToTray = true;
                 patty.transform.position = hologramLocation;
+                patty.transform.rotation = currentRotationToPutBurgerIngredient;
                 patty.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.BOTTOMBUN && currentIngredient.cookAmount == Cookable.CookAmount.REGULAR)
             {
                 currentIngredient.canAddToTray = true;
                 bottomBun.transform.position = hologramLocation;
+                bottomBun.transform.rotation = currentRotationToPutBurgerIngredient;
                 bottomBun.SetActive(true);
             }
             else if (type == BurgerIngredientData.IngredientType.TOPBUN && currentIngredient.cookAmount == Cookable.CookAmount.REGULAR)
             {
                 currentIngredient.canAddToTray = true;
                 topBun.transform.position = hologramLocation;
+                topBun.transform.rotation = currentRotationToPutBurgerIngredient;
                 topBun.SetActive(true);
             }
         }
@@ -311,7 +323,7 @@ public class Tray : MonoBehaviour
 
                 UpdateCurrentLocationToPutBurgerIngredient(currentIngredient.data.yHeight);
 
-                currentIngredient.PutOnTray(currentLocationToPutBurgerIngredient, ingredientsParent);
+                currentIngredient.PutOnTray(currentLocationToPutBurgerIngredient, currentRotationToPutBurgerIngredient, ingredientsParent);
 
                 Invoke("Squash", currentIngredient.data.timeToPutOnTray / 1.2f);
 

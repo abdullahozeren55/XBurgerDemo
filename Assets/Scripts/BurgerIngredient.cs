@@ -69,7 +69,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         canAddToTray = false;
     }
 
-    public void PutOnTray(Vector3 trayPos, Transform parentTray)
+    public void PutOnTray(Vector3 trayPos, Quaternion trayRot, Transform parentTray)
     {
         canAddToTray = false;
         isGettingPutOnTray = true;
@@ -93,10 +93,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         transform.parent = parentTray;
 
-        Quaternion randomRot = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-
         var moveTween = transform.DOMove(trayPos, data.timeToPutOnTray).SetEase(Ease.OutQuad);
-        var rotateTween = transform.DORotateQuaternion(randomRot, data.timeToPutOnTray).SetEase(Ease.OutCubic);
+        var rotateTween = transform.DORotateQuaternion(trayRot, data.timeToPutOnTray).SetEase(Ease.OutCubic);
 
         Sequence seq = DOTween.Sequence();
         seq.Join(moveTween);
