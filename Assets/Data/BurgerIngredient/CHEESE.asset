@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CHEESE
   m_EditorClassIdentifier: 
   isUseable: 0
+  IsCookable: 0
   ingredientType: 2
   handGrabType: 4
   yHeight: 0.0024
@@ -31,3 +32,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f90ad78c871ee8941881b549564a2341, type: 3}
   - {fileID: 8300000, guid: 7d6e09aa374a296429fab7f0b51cda27, type: 3}
   - {fileID: 8300000, guid: 8562a45926bbca041a48e9894b138304, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15

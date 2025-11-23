@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BOTTOMBUN
   m_EditorClassIdentifier: 
   isUseable: 0
+  IsCookable: 1
   ingredientType: 0
   handGrabType: 5
   yHeight: 0.011
@@ -37,3 +38,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 4b125dc5bc95ec04e867f0357eff41bf, type: 3}
   - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}
   - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LETTUCE
   m_EditorClassIdentifier: 
   isUseable: 0
+  IsCookable: 0
   ingredientType: 3
   handGrabType: 4
   yHeight: 0.006
@@ -28,6 +29,15 @@ MonoBehaviour:
   throwParticles:
   - {fileID: 8670732574423207768, guid: d5ae8a1be8c04884f9e71a8e16b58d51, type: 3}
   audioClips:
-  - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
-  - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}
-  - {fileID: 8300000, guid: 663ad0518d9d3c04f89c09b876621b22, type: 3}
+  - {fileID: 8300000, guid: 6364f8e3c28d2f5479858a12a9c8461e, type: 3}
+  - {fileID: 8300000, guid: 73aea1c146edc0449b056b3743e7d624, type: 3}
+  - {fileID: 8300000, guid: 243d7da6b9c7e874aa89f00c3872e0ba, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 0.8
+  dropSoundMinPitch: 1.2
+  dropSoundMaxPitch: 1.5
+  throwSoundVolume: 1.3
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15

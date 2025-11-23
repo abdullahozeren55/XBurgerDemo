@@ -190,7 +190,7 @@ public class FoodPack : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
 
                 ChangeLayer(grabableLayer);
 
@@ -200,7 +200,7 @@ public class FoodPack : MonoBehaviour, IGrabable
             {
                 ChangeLayer(grabableLayer);
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
 
                 isJustDropped = false;
             }

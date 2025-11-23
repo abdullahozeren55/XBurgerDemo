@@ -42,14 +42,14 @@ MonoBehaviour:
   throwSoundVolume: 0.8
   throwSoundMinPitch: 0.8
   throwSoundMaxPitch: 1.2
-  openSoundVolume: 0.8
+  openSoundVolume: 1.5
   openSoundMinPitch: 1
   openSoundMaxPitch: 1.3
   explodeSoundVolume: 0.8
   explodeSoundMinPitch: 0.8
   explodeSoundMaxPitch: 1.2
-  instantiatedSoundMinDelay: 0.05
-  instantiatedSoundMaxDelay: 0.25
+  instantiatedSoundMinDelay: 0.2
+  instantiatedSoundMaxDelay: 0.5
   instantiatedSoundVolume: 0.8
   instantiatedSoundMinPitch: 0.8
   instantiatedSoundMaxPitch: 1.2

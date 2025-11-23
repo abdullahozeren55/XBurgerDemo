@@ -75,19 +75,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         isGettingPutOnTray = true;
         gameObject.layer = onTrayLayer;
 
-        // Ses çalma kýsmý ayný kalýyor
-        if (data.audioClips.Length < 4)
-            SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
-        else
-        {
-            if (cookAmount == Cookable.CookAmount.RAW)
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
-            else if (cookAmount == Cookable.CookAmount.REGULAR)
-                SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, 1f, 0.85f, 1.15f);
-            else if (cookAmount == Cookable.CookAmount.BURNT)
-                SoundManager.Instance.PlaySoundFX(data.audioClips[7], transform, 1f, 0.85f, 1.15f);
-        }
-
         rb.velocity = Vector3.zero;
         rb.isKinematic = true;
 
@@ -122,23 +109,23 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         if (isStuck)
             Unstick();
 
-        if (data.audioClips.Length < 4)
+        if (!data.IsCookable)
         {
-            SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
         }
         else
         {
             if (cookAmount == Cookable.CookAmount.RAW)
             {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
             }
             else if (cookAmount == Cookable.CookAmount.REGULAR)
             {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
             }
             else if (cookAmount == Cookable.CookAmount.BURNT)
             {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[6], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[6], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
             }
         }
 
@@ -363,23 +350,23 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 if (canStick)
                     StickToSurface(collision);
 
-                if (data.audioClips.Length < 4)
+                if (!data.IsCookable)
                 {
-                    SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
+                    SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
                 }
                 else
                 {
                     if (cookAmount == Cookable.CookAmount.RAW)
                     {
-                        SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
                     }
                     else if (cookAmount == Cookable.CookAmount.REGULAR)
                     {
-                        SoundManager.Instance.PlaySoundFX(data.audioClips[5], transform, 1f, 0.85f, 1.15f);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[5], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
                     }
                     else if (cookAmount == Cookable.CookAmount.BURNT)
                     {
-                        SoundManager.Instance.PlaySoundFX(data.audioClips[8], transform, 1f, 0.85f, 1.15f);
+                        SoundManager.Instance.PlaySoundFX(data.audioClips[8], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
                     }
                 }
 
@@ -394,7 +381,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
                 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
 
                 if (data.dropParticles[(int)cookAmount] != null)
                     Instantiate(data.dropParticles[(int)cookAmount], transform.position, collisionRotation);

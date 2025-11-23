@@ -220,6 +220,12 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject dropThrowUI;
     [SerializeField] private GameObject interactUseUI;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip throwSound;
+    [SerializeField] private float throwVolume = 1f;
+    [SerializeField] private float throwMinPitch = 0.85f;
+    [SerializeField] private float throwMaxPitch = 1.15f;
+
     private Coroutine singleHandThrowCoroutine;
 
     private Camera mainCamera;
@@ -1101,6 +1107,7 @@ public class FirstPersonController : MonoBehaviour
                     }
                     else
                     {
+                        SoundManager.Instance.PlaySoundFX(throwSound, grabPoint, throwVolume, throwMinPitch, throwMaxPitch);
                         currentGrabable.OnThrow(throwDir, isCrouching ? currentThrowForce * 0.5f : IsSprinting ? currentThrowForce * 1.5f : currentThrowForce);
                     }
 

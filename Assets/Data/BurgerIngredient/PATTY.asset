@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PATTY
   m_EditorClassIdentifier: 
   isUseable: 0
+  IsCookable: 1
   ingredientType: 1
   handGrabType: 5
   yHeight: 0.009
@@ -43,3 +44,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f6346fd350ca0de49b1ac511d6600830, type: 3}
   - {fileID: 8300000, guid: 287963081c3c1f7488db38ef6899eaf1, type: 3}
   - {fileID: 8300000, guid: c673c1b3640dd8e4cac5fd0897507e5b, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15

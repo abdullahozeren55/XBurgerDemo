@@ -138,17 +138,16 @@ public class Knife : MonoBehaviour, IGrabable
         transform.SetParent(null);
 
         Vector3 throwDirection = Camera.main.transform.forward;
-        Quaternion lookRotation = Quaternion.LookRotation(throwDirection);
 
-        // Decompose to Euler angles to modify just Y and Z
-        Vector3 euler = lookRotation.eulerAngles;
+        // 1. Býçaðýn ana yönünü kameraya çevir
+        Quaternion baseRotation = Quaternion.LookRotation(throwDirection);
 
-        // Modify Y and Z as needed
-        euler.y += 180f;
-        euler.z = 180f;
+        // 2. Modelin yamukluðunu düzeltmek için gerekli ofset (Senin Y+180 ve Z=180 dediðin kýsým)
+        // Bu deðerler modelin kendisine (Local Space) uygulanýr.
+        Quaternion correction = Quaternion.Euler(0, 180f, 180f);
 
-        // Apply the final rotation
-        transform.rotation = Quaternion.Euler(euler);
+        // 3. Ýkisini çarp (Sýra Önemli: Base * Correction)
+        transform.rotation = baseRotation * correction;
 
         rb.useGravity = true;
 

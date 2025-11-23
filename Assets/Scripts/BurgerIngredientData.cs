@@ -6,8 +6,20 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewBurgerIngredientData", menuName = "Data/BurgerIngredient")]
 public class BurgerIngredientData : ScriptableObject
 {
+    public enum IngredientType
+    {
+        BOTTOMBUN,
+        PATTY,
+        CHEESE,
+        LETTUCE,
+        TOMATO,
+        ONION,
+        PICKLE,
+        TOPBUN
+    }
 
     public bool isUseable = false;
+    public bool IsCookable = false; //for audio play only
     [Space]
     public IngredientType ingredientType;
     public PlayerManager.HandGrabTypes handGrabType;
@@ -25,15 +37,16 @@ public class BurgerIngredientData : ScriptableObject
     public ParticleSystem[] throwParticles;
     [Space]
     public AudioClip[] audioClips;
-    public enum IngredientType
-    {
-        BOTTOMBUN,
-        PATTY,
-        CHEESE,
-        LETTUCE,
-        TOMATO,
-        ONION,
-        PICKLE,
-        TOPBUN
-    }
+    [Space]
+    public float grabSoundVolume = 1f;
+    public float grabSoundMinPitch = 0.85f;
+    public float grabSoundMaxPitch = 1.15f;
+    [Space]
+    public float dropSoundVolume = 1f;
+    public float dropSoundMinPitch = 0.85f;
+    public float dropSoundMaxPitch = 1.15f;
+    [Space]
+    public float throwSoundVolume = 1f;
+    public float throwSoundMinPitch = 0.85f;
+    public float throwSoundMaxPitch = 1.15f;
 }
