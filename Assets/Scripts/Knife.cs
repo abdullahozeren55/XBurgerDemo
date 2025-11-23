@@ -22,6 +22,7 @@ public class Knife : MonoBehaviour, IGrabable
     [Space]
     [SerializeField] private KnifeTrigger triggerSC;
     [SerializeField] private Collider triggerCol;
+    [SerializeField] private Transform knifeEdgeTransform;
 
     private Rigidbody rb;
     private Collider col;
@@ -171,7 +172,7 @@ public class Knife : MonoBehaviour, IGrabable
     private void StickToSurface(Collision collision)
     {
         // Get the surface normal from the collision
-        Vector3 surfaceNormal = collision.contacts[0].normal;
+        Vector3 surfaceNormal = collision.GetContact(0).normal;
 
         // Define the sharp edge direction of the knife (e.g., forward direction)
         Vector3 sharpEdgeDirection = transform.forward;
@@ -192,6 +193,8 @@ public class Knife : MonoBehaviour, IGrabable
         // Attach the knife to the surface (set parent to the wall or surface)
         transform.SetParent(collision.transform);
         rb.isKinematic = true;
+
+        Instantiate(data.throwParticles, knifeEdgeTransform.position, Quaternion.identity);
 
         // Set the flag that the object is stuck
         isStuck = true;

@@ -11,6 +11,8 @@ public class KnifeData : ScriptableObject
     [Space]
     public LayerMask stabableLayers;
     [Space]
+    public ParticleSystem throwParticles;
+    [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]

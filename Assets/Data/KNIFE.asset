@@ -17,6 +17,7 @@ MonoBehaviour:
   stabableLayers:
     serializedVersion: 2
     m_Bits: 69249
+  throwParticles: {fileID: 8670732574423207768, guid: cc31d56079258774aa559250869c296f, type: 3}
   grabPositionOffset: {x: 0.3, y: 0, z: 2}
   grabRotationOffset: {x: 45, y: -60, z: -90}
   grabLocalPositionOffset: {x: -0.0000010572512, y: 0.00051305967, z: 0.000011773997}
