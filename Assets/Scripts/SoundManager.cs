@@ -112,7 +112,7 @@ public class SoundManager : MonoBehaviour
         StartCoroutine(PlayWithDelay(audioSource, delay, clipLength));
     }
 
-    public void PlayRandomSoundFX(AudioClip[] audioClip, Transform spawnTransform, float volume, float minPitch, float maxPitch)
+    public void PlayRandomSoundFX(AudioClip[] audioClip, Transform spawnTransform, float volume = 1f, float minPitch = 0.85f, float maxPitch = 1.15f)
     {
 
         int rand = Random.Range(0, audioClip.Length);

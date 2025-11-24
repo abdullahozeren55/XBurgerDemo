@@ -9,7 +9,6 @@ public class FrontDoorTrigger : MonoBehaviour
     {
         if (other.CompareTag("Customer"))
         {
-
             for (var i = 0; i < frontDoors.Length; i++)
             {
                 if (!frontDoors[i].isOpened)

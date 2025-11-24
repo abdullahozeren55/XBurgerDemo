@@ -1,15 +1,7 @@
-using Cinemachine;
 using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
-using static ICustomer;
-using static UnityEngine.GraphicsBuffer;
-using static UnityEngine.Rendering.DebugUI;
 
 public class Sukran : MonoBehaviour, ICustomer, IInteractable
 {
@@ -29,6 +21,9 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     public ICustomer.CustomerName PersonName { get => personName; set => personName = value; }
     [SerializeField] private ICustomer.CustomerName personName;
+
+    public ICustomer.Footstep CurrentFootstep { get => currentFootstep; set => currentFootstep = value; }
+    [SerializeField] private ICustomer.Footstep currentFootstep;
 
     public GameManager.BurgerTypes BurgerType { get => burgerType; set => burgerType = value; }
     [SerializeField] private GameManager.BurgerTypes burgerType;
@@ -101,12 +96,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int customerLayer;
-
-    [Header("Footstep Parameters")]
-    private bool shouldPlayFootstep;
-    private Material currentGroundMaterial;
-    private AudioClip lastPlayedFootstep;
-
     public bool TrueDrinkReceived { get => trueDrinkReceived; set => trueDrinkReceived = value; }
     public bool TrueBurgerReceived { get => trueBurgerReceived; set => trueBurgerReceived = value; }
     private bool trueBurgerReceived;
@@ -118,9 +107,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     [Header("Sükran Settings")]
     [SerializeField] private BurgerBox sukranBurgerBox;
-
-    [Header("Push Player Settings")]
-    [SerializeField] private Transform rayPointForPushingPlayer;
 
     private Tween rotateTween;
     private Coroutine currentAnimCoroutine;
@@ -154,8 +140,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
         if (currentAction == ICustomer.Action.GoingToDestination)
         {
             HandlePathFollow(currentDestination);
-            HandleFootsteps();
-            HandlePushingPlayer();
         }
     }
 
@@ -195,74 +179,10 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     public void HandleFootsteps()
     {
-    }
-
-    private void PlayFootstep(AudioClip[] audioClips)
-    {
-        var audio = audioClips[Random.Range(0, audioClips.Length - 1)];
-
-        if (audio == lastPlayedFootstep)
-            PlayFootstep(audioClips);
-        else
-        {
-            audioSource.PlayOneShot(audio);
-            lastPlayedFootstep = audio;
-        }
-    }
-
-    private void FindCurrentGroundMaterial()
-    {
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, CustomerData.rayDistance, CustomerData.groundTypeLayers))
-        {
-            // Step 1: Get material (existing)
-            if (hit.collider.TryGetComponent<MeshRenderer>(out var renderer))
-            {
-                var materials = renderer.materials;
-                var index = hit.triangleIndex;
-                var mesh = hit.transform.GetComponent<MeshFilter>().mesh;
-                var subMeshIndex = GetSubMeshIndex(mesh, index);
-                currentGroundMaterial = materials[subMeshIndex];
-            }
-
-            agent.updatePosition = false;
-
-            // Step 2: Adjust NPC Y-position to match hit point
-            Vector3 currentPos = transform.position;
-            currentPos.y = hit.point.y;
-            transform.position = currentPos;
-
-            agent.updatePosition = true;
-        }
-    }
-
-    private int GetSubMeshIndex(Mesh mesh, int triangleIndex)
-    {
-        if (!mesh.isReadable) return 0;
-
-        var triangleCounter = 0;
-        for (var subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
-        {
-            var indexCount = mesh.GetSubMesh(subMeshIndex).indexCount;
-            triangleCounter += indexCount / 3;
-            if (triangleIndex < triangleCounter) return subMeshIndex;
-        }
-
-        return 0;
-    }
-
-    private void HandlePushingPlayer()
-    {
-        Ray ray = new Ray(rayPointForPushingPlayer.position, transform.forward);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, customerData.rayDistanceForPushingPlayer, customerData.playerLayer))
-        {
-            PlayerManager.Instance.SetPlayerPushedByCustomer(true);
-            PlayerManager.Instance.MovePlayer(transform.forward * CustomerData.pushForce * Time.deltaTime);
-        }
-        else
-        {
-            PlayerManager.Instance.SetPlayerPushedByCustomer(false);
-        }
+        if (CurrentFootstep == ICustomer.Footstep.STONE)
+            SoundManager.Instance.PlayRandomSoundFX(customerData.stoneClips, transform, customerData.FootstepVolume, customerData.FootstepMinPitch, customerData.FootstepMaxPitch);
+        else if (CurrentFootstep == ICustomer.Footstep.WOOD)
+            SoundManager.Instance.PlayRandomSoundFX(customerData.woodClips, transform, customerData.FootstepVolume, customerData.FootstepMinPitch, customerData.FootstepMaxPitch);
     }
 
     public void HandleFinishDialogue()
@@ -421,8 +341,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
         CurrentAction = ICustomer.Action.GoingToDestination;
     }
 
-    private void ChangeShouldPlayFootstep() => shouldPlayFootstep = !shouldPlayFootstep;
-
     private void RotateCustomer()
     {
         Vector3 direction = facingDirectionTransform.position - transform.position;
@@ -467,7 +385,7 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
     }
 
 
-    public void HandleDialogueAnim(DialogueAnim dialogueAnim, float delay)
+    public void HandleDialogueAnim(ICustomer.DialogueAnim dialogueAnim, float delay)
     {
         if (currentAnimCoroutine != null)
         {
@@ -478,11 +396,11 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
         currentAnimCoroutine = StartCoroutine(PlayAnimWithDelay(dialogueAnim, delay));
     }
 
-    private IEnumerator PlayAnimWithDelay(DialogueAnim dialogueAnim, float delay)
+    private IEnumerator PlayAnimWithDelay(ICustomer.DialogueAnim dialogueAnim, float delay)
     {
         yield return new WaitForSeconds(delay);
 
-        if (dialogueAnim == DialogueAnim.PUTPICKLEONHEAD && !anim.GetCurrentAnimatorStateInfo(1).IsName("PutPickleOnHead"))
+        if (dialogueAnim == ICustomer.DialogueAnim.PUTPICKLEONHEAD && !anim.GetCurrentAnimatorStateInfo(1).IsName("PutPickleOnHead"))
             anim.SetTrigger("putPickleOnHead");
     }
 }

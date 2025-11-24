@@ -54,6 +54,12 @@ public interface ICustomer
         PUTPICKLEONHEAD
     }
 
+    public enum Footstep
+    {
+        STONE,
+        WOOD
+    }
+
     [System.Serializable]
     public class CustomerDayChangesSegment
     {
@@ -105,6 +111,7 @@ public interface ICustomer
     public Action CurrentAction {  get; set; }
     public Feeling CurrentFeeling { get; set; }
     public CustomerName PersonName { get; set; }
+    public Footstep CurrentFootstep { get; set; }
     public GameManager.BurgerTypes BurgerType { get; set; }
     public GameManager.DrinkTypes DrinkType { get; set; }
 
