@@ -31,6 +31,22 @@ public class Kettle : MonoBehaviour, IGrabable
     public bool CanGetFocused;
 
     public AudioClip[] audioClips;
+    [Space]
+    public float grabSoundVolume = 1f;
+    public float grabSoundMinPitch = 0.85f;
+    public float grabSoundMaxPitch = 1.15f;
+    [Space]
+    public float dropSoundVolume = 1f;
+    public float dropSoundMinPitch = 0.85f;
+    public float dropSoundMaxPitch = 1.15f;
+    [Space]
+    public float throwSoundVolume = 1f;
+    public float throwSoundMinPitch = 0.85f;
+    public float throwSoundMaxPitch = 1.15f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 6f;
+    public float dropThreshold = 2f;
     public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
     [SerializeField] private string focusTextKey;
     [Space]
@@ -59,6 +75,7 @@ public class Kettle : MonoBehaviour, IGrabable
 
     private Coroutine waterPourCoroutine;
 
+    private float lastSoundTime = 0f;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -102,7 +119,7 @@ public class Kettle : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        SoundManager.Instance.PlaySoundFX(audioClips[0], transform, 1f, 0.85f, 1.15f);
+        SoundManager.Instance.PlaySoundFX(audioClips[0], transform, grabSoundVolume, grabSoundMinPitch, grabSoundMaxPitch);
 
         rb.isKinematic = false;
         rb.velocity = Vector3.zero;
@@ -186,22 +203,59 @@ public class Kettle : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                SoundManager.Instance.PlaySoundFX(audioClips[2], transform, 1f, 0.85f, 1.15f);
-
                 isJustThrowed = false;
             }
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
 
-                SoundManager.Instance.PlaySoundFX(audioClips[1], transform, 1f, 0.85f, 1.15f);
-
                 isJustDropped = false;
             }
+
+            HandleSoundFX(collision);
 
         }
 
 
+    }
+
+    private void HandleSoundFX(Collision collision)
+    {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < dropThreshold || Time.time - lastSoundTime < soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                audioClips[2],
+                transform,
+                throwSoundVolume,
+                throwSoundMinPitch,
+                throwSoundMaxPitch
+            );
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                audioClips[1],
+                transform,
+                dropSoundVolume,
+                dropSoundMinPitch,
+                dropSoundMaxPitch
+            );
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
     }
 
     private IEnumerator PutOnHologram()

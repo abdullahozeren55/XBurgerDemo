@@ -35,6 +35,8 @@ public class Trash : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
+    private float lastSoundTime = 0f;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -126,6 +128,45 @@ public class Trash : MonoBehaviour, IGrabable
         }
     }
 
+    private void HandleSoundFX(Collision collision)
+    {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= data.throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch,
+                data.throwSoundMaxPitch
+            );
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch,
+                data.dropSoundMaxPitch
+            );
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
+    }
+
     private void OnDestroy()
     {
         PlayerManager.Instance.ResetPlayerGrab(this);
@@ -137,21 +178,16 @@ public class Trash : MonoBehaviour, IGrabable
         {
             if (isJustThrowed)
             {
-
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
-
                 gameObject.layer = grabableLayer;
-
                 isJustThrowed = false;
             }
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
-
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
-
                 isJustDropped = false;
             }
+
+            HandleSoundFX(collision);
 
         }
 
@@ -160,11 +196,11 @@ public class Trash : MonoBehaviour, IGrabable
 
     public void OnUseHold()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public void OnUseRelease()
     {
-        throw new System.NotImplementedException();
+
     }
 }

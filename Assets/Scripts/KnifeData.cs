@@ -43,4 +43,8 @@ public class KnifeData : ScriptableObject
     public float throwSoundVolume = 0.8f;
     public float throwSoundMinPitch = 0.8f;
     public float throwSoundMaxPitch = 1.2f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 6f;
+    public float dropThreshold = 2f;
 }

@@ -26,6 +26,8 @@ public class BurgerIngredientData : ScriptableObject
     public float yHeight = 0.1f;
     public float timeToPutOnTray = 0.3f;
     [Space]
+    public LayerMask stickableLayers;
+    [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     public Vector3 grabLocalPositionOffset;
@@ -49,4 +51,8 @@ public class BurgerIngredientData : ScriptableObject
     public float throwSoundVolume = 1f;
     public float throwSoundMinPitch = 0.85f;
     public float throwSoundMaxPitch = 1.15f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 6f;
+    public float dropThreshold = 2f;
 }

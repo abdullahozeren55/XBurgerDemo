@@ -27,4 +27,8 @@ public class TrashData : ScriptableObject
     public float throwSoundVolume = 1f;
     public float throwSoundMinPitch = 0.85f;
     public float throwSoundMaxPitch = 1.15f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 6f;
+    public float dropThreshold = 2f;
 }

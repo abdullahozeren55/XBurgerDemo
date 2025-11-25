@@ -53,4 +53,8 @@ public class FoodPackData : ScriptableObject
     public float instantiatedSoundVolume = 0.8f;
     public float instantiatedSoundMinPitch = 0.8f;
     public float instantiatedSoundMaxPitch = 1.2f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 6f;
+    public float dropThreshold = 2f;
 }

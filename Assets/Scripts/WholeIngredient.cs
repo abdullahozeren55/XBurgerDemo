@@ -44,6 +44,7 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
     private Quaternion collisionRotation;
 
+    private float lastSoundTime = 0f;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -256,6 +257,51 @@ public class WholeIngredient : MonoBehaviour, IGrabable
         PlayerManager.Instance.ResetPlayerGrab(this);
     }
 
+    private void HandleSoundFX(Collision collision)
+    {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= data.throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch,
+                data.throwSoundMaxPitch
+            );
+
+            if (data.throwParticles != null)
+                Instantiate(data.throwParticles, transform.position, collisionRotation);
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch,
+                data.dropSoundMaxPitch
+            );
+
+            if (data.dropParticles != null)
+                Instantiate(data.dropParticles, transform.position, collisionRotation);
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
@@ -269,11 +315,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
                 gameObject.layer = grabableLayer;
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
-
-                if (data.throwParticles != null)
-                    Instantiate(data.throwParticles, transform.position, collisionRotation);
-
                 isJustThrowed = false;
             }
             else if (isJustDropped)
@@ -283,15 +324,12 @@ public class WholeIngredient : MonoBehaviour, IGrabable
                 if (decalParent != null && decalParent.childCount > 0)
                     HandleSauceDrops(collision);
 
-                gameObject.layer = grabableLayer;
-
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
-
-                if (data.dropParticles != null)
-                    Instantiate(data.dropParticles, transform.position, collisionRotation);
+                gameObject.layer = grabableLayer;           
 
                 isJustDropped = false;
             }
+
+            HandleSoundFX(collision);
 
         }
 

@@ -61,6 +61,7 @@ public class Noodle : MonoBehaviour, IGrabable
     private Coroutine openLidCoroutine;
     private Coroutine instantiateSaucePackCoroutine;
 
+    private float lastSoundTime = 0f;
 
     private void Awake()
     {
@@ -110,7 +111,7 @@ public class Noodle : MonoBehaviour, IGrabable
 
         SetColliders(false);
 
-        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
 
         rb.isKinematic = false;
         rb.velocity = Vector3.zero;
@@ -196,15 +197,51 @@ public class Noodle : MonoBehaviour, IGrabable
         lidCollider.enabled = value == true ? isOpened : false;
     }
 
+    private void HandleSoundFX(Collision collision)
+    {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= data.throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch,
+                data.throwSoundMaxPitch
+            );
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch,
+                data.dropSoundMaxPitch
+            );
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && !IsGettingPutOnHologram && !collision.gameObject.CompareTag("Player"))
         {
             if (isJustThrowed)
             {
-
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
-
                 gameObject.layer = grabableLayer;
 
                 isJustThrowed = false;
@@ -212,11 +249,11 @@ public class Noodle : MonoBehaviour, IGrabable
             else if (isJustDropped)
             {
                 gameObject.layer = grabableLayer;
-                
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
 
                 isJustDropped = false;
             }
+
+            HandleSoundFX(collision);
 
         }
 
