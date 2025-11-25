@@ -19,6 +19,15 @@ MonoBehaviour:
   grabLocalPositionOffset: {x: 0.00065761956, y: 0.00089589745, z: 0.0012795615}
   grabLocalRotationOffset: {x: 4.869211, y: 220.1298, z: 2.2681477}
   audioClips:
-  - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
-  - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
+  - {fileID: 8300000, guid: 6ba247c05ab01244d97d4f693e4f832e, type: 3}
+  - {fileID: 8300000, guid: b5c223266c9892747aafc530c31bb790, type: 3}
+  - {fileID: 8300000, guid: 7b272dd5318467c40abc0c82a05fdabd, type: 3}
+  grabSoundVolume: 0.6
+  grabSoundMinPitch: 1
+  grabSoundMaxPitch: 1.2
+  dropSoundVolume: 0.8
+  dropSoundMinPitch: 1
+  dropSoundMaxPitch: 1.2
+  throwSoundVolume: 1
+  throwSoundMinPitch: 1
+  throwSoundMaxPitch: 1.2

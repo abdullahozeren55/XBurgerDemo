@@ -275,10 +275,15 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         // Rastgele offset (yüzeye paralel düzlemde)
         float spreadRadius = 0.05f;
 
+        Transform targetTransform = collision.transform.Find("DecalParent");
+
+        if (targetTransform == null)
+            targetTransform = collision.transform;
+
         for (int i = 0; i < countToDrop; i++)
         {
             Transform child = decalParent.GetChild(i);
-            child.transform.parent = collision.transform;
+            child.transform.parent = targetTransform;
 
             Vector3 randomOffset = tangent * Random.Range(-spreadRadius, spreadRadius) +
                                bitangent * Random.Range(-spreadRadius, spreadRadius);
@@ -339,14 +344,13 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     {
         if (!IsGrabbed && !isGettingPutOnTray && !collision.gameObject.CompareTag("Player"))
         {
-
-            CalculateCollisionRotation(collision);
-
-            if (decalParent != null && decalParent.childCount > 0)
-                HandleSauceDrops(collision);
-
             if (isJustThrowed)
             {
+                CalculateCollisionRotation(collision);
+
+                if (decalParent != null && decalParent.childCount > 0)
+                    HandleSauceDrops(collision);
+
                 if (canStick)
                     StickToSurface(collision);
 
@@ -379,6 +383,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             }
             else if (isJustDropped)
             {
+                CalculateCollisionRotation(collision);
+
+                if (decalParent != null && decalParent.childCount > 0)
+                    HandleSauceDrops(collision);
+
                 gameObject.layer = grabableLayer;
                 
                 SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);

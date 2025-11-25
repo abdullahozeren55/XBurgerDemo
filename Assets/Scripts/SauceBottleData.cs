@@ -24,5 +24,17 @@ public class SauceBottleData : ScriptableObject
     public float timeToUse = 0.3f;
     public float usingFOV = 70f;
     [Space]
-    public AudioClip[] audioClips;
+    public AudioClip[] audioClips; //0 grab, 1 drop, 2 throw
+    [Space]
+    public float grabSoundVolume = 1f;
+    public float grabSoundMinPitch = 0.85f;
+    public float grabSoundMaxPitch = 1.15f;
+    [Space]
+    public float dropSoundVolume = 1f;
+    public float dropSoundMinPitch = 0.85f;
+    public float dropSoundMaxPitch = 1.15f;
+    [Space]
+    public float throwSoundVolume = 1f;
+    public float throwSoundMinPitch = 0.85f;
+    public float throwSoundMaxPitch = 1.15f;
 }

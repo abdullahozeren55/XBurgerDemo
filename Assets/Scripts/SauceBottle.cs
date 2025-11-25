@@ -44,6 +44,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     private Rigidbody rb;
     private Collider col;
+    private AudioSource audioSource;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -59,6 +60,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+        audioSource = GetComponent<AudioSource>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
@@ -79,8 +81,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         tray.TurnOnSauceHologram(sauceType);
 
-        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
-
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
@@ -91,6 +91,8 @@ public class SauceBottle : MonoBehaviour, IGrabable
         transform.position = grabPoint.position;
         transform.localPosition = data.grabLocalPositionOffset;
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
+
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
     }
     public void OnFocus()
     {
@@ -183,7 +185,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
         {
             if (isJustThrowed)
             {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
 
                 gameObject.layer = grabableLayer;
 
@@ -193,7 +195,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
 
                 isJustDropped = false;
             }
@@ -225,6 +227,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
         CameraManager.Instance.EndFOV(0f, data.timeToUse / 2f);
 
         pourParticle.Stop();
+        audioSource.Stop();
         isPlayingParticles = false;
 
         if (useCoroutine != null)
@@ -257,6 +260,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
             if (shouldUse && !isPlayingParticles && value > 0.6f)
             {
                 pourParticle.Play();
+                audioSource.Play();
                 isPlayingParticles = true;
             }
 

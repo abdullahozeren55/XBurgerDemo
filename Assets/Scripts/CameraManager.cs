@@ -376,7 +376,7 @@ public class CameraManager : MonoBehaviour
                      duration, isCharging ? throwChargeColor : normalVignetteColor, ease);
 
         PlayFOV(isCharging ? maxFOV : normalFOV,
-                duration, Ease.InOutBack, 3f);
+                duration, Ease.InOutBack, 3f, "ThrowEffectsFOV");
     }
 
     public void PlayJumpscareEffects(JumpscareType type)

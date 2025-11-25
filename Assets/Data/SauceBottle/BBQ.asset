@@ -23,7 +23,17 @@ MonoBehaviour:
   useLocalPositionOffset: {x: -0.0000453092, y: 0.00025515014, z: 0.00018518488}
   useLocalRotationOffset: {x: 82.59723, y: 254.8648, z: 341.04047}
   timeToUse: 0.3
+  usingFOV: 70
   audioClips:
-  - {fileID: 8300000, guid: 7e272a7e565997f4fba70c1c132a9a0b, type: 3}
-  - {fileID: 8300000, guid: 4587f6a1fb32b344ca5c3bc310e32ca1, type: 3}
-  - {fileID: 8300000, guid: 663ad0518d9d3c04f89c09b876621b22, type: 3}
+  - {fileID: 8300000, guid: 802098a4a628b9441a8dd1ab6f99016f, type: 3}
+  - {fileID: 8300000, guid: 661b5a0ce5cbad3449ff0fb5b5e8d22d, type: 3}
+  - {fileID: 8300000, guid: ab1ae25769643ef4aa7ecd87e9b2aac4, type: 3}
+  grabSoundVolume: 0.3
+  grabSoundMinPitch: 1.1
+  grabSoundMaxPitch: 1.3
+  dropSoundVolume: 0.4
+  dropSoundMinPitch: 1.1
+  dropSoundMaxPitch: 1.3
+  throwSoundVolume: 0.4
+  throwSoundMinPitch: 1.1
+  throwSoundMaxPitch: 1.3

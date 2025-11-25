@@ -59,8 +59,6 @@ public class Trash : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, 1f, 0.85f, 1.15f);
-
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
@@ -71,6 +69,8 @@ public class Trash : MonoBehaviour, IGrabable
         transform.position = grabPoint.position;
         transform.localPosition = data.grabLocalPositionOffset;
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
+
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
 
     }
     public void OnFocus()
@@ -138,7 +138,7 @@ public class Trash : MonoBehaviour, IGrabable
             if (isJustThrowed)
             {
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
 
                 gameObject.layer = grabableLayer;
 
@@ -148,7 +148,7 @@ public class Trash : MonoBehaviour, IGrabable
             {
                 gameObject.layer = grabableLayer;
 
-                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, 1f, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
 
                 isJustDropped = false;
             }

@@ -326,12 +326,25 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 
     public void ChangeLayer(int layer)
     {
-        gameObject.layer = layer;
-        skinnedMeshRenderer.gameObject.layer = layer;
+        ChangeLayerRecursive(gameObject, layer);
+    }
 
-        foreach (GameObject item in ordersInRightHand)
+    // Bu da iþi yapan yardýmcý fonksiyon (Private olabilir)
+    private void ChangeLayerRecursive(GameObject obj, int newLayer)
+    {
+        if (null == obj) return;
+
+        // 1. Þu anki objeyi deðiþtir
+        obj.layer = newLayer;
+
+        // 2. Çocuklarý gez
+        foreach (Transform child in obj.transform)
         {
-            item.layer = layer;
+            if (null == child) continue;
+
+            // DÝKKAT: Burada sadece layer atamak yerine, fonksiyonu tekrar çaðýrýyoruz.
+            // Böylece child da kendi içine (torunlara) bakýyor.
+            ChangeLayerRecursive(child.gameObject, newLayer);
         }
     }
 
