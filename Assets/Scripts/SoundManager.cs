@@ -41,6 +41,7 @@ public class SoundManager : MonoBehaviour
     float volume = 1f,
     float minPitch = 0.85f,
     float maxPitch = 1.15f,
+    bool shouldBeParentToTransform = true,
     string tag = null)
     {
         // Eðer tag varsa eski sesi durdur
@@ -59,7 +60,7 @@ public class SoundManager : MonoBehaviour
         }
 
         // Yeni ses objesini oluþtur
-        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity, spawnTransform);
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity, shouldBeParentToTransform ? spawnTransform : null);
 
         audioSource.clip = audioClip;
         audioSource.volume = volume;

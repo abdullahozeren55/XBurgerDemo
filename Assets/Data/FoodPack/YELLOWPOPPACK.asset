@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: YELLOWPOPPACK
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 3451705259810622206, guid: 8e60696b3ef07a741951951e31b26d9f, type: 3}
-  destroyParticleExplode: {fileID: 0}
+  destroyParticleExplode: {fileID: 3451705259810622206, guid: 57e158934a9d10747b9b7e920febf6ce, type: 3}
   isUseable: 0
   handGrabType: 10
   minForce: 0.2
@@ -28,28 +28,25 @@ MonoBehaviour:
   focusTextKey: GRABABLE_YELLOW_POP_PACK
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
-  - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
-  grabSoundVolume: 1
-  grabSoundMinPitch: 0.95
-  grabSoundMaxPitch: 1.05
-  dropSoundVolume: 0.7
-  dropSoundMinPitch: 1
-  dropSoundMaxPitch: 1.3
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  - {fileID: 8300000, guid: cb352899942c0ac4aa13a8b6f7f5de09, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  grabSoundVolume: 0.8
+  grabSoundMinPitch: 0.5
+  grabSoundMaxPitch: 0.7
+  dropSoundVolume: 0.6
+  dropSoundMinPitch: 0.8
+  dropSoundMaxPitch: 1.2
   throwSoundVolume: 0.8
-  throwSoundMinPitch: 0.8
-  throwSoundMaxPitch: 1.2
-  openSoundVolume: 1.5
-  openSoundMinPitch: 1
-  openSoundMaxPitch: 1.3
+  throwSoundMinPitch: 0.5
+  throwSoundMaxPitch: 0.7
+  openSoundVolume: 0.7
+  openSoundMinPitch: 0.8
+  openSoundMaxPitch: 1
   explodeSoundVolume: 0.8
   explodeSoundMinPitch: 0.8
   explodeSoundMaxPitch: 1.2
-  instantiatedSoundMinDelay: 0.2
-  instantiatedSoundMaxDelay: 0.5
-  instantiatedSoundVolume: 0.8
-  instantiatedSoundMinPitch: 0.8
-  instantiatedSoundMaxPitch: 1.2
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

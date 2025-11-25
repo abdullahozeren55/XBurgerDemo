@@ -41,5 +41,17 @@ MonoBehaviour:
   - BURGER_RANDOM_BULLSHIT
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
-  - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  grabSoundVolume: 0.8
+  grabSoundMinPitch: 0.9
+  grabSoundMaxPitch: 1.1
+  dropSoundVolume: 0.6
+  dropSoundMinPitch: 1.2
+  dropSoundMaxPitch: 1.5
+  throwSoundVolume: 0.8
+  throwSoundMinPitch: 0.9
+  throwSoundMaxPitch: 1.1
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

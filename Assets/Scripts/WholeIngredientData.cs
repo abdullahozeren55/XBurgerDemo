@@ -54,6 +54,10 @@ public class WholeIngredientData : ScriptableObject
     public float throwSoundMinPitch = 0.8f;
     public float throwSoundMaxPitch = 1.2f;
     [Space]
+    public float openSoundVolume = 0.8f;
+    public float openSoundMinPitch = 0.8f;
+    public float openSoundMaxPitch = 1.2f;
+    [Space]
     public float explodeSoundVolume = 0.8f;
     public float explodeSoundMinPitch = 0.8f;
     public float explodeSoundMaxPitch = 1.2f;

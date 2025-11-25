@@ -30,7 +30,19 @@ MonoBehaviour:
   timeToHandleLid: 0.2
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
-  - {fileID: 8300000, guid: 4f6e7709719ceb74891a868f79cab061, type: 3}
-  - {fileID: 8300000, guid: eb9009cde0262ab47bab39f312e9823b, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
+  - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
   - {fileID: 8300000, guid: 9cec7cba28734254e93960c32889e1fe, type: 3}
   - {fileID: 8300000, guid: 6fb908fb320e2c84b87733fef473ecea, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15
+  soundCooldown: 0.1
+  throwThreshold: 6
+  dropThreshold: 2

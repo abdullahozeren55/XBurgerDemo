@@ -26,7 +26,7 @@ public class FoodPackData : ScriptableObject
     [Space]
     public string focusTextKey;
     [Space]
-    public AudioClip[] audioClips; //0 grab, 1 drop, 2 throw, 3 open, 4 explode, 5 instantiatedObjects
+    public AudioClip[] audioClips; //0 grab, 1 drop, 2 throw, 3 open, 4 explode
     [Space]
     public float grabSoundVolume = 1f;
     public float grabSoundMinPitch = 0.95f;
@@ -47,12 +47,6 @@ public class FoodPackData : ScriptableObject
     public float explodeSoundVolume = 0.8f;
     public float explodeSoundMinPitch = 0.8f;
     public float explodeSoundMaxPitch = 1.2f;
-    [Space]
-    public float instantiatedSoundMinDelay = 0.05f;
-    public float instantiatedSoundMaxDelay = 0.25f;
-    public float instantiatedSoundVolume = 0.8f;
-    public float instantiatedSoundMinPitch = 0.8f;
-    public float instantiatedSoundMaxPitch = 1.2f;
     [Space]
     public float soundCooldown = 0.1f;
     public float throwThreshold = 6f;

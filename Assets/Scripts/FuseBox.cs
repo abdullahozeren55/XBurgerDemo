@@ -106,7 +106,7 @@ public class FuseBox : MonoBehaviour, IInteractable
     {
         isOpened = !isOpened;
 
-        SoundManager.Instance.PlaySoundFX(isOpened ? openSound : closeSound, transform, 1f, 0.99f, 1.01f, audioTag);
+        SoundManager.Instance.PlaySoundFX(isOpened ? openSound : closeSound, transform, 1f, 0.99f, 1.01f, true, audioTag);
 
         coolerStateNum = isOpened ? 1 : 0;
 

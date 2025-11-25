@@ -18,6 +18,9 @@ MonoBehaviour:
   handGrabType: 4
   yHeight: 0.0036
   timeToPutOnTray: 0.2
+  stickableLayers:
+    serializedVersion: 2
+    m_Bits: 0
   grabPositionOffset: {x: 0.4, y: 0.3, z: 2}
   grabRotationOffset: {x: -30, y: -80, z: -80}
   grabLocalPositionOffset: {x: 0.00017944007, y: 0.00088617083, z: 0.00021549959}
@@ -41,3 +44,6 @@ MonoBehaviour:
   throwSoundVolume: 1.3
   throwSoundMinPitch: 0.8
   throwSoundMaxPitch: 1
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

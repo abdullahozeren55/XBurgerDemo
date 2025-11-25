@@ -57,5 +57,5 @@ MonoBehaviour:
   throwSoundMinPitch: 0.85
   throwSoundMaxPitch: 1.15
   soundCooldown: 0.1
-  throwThreshold: 6
-  dropThreshold: 2
+  throwThreshold: 5
+  dropThreshold: 1

@@ -32,7 +32,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 37dd525f24edce549af7f5fa1fc6325e, type: 3}
   - {fileID: 8300000, guid: 937affb2c67daf44583c7d738d836bec, type: 3}
   - {fileID: 8300000, guid: aade324c0b4985a45a105c83a668e313, type: 3}
-  - {fileID: 8300000, guid: 73aea1c146edc0449b056b3743e7d624, type: 3}
   grabSoundVolume: 0.8
   grabSoundMinPitch: 0.95
   grabSoundMaxPitch: 1.05
@@ -42,14 +41,12 @@ MonoBehaviour:
   throwSoundVolume: 0.5
   throwSoundMinPitch: 1.2
   throwSoundMaxPitch: 1.4
-  openSoundVolume: 1.5
+  openSoundVolume: 0.8
   openSoundMinPitch: 1
   openSoundMaxPitch: 1.2
   explodeSoundVolume: 0.8
   explodeSoundMinPitch: 0.8
   explodeSoundMaxPitch: 1.2
-  instantiatedSoundMinDelay: 0.2
-  instantiatedSoundMaxDelay: 0.5
-  instantiatedSoundVolume: 1
-  instantiatedSoundMinPitch: 0.85
-  instantiatedSoundMaxPitch: 1.15
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

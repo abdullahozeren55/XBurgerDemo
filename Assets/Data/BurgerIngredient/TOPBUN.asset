@@ -18,6 +18,9 @@ MonoBehaviour:
   handGrabType: 6
   yHeight: 0.023
   timeToPutOnTray: 0.2
+  stickableLayers:
+    serializedVersion: 2
+    m_Bits: 0
   grabPositionOffset: {x: 0.4, y: 0.3, z: 2}
   grabRotationOffset: {x: -30, y: -80, z: -80}
   grabLocalPositionOffset: {x: 0.00025912363, y: 0.00079479074, z: 0.00063007564}
@@ -36,14 +39,17 @@ MonoBehaviour:
   - {fileID: 8670732574423207768, guid: f513bc2922bdd9f43bc45eba9de401e9, type: 3}
   audioClips:
   - {fileID: 8300000, guid: 4b125dc5bc95ec04e867f0357eff41bf, type: 3}
-  - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}
+  - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
   - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
   grabSoundVolume: 1
-  grabSoundMinPitch: 0.85
-  grabSoundMaxPitch: 1.15
+  grabSoundMinPitch: 1
+  grabSoundMaxPitch: 1.2
   dropSoundVolume: 1
-  dropSoundMinPitch: 0.85
-  dropSoundMaxPitch: 1.15
+  dropSoundMinPitch: 0.9
+  dropSoundMaxPitch: 1.1
   throwSoundVolume: 1
-  throwSoundMinPitch: 0.85
-  throwSoundMaxPitch: 1.15
+  throwSoundMinPitch: 0.6
+  throwSoundMaxPitch: 0.8
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

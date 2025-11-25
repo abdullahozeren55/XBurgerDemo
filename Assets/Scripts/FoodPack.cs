@@ -143,9 +143,6 @@ public class FoodPack : MonoBehaviour, IGrabable
             if (data.haveWholeIngredient)
                 allTransform[i].GetComponent<WholeIngredient>().HandlePackOpening();
 
-            SoundManager.Instance.PlaySoundFXWithRandomDelay(data.audioClips[5], allTransform[i], data.instantiatedSoundVolume, data.instantiatedSoundMinPitch, data.instantiatedSoundMaxPitch, data.instantiatedSoundMinDelay, data.instantiatedSoundMaxDelay);
-
-
             // Generate a random force direction and magnitude
             Vector3 randomForce = new Vector3(
                     Random.Range(-0.5f, 0.5f), // Random x direction
@@ -163,9 +160,9 @@ public class FoodPack : MonoBehaviour, IGrabable
         Instantiate(shouldExplode? data.destroyParticleExplode : data.destroyParticle, transform.position, Quaternion.Euler(transform.rotation.x - 90f, transform.rotation.y + 90f, transform.rotation.z + 90f));
 
         if (shouldExplode)
-            SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, data.explodeSoundVolume, data.explodeSoundMinPitch, data.explodeSoundMaxPitch);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, data.explodeSoundVolume, data.explodeSoundMinPitch, data.explodeSoundMaxPitch, false);
         else
-            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.openSoundVolume, data.openSoundMinPitch, data.openSoundMaxPitch);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.openSoundVolume, data.openSoundMinPitch, data.openSoundMaxPitch, false);
 
         Destroy(gameObject);
     }

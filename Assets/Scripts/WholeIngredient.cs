@@ -235,7 +235,9 @@ public class WholeIngredient : MonoBehaviour, IGrabable
             Instantiate(shouldExplode ? data.destroyParticleExplode : data.destroyParticle, transform.position, transform.rotation * data.instantiateRotationOffset);
 
             if (shouldExplode)
-                SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, data.explodeSoundVolume, data.explodeSoundMinPitch, data.explodeSoundMaxPitch);
+                SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, data.explodeSoundVolume, data.explodeSoundMinPitch, data.explodeSoundMaxPitch, false);
+            else
+                SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.openSoundVolume, data.openSoundMinPitch, data.openSoundMaxPitch, false);
 
             Destroy(gameObject);
         }  
