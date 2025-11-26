@@ -33,6 +33,10 @@ public class BurgerBoxData : ScriptableObject
     public float throwSoundMinPitch = 0.85f;
     public float throwSoundMaxPitch = 1.15f;
     [Space]
+    public float closeSoundVolume = 1f;
+    public float closeSoundMinPitch = 0.85f;
+    public float closeSoundMaxPitch = 1.15f;
+    [Space]
     public float soundCooldown = 0.1f;
     public float throwThreshold = 6f;
     public float dropThreshold = 2f;

@@ -91,7 +91,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         seq.Join(rotateTween);
 
         seq.OnComplete(() => {
-            
+
+            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.traySoundVolume, data.traySoundMinPitch, data.traySoundMaxPitch);
             col.enabled = false;
 
         });
@@ -112,26 +113,9 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         if (isStuck)
             Unstick();
 
-        if (!data.IsCookable)
-        {
-            SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
-        }
-        else
-        {
-            if (cookAmount == Cookable.CookAmount.RAW)
-            {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
-            }
-            else if (cookAmount == Cookable.CookAmount.REGULAR)
-            {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
-            }
-            else if (cookAmount == Cookable.CookAmount.BURNT)
-            {
-                SoundManager.Instance.PlaySoundFX(data.audioClips[6], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
-            }
-        }
-
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume,
+                                          data.grabSoundMinPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                                          data.grabSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier));
 
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -364,8 +348,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 data.audioClips[2],
                 transform,
                 data.throwSoundVolume,
-                data.throwSoundMinPitch,
-                data.throwSoundMaxPitch
+                data.throwSoundMinPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                data.throwSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier)
             );
 
             if (data.throwParticles[(int)cookAmount] != null)
@@ -381,8 +365,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 data.audioClips[1],
                 transform,
                 data.dropSoundVolume,
-                data.dropSoundMinPitch,
-                data.dropSoundMaxPitch
+                data.dropSoundMinPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                data.dropSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier)
             );
 
             if (data.dropParticles[(int)cookAmount] != null)

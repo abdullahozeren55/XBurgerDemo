@@ -105,6 +105,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         seq.Join(transform.DORotateQuaternion(Quaternion.identity, data.timeToPutOnTray).SetEase(Ease.OutCubic));
         seq.OnComplete(() =>
         {
+            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.closeSoundVolume, data.closeSoundMinPitch, data.closeSoundMaxPitch);
             anim.Play("TopHolderClose");
         });
 

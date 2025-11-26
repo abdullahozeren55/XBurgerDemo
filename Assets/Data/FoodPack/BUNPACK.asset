@@ -16,10 +16,10 @@ MonoBehaviour:
   destroyParticleExplode: {fileID: 3451705259810622206, guid: bb8bf2e2ff31bb848a249683a3a1fbf8, type: 3}
   isUseable: 0
   handGrabType: 9
-  minForce: 0.2
-  maxForce: 0.4
-  minForceExplode: 0.4
-  maxForceExplode: 0.8
+  minForce: 0.1
+  maxForce: 0.2
+  minForceExplode: 0.2
+  maxForceExplode: 0.4
   haveWholeIngredient: 1
   grabPositionOffset: {x: 0.4, y: 0.5, z: 2}
   grabRotationOffset: {x: -5, y: -70, z: -70}

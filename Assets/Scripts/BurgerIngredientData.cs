@@ -19,7 +19,6 @@ public class BurgerIngredientData : ScriptableObject
     }
 
     public bool isUseable = false;
-    public bool IsCookable = false; //for audio play only
     [Space]
     public IngredientType ingredientType;
     public PlayerManager.HandGrabTypes handGrabType;
@@ -52,7 +51,14 @@ public class BurgerIngredientData : ScriptableObject
     public float throwSoundMinPitch = 0.85f;
     public float throwSoundMaxPitch = 1.15f;
     [Space]
+    public float traySoundVolume = 1f;
+    public float traySoundMinPitch = 0.85f;
+    public float traySoundMaxPitch = 1.15f;
+    [Space]
     public float soundCooldown = 0.1f;
     public float throwThreshold = 6f;
     public float dropThreshold = 2f;
+    [Space]
+    public float cookedSoundMultiplier = 0.8f;
+    public float burntSoundMultiplier = 0.6f;
 }

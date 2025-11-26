@@ -16,7 +16,7 @@ MonoBehaviour:
   smokeParticlesWorld: {fileID: 1436701112834747369, guid: 5a8f625499965e746a672b9b8cecffaf, type: 3}
   smokeParticlesLocal: {fileID: 1436701112834747369, guid: 87bf2995f86b3844faf3ab36cd89d9dc, type: 3}
   cookingSound: {fileID: 8300000, guid: 37ed047ef5a0db24b9883d5cbb5270f6, type: 3}
-  cookingSoundVolume: 0.2
+  cookingSoundVolume: 0.15
   cookingSoundMinPitch: 0.5
   cookingSoundMaxPitch: 0.7
   materials:

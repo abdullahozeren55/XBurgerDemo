@@ -26,6 +26,10 @@ public class Tray : MonoBehaviour
 
     [Header("Sauces")]
     [SerializeField] private GameObject[] sauces; //0 ketchup, 1 mayo, 2 mustard, 3 bbq
+    public AudioClip sauceOnTraySound;
+    public float sauceOnTrayVolume = 1f;
+    public float sauceOnTrayMinPitch = 0.8f;
+    public float sauceOnTrayMaxPitch = 1.2f;
 
     private Vector3 currentLocationToPutBurgerIngredient;
     private Quaternion currentRotationToPutBurgerIngredient;
@@ -101,6 +105,8 @@ public class Tray : MonoBehaviour
 
             allSauces.Add(type);
             allGO.Add(go);
+
+            SoundManager.Instance.PlaySoundFX(sauceOnTraySound, go.transform, sauceOnTrayVolume, sauceOnTrayMinPitch, sauceOnTrayMaxPitch);
 
             TurnOffAllHolograms();
         }

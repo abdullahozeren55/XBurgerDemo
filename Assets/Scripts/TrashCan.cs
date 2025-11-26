@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class TrashCan : MonoBehaviour
 {
+    [SerializeField] private AudioClip trashToCanSound;
+    [SerializeField] private float trashToCanVolume = 1f;
+    [SerializeField] private float trashToCanMinPitch = 0.85f;
+    [SerializeField] private float trashToCanMaxPitch = 1.15f;
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Trash") ||
@@ -15,6 +19,7 @@ public class TrashCan : MonoBehaviour
             other.gameObject.CompareTag("FoodPack") ||
             other.gameObject.CompareTag("Drink"))
         {
+            SoundManager.Instance.PlaySoundFX(trashToCanSound, transform, trashToCanVolume, trashToCanMinPitch, trashToCanMaxPitch);
             Destroy(other.gameObject);
         }
     }
