@@ -38,6 +38,8 @@ MonoBehaviour:
   - BURGER_GOUT
   - BURGER_X
   - BURGER_LONG_AHH
+  - BURGER_TOMATO_LOVER
+  - BURGER_BBQ
   - BURGER_RANDOM_BULLSHIT
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}

@@ -452,6 +452,18 @@
     },
 
     {
+      "key": "BURGER_TOMATO_LOVER",
+      "tr": "Domates Sever Burger",
+      "en": "Tomato Lover Burger"
+    },
+
+    {
+      "key": "BURGER_BBQ",
+      "tr": "Barbekü Burger",
+      "en": "BBQ Burger"
+    },
+
+    {
       "key": "BURGER_RANDOM_BULLSHIT",
       "tr": "Saçma Sapan Bi Burger",
       "en": "Random Bullshit Burger"

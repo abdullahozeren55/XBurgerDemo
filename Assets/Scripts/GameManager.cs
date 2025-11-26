@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
         GoutBurger,
         XBurger,
         LongAhhBurger,
+        TomatoLoverBurger,
+        BBQBurger,
         RandomBullShitBurger,
     }
 
@@ -87,6 +89,11 @@ public class GameManager : MonoBehaviour
     public List<BurgerIngredientData.IngredientType> longAhhBurger = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> longAhhBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
+    public List<BurgerIngredientData.IngredientType> tomatoLoverBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> tomatoLoverBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
+    public List<BurgerIngredientData.IngredientType> bbqBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> bbqBurgerSauces = new List<SauceBottle.SauceType>();
 
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
 
@@ -156,6 +163,8 @@ public class GameManager : MonoBehaviour
             goutBurger,
             xBurger,
             longAhhBurger,
+            tomatoLoverBurger,
+            bbqBurger,
         };
 
         allCustomersName = new ICustomer.CustomerName[allCustomers.Length]; // initialize
@@ -311,6 +320,9 @@ public class GameManager : MonoBehaviour
                 box.SetBurgerType(BurgerTypes.BrokeAhhBurger);
                 box.SetBurgerType(BurgerTypes.GoutBurger);
                 box.SetBurgerType(BurgerTypes.XBurger);
+                box.SetBurgerType(BurgerTypes.LongAhhBurger);
+                box.SetBurgerType(BurgerTypes.TomatoLoverBurger);
+                box.SetBurgerType(BurgerTypes.BBQBurger);
                 box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
 
                 if (menu == classicBurger)
@@ -336,6 +348,12 @@ public class GameManager : MonoBehaviour
 
                 else if (menu == xBurger)
                     matchedType = BurgerTypes.XBurger;
+                else if (menu == longAhhBurger)
+                    matchedType = BurgerTypes.LongAhhBurger;
+                else if (menu == tomatoLoverBurger)
+                    matchedType = BurgerTypes.TomatoLoverBurger;
+                else if (menu == bbqBurger)
+                    matchedType = BurgerTypes.BBQBurger;
 
                 break;
 
@@ -386,6 +404,20 @@ public class GameManager : MonoBehaviour
             else if (matchedType == BurgerTypes.XBurger)
             {
                 requiredSauces = xBurgerSauces;
+            }
+
+            else if (matchedType == BurgerTypes.LongAhhBurger)
+            {
+                requiredSauces = longAhhBurgerSauces;
+            }
+
+            else if (matchedType == BurgerTypes.TomatoLoverBurger)
+            {
+                requiredSauces = tomatoLoverBurgerSauces;
+            }
+            else if (matchedType == BurgerTypes.BBQBurger)
+            {
+                requiredSauces = bbqBurgerSauces;
             }
 
 
