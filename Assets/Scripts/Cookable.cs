@@ -123,6 +123,8 @@ public class Cookable : MonoBehaviour
 
             if (currentCookingParticles != null)
                 StopCookingParticles();
+
+            SoundManager.Instance.RemoveItemFromGrill(burgerIngredient.data.ingredientType);
         }
     }
 
@@ -138,6 +140,7 @@ public class Cookable : MonoBehaviour
                 CreateCookingParticles();
 
             SoundManager.Instance.AddItemToGrill(burgerIngredient.data.ingredientType);
+            SoundManager.Instance.PlaySoundFX(cookableData.cookingSound, transform, cookableData.cookingSoundVolume, cookableData.cookingSoundMinPitch, cookableData.cookingSoundMaxPitch);
         }
     }
 
@@ -146,8 +149,6 @@ public class Cookable : MonoBehaviour
         if (other.gameObject.CompareTag("Grill") && isActiveAndEnabled)
         {
             StopCooking();
-
-            SoundManager.Instance.RemoveItemFromGrill(burgerIngredient.data.ingredientType);
         }
     }
 

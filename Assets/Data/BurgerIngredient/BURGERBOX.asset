@@ -43,7 +43,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
   - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
-  grabSoundVolume: 0.8
+  grabSoundVolume: 0.3
   grabSoundMinPitch: 0.9
   grabSoundMaxPitch: 1.1
   dropSoundVolume: 0.6

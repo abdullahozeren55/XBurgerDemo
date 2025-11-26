@@ -22,10 +22,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6ba247c05ab01244d97d4f693e4f832e, type: 3}
   - {fileID: 8300000, guid: b5c223266c9892747aafc530c31bb790, type: 3}
   - {fileID: 8300000, guid: 7b272dd5318467c40abc0c82a05fdabd, type: 3}
-  grabSoundVolume: 0.6
+  grabSoundVolume: 0.7
   grabSoundMinPitch: 1
   grabSoundMaxPitch: 1.2
-  dropSoundVolume: 0.8
+  dropSoundVolume: 1
   dropSoundMinPitch: 1
   dropSoundMaxPitch: 1.2
   throwSoundVolume: 1

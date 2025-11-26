@@ -15,8 +15,10 @@ MonoBehaviour:
   cookingParticles: {fileID: 8670732574423207768, guid: 70b1ea9685e3bfe4f85c6b3d85932e08, type: 3}
   smokeParticlesWorld: {fileID: 1436701112834747369, guid: 5a8f625499965e746a672b9b8cecffaf, type: 3}
   smokeParticlesLocal: {fileID: 1436701112834747369, guid: 87bf2995f86b3844faf3ab36cd89d9dc, type: 3}
-  cookingSound: {fileID: 8300000, guid: cc9ee78bfe4702a4ca52f01601e3ca3b, type: 3}
-  audioFadeOutDuration: 1
+  cookingSound: {fileID: 8300000, guid: 37ed047ef5a0db24b9883d5cbb5270f6, type: 3}
+  cookingSoundVolume: 0.35
+  cookingSoundMinPitch: 1
+  cookingSoundMaxPitch: 1.3
   materials:
   - {fileID: 2100000, guid: b167df5b10b2e7844abcfb20993fec98, type: 2}
   - {fileID: 2100000, guid: ca1dfd91055e20240ab4c5f793c39cf9, type: 2}

@@ -32,12 +32,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
   - {fileID: 8300000, guid: cb352899942c0ac4aa13a8b6f7f5de09, type: 3}
   - {fileID: 8300000, guid: e22115af83c98b84cac0fe788f534f16, type: 3}
-  grabSoundVolume: 0.8
+  grabSoundVolume: 0.3
   grabSoundMinPitch: 0.5
   grabSoundMaxPitch: 0.7
   dropSoundVolume: 0.6
-  dropSoundMinPitch: 0.8
-  dropSoundMaxPitch: 1.2
+  dropSoundMinPitch: 0.7
+  dropSoundMaxPitch: 0.9
   throwSoundVolume: 0.8
   throwSoundMinPitch: 0.5
   throwSoundMaxPitch: 0.7
