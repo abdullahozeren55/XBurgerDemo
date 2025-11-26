@@ -464,6 +464,12 @@
     },
 
     {
+      "key": "BURGER_BASIC",
+      "tr": "Basit Burger",
+      "en": "Basic Burger"
+    },
+
+    {
       "key": "BURGER_RANDOM_BULLSHIT",
       "tr": "Saçma Sapan Bi Burger",
       "en": "Random Bullshit Burger"

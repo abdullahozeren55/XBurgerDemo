@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
         LongAhhBurger,
         TomatoLoverBurger,
         BBQBurger,
+        BasicBurger,
         RandomBullShitBurger,
     }
 
@@ -94,6 +95,9 @@ public class GameManager : MonoBehaviour
     [Space]
     public List<BurgerIngredientData.IngredientType> bbqBurger = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> bbqBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
+    public List<BurgerIngredientData.IngredientType> basicBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> basicBurgerSauces = new List<SauceBottle.SauceType>();
 
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
 
@@ -165,6 +169,7 @@ public class GameManager : MonoBehaviour
             longAhhBurger,
             tomatoLoverBurger,
             bbqBurger,
+            basicBurger,
         };
 
         allCustomersName = new ICustomer.CustomerName[allCustomers.Length]; // initialize
@@ -323,6 +328,7 @@ public class GameManager : MonoBehaviour
                 box.SetBurgerType(BurgerTypes.LongAhhBurger);
                 box.SetBurgerType(BurgerTypes.TomatoLoverBurger);
                 box.SetBurgerType(BurgerTypes.BBQBurger);
+                box.SetBurgerType(BurgerTypes.BasicBurger);
                 box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
 
                 if (menu == classicBurger)
@@ -354,6 +360,8 @@ public class GameManager : MonoBehaviour
                     matchedType = BurgerTypes.TomatoLoverBurger;
                 else if (menu == bbqBurger)
                     matchedType = BurgerTypes.BBQBurger;
+                else if (menu == basicBurger)
+                    matchedType = BurgerTypes.BasicBurger;
 
                 break;
 
@@ -418,6 +426,10 @@ public class GameManager : MonoBehaviour
             else if (matchedType == BurgerTypes.BBQBurger)
             {
                 requiredSauces = bbqBurgerSauces;
+            }
+            else if (matchedType == BurgerTypes.BasicBurger)
+            {
+                requiredSauces = basicBurgerSauces;
             }
 
 
