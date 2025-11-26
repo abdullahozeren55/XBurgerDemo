@@ -41,7 +41,7 @@ MonoBehaviour:
   throwSoundVolume: 0.5
   throwSoundMinPitch: 1.2
   throwSoundMaxPitch: 1.4
-  openSoundVolume: 0.8
+  openSoundVolume: 0.4
   openSoundMinPitch: 1
   openSoundMaxPitch: 1.2
   explodeSoundVolume: 0.8
