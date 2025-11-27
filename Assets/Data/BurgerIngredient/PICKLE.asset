@@ -13,7 +13,12 @@ MonoBehaviour:
   m_Name: PICKLE
   m_EditorClassIdentifier: 
   isUseable: 0
+  isSauce: 0
+  sauceDropAmount: 5
+  targetDropScale: 0.8
+  randomMultiplier: 1.3
   ingredientType: 6
+  sauceType: 0
   handGrabType: 4
   yHeight: 0.0036
   timeToPutOnTray: 0.2
@@ -42,7 +47,7 @@ MonoBehaviour:
   dropSoundVolume: 0.8
   dropSoundMinPitch: 1.2
   dropSoundMaxPitch: 1.5
-  throwSoundVolume: 1.3
+  throwSoundVolume: 1
   throwSoundMinPitch: 0.8
   throwSoundMaxPitch: 1
   traySoundVolume: 1

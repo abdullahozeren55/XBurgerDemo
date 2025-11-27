@@ -4631,8 +4631,8 @@ MonoBehaviour:
   waitingLoopSound: {fileID: 8300000, guid: a8c6be774e549814587852bb5ab165d7, type: 3}
   breakSound: {fileID: 8300000, guid: adaab6420f9ed7f4da716b63286e9d04, type: 3}
   honkSound: {fileID: 8300000, guid: b8c7e48fd2bd6e54187f6782f51de82c, type: 3}
-  engineLoopSoundVolume: 0.25
-  waitingLoopSoundVolume: 0.5
+  engineLoopSoundVolume: 0.15
+  waitingLoopSoundVolume: 0.35
   breakSoundVolume: 0.7
   honkSoundVolume: 0.7
   honkSoundCooldown: 5

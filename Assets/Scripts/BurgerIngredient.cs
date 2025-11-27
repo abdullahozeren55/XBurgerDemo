@@ -1,5 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
+using static SauceBottle;
 
 public class BurgerIngredient : MonoBehaviour, IGrabable
 {
@@ -328,9 +329,14 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
             Vector3 spawnPoint = hitPoint + randomOffset;
 
+            float randomValue = Random.Range(data.targetDropScale / data.randomMultiplier, data.targetDropScale * data.randomMultiplier);
 
-            GameObject drop = Instantiate(data.drop, spawnPoint, collisionRotation, collision.transform);
+            Vector3 finalScale = new Vector3(randomValue, randomValue, randomValue);
+
+            SauceManager.Instance.SpawnDrop(data.sauceType, spawnPoint, collisionRotation, finalScale, collision.transform);
         }
+
+        float impactForce = collision.relativeVelocity.magnitude;
 
         Destroy(gameObject);
     }
@@ -394,7 +400,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 transform,
                 data.throwSoundVolume,
                 data.throwSoundMinPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
-                data.throwSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier)
+                data.throwSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier), false
             );
 
             if (data.throwParticles[(int)cookAmount] != null)
@@ -411,7 +417,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 transform,
                 data.dropSoundVolume,
                 data.dropSoundMinPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
-                data.dropSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier)
+                data.dropSoundMaxPitch * (cookAmount == Cookable.CookAmount.RAW ? 1f : cookAmount == Cookable.CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier), false
             );
 
             if (data.dropParticles[(int)cookAmount] != null)
