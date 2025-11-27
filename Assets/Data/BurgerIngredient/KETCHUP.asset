@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7283705b9a48eed4cafef7f670eb71e3, type: 3}
+  m_Name: KETCHUP
+  m_EditorClassIdentifier: 
+  isUseable: 0
+  isSauce: 1
+  sauceDropAmount: 5
+  drop: {fileID: 379718580292736384, guid: dd1bce52a7963864383acd1ae9253f15, type: 3}
+  ingredientType: 3
+  sauceType: 0
+  handGrabType: 0
+  yHeight: 0.004
+  timeToPutOnTray: 0.2
+  localScaleWhenGrabbed: {x: 0.22, y: 0.22, z: 0.04}
+  stickableLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  grabPositionOffset: {x: 0.4, y: 0.3, z: 2}
+  grabRotationOffset: {x: -30, y: -80, z: -80}
+  grabLocalPositionOffset: {x: 0.00010675803, y: 0.0006777254, z: 0.00015923989}
+  grabLocalRotationOffset: {x: 306.82666, y: 186.3378, z: 188.63396}
+  focusTextKeys:
+  - GRABABLE_LETTUCE_SLICE
+  dropParticles:
+  - {fileID: 8670732574423207768, guid: bada39be787d6bf4e954e7b29744f1ea, type: 3}
+  throwParticles:
+  - {fileID: 8670732574423207768, guid: d927baf2e160501499073b04dee1a2b2, type: 3}
+  audioClips:
+  - {fileID: 8300000, guid: 6364f8e3c28d2f5479858a12a9c8461e, type: 3}
+  - {fileID: 8300000, guid: 73aea1c146edc0449b056b3743e7d624, type: 3}
+  - {fileID: 8300000, guid: 243d7da6b9c7e874aa89f00c3872e0ba, type: 3}
+  - {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
+  grabSoundVolume: 0.7
+  grabSoundMinPitch: 1
+  grabSoundMaxPitch: 1.2
+  dropSoundVolume: 0.8
+  dropSoundMinPitch: 1.2
+  dropSoundMaxPitch: 1.5
+  throwSoundVolume: 1.3
+  throwSoundMinPitch: 0.8
+  throwSoundMaxPitch: 1
+  traySoundVolume: 1
+  traySoundMinPitch: 0.8
+  traySoundMaxPitch: 1.2
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1
+  cookedSoundMultiplier: 0.8
+  burntSoundMultiplier: 0.6

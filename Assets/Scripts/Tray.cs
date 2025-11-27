@@ -10,7 +10,7 @@ public class Tray : MonoBehaviour
     [SerializeField] private Transform burgerBoxTransform;
     [SerializeField] private Transform ingredientsParent;
     [SerializeField] private BoxCollider boxCollider;
-    [SerializeField] private BoxCollider burgerCollider;
+    [SerializeField] private BoxCollider sauceCollider;
 
     [Header("Holograms")]
     [SerializeField] private GameObject onion;
@@ -42,8 +42,8 @@ public class Tray : MonoBehaviour
     private float boxColliderStartZ;
     private float boxColliderStartCenterZ;
 
-    private float burgerColliderStartZ;
-    private float burgerColliderStartCenterZ;
+    private float sauceColliderStartZ;
+    private float sauceColliderStartCenterZ;
 
     private bool burgerIsDone;
 
@@ -51,6 +51,7 @@ public class Tray : MonoBehaviour
     [HideInInspector] public BurgerBox currentBox;
 
     private int onTrayLayer;
+    private int grabableLayer;
 
     private void Awake()
     {
@@ -60,14 +61,15 @@ public class Tray : MonoBehaviour
         boxColliderStartZ = boxCollider.size.z;
         boxColliderStartCenterZ = boxCollider.center.z;
 
-        burgerColliderStartZ = burgerCollider.size.z;
-        burgerColliderStartCenterZ = burgerCollider.center.z;
+        sauceColliderStartZ = sauceCollider.size.z;
+        sauceColliderStartCenterZ = sauceCollider.center.z;
 
         burgerIsDone = false;
 
         ResetPosition();
 
         onTrayLayer = LayerMask.NameToLayer("OnTray");
+        grabableLayer = LayerMask.NameToLayer("Grabable");
     }
 
     private void UpdateCurrentLocationToPutBurgerIngredient(float heightIncreaseAmount)
@@ -78,17 +80,18 @@ public class Tray : MonoBehaviour
         newSize.z += heightIncreaseAmount/12;
         Vector3 newCenter = boxCollider.center;
         newCenter.z += heightIncreaseAmount / 24f;
+
         boxCollider.size = newSize;
         boxCollider.center = newCenter;
 
-        newSize = burgerCollider.size;
-        newSize.z += heightIncreaseAmount/12;
-        newCenter = burgerCollider.center;
+
+        newSize = sauceCollider.size;
+        newSize.z += heightIncreaseAmount / 12;
+        newCenter = sauceCollider.center;
         newCenter.z += heightIncreaseAmount / 24f;
 
-        burgerCollider.size = newSize;
-        burgerCollider.center = newCenter;
-
+        sauceCollider.size = newSize;
+        sauceCollider.center = newCenter;
     }
 
     public void AddSauce(SauceBottle.SauceType type)
@@ -99,10 +102,14 @@ public class Tray : MonoBehaviour
                         type == SauceBottle.SauceType.Mayo ? sauces[1] :
                         type == SauceBottle.SauceType.Mustard ? sauces[2] : sauces[3], sauce.transform.position, sauce.transform.rotation, transform);
 
-            currentLocationToPutBurgerIngredient.y += 0.006f;
+            UpdateCurrentLocationToPutBurgerIngredient(2 * 0.004f);
 
             go.transform.parent = ingredientsParent;
 
+            if (allBurgerIngredients.Count > 0)
+                allBurgerIngredients[allBurgerIngredients.Count - 1].SetOnTrayLayer();
+
+            allBurgerIngredients.Add(go.GetComponent<BurgerIngredient>());
             allSauces.Add(type);
             allGO.Add(go);
 
@@ -111,6 +118,17 @@ public class Tray : MonoBehaviour
             TurnOffAllHolograms();
         }
             
+    }
+
+    public void RemoveSauce()
+    {
+        UpdateCurrentLocationToPutBurgerIngredient(-2 * 0.004f);
+        allBurgerIngredients.RemoveAt(allBurgerIngredients.Count - 1);
+        allSauces.RemoveAt(allSauces.Count - 1);
+        allGO.RemoveAt(allGO.Count - 1);
+
+        if (allBurgerIngredients.Count > 0)
+            allBurgerIngredients[allBurgerIngredients.Count - 1].SetOnGrabableLayer();
     }
 
     public void ResetTray()
@@ -122,7 +140,8 @@ public class Tray : MonoBehaviour
 
         foreach (BurgerIngredient burgerIngredient in allBurgerIngredients)
         {
-            currentBox.allBurgerIngredientTypes.Add(burgerIngredient.data.ingredientType);
+            if (!burgerIngredient.data.isSauce)
+                currentBox.allBurgerIngredientTypes.Add(burgerIngredient.data.ingredientType);
         }
 
         foreach(SauceBottle.SauceType sauceType in allSauces)
@@ -146,11 +165,26 @@ public class Tray : MonoBehaviour
         if (allBurgerIngredients.Count != 0 && !allSauces.Contains(type) && !burgerIsDone)
         {
             hologramLocation = currentLocationToPutBurgerIngredient;
-            hologramLocation.y += 0.006f;
+            hologramLocation.y += 0.004f;      
 
             sauce.transform.position = hologramLocation;
             sauce.transform.rotation = Quaternion.Euler(90, Random.Range(0, 360), 0);
+
+            if (currentIngredient != null && currentIngredient.data.isSauce)
+            {
+                currentIngredient.canAddToTray = true;
+
+                currentRotationToPutBurgerIngredient = sauce.transform.rotation;
+            }
+
             sauce.SetActive(true);
+        }
+        else
+        {
+            if (currentIngredient != null && currentIngredient.data.isSauce)
+            {
+                currentIngredient.canAddToTray = false;
+            }
         }
             
     }
@@ -171,6 +205,8 @@ public class Tray : MonoBehaviour
                 bottomBun.transform.rotation = currentRotationToPutBurgerIngredient;
                 bottomBun.SetActive(true);
             }
+            else
+                currentIngredient.canAddToTray = false;
         }
         else if (!burgerIsDone)
         {
@@ -231,6 +267,10 @@ public class Tray : MonoBehaviour
                 topBun.SetActive(true);
             }
         }
+        else
+        {
+            currentIngredient.canAddToTray = false;
+        }
     }
 
     public void TurnOnBoxHologram()
@@ -265,17 +305,20 @@ public class Tray : MonoBehaviour
         newSize.z = boxColliderStartZ;
         Vector3 newCenter = boxCollider.center;
         newCenter.z = boxColliderStartCenterZ;
+
         boxCollider.size = newSize;
         boxCollider.center = newCenter;
 
-        newSize = burgerCollider.size;
-        newSize.z = burgerColliderStartZ;
-        newCenter = burgerCollider.center;
-        newCenter.z = burgerColliderStartCenterZ;
-        burgerCollider.size = newSize;
-        burgerCollider.center = newCenter;
 
-        burgerCollider.enabled = false;
+        newSize = sauceCollider.size;
+        newSize.z += sauceColliderStartZ;
+        newCenter = sauceCollider.center;
+        newCenter.z += sauceColliderStartCenterZ;
+
+        sauceCollider.size = newSize;
+        sauceCollider.center = newCenter;
+
+        sauceCollider.enabled = false;
 
         UpdateCurrentLocationToPutBurgerIngredient(startPointYHeight);
     }
@@ -297,6 +340,20 @@ public class Tray : MonoBehaviour
         ingredientsParent
             .DOScale(new Vector3(ingredientsParent.localScale.x, ingredientsParent.localScale.y, targetZ), 0.16f)
             .SetEase(Ease.Linear); // lineer, geri yaylanma yok
+    }
+
+    public void RemoveIngredient()
+    {
+        UpdateCurrentLocationToPutBurgerIngredient(-2 * allBurgerIngredients[allBurgerIngredients.Count - 1].data.yHeight);
+        allBurgerIngredients.RemoveAt(allBurgerIngredients.Count - 1);
+        allGO.RemoveAt(allGO.Count - 1);
+
+        if (allBurgerIngredients.Count > 0)
+            allBurgerIngredients[allBurgerIngredients.Count - 1].SetOnGrabableLayer();
+        else
+            sauceCollider.enabled = false;
+
+            burgerIsDone = false;
     }
 
     private void Squash()
@@ -321,9 +378,15 @@ public class Tray : MonoBehaviour
                 if (currentIngredient.data.ingredientType == BurgerIngredientData.IngredientType.TOPBUN)
                     burgerIsDone = true;
 
-                if (!burgerCollider.enabled)
-                    burgerCollider.enabled = true;
+                if (!sauceCollider.enabled)
+                    sauceCollider.enabled = true;
 
+                if (allBurgerIngredients.Count > 0)
+                    allBurgerIngredients[allBurgerIngredients.Count - 1].SetOnTrayLayer();
+
+                if (currentIngredient.data.isSauce)
+                    allSauces.Add(currentIngredient.data.sauceType);
+                
                 allBurgerIngredients.Add(currentIngredient);
                 allGO.Add(currentIngredient.gameObject);
 
@@ -334,6 +397,7 @@ public class Tray : MonoBehaviour
                 Invoke("Squash", currentIngredient.data.timeToPutOnTray / 1.2f);
 
                 UpdateCurrentLocationToPutBurgerIngredient(currentIngredient.data.yHeight);
+
             }
             else if (currentBox != null && other.gameObject.GetInstanceID() == currentBox.gameObject.GetInstanceID() && currentBox.canAddToTray)
             {

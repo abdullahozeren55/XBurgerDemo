@@ -15,15 +15,20 @@ public class BurgerIngredientData : ScriptableObject
         TOMATO,
         ONION,
         PICKLE,
-        TOPBUN
+        TOPBUN,
     }
 
     public bool isUseable = false;
+    public bool isSauce = false;
+    public int sauceDropAmount = 5;
+    public GameObject drop;
     [Space]
     public IngredientType ingredientType;
+    public SauceBottle.SauceType sauceType;
     public PlayerManager.HandGrabTypes handGrabType;
     public float yHeight = 0.1f;
     public float timeToPutOnTray = 0.3f;
+    public Vector3 localScaleWhenGrabbed;
     [Space]
     public LayerMask stickableLayers;
     [Space]

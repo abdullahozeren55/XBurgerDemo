@@ -16,6 +16,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
 
     private bool isGettingPutOnTray;
+    private bool isAddedToBurger;
 
     public BurgerIngredientData data;
 
@@ -27,6 +28,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private Rigidbody rb;
     private Collider col;
+    private MeshCollider meshCol;
 
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -42,8 +44,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     private Cookable cookable;
     public Cookable.CookAmount cookAmount;
 
-    private Transform decalParent;
-
     private float lastSoundTime = 0f;
     private bool isStuckAndCantPlayAudioUntilPickedAgain;
 
@@ -53,6 +53,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+        meshCol = GetComponent<MeshCollider>();
         cookable = GetComponent<Cookable>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -61,21 +62,47 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
         onTrayLayer = LayerMask.NameToLayer("OnTray");
 
-        decalParent = transform.Find("DecalParent");
-
         IsGrabbed = false;
         isGettingPutOnTray = false;
+        isAddedToBurger = false;
 
         isJustThrowed = false;
         isStuck = false;
 
         canAddToTray = false;
+
+        if (data.isSauce)
+        {
+            isAddedToBurger = true;
+            isGettingPutOnTray = false;
+            isJustDropped = false;
+            isJustThrowed = false;
+
+            meshCol.convex = false;
+
+            SetOnGrabableLayer();
+        }
+    }
+
+    public void SetOnTrayLayer()
+    {
+        isGettingPutOnTray = true;
+        PlayerManager.Instance.ResetPlayerGrab(this);
+        gameObject.layer = onTrayLayer;
+    }
+
+    public void SetOnGrabableLayer()
+    {
+        isGettingPutOnTray = false;
+        gameObject.layer = grabableLayer;
     }
 
     public void PutOnTray(Vector3 trayPos, Quaternion trayRot, Transform parentTray)
     {
         canAddToTray = false;
-        isGettingPutOnTray = true;
+        
+        SetOnTrayLayer();
+
         gameObject.layer = onTrayLayer;
 
         rb.velocity = Vector3.zero;
@@ -92,8 +119,17 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         seq.OnComplete(() => {
 
+            isAddedToBurger = true;
+            isGettingPutOnTray = false;
+            isJustDropped = false;
+            isJustThrowed = false;
+
+            if (data.isSauce)
+                meshCol.convex = false;
+
+            SetOnGrabableLayer();
+
             SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.traySoundVolume, data.traySoundMinPitch, data.traySoundMaxPitch);
-            col.enabled = false;
 
         });
     }
@@ -102,8 +138,25 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     {
         gameObject.layer = ungrabableLayer;
 
+        if (isAddedToBurger)
+        {
+            if (data.isSauce)
+            {
+                tray.RemoveSauce();
+                meshCol.convex = true;
+            }   
+            else
+                tray.RemoveIngredient();
+
+            isAddedToBurger = false;
+        }
+
         tray.currentIngredient = this;
-        tray.TurnOnHologram(data.ingredientType);
+
+        if (data.isSauce)
+            tray.TurnOnSauceHologram(data.sauceType);
+        else
+            tray.TurnOnHologram(data.ingredientType);
 
         col.enabled = false;
 
@@ -120,6 +173,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
+        rb.isKinematic = false;
 
         IsGrabbed = true;
 
@@ -127,6 +181,8 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         transform.position = grabPoint.position;
         transform.localPosition = data.grabLocalPositionOffset;
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
+
+        transform.localScale = data.localScaleWhenGrabbed;
     }
     public void OnFocus()
     {
@@ -246,8 +302,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     private void HandleSauceDrops(Collision collision)
     {
-        int countToDrop = Mathf.CeilToInt(decalParent.childCount / 2f);
-
         ContactPoint contact = collision.contacts[0];
 
         Vector3 normal = contact.normal;
@@ -267,27 +321,18 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         if (targetTransform == null)
             targetTransform = collision.transform;
 
-        for (int i = 0; i < countToDrop; i++)
+        for (int i = 0; i < data.sauceDropAmount; i++)
         {
-            Transform child = decalParent.GetChild(i);
-            child.transform.parent = targetTransform;
-
             Vector3 randomOffset = tangent * Random.Range(-spreadRadius, spreadRadius) +
                                bitangent * Random.Range(-spreadRadius, spreadRadius);
 
             Vector3 spawnPoint = hitPoint + randomOffset;
 
-            child.transform.position = spawnPoint;
-            child.transform.rotation = collisionRotation;
+
+            GameObject drop = Instantiate(data.drop, spawnPoint, collisionRotation, collision.transform);
         }
 
-        if (decalParent.childCount > 0)
-        {
-            for (int i = 0; i < decalParent.childCount; i++)
-            {
-                Destroy(decalParent.GetChild(i).gameObject);
-            }
-        }
+        Destroy(gameObject);
     }
 
     private void Unstick()
@@ -381,15 +426,21 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     {
         if (!IsGrabbed && !isGettingPutOnTray && !collision.gameObject.CompareTag("Player"))
         {
-            if (isJustThrowed)
+            if (data.isSauce)
+            {
+                if (!isAddedToBurger && !isGettingPutOnTray)
+                {
+                    CalculateCollisionRotation(collision);
+                    HandleSauceDrops(collision);
+                }
+                
+            }
+            else if (isJustThrowed)
             {
                 CalculateCollisionRotation(collision);
 
                 if (canStick && ((1 << collision.gameObject.layer) & data.stickableLayers) != 0)
                     StickToSurface(collision);
-
-                if (decalParent != null && decalParent.childCount > 0)
-                    HandleSauceDrops(collision);
 
                 gameObject.layer = grabableLayer;
 
@@ -398,9 +449,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
             else if (isJustDropped)
             {
                 CalculateCollisionRotation(collision);
-
-                if (decalParent != null && decalParent.childCount > 0)
-                    HandleSauceDrops(collision);
 
                 gameObject.layer = grabableLayer;
 

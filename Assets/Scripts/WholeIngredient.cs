@@ -40,8 +40,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
     private bool isJustThrowed;
     private bool isJustDropped;
 
-    private Transform decalParent;
-
     private Quaternion collisionRotation;
 
     private float lastSoundTime = 0f;
@@ -54,8 +52,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
-
-        decalParent = transform.Find("DecalParent");
 
         IsGrabbed = false;
 
@@ -152,52 +148,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
 
         // Normal yönüne göre rotation hesapla
         collisionRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
-    }
-
-    private void HandleSauceDrops(Collision collision)
-    {
-        int countToDrop = Mathf.CeilToInt(decalParent.childCount / 2f);
-
-        ContactPoint contact = collision.contacts[0];
-
-        Vector3 normal = contact.normal;
-        Vector3 hitPoint = contact.point + normal * 0.02f;
-
-        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
-        if (tangent == Vector3.zero)
-            tangent = Vector3.Cross(normal, Vector3.forward);
-        tangent.Normalize();
-        Vector3 bitangent = Vector3.Cross(normal, tangent);
-
-        // Rastgele offset (yüzeye paralel düzlemde)
-        float spreadRadius = 0.05f;
-
-        Transform targetTransform = collision.transform.Find("DecalParent");
-
-        if (targetTransform == null)
-            targetTransform = collision.transform;
-
-        for (int i = 0; i < countToDrop; i++)
-        {
-            Transform child = decalParent.GetChild(i);
-            child.transform.parent = targetTransform;
-
-            Vector3 randomOffset = tangent * Random.Range(-spreadRadius, spreadRadius) +
-                               bitangent * Random.Range(-spreadRadius, spreadRadius);
-
-            Vector3 spawnPoint = hitPoint + randomOffset;
-
-            child.transform.position = spawnPoint;
-            child.transform.rotation = collisionRotation;
-        }
-
-        if (decalParent.childCount > 0)
-        {
-            for (int i = 0; i < decalParent.childCount; i++)
-            {
-                Destroy(decalParent.GetChild(i).gameObject);
-            }
-        }
     }
 
     public void Slice(bool shouldExplode)
@@ -312,9 +262,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
             {
                 CalculateCollisionRotation(collision);
 
-                if (decalParent != null && decalParent.childCount > 0)
-                    HandleSauceDrops(collision);
-
                 gameObject.layer = grabableLayer;
 
                 isJustThrowed = false;
@@ -322,9 +269,6 @@ public class WholeIngredient : MonoBehaviour, IGrabable
             else if (isJustDropped)
             {
                 CalculateCollisionRotation(collision);
-
-                if (decalParent != null && decalParent.childCount > 0)
-                    HandleSauceDrops(collision);
 
                 gameObject.layer = grabableLayer;           
 

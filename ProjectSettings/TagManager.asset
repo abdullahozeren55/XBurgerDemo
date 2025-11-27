@@ -24,11 +24,12 @@ TagManager:
   - Kettle
   - FoodPack
   - Stain
+  - BurgerIngredientTrigger
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - BurgerIngredientTrigger
   - Water
   - UI
   - Player
@@ -43,7 +44,7 @@ TagManager:
   - Grill
   - InteractableOutlinedRed
   - OnTray
-  - 
+  - OnlySauceParticleCollision
   - CustomerTriggers
   - OrderThrowArea
   - 

@@ -17,6 +17,7 @@ MonoBehaviour:
   handGrabType: 4
   yHeight: 0.0024
   timeToPutOnTray: 0.2
+  localScaleWhenGrabbed: {x: 0.066, y: 0.067, z: 0.066}
   stickableLayers:
     serializedVersion: 2
     m_Bits: 3713

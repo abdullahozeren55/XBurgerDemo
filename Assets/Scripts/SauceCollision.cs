@@ -38,11 +38,7 @@ public class SauceCollision : MonoBehaviour
                 // Normal yönüne göre rotation hesapla
                 Quaternion finalRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
 
-                // Objeyi doðru ebeveyne yerleþtir
-                Transform decalParent = other.transform.Find("DecalParent");
-                Transform parentToUse = decalParent != null ? decalParent : other.transform;
-
-                SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, parentToUse);
+                SauceManager.Instance.SpawnDrop(sauceType, hitPoint, finalRotation, other.transform);
             }
         }
     }
