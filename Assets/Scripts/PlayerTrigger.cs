@@ -7,8 +7,6 @@ public class PlayerTrigger : MonoBehaviour
     public enum TriggerType
     {
         CloseTheDoorAndStartNoodlePrepare,
-        EnterColdRoom,
-        ExitColdRoom
     }
 
     public TriggerType type;
@@ -29,10 +27,6 @@ public class PlayerTrigger : MonoBehaviour
 
             if (type == TriggerType.CloseTheDoorAndStartNoodlePrepare)
                 NoodleManager.Instance.HandleCloseTheDoorAndStartNoodlePrepare();
-            else if (type == TriggerType.EnterColdRoom)
-                PlayerManager.Instance.HandlePlayerEnterExitColdRoom(true);
-            else if (type == TriggerType.ExitColdRoom)
-                PlayerManager.Instance.HandlePlayerEnterExitColdRoom(false);
         }
     }
 }

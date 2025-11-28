@@ -15,12 +15,8 @@ public class AudioReverbTrigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Sadece Player triggerdan TAMAMEN ÇIKTIÐINDA çalýþýr.
-        // Böylece oyuncu kapýda beklerse ses gidip gelmez.
         if (other.CompareTag("Player"))
         {
-            // Oyuncunun trigger'a göre yerel pozisyonunu al
-            // (Unity'nin matematik kütüphanesi yönü otomatik hesaplar)
             Vector3 localPos = transform.InverseTransformPoint(other.transform.position);
 
             if (localPos.z > 0)

@@ -401,6 +401,9 @@ public class Tray : MonoBehaviour
             }
             else if (currentBox != null && other.gameObject.GetInstanceID() == currentBox.gameObject.GetInstanceID() && currentBox.canAddToTray)
             {
+                if (allBurgerIngredients.Count > 0)
+                    allBurgerIngredients[allBurgerIngredients.Count - 1].SetOnTrayLayer();
+
                 currentBox.PutOnTray(burgerBoxTransform.position);
             }
             

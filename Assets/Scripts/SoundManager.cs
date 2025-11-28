@@ -13,7 +13,8 @@ public class SoundManager : MonoBehaviour
     [Space]
 
     [SerializeField] private AudioSource soundFXObject;
-
+    [Space]
+    [SerializeField] private AudioSource soundFXObjectForAmbiance;
     [Space]
     [SerializeField] private AudioSource soundFXObjectForUI;
 
@@ -33,6 +34,26 @@ public class SoundManager : MonoBehaviour
     public float mainAmbianceVolume;
     public float mainAmbiancePitch;
 
+    [Header("Bird Chirping Settings")]
+    public bool CanPlayBirdChirping = true;
+    [Space]
+    public int minAmountToPlayAtOnce = 2;
+    public int maxAmountToPlayAtOnce = 5;
+    [Space]
+    public float minCooldownForBirdChirping = 5f;
+    public float maxCooldownForBirdChirping = 15f;
+    [Space]
+    public float minPitchForBirdChirping = 0.8f;
+    public float maxPitchForBirdChirping = 1.2f;
+    [Space]
+    public AudioClip[] birdChirpingClips;
+    public Transform[] birdChirpingTransforms;
+    [Space]
+    private float lastTimeBirdChirpingPlayed = 0f;
+    private float currentCooldownForBirdChirping = 0f;
+    private int currentAmountToPlayAtOnce;
+    private Transform currentTransformForBirdChirping;
+
     private Dictionary<string, AudioSource> taggedSounds = new Dictionary<string, AudioSource>();
 
     private void Awake()
@@ -50,6 +71,12 @@ public class SoundManager : MonoBehaviour
             // If an instance already exists, destroy this one to enforce the singleton pattern
             Destroy(gameObject);
         }
+    }
+
+    private void Update()
+    {
+        if (CanPlayBirdChirping)
+            HandleBirdChirping();
     }
 
     public void SwitchSnapshot(string name, float duration)
@@ -160,6 +187,26 @@ public class SoundManager : MonoBehaviour
         Destroy(audioSource.gameObject, clipLength);
     }
 
+    public void PlayRandomAmbianceSoundFX(AudioClip[] audioClip, Transform spawnTransform, float volume = 1f, float minPitch = 0.85f, float maxPitch = 1.15f)
+    {
+
+        int rand = Random.Range(0, audioClip.Length);
+
+        AudioSource audioSource = Instantiate(soundFXObjectForAmbiance, spawnTransform.position, Quaternion.identity, spawnTransform);
+
+        audioSource.clip = audioClip[rand];
+
+        audioSource.volume = volume;
+
+        audioSource.pitch = Random.Range(minPitch, maxPitch);
+
+        audioSource.Play();
+
+        float clipLength = audioSource.clip.length / audioSource.pitch;
+
+        Destroy(audioSource.gameObject, clipLength);
+    }
+
     public void AddItemToGrill(BurgerIngredientData.IngredientType type)
     {
         if (type == BurgerIngredientData.IngredientType.PATTY)
@@ -221,6 +268,27 @@ public class SoundManager : MonoBehaviour
     public void SetTypewriterVolume(float value)
     {
         audioMixer.SetFloat("TypewriterVolume", Mathf.Log10(value) * 20f);
+    }
+
+    private void HandleBirdChirping()
+    {
+        if (Time.time > lastTimeBirdChirpingPlayed + currentCooldownForBirdChirping)
+        {
+            currentAmountToPlayAtOnce = Random.Range(minAmountToPlayAtOnce, maxAmountToPlayAtOnce);
+
+            for (int i = 0; i < currentAmountToPlayAtOnce; i++)
+            {
+                currentTransformForBirdChirping = birdChirpingTransforms[Random.Range(0, birdChirpingTransforms.Length)];
+
+                PlayRandomAmbianceSoundFX(birdChirpingClips, currentTransformForBirdChirping, 1f, minPitchForBirdChirping, maxPitchForBirdChirping);
+
+                i++;
+            }
+
+            currentCooldownForBirdChirping = Random.Range(minCooldownForBirdChirping, maxCooldownForBirdChirping);
+
+            lastTimeBirdChirpingPlayed = Time.time;
+        }
     }
 
     private IEnumerator RemoveTagAfterDelay(string tag, AudioSource source, float delay)
