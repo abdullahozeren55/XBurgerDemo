@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using static System.TimeZoneInfo;
 
 public class SoundManager : MonoBehaviour
 {
@@ -48,6 +49,16 @@ public class SoundManager : MonoBehaviour
         {
             // If an instance already exists, destroy this one to enforce the singleton pattern
             Destroy(gameObject);
+        }
+    }
+
+    public void SwitchSnapshot(string name, float duration)
+    {
+        AudioMixerSnapshot snap = audioMixer.FindSnapshot(name);
+
+        if (snap != null)
+        {
+            snap.TransitionTo(duration);
         }
     }
 

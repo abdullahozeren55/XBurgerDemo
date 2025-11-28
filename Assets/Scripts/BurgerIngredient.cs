@@ -461,7 +461,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 isJustDropped = false;
             }
 
-            if (!isStuckAndCantPlayAudioUntilPickedAgain)
+            if (!isStuckAndCantPlayAudioUntilPickedAgain && !isGettingPutOnTray && !isAddedToBurger)
                 HandleSoundFX(collision);
 
         }
