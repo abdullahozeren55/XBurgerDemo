@@ -330,7 +330,7 @@ public class NoodleManager : MonoBehaviour
 
     public void HandleAfterNoodle()
     {
-        if (GameManager.Instance.DayCount == 0)
+        if (DayManager.Instance.DayCount == 0)
         {
             afterFirstNoodleCutsceneTrigger.SetActive(true);
             DialogueManager.Instance.StartSelfDialogue(afterFirstNoodleSelfTalk);

@@ -127,7 +127,7 @@ public class Nevzat : MonoBehaviour, ICustomer, IInteractable
 
     private void OnEnable()
     {
-        day = GameManager.Instance.DayCount;
+        day = DayManager.Instance.DayCount;
 
         for (int i = 0; i < CustomerDayChanges.Length; i++)
         {

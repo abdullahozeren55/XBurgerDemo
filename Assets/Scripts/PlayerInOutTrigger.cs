@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using static LightSwitch;
-using static Unity.VisualScripting.AnnotationUtility;
 
 public class PlayerInOutTrigger : MonoBehaviour
 {

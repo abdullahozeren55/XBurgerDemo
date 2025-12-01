@@ -122,7 +122,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     private void OnEnable()
     {
-        day = GameManager.Instance.DayCount;
+        day = DayManager.Instance.DayCount;
 
         TrueBurgerReceived = false;
         TrueDrinkReceived = false;

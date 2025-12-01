@@ -8,36 +8,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class CustomerDaySortSegment
-    {
-        [Range(0, 10)]
-        public int Day;
-        public ICustomer.CustomerName[] CustomerSort;
-    }
-
-    [System.Serializable]
-    public class DayState
-    {
-        [Range(0, 10)]
-        public int Day;
-        [Range(1, 8)]
-        public int Part;
-        [Space]
-        public Vector3 sunRotation;
-        public float sunIntensity;
-        public Color sunColor;
-
-        public float skyboxExposure;
-        public float skyboxRotate;
-        public Color skyboxColor;
-        public Color environmentColor;
-
-        public Color fogColor;
-        public float fogDensity;
-
-        public bool shouldLightsUp;
-    }
     public enum BurgerTypes
     {
         ClassicBurger,
@@ -107,24 +77,6 @@ public class GameManager : MonoBehaviour
     private Drink lastThrowedDrink;
     private MeshRenderer[] lastThrowedBurgerBoxMeshRenderers;
 
-    [Header("Customer Settings")]
-    [SerializeField] private GameObject[] allCustomers; //One Ertan will be put inside and get changed based on the required Ertan.
-    private ICustomer.CustomerName[] allCustomersName;
-
-    [Header("Day Settings")]
-    public Light sun;
-    public Material skyboxMat;
-    public DayState[] DayStates;
-    public float transitionDuration = 10f;
-    private int currentIndex = 0;
-    private Coroutine transitionRoutine;
-    [Space]
-    [SerializeField] private Material[] lightMats;
-    [SerializeField] private GameObject[] allLights;
-    [Space]
-    public CustomerDaySortSegment[] DayCustomerSort;
-    private int customerCounter = 0;
-
     public ICustomer CurrentCustomer;
 
     private int customerLayer;
@@ -135,8 +87,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Tray tray;
     [Space]
     [SerializeField] private OrderThrowArea orderThrowArea;
-
-    public int DayCount;
 
     public static GameManager Instance;
 
@@ -172,59 +122,13 @@ public class GameManager : MonoBehaviour
             basicBurger,
         };
 
-        allCustomersName = new ICustomer.CustomerName[allCustomers.Length]; // initialize
-
-        for (int i = 0; i < allCustomers.Length; i++)
-        {
-            allCustomersName[i] = allCustomers[i].GetComponent<ICustomer>().PersonName;
-        }
-
         customerLayer = LayerMask.NameToLayer("Customer");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
-
-        NextState();
 
         SetOrderThrowArea(false);
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-    }
-
-    public void CallCustomer()
-    {
-        for (int i = 0; i < allCustomersName.Length; i++)
-        {
-            if (allCustomersName[i] == DayCustomerSort[DayCount - 1].CustomerSort[customerCounter])
-            {
-                allCustomers[i].gameObject.SetActive(true);
-                customerCounter++;
-            }
-        }
-        
-    }
-
-    public void NextState()
-    {
-        // O günün state’lerini filtrele
-        var todaysStates = DayStates.Where(s => s.Day == DayCount).ToArray();
-        if (todaysStates.Length == 0)
-        {
-            Debug.LogWarning("Bugün için tanýmlý DayState yok: " + DayCount);
-            return;
-        }
-
-        // sýradaki state
-        int nextIndex = (currentIndex + 1) % todaysStates.Length;
-
-        if (transitionRoutine != null) StopCoroutine(transitionRoutine);
-        transitionRoutine = StartCoroutine(Transition(todaysStates[currentIndex], todaysStates[nextIndex]));
-        currentIndex = nextIndex;
-    }
-
-    public void NextDay()
-    {
-        DayCount++;
-        currentIndex = 0; // yeni güne baþlarken baþtan
     }
 
     public void AddSauceToTray(SauceBottle.SauceType type)
@@ -304,7 +208,7 @@ public class GameManager : MonoBehaviour
         lastThrowedBurgerBox.GetComponent<Rigidbody>().velocity = force;
     }
 
-    public void SetOrderThrowArea(bool shouldReceive) => orderThrowArea.ShouldReceive = shouldReceive;
+    public void SetOrderThrowArea(bool shouldReceive) { if (orderThrowArea != null) orderThrowArea.ShouldReceive = shouldReceive; }
 
     public void CheckBurgerType(List<BurgerIngredientData.IngredientType> type, List<SauceBottle.SauceType> sauces, BurgerBox box)
     {
@@ -470,72 +374,5 @@ public class GameManager : MonoBehaviour
         var sortedList2 = list2.OrderBy(x => x).ToList();
 
         return sortedList1.SequenceEqual(sortedList2);
-    }
-
-    IEnumerator Transition(DayState from, DayState to)
-    {
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / transitionDuration;
-
-            // Sun
-            sun.transform.rotation = Quaternion.Slerp(
-                Quaternion.Euler(from.sunRotation),
-                Quaternion.Euler(to.sunRotation),
-                t
-            );
-            sun.intensity = Mathf.Lerp(from.sunIntensity, to.sunIntensity, t);
-            sun.color = Color.Lerp(from.sunColor, to.sunColor, t);
-
-            // Skybox
-            skyboxMat.SetFloat("_Exposure", Mathf.Lerp(from.skyboxExposure, to.skyboxExposure, t));
-            skyboxMat.SetFloat("_Rotation", Mathf.Lerp(from.skyboxRotate, to.skyboxRotate, t));
-            skyboxMat.SetColor("_Tint", Color.Lerp(from.skyboxColor, to.skyboxColor, t));
-
-            // Fog
-            RenderSettings.fogColor = Color.Lerp(from.fogColor, to.fogColor, t);
-            RenderSettings.fogDensity = Mathf.Lerp(from.fogDensity, to.fogDensity, t);
-            RenderSettings.ambientLight = Color.Lerp(from.environmentColor, to.environmentColor, t);
-
-            yield return null;
-        }
-
-        sun.transform.rotation = Quaternion.Euler(to.sunRotation);
-        sun.intensity = to.sunIntensity;
-        sun.color = to.sunColor;
-
-        skyboxMat.SetFloat("_Exposure", to.skyboxExposure);
-        skyboxMat.SetFloat("_Rotation", to.skyboxRotate);
-        skyboxMat.SetColor("_Tint", to.skyboxColor);
-
-        RenderSettings.fogColor = to.fogColor;
-        RenderSettings.fogDensity = to.fogDensity;
-        RenderSettings.ambientLight = to.environmentColor;
-
-        if (!from.shouldLightsUp && to.shouldLightsUp)
-        {
-            foreach (Material mat in lightMats)
-            {
-                mat.EnableKeyword("_EMISSION");
-            }
-
-            foreach (GameObject light in allLights)
-            {
-                light.SetActive(true);
-            }
-        }
-        else if (from.shouldLightsUp && !to.shouldLightsUp)
-        {
-            foreach (Material mat in lightMats)
-            {
-                mat.DisableKeyword("_EMISSION");
-            }
-
-            foreach (GameObject light in allLights)
-            {
-                light.SetActive(false);
-            }
-        }
     }
 }

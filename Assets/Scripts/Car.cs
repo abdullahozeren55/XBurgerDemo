@@ -73,6 +73,7 @@ public class Car : MonoBehaviour
 
     private void OnEnable()
     {
+        HandleLoopSound(true);
         ChangeCarColor(CarManager.Instance.GetRandomCar0Material());
         DecideCarNPC();
         DecideSpeed();
@@ -221,7 +222,7 @@ public class Car : MonoBehaviour
 
                 HandleLoopSound(false);
 
-                SoundManager.Instance.PlaySoundFX(breakSound, transform, breakSoundVolume, 0.85f, 1.15f);
+                SoundManager.Instance.PlaySoundFX(breakSound, transform, breakSoundVolume);
 
                 honkingCoroutine = StartCoroutine(Honk());
 
@@ -328,7 +329,7 @@ public class Car : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(honkSoundCooldown * 0.8f, honkSoundCooldown * 1.2f));
-            SoundManager.Instance.PlaySoundFX(honkSound, transform, honkSoundVolume, 0.85f, 1.15f);
+            SoundManager.Instance.PlaySoundFX(honkSound, transform, honkSoundVolume);
         }
     }
 
