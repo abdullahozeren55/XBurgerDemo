@@ -9,6 +9,9 @@ public class PlayerManager : MonoBehaviour
     [Space]
     public Animator playerAnim;
 
+    [Header("UI Settings")]
+    public GameObject crosshairGO;
+
     [Header("Knockback Settings")]
     public float knockbackDuration = 0.35f;
 
@@ -46,9 +49,6 @@ public class PlayerManager : MonoBehaviour
         {
             // If not, set this instance as the singleton
             Instance = this;
-
-            // Optionally, mark GameManager as not destroyed between scene loads
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -100,6 +100,7 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.CanGrab = can;
         firstPersonController.CanLook = can;
         firstPersonController.CanFootstep = can;
+        crosshairGO.SetActive(can);
     }
     public void SetPlayerCanInteract(bool can)
     {

@@ -5,6 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GameManager : MonoBehaviour
 {
@@ -84,11 +85,13 @@ public class GameManager : MonoBehaviour
 
     [Header("Other Settings")]
     [Space]
-    [SerializeField] private Tray tray;
+    public Tray tray;
     [Space]
-    [SerializeField] private OrderThrowArea orderThrowArea;
+    public OrderThrowArea orderThrowArea;
 
     public static GameManager Instance;
+
+    public Volume PostProcessVolume;
 
     private void Awake()
     {
@@ -127,8 +130,7 @@ public class GameManager : MonoBehaviour
 
         SetOrderThrowArea(false);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        
     }
 
     public void AddSauceToTray(SauceBottle.SauceType type)

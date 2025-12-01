@@ -387,9 +387,13 @@ public class FirstPersonController : MonoBehaviour
     {   
         if (CanPlay)
         {
-            HandleMouseAndHandControl();
+            if (CanLook)
+            {
+                HandleMouseAndHandControl();
 
-            HandleHandTargetPositions();
+                HandleHandTargetPositions();
+            }
+            
         }
 
         if (CanUseHeadbob)

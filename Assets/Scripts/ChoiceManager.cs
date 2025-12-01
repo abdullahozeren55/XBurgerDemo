@@ -44,7 +44,6 @@ public class ChoiceManager : MonoBehaviour
     [SerializeField] private Sprite[] keyboardASprites; //0 not pressed, 1 pressed
     [SerializeField] private Sprite[] keyboardDSprites;
     [Space]
-    [SerializeField] private Volume volume;
     private ColorAdjustments colorAdjust;
     private float normalSaturationValue;
     [SerializeField] private float fadeInTime = 1.5f;
@@ -106,10 +105,10 @@ public class ChoiceManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
 
-        volume.profile.TryGet(out colorAdjust);
+        Instance = this;
+
+        GameManager.Instance.PostProcessVolume.profile.TryGet(out colorAdjust);
 
         normalSaturationValue = colorAdjust.saturation.value;
 

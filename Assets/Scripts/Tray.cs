@@ -70,6 +70,8 @@ public class Tray : MonoBehaviour
 
         onTrayLayer = LayerMask.NameToLayer("OnTray");
         grabableLayer = LayerMask.NameToLayer("Grabable");
+
+        GameManager.Instance.tray = this;
     }
 
     private void UpdateCurrentLocationToPutBurgerIngredient(float heightIncreaseAmount)

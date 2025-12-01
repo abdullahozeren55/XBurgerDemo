@@ -64,7 +64,6 @@ public class PhoneManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         FlashlightIsOn = false;
         isInCall = false;

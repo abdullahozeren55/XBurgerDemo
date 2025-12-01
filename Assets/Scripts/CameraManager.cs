@@ -65,8 +65,6 @@ public class CameraManager : MonoBehaviour
     [Space]
     [SerializeField] private List<JumpscareSettings> jumpscarePresets;
     [Space]
-
-    [SerializeField] private Volume postProcessVolume;
     [SerializeField] private NoiseSettings wobbleNoise;
     [SerializeField] private NoiseSettings shakeNoise;
     [Space]
@@ -118,9 +116,6 @@ public class CameraManager : MonoBehaviour
         {
             // If not, set this instance as the singleton
             Instance = this;
-
-            // Optionally, mark GameManager as not destroyed between scene loads
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -148,7 +143,7 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        if (postProcessVolume.profile.TryGet(out Vignette v))
+        if (GameManager.Instance.PostProcessVolume.profile.TryGet(out Vignette v))
         {
             vignette = v;
 
@@ -156,7 +151,7 @@ public class CameraManager : MonoBehaviour
             normalVignetteColor = vignette.color.value;
         }
 
-        if (postProcessVolume.profile.TryGet(out ColorAdjustments c))
+        if (GameManager.Instance.PostProcessVolume.profile.TryGet(out ColorAdjustments c))
         {
             colorAdjustments = c;
 

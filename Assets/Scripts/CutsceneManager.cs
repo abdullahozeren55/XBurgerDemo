@@ -42,8 +42,8 @@ public class CutsceneManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         playableDirector = GetComponent<PlayableDirector>();
     }

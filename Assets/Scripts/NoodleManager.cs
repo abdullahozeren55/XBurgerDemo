@@ -99,9 +99,6 @@ public class NoodleManager : MonoBehaviour
         {
             // If not, set this instance as the singleton
             Instance = this;
-
-            // Optionally, mark GameManager as not destroyed between scene loads
-            DontDestroyOnLoad(gameObject);
         }
         else
         {

@@ -105,7 +105,6 @@ public class DialogueManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         typewriterAudioSource = GetComponent<AudioSource>();
 

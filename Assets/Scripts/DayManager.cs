@@ -47,10 +47,11 @@ public class DayManager : MonoBehaviour
 
     [Header("Street Lights")]
     [SerializeField] private Material[] lightMats; // Emissive materyaller
-    [SerializeField] private GameObject[] allLights; // Iþýk objeleri (Point/Spot lights)
+    public List<GameObject> allLights = new List<GameObject>(); // Iþýk objeleri (Point/Spot lights)
 
     [Header("Data")]
     public DayState[] DayStates;
+    public DayState CurrentDayState;
 
     private int currentIndex = 0;
     private Coroutine transitionRoutine;
@@ -84,11 +85,11 @@ public class DayManager : MonoBehaviour
         InitializeDay(DayCount, DayPartToInitialize);
     }
 
-    private void Update()
+    /*private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
             NextDayState();
-    }
+    }*/
 
     public void NextDayState()
     {
@@ -138,6 +139,8 @@ public class DayManager : MonoBehaviour
         var targetState = DayStates
             .FirstOrDefault(s => s.Day == DayCount && s.Part == partNumber);
 
+        CurrentDayState = targetState;
+
         // 2. Index'i Güncelle
         // NextDayState fonksiyonunun doðru sýradan devam etmesi için currentIndex'i ayarlamalýyýz.
         var todaysStates = DayStates
@@ -155,6 +158,18 @@ public class DayManager : MonoBehaviour
 
         if (DayInLoop)
             NextDayState();
+    }
+
+    public void RegisterLight(GameObject lightObj)
+    {
+        if (!allLights.Contains(lightObj))
+            allLights.Add(lightObj);
+    }
+
+    public void UnregisterLight(GameObject lightObj)
+    {
+        if (allLights.Contains(lightObj))
+            allLights.Remove(lightObj);
     }
 
     // Kod tekrarýný önlemek ve temizlik için atama iþlemini ayýrdým
@@ -189,6 +204,8 @@ public class DayManager : MonoBehaviour
     private IEnumerator TransitionRoutine(DayState from, DayState to)
     {
         lightsHandled = false;
+
+        CurrentDayState = to;
 
         float t = 0f;
 

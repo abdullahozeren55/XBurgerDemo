@@ -32,6 +32,7 @@ public class SauceManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 

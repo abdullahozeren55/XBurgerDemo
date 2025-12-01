@@ -9,6 +9,11 @@ public class OrderThrowArea : MonoBehaviour
     [Header("Sukran Settings")]
     [SerializeField] private BurgerBox sukranBurgerBox;
 
+    private void Awake()
+    {
+        GameManager.Instance.orderThrowArea = this;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (ShouldReceive)
