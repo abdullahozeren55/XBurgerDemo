@@ -721,21 +721,21 @@ public class FirstPersonController : MonoBehaviour
     {
         if (isUsingGrabbedItem)
         {
-            interactUI.SetActive(false);
-            interact2UI.SetActive(false);
-            useUI.SetActive(false);
-            grabUI.SetActive(false);
-            dropThrowUI.SetActive(false);
-            interactUseUI.SetActive(false);
+            if (interactUI != null) interactUI.SetActive(false);
+            if (interact2UI != null) interact2UI.SetActive(false);
+            if (useUI != null) useUI.SetActive(false);
+            if (grabUI != null) grabUI.SetActive(false);
+            if (dropThrowUI != null) dropThrowUI.SetActive(false);
+            if (interactUseUI != null) interactUseUI.SetActive(false);
         }
         else
         {
-            interactUI.SetActive(currentInteractable != null && (currentGrabable == null || !currentGrabable.IsGrabbed));
-            interact2UI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && !currentGrabable.IsUseable);
-            useUI.SetActive((currentInteractable == null || currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab) && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
-            grabUI.SetActive(currentInteractable == null && currentGrabable != null && !currentGrabable.IsGrabbed);
-            dropThrowUI.SetActive(currentGrabable != null && currentGrabable.IsGrabbed);
-            interactUseUI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
+            if (interactUI != null) interactUI.SetActive(currentInteractable != null && (currentGrabable == null || !currentGrabable.IsGrabbed));
+            if (interact2UI != null) interact2UI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && !currentGrabable.IsUseable);
+            if (useUI != null) useUI.SetActive((currentInteractable == null || currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab) && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
+            if (grabUI != null) grabUI.SetActive(currentInteractable == null && currentGrabable != null && !currentGrabable.IsGrabbed);
+            if (dropThrowUI != null) dropThrowUI.SetActive(currentGrabable != null && currentGrabable.IsGrabbed);
+            if (interactUseUI != null) interactUseUI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
         }
     }
 

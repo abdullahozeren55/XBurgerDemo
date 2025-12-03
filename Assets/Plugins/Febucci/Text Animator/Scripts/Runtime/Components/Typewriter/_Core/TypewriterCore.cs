@@ -456,13 +456,20 @@ namespace Febucci.UI.Core
         [ContextMenu("Start Disappearing Text")]
         public void StartDisappearingText()
         {
+            // --- BU SATIRI EKLE (KORUMA KALKANI) ---
+            if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+            // ---------------------------------------
+
             if (disappearanceOrientation == DisappearanceOrientation.Inverted && isShowingText)
             {
-                Debug.LogWarning("TextAnimatorPlayer: Can't start disappearance routine in the opposite direction of the typewriter, because you're still showing the text! (the typewriter might get stuck trying to show and override letters that keep disappearing)");
+                Debug.LogWarning("TextAnimatorPlayer: Can't start disappearance routine in the opposite direction of the typewriter, " +
+                                "because you're still showing the text! (the typewriter might get stuck trying to show and override letters that keep disappearing)");
                 return;
             }
 
-            if(isHidingText) return;
+            if (isHidingText) return;
+
+            // Obje yoksa buraya gelip patlamaz artık
             hideRoutine = StartCoroutine(HideTextRoutine());
         }
 

@@ -19,6 +19,8 @@ public class MenuManager : MonoBehaviour
 
     private Canvas myCanvas;
 
+    private List<PixelPerfectCanvasScaler> activeScalers = new List<PixelPerfectCanvasScaler>();
+
     private void Awake()
     {
         if (Instance == null)
@@ -105,6 +107,7 @@ public class MenuManager : MonoBehaviour
                 HandlePauseMenu(false);
                 SetCanPause(true);
                 UpdateDoFState(false);
+                SoundManager.Instance.SwitchSnapshot("Outside", 0f);
             }
             else if (scene.name == "MainMenu")
             {
@@ -117,6 +120,7 @@ public class MenuManager : MonoBehaviour
                 HandlePauseMenu(false);
                 SetCanPause(false);
                 UpdateDoFState(true);
+                SoundManager.Instance.SwitchSnapshot("Outside", 0f);
             }
         }
     }
@@ -181,6 +185,38 @@ public class MenuManager : MonoBehaviour
             {
                 dof.active = enableDoF;
             }
+        }
+    }
+
+    // Scaler'lar doðunca buraya kaydolacak
+    public void RegisterScaler(PixelPerfectCanvasScaler scaler)
+    {
+        if (!activeScalers.Contains(scaler))
+        {
+            activeScalers.Add(scaler);
+            // Kayýt olur olmaz bir kere güncelle ki bozuk baþlamasýn
+            scaler.UpdateScale();
+        }
+    }
+
+    // Scaler'lar kapanýnca (veya sahne deðiþince) listeden çýkacak
+    public void UnregisterScaler(PixelPerfectCanvasScaler scaler)
+    {
+        if (activeScalers.Contains(scaler))
+        {
+            activeScalers.Remove(scaler);
+        }
+    }
+
+    // Çözünürlük deðiþtiðinde bunu çaðýracaðýz!
+    public void RefreshAllCanvases()
+    {
+        // Tersten döngü (Foreach yerine) liste güvenliði için daha iyidir ama
+        // burada liste deðiþmediði için foreach de olur.
+        foreach (var scaler in activeScalers)
+        {
+            if (scaler != null)
+                scaler.UpdateScale();
         }
     }
 }

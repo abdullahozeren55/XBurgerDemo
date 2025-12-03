@@ -85,6 +85,7 @@ public class LightSwitch : MonoBehaviour, IInteractable
             Renderer rend = settings.lightGO.GetComponentInChildren<Renderer>();
             if (rend != null)
                 rend.material = new Material(lightMatToCopy);
+                rend.material.SetColor("_EmissionColor", Color.black);
         }
     }
 

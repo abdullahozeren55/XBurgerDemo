@@ -219,7 +219,7 @@ public class DayManager : MonoBehaviour
         // NextDayState() zaten InitializeDay içinde DayInLoop true ise çaðrýlýyor.
     }
 
-    public void InitializeDay(int dayIndex, int partNumber = 1)
+    public void InitializeDay(int dayIndex, int partNumber = 0)
     {
         DayCount = dayIndex;
         // lightsHandled = false; // Buna gerek kalmadý, sürekli lerp yapacaðýz
