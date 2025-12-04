@@ -41,9 +41,9 @@ public class MonitorManager : MonoBehaviour
     {
         burgerImage.sprite = burgerSprites[value];
 
-        //ingredientsTMP.text = LocalizationManager.Instance.GetText(ingredientKeys[value]);
+        ingredientsTMP.text = LocalizationManager.Instance.GetText(ingredientKeys[value]);
 
-        //descriptionTMP.text = LocalizationManager.Instance.GetText(descriptionKeys[value]);
+        descriptionTMP.text = LocalizationManager.Instance.GetText(descriptionKeys[value]);
 
         headerTMP.text = LocalizationManager.Instance.GetText(headerKeys[value]);
 

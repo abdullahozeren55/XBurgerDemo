@@ -1,0 +1,1270 @@
+{
+      "entries": [
+  {
+    "key": "INTERACTABLE_OPEN_DOOR",
+    "tr": "Kapıyı Aç",
+    "en": "Open The Door"
+  },
+  {
+    "key": "INTERACTABLE_CLOSE_DOOR",
+    "tr": "Kapıyı Kapat",
+    "en": "Close The Door"
+  },
+  {
+    "key": "INTERACTABLE_LOCKED_DOOR",
+    "tr": "Kapı Kilitli",
+    "en": "The Door Is Locked"
+  },
+  {
+    "key": "INTERACTABLE_OPEN_WINDOW",
+    "tr": "Pencereyi Aç",
+    "en": "Open The Window"
+  },
+  {
+    "key": "INTERACTABLE_CLOSE_WINDOW",
+    "tr": "Pencereyi Kapat",
+    "en": "Close The Window"
+  },
+  {
+    "key": "INTERACTABLE_LOCKED_WINDOW",
+    "tr": "Pencere Kilitli",
+    "en": "The Window Is Locked"
+  },
+  {
+    "key": "INTERACTABLE_OPEN_COOLER",
+    "tr": "Dolabı Aç",
+    "en": "Open The Fridge"
+  },
+  {
+    "key": "INTERACTABLE_CLOSE_COOLER",
+    "tr": "Dolabı Kapat",
+    "en": "Close The Fridge"
+  },
+  {
+    "key": "INTERACTABLE_OPEN_FUSE_BOX",
+    "tr": "Sigorta Kutusunu Aç",
+    "en": "Open The Fuse Box"
+  },
+  {
+    "key": "INTERACTABLE_CLOSE_FUSE_BOX",
+    "tr": "Sigorta Kutusunu Kapat",
+    "en": "Close The Fuse Box"
+  },
+  {
+    "key": "INTERACTABLE_LIFT_TOILET_LID",
+    "tr": "Kapağı Kaldır",
+    "en": "Put The Toilet Seat Up"
+  },
+  {
+    "key": "INTERACTABLE_LOWER_TOILET_LID",
+    "tr": "Kapağı İndir",
+    "en": "Put The Toilet Seat Down"
+  },
+  {
+    "key": "INTERACTABLE_KNIFE_HOLDER",
+    "tr": "Bıçak Al",
+    "en": "Take The Knife"
+  },
+  {
+    "key": "INTERACTABLE_BURGER_BOX_BOX",
+    "tr": "Burger Kutusu Al",
+    "en": "Take The Burger Box"
+  },
+  {
+    "key": "INTERACTABLE_BUN_BOX",
+    "tr": "Ekmek Paketi Al",
+    "en": "Take The Bun Pack"
+  },
+  {
+    "key": "INTERACTABLE_PATTY_BOX",
+    "tr": "Köfte Paketi Al",
+    "en": "Take The Patty Pack"
+  },
+  {
+    "key": "INTERACTABLE_CHEESE_BOX",
+    "tr": "Peynir Paketi Al",
+    "en": "Take The Cheese Pack"
+  },
+  {
+    "key": "INTERACTABLE_PICKLE_BOX",
+    "tr": "Turşu Paketi Al",
+    "en": "Take The Pickle Pack"
+  },
+  {
+    "key": "INTERACTABLE_TOMATO_BOX",
+    "tr": "Domates Paketi Al",
+    "en": "Take The Tomato Pack"
+  },
+  {
+    "key": "INTERACTABLE_ONION_BOX",
+    "tr": "Soğan Paketi Al",
+    "en": "Take The Onion Pack"
+  },
+  {
+    "key": "INTERACTABLE_LETTUCE_BOX",
+    "tr": "Marul Paketi Al",
+    "en": "Take The Lettuce Pack"
+  },
+  {
+    "key": "INTERACTABLE_BLACK_POP_BOX",
+    "tr": "Siyah Kula Paketi Al",
+    "en": "Take The Black Kula Pack"
+  },
+  {
+    "key": "INTERACTABLE_YELLOW_POP_BOX",
+    "tr": "Sarı Kula Paketi Al",
+    "en": "Take The Yellow Kula Pack"
+  },
+  {
+    "key": "INTERACTABLE_WHITE_POP_BOX",
+    "tr": "Beyaz Kula Paketi Al",
+    "en": "Take The White Kula Pack"
+  },
+  {
+    "key": "INTERACTABLE_KETCHUP_BOX",
+    "tr": "Ketçap Şişesi Al",
+    "en": "Take The Ketchup Bottle"
+  },
+  {
+    "key": "INTERACTABLE_MAYONNAISE_BOX",
+    "tr": "Mayonez Şişesi Al",
+    "en": "Take The Mayo Bottle"
+  },
+  {
+    "key": "INTERACTABLE_MUSTARD_BOX",
+    "tr": "Hardal Şişesi Al",
+    "en": "Take The Mustard Bottle"
+  },
+  {
+    "key": "INTERACTABLE_BBQ_SAUCE_BOX",
+    "tr": "Barbekü Sosu Şişesi Al",
+    "en": "Take The BBQ Sauce Bottle"
+  },
+  {
+    "key": "INTERACTABLE_TURN_ON_LIGHT",
+    "tr": "Işığı Aç",
+    "en": "Turn On The Light"
+  },
+  {
+    "key": "INTERACTABLE_TURN_OFF_LIGHT",
+    "tr": "Işığı Kapat",
+    "en": "Turn Off The Light"
+  },
+  {
+    "key": "INTERACTABLE_NOODLE_SHELF",
+    "tr": "Zortdomie® Çabuk Noodle - Kanser Aromalı™ Al",
+    "en": "Take A Zortdomie® Instant Noodle - Cancer Flavored™"
+  },
+  {
+    "key": "INTERACTABLE_SHOP_OWNER",
+    "tr": "Dükkan Sahibi İle Konuş",
+    "en": "Talk To The Shop Owner"
+  },
+  {
+    "key": "GRABABLE_BUN",
+    "tr": "Ekmek",
+    "en": "Bun"
+  },
+  {
+    "key": "GRABABLE_PICKLE",
+    "tr": "Turşu",
+    "en": "Pickle"
+  },
+  {
+    "key": "GRABABLE_TOMATO",
+    "tr": "Domates",
+    "en": "Tomato"
+  },
+  {
+    "key": "GRABABLE_ONION",
+    "tr": "Soğan",
+    "en": "Onion"
+  },
+  {
+    "key": "GRABABLE_LETTUCE",
+    "tr": "Marul",
+    "en": "Lettuce"
+  },
+  {
+    "key": "GRABABLE_BLACK_POP_PACK",
+    "tr": "Siyah Kula Paketi",
+    "en": "Black Kula Pack"
+  },
+  {
+    "key": "GRABABLE_YELLOW_POP_PACK",
+    "tr": "Sarı Kula Paketi",
+    "en": "Yellow Kula Pack"
+  },
+  {
+    "key": "GRABABLE_WHITE_POP_PACK",
+    "tr": "Beyaz Kula Paketi",
+    "en": "White Kula Pack"
+  },
+  {
+    "key": "GRABABLE_BUN_PACK",
+    "tr": "Ekmek Paketi",
+    "en": "Bun Pack"
+  },
+  {
+    "key": "GRABABLE_PATTY_PACK",
+    "tr": "Köfte Paketi",
+    "en": "Patty Pack"
+  },
+  {
+    "key": "GRABABLE_CHEESE_PACK",
+    "tr": "Peynir Paketi",
+    "en": "Cheese Pack"
+  },
+  {
+    "key": "GRABABLE_PICKLE_PACK",
+    "tr": "Turşu Paketi",
+    "en": "Pickle Pack"
+  },
+  {
+    "key": "GRABABLE_TOMATO_PACK",
+    "tr": "Domates Paketi",
+    "en": "Tomato Pack"
+  },
+  {
+    "key": "GRABABLE_ONION_PACK",
+    "tr": "Soğan Paketi",
+    "en": "Onion Pack"
+  },
+  {
+    "key": "GRABABLE_LETTUCE_PACK",
+    "tr": "Marul Paketi",
+    "en": "Lettuce Pack"
+  },
+  {
+    "key": "GRABABLE_BOTTOM_BUN_RAW",
+    "tr": "Alt Ekmek (Normal)",
+    "en": "Bottom Bun (Normal)"
+  },
+  {
+    "key": "GRABABLE_BOTTOM_BUN_COOKED",
+    "tr": "Alt Ekmek (Kızarmış)",
+    "en": "Bottom Bun (Toasted)"
+  },
+  {
+    "key": "GRABABLE_BOTTOM_BUN_BURNT",
+    "tr": "Alt Ekmek (Yanmış)",
+    "en": "Bottom Bun (Burnt)"
+  },
+  {
+    "key": "GRABABLE_TOP_BUN_RAW",
+    "tr": "Üst Ekmek (Normal)",
+    "en": "Top Bun (Normal)"
+  },
+  {
+    "key": "GRABABLE_TOP_BUN_COOKED",
+    "tr": "Üst Ekmek (Kızarmış)",
+    "en": "Top Bun (Toasted)"
+  },
+  {
+    "key": "GRABABLE_TOP_BUN_BURNT",
+    "tr": "Üst Ekmek (Yanmış)",
+    "en": "Top Bun (Burnt)"
+  },
+  {
+    "key": "GRABABLE_PATTY_RAW",
+    "tr": "Köfte (Çiğ)",
+    "en": "Patty (Raw)"
+  },
+  {
+    "key": "GRABABLE_PATTY_COOKED",
+    "tr": "Köfte (Pişmiş)",
+    "en": "Patty (Cooked)"
+  },
+  {
+    "key": "GRABABLE_PATTY_BURNT",
+    "tr": "Köfte (Yanmış)",
+    "en": "Patty (Burnt)"
+  },
+  {
+    "key": "GRABABLE_CHEESE_SLICE",
+    "tr": "Peynir Dilimi",
+    "en": "Cheese Slice"
+  },
+  {
+    "key": "GRABABLE_PICKLE_SLICE",
+    "tr": "Turşu Dilimi",
+    "en": "Pickle Slice"
+  },
+  {
+    "key": "GRABABLE_TOMATO_SLICE",
+    "tr": "Domates Dilimi",
+    "en": "Tomato Slice"
+  },
+  {
+    "key": "GRABABLE_ONION_SLICE",
+    "tr": "Soğan Dilimi",
+    "en": "Onion Slice"
+  },
+  {
+    "key": "GRABABLE_LETTUCE_SLICE",
+    "tr": "Marul Dilimi",
+    "en": "Lettuce Slice"
+  },
+  {
+    "key": "GRABABLE_KNIFE",
+    "tr": "Bıçak",
+    "en": "Knife"
+  },
+  {
+    "key": "GRABABLE_BLACK_POP",
+    "tr": "Siyah Kula",
+    "en": "Black Kula"
+  },
+  {
+    "key": "GRABABLE_YELLOW_POP",
+    "tr": "Sarı Kula",
+    "en": "Yellow Kula"
+  },
+  {
+    "key": "GRABABLE_WHITE_POP",
+    "tr": "Beyaz Kula",
+    "en": "White Kula"
+  },
+  {
+    "key": "GRABABLE_KETCHUP_BOTTLE",
+    "tr": "Ketçap Şişesi",
+    "en": "Ketchup Bottle"
+  },
+  {
+    "key": "GRABABLE_MAYONNAISE_BOTTLE",
+    "tr": "Mayonez Şişesi",
+    "en": "Mayo Bottle"
+  },
+  {
+    "key": "GRABABLE_MUSTARD_BOTTLE",
+    "tr": "Hardal Şişesi",
+    "en": "Mustard Bottle"
+  },
+  {
+    "key": "GRABABLE_BBQ_SAUCE_BOTTLE",
+    "tr": "Barbekü Sosu Şişesi",
+    "en": "BBQ Sauce Bottle"
+  },
+  {
+    "key": "GRABABLE_NOODLE",
+    "tr": "Zortdomie® Çabuk Noodle - Kanser Aromalı™",
+    "en": "Zortdomie® Instant Noodle - Cancer Flavored™"
+  },
+  {
+    "key": "GRABABLE_KETCHUP",
+    "tr": "Ketçap",
+    "en": "Ketchup"
+  },
+  {
+    "key": "GRABABLE_MAYONNAISE",
+    "tr": "Mayonez",
+    "en": "Mayo"
+  },
+  {
+    "key": "GRABABLE_MUSTARD",
+    "tr": "Hardal",
+    "en": "Mustard"
+  },
+  {
+    "key": "GRABABLE_BBQ",
+    "tr": "Barbekü Sosu",
+    "en": "BBQ Sauce"
+  },
+  {
+    "key": "BURGER_BOX",
+    "tr": "Burger Kutusu",
+    "en": "Burger Box"
+  },
+  {
+    "key": "BURGER_CLASSIC",
+    "tr": "Klasik Burger",
+    "en": "Classic Burger"
+  },
+  {
+    "key": "BURGER_CHEESE",
+    "tr": "Çizburger",
+    "en": "Cheeseburger"
+  },
+  {
+    "key": "BURGER_DOUBLE_CHEESE",
+    "tr": "Duble Çizburger",
+    "en": "Double Cheeseburger"
+  },
+  {
+    "key": "BURGER_FULLY_LOADED",
+    "tr": "Full Karışık Burger",
+    "en": "Fully Loaded Burger"
+  },
+  {
+    "key": "BURGER_BUDGET",
+    "tr": "Öğrenci Burger",
+    "en": "Budget Burger"
+  },
+  {
+    "key": "BURGER_BROKE_AHH",
+    "tr": "Fukara Burger",
+    "en": "Broke Ahh Burger"
+  },
+  {
+    "key": "BURGER_GOUT",
+    "tr": "Gut Burger",
+    "en": "Gout Burger"
+  },
+  {
+    "key": "BURGER_X",
+    "tr": "X Burger",
+    "en": "X Burger"
+  },
+  {
+    "key": "BURGER_LONG_AHH",
+    "tr": "Zurna Burger",
+    "en": "Long Ahh Burger"
+  },
+  {
+    "key": "BURGER_TOMATO_LOVER",
+    "tr": "Domates Sever Burger",
+    "en": "Tomato Lover Burger"
+  },
+  {
+    "key": "BURGER_BBQ",
+    "tr": "Barbekü Burger",
+    "en": "BBQ Burger"
+  },
+  {
+    "key": "BURGER_BASIC",
+    "tr": "Basit Burger",
+    "en": "Basic Burger"
+  },
+  {
+    "key": "BURGER_RANDOM_BULLSHIT",
+    "tr": "Saçma Sapan Bi Burger",
+    "en": "Random Bullshit Burger"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_BEFORE_ORDER_0",
+    "tr": "Kolay gelsin kral. Bi X Burger bi de Siyah Kula çek sana zahmet.",
+    "en": "Hey man, hope you're holding up. Lemme get an X Burger and a Black Kula, if you don't mind."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_BEFORE_ORDER_1",
+    "tr": "Hazırlıyorum hemen.",
+    "en": "Coming right up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_BEFORE_ORDER_2",
+    "tr": "Eyvallah usta. Bekliyorum.",
+    "en": "Appreciate it, man. I'll be right here."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_AFTER_ORDER_0",
+    "tr": "Bro bi Siyah Kula bi X Burger istediydik.",
+    "en": "Yo bro, I ordered a Black Kula and an X Burger, remember?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_AFTER_ORDER_1",
+    "tr": "Hazırlıyorum abi.",
+    "en": "I'm on it, man."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_FALSE_BURGER_0",
+    "tr": "Hocam ben X Burger istemiştim bi yanlışlık oldu sanırım.",
+    "en": "Hey buddy, I'd ordered an X Burger. Must've been a mix up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_FALSE_BURGER_1",
+    "tr": "Çok pardon abi. Hemen yenisini hazırlıyorum.",
+    "en": "My bad, man. I'll make a new one right away."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_FALSE_DRINK_0",
+    "tr": "Kuzen Siyah Kula değil bu.",
+    "en": "Buddy, this ain't a Black Kula."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_FALSE_DRINK_1",
+    "tr": "Pardon ya karıştırdım.",
+    "en": "Sorry, I mixed it up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_TRUE_BURGER_0",
+    "tr": "Eline sağlık kankam. Bi de içecek vardı.",
+    "en": "Appreciate it, my guy. And there was the drink too."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_TRUE_BURGER_1",
+    "tr": "Getiriyorum abi.",
+    "en": "On my way with it, sir."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_TRUE_DRINK_0",
+    "tr": "Eyvallah reis. Bi de burgeri verdin mi tamamız.",
+    "en": "Appreciate it, homie. Just need that burger and we're good."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_0_TRUE_DRINK_1",
+    "tr": "Hemen hazırlıyorum abi.",
+    "en": "Got you, man. Making it."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_BEFORE_ORDER_0",
+    "tr": "Ohooo adamım benim ya! Dünkü verdiğin burger varya efsoydu. Ondan yine almaya geldim.",
+    "en": "Ayy man, that burger yesterday was next level. Im here for another one."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_BEFORE_ORDER_1",
+    "tr": "Afiyet olsun abi. Hoşgeldin. Hangisiydi o? X Burger miydi?",
+    "en": "Glad you liked it, man. Welcome back. Which one was it? The X Burger?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_BEFORE_ORDER_2",
+    "tr": "Ayyyynen baboş ayyyynen. Bi de Sarı Kula yapıştır.",
+    "en": "Yup, exactly, man. And get me a Yellow Kula too."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_BEFORE_ORDER_3",
+    "tr": "Tamamdır abi. Hazırlayıp getiriyorum hemen.",
+    "en": "Got it, man. I'll get it ready right away."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_BEFORE_ORDER_4",
+    "tr": "Bekliyorum kardooo.",
+    "en": "I'll be waitin', brothaaa."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_AFTER_ORDER_0",
+    "tr": "Dostum bi X Burger bi Sarı Kula dedik ama avcumuzu yalattın bize.",
+    "en": "Buddy, I asked for an X Burger and a Yellow Kula, and you got me out here starving."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_AFTER_ORDER_1",
+    "tr": "Kusura bakma abi ya... Biraz uzun sürüyo da...",
+    "en": "Sorry bro... It's taking a bit."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_FALSE_BURGER_0",
+    "tr": "Oğlum... X Burger mi sence bu?",
+    "en": "My boy... You actually think this is an X Burger?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_FALSE_BURGER_1",
+    "tr": "Çok özür dilerim. Yeni bi tane yapıyorum hemen.",
+    "en": "Im sorry. I'll make a new one right now."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_FALSE_DRINK_0",
+    "tr": "Dayıoğlu Sarı Kula istedim ben.",
+    "en": "Bruh, I ordered a Yellow Kula."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_FALSE_DRINK_1",
+    "tr": "Kusura bakma abi kafam karıştı da.",
+    "en": "Sorry man, I was confused."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_TRUE_BURGER_0",
+    "tr": "Eline, koluna, yüreğine sağlık abim. Sarı Kula vardı bi de.",
+    "en": "Respect, my guy. There was a Yellow Kula as well."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_TRUE_BURGER_1",
+    "tr": "Hemen getiriyorum abi.",
+    "en": "Coming right up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_TRUE_DRINK_0",
+    "tr": "Sağolasın babacan. Bi de X Burger'i yapıştır da kaçayım ben.",
+    "en": "Thanks, big fella. Hit me with that X Burger too so I can leave."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER0_DAY_1_TRUE_DRINK_1",
+    "tr": "Tamamdır abi",
+    "en": "Got you, bro."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_BEFORE_ORDER_0",
+    "tr": "Hoşgeldiniz! Siparişinizi alabilir miyim?",
+    "en": "Welcome! May I take your order please?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_BEFORE_ORDER_1",
+    "tr": "Öğrenci Burger.",
+    "en": "Budget Burger."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_BEFORE_ORDER_2",
+    "tr": "Tamamdır. İçecek bir şey ister misiniz?",
+    "en": "Alright. Do you want anything to drink?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_BEFORE_ORDER_3",
+    "tr": "Beyaz Kula.",
+    "en": "White Kula."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_BEFORE_ORDER_4",
+    "tr": "Tamamdır. Hazırlayıp getiriyorum hemen.",
+    "en": "Got it. I'll bring it right away when its ready."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_AFTER_ORDER_0",
+    "tr": "Öğrenci Burger... Beyaz Kula... Öğrenci Burger... Beyaz Kula...",
+    "en": "Budget Burger... White Kula... Budget Burger... White Kula..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_AFTER_ORDER_1",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_BURGER_0",
+    "tr": "Öğrenci Burger değil bu.",
+    "en": "This is not the Budget Burger!"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_BURGER_1",
+    "tr": "Çok pardon yanlışlık olmuş.",
+    "en": "Im really sorry its been a mix up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_BURGER_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_BURGER_3",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_DRINK_0",
+    "tr": "Beyaz Kula istedim ben.",
+    "en": "I wanted a White Kula."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_DRINK_1",
+    "tr": "Pardon.",
+    "en": "Sorry."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_DRINK_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_FALSE_DRINK_3",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_TRUE_BURGER_0",
+    "tr": "Ooh mis gibi Öğrenci Burger. Bi de Beyaz Kula vardı.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_TRUE_BURGER_1",
+    "tr": "Getiriyorum.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_TRUE_DRINK_0",
+    "tr": "Sağolasın. Öğrenci Burger nerde Öğrenci Burger?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER1_DAY_0_TRUE_DRINK_1",
+    "tr": "Hazırlıyorum abi.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_BEFORE_ORDER_0",
+    "tr": "Hoşgeldiniz! Buyrun siparişinizi alayım.",
+    "en": "Welcome! May I take your order?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_BEFORE_ORDER_1",
+    "tr": "Öğrenci Burger.",
+    "en": "Budget Burger."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_BEFORE_ORDER_2",
+    "tr": "Tamamdır. İçecek bir şey ister misiniz?",
+    "en": "Alright. Do you want anything to drink?"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_BEFORE_ORDER_3",
+    "tr": "Beyaz Kula.",
+    "en": "White Kula."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_BEFORE_ORDER_4",
+    "tr": "Tamamdır. Hazırlayıp getiriyorum hemen.",
+    "en": "Got it. I'll bring it right away when its ready."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_AFTER_ORDER_0",
+    "tr": "Öğrenci Burger... Beyaz Kula... Öğrenci Burger... Beyaz Kula...",
+    "en": "Budget Burger... White Kula... Budget Burger... White Kula..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_AFTER_ORDER_1",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_BURGER_0",
+    "tr": "Öğrenci Burger değil bu.",
+    "en": "This isnt the budget burger."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_BURGER_1",
+    "tr": "Çok pardon yanlışlık olmuş.",
+    "en": "Im really sorry its been a mix up."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_BURGER_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_BURGER_3",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_DRINK_0",
+    "tr": "Beyaz Kula istedim ben.",
+    "en": "I wanted White Kula"
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_DRINK_1",
+    "tr": "Pardon.",
+    "en": "Sorry."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_DRINK_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_FALSE_DRINK_3",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_TRUE_BURGER_0",
+    "tr": "Ooh mis gibi Öğrenci Burger. Bi de Beyaz Kula vardı.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_TRUE_BURGER_1",
+    "tr": "Getiriyorum.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_TRUE_DRINK_0",
+    "tr": "Sağolasın. Bi de Öğrenci Burger vardı.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_NPCCUSTOMER3_DAY_0_TRUE_DRINK_1",
+    "tr": "Hazırlıyorum abi.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_0",
+    "tr": "Buyrun, hoşgeldiniz. Siparişinizi alay-",
+    "en": "Hi, welcome. What can I get for yo-"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_1",
+    "tr": "TURŞU!",
+    "en": "PICKLE!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_3",
+    "tr": "N-ne?",
+    "en": "...Huh?"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_4",
+    "tr": "TURŞU... TURŞU!",
+    "en": "PICKLE... PICKLE!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_5",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_6",
+    "tr": "TURŞU!",
+    "en": "PICKLE!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_BEFORE_ORDER_7",
+    "tr": "Tamam anladık ya turşu!",
+    "en": "Alright, PICKLE, I get it!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_SELF_TALK_0",
+    "tr": "Ne diyo bu ya?",
+    "en": "What is she even saying?"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_SELF_TALK_1",
+    "tr": "Turşu istiyo... Galiba.",
+    "en": "She... wants a pickle? I think?"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_0",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_1",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_2",
+    "tr": "TURŞU! TURŞU!",
+    "en": "PICKLE! PICKLE!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_AFTER_ORDER_3",
+    "tr": "He he turşu.",
+    "en": "Yeah yeah pickle."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_FALSE_BURGER_0",
+    "tr": "Turşu...",
+    "en": "Pickle..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_FALSE_BURGER_1",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_FALSE_DRINK_0",
+    "tr": "TURŞUTURŞUTURŞUTURŞUTURŞUTURŞUTURŞUTUR-",
+    "en": "PICKLEPICKLEPICKLEPICKLEPICKLEPICKLEPI-"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_FALSE_DRINK_1",
+    "tr": "Hay turşu kadar kafana taş düşsün e mi ablacım!",
+    "en": "May a giant PICKLE fall on your head lady!"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_TRUE_BURGER_0",
+    "tr": "<shake> T U R Ş U </shake>",
+    "en": "<shake> P I C K L E </shake>"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_TRUE_BURGER_1",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_TRUE_BURGER_SELF_TALK_0",
+    "tr": "Nere gidiyon paras-",
+    "en": "Where are you going you didnt pa-"
+  },
+  {
+    "key": "CUSTOMER_SUKRAN_DAY_0_TRUE_BURGER_SELF_TALK_1",
+    "tr": "Amaan neyse. Bi turşu alt tarafı.",
+    "en": "You know what... Whatever it just a pickle."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_0",
+    "tr": "Golay gelsin yeenim.",
+    "en": "Smells so good son."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_1",
+    "tr": "Sağolasın amcacım! Buyur hoşgeldin.",
+    "en": "Thank you sir! Welcome."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_2",
+    "tr": "Oğlum burayı çok övdü yauv. Ben de dedim ki geliyim bi deniyim hıh hıh hıh.",
+    "en": "My son said this place has very good burgers thays why Im here."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_3",
+    "tr": "İyi yapmışsın amcacım iyi. Ne vereyim peki ne istersin?",
+    "en": "Im glad you are here sir. So what can I get you?"
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_4",
+    "tr": "Ben hiç bilmiyom ki burdaki şeyleri yeenim. Normal bi şey ver böyle genç işi olmasın yauv.",
+    "en": "I dont know any of these son. Just give me something normal not like gen z burgers."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_5",
+    "tr": "Hmm...",
+    "en": "Hmm..."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_6",
+    "tr": "Klasik Burger vereyim amca sana o zaman.",
+    "en": "I'll give you a Classic Burger then."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_7",
+    "tr": "Ne goyyonuz onun içine dorunum?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_8",
+    "tr": "Köfte, soğan, marul, domate-",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_9",
+    "tr": "Hee bizim göfde egmeg gibi aynı. Ver ondan ver öyleyince.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_10",
+    "tr": "Tamamdır amcacım! İçecek ne vereyim ne istersin?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_11",
+    "tr": "Sarı Gulan var mı Sarı Gulan?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_12",
+    "tr": "Var var olmaz olur mu!",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_13",
+    "tr": "Sarı Gula ver öyleyince.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_BEFORE_ORDER_14",
+    "tr": "Tamamdır amcacım! Sen bekleyiver ben hemen hazırlayıp getiriyorum!",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_AFTER_ORDER_0",
+    "tr": "Dorunum bana bidene Sarı Gulaynan Glasik Göfde mi ne vereceğdin noldu o iş?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_AFTER_ORDER_1",
+    "tr": "Hazırlıyorum amcacım getiricem birazdan.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_FALSE_BURGER_0",
+    "tr": "Yeenim bunun Glasik Göfde olduğuna emin misin yauv?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_FALSE_BURGER_1",
+    "tr": "Pardon amcacım yanlışlık olmuş. Yenisini hazırlıyorum hemen.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_BURGER_0",
+    "tr": "Sağolasın dorunum eline goluna sağlık. Bide Sarı Gula mı ne vereceğdin.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_BURGER_1",
+    "tr": "Getiriyorum amcacım.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_0",
+    "tr": "Ben bu Sarı Gula'yı çok seviyom yav. Çocukken yediğim portugallara benziyo dadı.",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_1",
+    "tr": "Şimdi nerde öyle portakallar, hepsi hormonlu tatsız tutsuz. Di mi amca?",
+    "en": ""
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_2",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_3",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_4",
+    "tr": "...",
+    "en": "..."
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_5",
+    "tr": "Amca?",
+    "en": "Sir?"
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_6",
+    "tr": "Ha ney? Kim?",
+    "en": "Huh what? Who?"
+  },
+  {
+    "key": "CUSTOMER_HIKMET_DAY_0_TRUE_DRINK_7",
+    "tr": "Diyorum ki şimdiki portak- Amaan getiriyorum hemen içeceğini.",
+    "en": "Im saying oranges are bad these da- Ugh whatever you will have your drink in a sec."
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_O",
+    "tr": "Bu tarafta işim yok.",
+    "en": "Nothing for me that way."
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_1",
+    "tr": "Nere gidiyorum yav?",
+    "en": "Where am I  going?"
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_2",
+    "tr": "Çok uzaklaşmasam iyi olur.",
+    "en": "Better not go too far away."
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_3",
+    "tr": "Dalmışım gidiyorum ya...",
+    "en": "Im sleepy."
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_4",
+    "tr": "Geri al... Geri al...",
+    "en": "Undo... Undo..."
+  },
+  {
+    "key": "SELF_TALK_WORLD_LIMIT_5",
+    "tr": "Uzaklaşma! Yabancı semtteyiz.",
+    "en": "Dont go too far we dont know this neighbourhood."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_CLASSIC",
+    "tr": "Alt Ekmek x1\nKöfte x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\nKetçap\nMayonez",
+    "en": "Bottom Bun x1\nPatty x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\nKetchup\nMayo"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_CHEESE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nTurşu Dilimi x1\nÜst Ekmek x1\nKetçap\nHardal",
+    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nPickle Slice x1\nTop Bun x1\nKetchup\nMustard"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_DOUBLE_CHEESE",
+    "tr": "Alt Ekmek x1\nKöfte x2\nPeynir Dilimi x2\nTurşu Dilimi x2\nÜst Ekmek x1\nKetçap\nHardal",
+    "en": "Bottom Bun x1\nPatty x2\nCheese Slice x2\nPickle Slice x2\nTop Bun x1\nKetchup\nMustard"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_FULLY_LOADED",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\nKetçap\nMayonez\nHardal\nBarbekü Sosu",
+    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\nKetchup\nMayo\nMustard\nBBQ Sauce"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_BUDGET",
+    "tr": "Alt Ekmek x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\nKetçap\nMayonez",
+    "en": "Bottom Bun x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\nKetchup\nMayo"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_BROKE_AHH",
+    "tr": "Alt Ekmek x1\nÜst Ekmek x1",
+    "en": "Bottom Bun x1\nTop Bun x1"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_GOUT",
+    "tr": "Alt Ekmek x1\nKöfte x5\nÜst Ekmek x1",
+    "en": "Bottom Bun x1\nPatty x5\nTop Bun x1"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_X",
+    "tr": "Alt Ekmek x2\nKöfte x2\nPeynir Dilimi x2\nMarul Dilimi x2\nSoğan Dilimi x2\nTurşu Dilimi x2\nÜst Ekmek x1\nMayonez\nHardal",
+    "en": "Bottom Bun x2\nPatty x2\nCheese Slice x2\nLettuce Slice x2\nOnion Slice x2\nPickle Slice x2\nTop Bun x1\nMayo\nMustard"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_LONG_AHH",
+    "tr": "Alt Ekmek x1\nKöfte x3\nPeynir Dilimi x3\nMarul Dilimi x3\nÜst Ekmek x1\nKetçap\nMayonez\nHardal",
+    "en": "Bottom Bun x1\nPatty x3\nCheese Slice x3\nLettuce Slice x3\nTop Bun x1\nKetchup\nMayo\nMustard"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_TOMATO_LOVER",
+    "tr": "Alt Ekmek x1\nKöfte x1\nDomates Dilimi x4\nÜst Ekmek x1\nKetçap",
+    "en": "Bottom Bun x1\nPatty x1\nTomato Slice x4\nTop Bun x1\nKetchup"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_BBQ",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nSoğan Dilimi x1\nÜst Ekmek x1\nMayonez\nBarbekü Sosu",
+    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nOnion Slice x1\nTop Bun x1\nMayo\nBBQ Sauce"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_INGREDIENTS_BASIC",
+    "tr": "Alt Ekmek x1\nKöfte x1\nÜst Ekmek x1\nKetçap",
+    "en": "Bottom Bun x1\nPatty x1\nTop Bun x1\nKetchup"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_CLASSIC",
+    "tr": "Macera aramayanların klasik lezzeti...",
+    "en": "For those who like to play it safe..."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_CHEESE",
+    "tr": "\"Peynirsiz yapamam.\" diyenlere...",
+    "en": "For those who say, \"I can't live without cheese.\""
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_DOUBLE_CHEESE",
+    "tr": "\"Asıl ben peynirsiz yapamam.\" diyenlere...",
+    "en": "For those who say, \"No, seriously, I can not live without cheese.\""
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_FULLY_LOADED",
+    "tr": "Her şey... HER ŞEY.",
+    "en": "Everything... LITERALLY EVERYTHING."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_BUDGET",
+    "tr": "\"Hem burgerimi yiyorum hem de param cebimde kalıyor. Et mi? O da ne?\"",
+    "en": "\"Full stomach, full wallet. Meat? Never heard of her.\""
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_BROKE_AHH",
+    "tr": "\"Ekmek zeki toplumların temel gıda maddesidir.\" -fukaraburgerfan34",
+    "en": "\"Bread is the fuel of high-IQ societies.\" -brokeahhburgerfan67"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_GOUT",
+    "tr": "Ekmek arası bütün dana.",
+    "en": "A whole cow between two buns."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_X",
+    "tr": "Ağzının tadını bilenlere...",
+    "en": "For those with refined taste..."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_LONG_AHH",
+    "tr": "Dönerden bıkan, zurnadan ise bıkamayanların favorisi...",
+    "en": "For those who believe length matters..."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_TOMATO_LOVER",
+    "tr": "\"Keşke domates olarak doğsaydım.\"",
+    "en": "\"I wish I was born as a tomato.\""
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_BBQ",
+    "tr": "Gerçek gurmelerin seçimi...",
+    "en": "The choice of true gourmets..."
+  },
+  {
+    "key": "UI_MONITOR_BURGER_DESCRIPTION_BASIC",
+    "tr": "Durumu \"Merhaba! Ben VırtApp kullanıyorum.\" olanların tek tercihi...",
+    "en": "The #1 choice for people whose status is \"Hey there! I am using VirtApp\""
+  },
+  {
+    "key": "UI_MAIN_MENU_CONTINUE",
+    "tr": "Devam Et",
+    "en": "Continue"
+  },
+  {
+    "key": "UI_MAIN_MENU_NEW_GAME",
+    "tr": "Yeni Oyun",
+    "en": "New Game"
+  },
+  {
+    "key": "UI_MAIN_MENU_SETTINGS",
+    "tr": "Ayarlar",
+    "en": "Settings"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUIT",
+    "tr": "Çıkış",
+    "en": "Quit"
+  },
+  {
+    "key": "UI_MAIN_MENU_RESOLUTION",
+    "tr": "Çözünürlük",
+    "en": "Resolution"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUALITY",
+    "tr": "Kalite",
+    "en": "Quality"
+  },
+  {
+    "key": "UI_MAIN_MENU_LANGUAGE",
+    "tr": "Dil",
+    "en": "Language"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUALITY_0",
+    "tr": "Tost Makinesi",
+    "en": "Toast Machine"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUALITY_1",
+    "tr": "Düşük",
+    "en": "Low"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUALITY_2",
+    "tr": "Orta",
+    "en": "Medium"
+  },
+  {
+    "key": "UI_MAIN_MENU_QUALITY_3",
+    "tr": "Yüksek",
+    "en": "High"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_MASTER",
+    "tr": "Ana Ses",
+    "en": "Master Volume"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_SOUND_FX",
+    "tr": "Ses Efektleri",
+    "en": "Sound FX"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_MUSIC",
+    "tr": "Müzik",
+    "en": "Music"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_AMBIANCE",
+    "tr": "Atmosfer",
+    "en": "Ambience"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_TYPEWRITER",
+    "tr": "Yazı Sesi",
+    "en": "Text Sound"
+  },
+  {
+    "key": "UI_MAIN_MENU_AUDIO_UI",
+    "tr": "Arayüz",
+    "en": "Interface"
+  },
+  {
+    "key": "UI_OKAY",
+    "tr": "Tamam",
+    "en": "Okay"
+  }
+]
+
+}

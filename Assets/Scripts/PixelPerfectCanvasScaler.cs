@@ -53,8 +53,6 @@ public class PixelPerfectCanvasScaler : MonoBehaviour
     public void UpdateScale()
     {
         if (_canvasScaler == null) return;
-
-        // Ekran boyutu 0 gelirse (Unity bazen ilk karede yapar) patlamasýn
         if (Screen.height == 0) return;
 
         float screenHeight = Screen.height;
@@ -62,10 +60,29 @@ public class PixelPerfectCanvasScaler : MonoBehaviour
 
         if (onlyIntegerScale)
         {
-            int integerScale = Mathf.FloorToInt(screenHeight / referenceHeight);
-            if (integerScale < 1) integerScale = 1;
+            // 1. Önce normal tam sayý katýný bul (Örn: 1080 / 360 = 3)
+            int rawScale = Mathf.FloorToInt(screenHeight / referenceHeight);
+            if (rawScale < 1) rawScale = 1;
 
-            scaleFactor = integerScale;
+            // 2. SADECE 2'NÝN KUVVETLERÝ (1, 2, 4, 8, 16...)
+            // Mantýk: rawScale'den küçük veya eþit olan en büyük 2'nin kuvvetini bul.
+
+            // Eðer 3 geldiyse -> 2 olsun.
+            // Eðer 5 geldiyse -> 4 olsun.
+            // Eðer 7 geldiyse -> 4 olsun.
+            // Eðer 8 geldiyse -> 8 olsun.
+
+            // Matematiksel hile: Logaritma 2 tabanýnda alýp aþaðý yuvarla, sonra 2 üzeri yap.
+            // Örnek: 3 için -> Log2(3) = 1.58 -> Floor = 1 -> 2^1 = 2.
+            // Örnek: 5 için -> Log2(5) = 2.32 -> Floor = 2 -> 2^2 = 4.
+
+            int powerOfTwoExponent = Mathf.FloorToInt(Mathf.Log(rawScale, 2));
+            int powerOfTwoScale = (int)Mathf.Pow(2, powerOfTwoExponent);
+
+            // Güvenlik: 1'in altýna düþmesin
+            if (powerOfTwoScale < 1) powerOfTwoScale = 1;
+
+            scaleFactor = powerOfTwoScale;
         }
         else
         {

@@ -262,34 +262,46 @@ public class SoundManager : MonoBehaviour
         cookingSoundCoroutine = StartCoroutine(LerpGrillSoundToTarget());
     }
 
-    public void SetMasterVolume (float value)
+    public void SetMasterVolume(float value)
     {
-        audioMixer.SetFloat("MasterVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("MasterVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     public void SetSoundFXVolume(float value)
     {
-        audioMixer.SetFloat("SoundFXVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("SoundFXVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     public void SetMusicVolume(float value)
     {
-        audioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("MusicVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     public void SetAmbianceVolume(float value)
     {
-        audioMixer.SetFloat("AmbianceVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("AmbianceVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     public void SetTypewriterVolume(float value)
     {
-        audioMixer.SetFloat("TypewriterVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("TypewriterVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     public void SetUIVolume(float value)
     {
-        audioMixer.SetFloat("UIVolume", Mathf.Log10(value) * 20f);
+        // 0 gelirse 0.0001 yap ki logaritma patlamasýn
+        float safeValue = Mathf.Clamp(value, 0.0001f, 1f);
+        audioMixer.SetFloat("UIVolume", Mathf.Log10(safeValue) * 20f);
     }
 
     private void HandleBirdChirping()

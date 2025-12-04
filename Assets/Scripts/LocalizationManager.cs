@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System; // Action için gerekli
 
 public class LocalizationManager : MonoBehaviour
 {
@@ -7,29 +8,79 @@ public class LocalizationManager : MonoBehaviour
 
     public enum GameLanguage
     {
+        English,
         Turkish,
-        English
     }
 
     [Header("Language Settings")]
-    public GameLanguage currentLanguage = GameLanguage.Turkish;
-    public TextAsset localizationJSON; // JSON dosyasýný buraya sürükleyeceðiz
+    public GameLanguage currentLanguage = GameLanguage.English;
+    public TextAsset localizationJSON;
 
     private Dictionary<string, string> _localizedTexts;
 
+    // --- YENÝ: DÝL DEÐÝÞTÝ EVENTÝ ---
+    // Diðer scriptler buna abone olacak. Dil deðiþince hepsine "Güncellen!" diye baðýracaðýz.
+    public event Action OnLanguageChanged;
+
     private void Awake()
     {
-        // singleton
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Önce kayýtlý dili yükle (PlayerPrefs)
+            LoadSavedLanguage();
+
             LoadLocalization();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    // --- YENÝ: DÝL DEÐÝÞTÝRME FONKSÝYONU (ENUM ÝLE) ---
+    public void ChangeLanguage(GameLanguage newLang)
+    {
+        if (currentLanguage == newLang) return;
+
+        currentLanguage = newLang;
+
+        // 1. Sözlüðü yeni dile göre tekrar doldur
+        LoadLocalization();
+
+        // 2. Sisteme haber ver (Event Fýrlat)
+        OnLanguageChanged?.Invoke();
+
+        // 3. Kaydet (Bir sonraki açýlýþta hatýrlasýn)
+        string langCode = (newLang == GameLanguage.Turkish) ? "tr" : "en";
+        PlayerPrefs.SetString("Language", langCode);
+        PlayerPrefs.Save();
+    }
+
+    // --- YENÝ: DÝL DEÐÝÞTÝRME FONKSÝYONU (STRING ÝLE - Settings.cs ÝÇÝN) ---
+    public void ChangeLanguage(string langCode)
+    {
+        switch (langCode)
+        {
+            case "tr":
+                ChangeLanguage(GameLanguage.Turkish);
+                break;
+            case "en":
+                ChangeLanguage(GameLanguage.English);
+                break;
+            default:
+                Debug.LogWarning("Bilinmeyen dil kodu: " + langCode);
+                break;
+        }
+    }
+
+    private void LoadSavedLanguage()
+    {
+        string savedLang = PlayerPrefs.GetString("Language", "tr");
+        if (savedLang == "en") currentLanguage = GameLanguage.English;
+        else currentLanguage = GameLanguage.Turkish;
     }
 
     private void LoadLocalization()
@@ -42,7 +93,6 @@ public class LocalizationManager : MonoBehaviour
             return;
         }
 
-        // JSON'u C# sýnýfýna çevir
         LocalizationData data = JsonUtility.FromJson<LocalizationData>(localizationJSON.text);
 
         if (data == null || data.entries == null)
@@ -51,7 +101,6 @@ public class LocalizationManager : MonoBehaviour
             return;
         }
 
-        // Her entry için diline göre deðeri sözlüðe koy
         foreach (var entry in data.entries)
         {
             string value;
@@ -73,29 +122,18 @@ public class LocalizationManager : MonoBehaviour
             {
                 _localizedTexts.Add(entry.key, value);
             }
-            else
-            {
-                Debug.LogWarning("Ayný key iki kez tanýmlanmýþ: " + entry.key);
-            }
         }
-
-        Debug.Log("Localization yüklendi. Toplam key: " + _localizedTexts.Count);
     }
 
     public string GetText(string key)
     {
-        if (_localizedTexts == null)
-        {
-            Debug.LogWarning("Localization henüz yüklenmemiþ, key: " + key);
-            return key;
-        }
+        if (_localizedTexts == null) return key;
 
         if (_localizedTexts.TryGetValue(key, out string value))
         {
             return value;
         }
 
-        Debug.LogWarning("Localization key bulunamadý: " + key);
-        return key; // fallback olarak key'i döndürüyoruz
+        return key;
     }
 }
