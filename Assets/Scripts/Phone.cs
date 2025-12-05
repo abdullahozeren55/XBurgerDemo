@@ -163,7 +163,7 @@ public class Phone : MonoBehaviour, IGrabable
         PlayerManager.Instance.SetPlayerUseHandLerp(usePositionOffset, useRotationOffset, timeToUse);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
-        PlayerManager.Instance.SetPlayerBasicMovements(false);
+        PlayerManager.Instance.SetPlayerMovementsForPhone(false);
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.PhoneLook);
 
@@ -177,7 +177,7 @@ public class Phone : MonoBehaviour, IGrabable
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.FirstPerson);
 
-        PlayerManager.Instance.SetPlayerBasicMovements(true);
+        PlayerManager.Instance.SetPlayerMovementsForPhone(true);
     }
 
     public void OutlineChangeCheck()

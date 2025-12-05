@@ -136,9 +136,8 @@ public class FirstPersonController : MonoBehaviour
     [Header("Grab Parameters")]
     [SerializeField] private LayerMask grabableLayers;
     [SerializeField] private LayerMask throwRaycastLayers;
-    [SerializeField] private TMP_Text crosshairText;
-    [SerializeField] private float grabCrosshairSize = 32;
-    [SerializeField] private Vector2 grabCrosshairPosition;
+    [SerializeField] private UnityEngine.UI.Image crosshair;
+    [SerializeField] private Vector2 grabCrosshairSize = new Vector2(4f, 4f);
     [SerializeField] private Color grabCrosshairColor;
     [SerializeField] private Color useCrosshairColor;
     [SerializeField] private float maxThrowForce = 1.3f;
@@ -148,8 +147,7 @@ public class FirstPersonController : MonoBehaviour
     public bool isUsingGrabbedItem = false;
     private float throwChargeTimer = 0f;
     private float currentThrowForce = 0f;
-    private float defaultCrosshairSize;
-    private Vector2 defaultCrosshairPosition;
+    private Vector2 defaultCrosshairSize;
     private Color defaultCrosshairColor;
     private IGrabable currentGrabable;
     private IGrabable otherGrabable;
@@ -215,12 +213,13 @@ public class FirstPersonController : MonoBehaviour
     private float coyoteTimeForPhone;
 
     [Header("UI Settings")]
-    [SerializeField] private GameObject interactUI;
-    [SerializeField] private GameObject interact2UI;
     [SerializeField] private GameObject useUI;
-    [SerializeField] private GameObject grabUI;
-    [SerializeField] private GameObject dropThrowUI;
-    [SerializeField] private GameObject interactUseUI;
+    [SerializeField] private GameObject takeUI;
+    [SerializeField] private GameObject interactUI; 
+    [SerializeField] private GameObject dropUI;
+    [SerializeField] private GameObject throwUI;
+    [SerializeField] private GameObject useTakeInteractParent;
+    [SerializeField] private GameObject throwDropParent;
 
     [Header("Audio Settings")]
     [SerializeField] private AudioClip throwSound;
@@ -250,9 +249,8 @@ public class FirstPersonController : MonoBehaviour
 
         phoneGrabable = phoneGO.GetComponent<IGrabable>();
 
-        defaultCrosshairSize = crosshairText.fontSize;
-        defaultCrosshairPosition = crosshairText.rectTransform.localPosition;
-        defaultCrosshairColor = crosshairText.color;
+        defaultCrosshairSize = crosshair.rectTransform.sizeDelta;
+        defaultCrosshairColor = crosshair.color;
 
         canUsePhone = true;
 
@@ -260,7 +258,7 @@ public class FirstPersonController : MonoBehaviour
 
         InteractKeyIsDone = false;
 
-        DecideFocusText();
+        DecideOutlineAndCrosshair();
     }
 
     void Start()
@@ -644,11 +642,11 @@ public class FirstPersonController : MonoBehaviour
     {
         if (currentInteractable != null || (currentGrabable != null && (!currentGrabable.IsGrabbed || otherGrabable != null)))
         {
-            ChangeCrosshairSize(grabCrosshairSize, grabCrosshairPosition);
+            ChangeCrosshairSize(grabCrosshairSize);
         }
         else
         {
-            ChangeCrosshairSize(defaultCrosshairSize, defaultCrosshairPosition);
+            ChangeCrosshairSize(defaultCrosshairSize);
         }
     }
 
@@ -659,7 +657,7 @@ public class FirstPersonController : MonoBehaviour
         {
             string localizedText = LocalizationManager.Instance.GetText(currentInteractable.FocusTextKey);
 
-            focusText.color = crosshairText.color;
+            focusText.color = crosshair.color;
             focusTextAnim.StopDisappearingText();
 
             if (focusText.text != localizedText)
@@ -677,7 +675,7 @@ public class FirstPersonController : MonoBehaviour
         {
             string localizedText = LocalizationManager.Instance.GetText(currentGrabable.FocusTextKey);
 
-            focusText.color = crosshairText.color;
+            focusText.color = crosshair.color;
             focusTextAnim.StopDisappearingText();
 
             if (focusText.text != localizedText)
@@ -695,7 +693,7 @@ public class FirstPersonController : MonoBehaviour
         {
             string localizedText = LocalizationManager.Instance.GetText(otherGrabable.FocusTextKey);
 
-            focusText.color = crosshairText.color;
+            focusText.color = crosshair.color;
             focusTextAnim.StopDisappearingText();
 
             if (focusText.text != localizedText)
@@ -719,24 +717,88 @@ public class FirstPersonController : MonoBehaviour
 
     public void DecideUIText()
     {
-        if (isUsingGrabbedItem)
+        // --- 1. DURUM ANALÝZÝ ---
+        bool isHandBusy = isUsingGrabbedItem;
+
+        // Elimde bir þey var mý?
+        bool isHoldingItem = currentGrabable != null && currentGrabable.IsGrabbed;
+
+        // Bir Interactable'a bakýyor muyum?
+        bool isLookingAtInteractable = currentInteractable != null;
+
+        // Yerdeki bir Grabable'a bakýyor muyum?
+        bool isLookingAtGrabbable = currentGrabable != null && !currentGrabable.IsGrabbed;
+
+
+        // --- 2. ACÝL DURUM ---
+        if (isHandBusy)
         {
-            if (interactUI != null) interactUI.SetActive(false);
-            if (interact2UI != null) interact2UI.SetActive(false);
-            if (useUI != null) useUI.SetActive(false);
-            if (grabUI != null) grabUI.SetActive(false);
-            if (dropThrowUI != null) dropThrowUI.SetActive(false);
-            if (interactUseUI != null) interactUseUI.SetActive(false);
+            SetAllPrompts(false);
+            return;
         }
-        else
+
+        bool showInteract = false;
+
+        if (isLookingAtInteractable)
         {
-            if (interactUI != null) interactUI.SetActive(currentInteractable != null && (currentGrabable == null || !currentGrabable.IsGrabbed));
-            if (interact2UI != null) interact2UI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && !currentGrabable.IsUseable);
-            if (useUI != null) useUI.SetActive((currentInteractable == null || currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab) && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
-            if (grabUI != null) grabUI.SetActive(currentInteractable == null && currentGrabable != null && !currentGrabable.IsGrabbed);
-            if (dropThrowUI != null) dropThrowUI.SetActive(currentGrabable != null && currentGrabable.IsGrabbed);
-            if (interactUseUI != null) interactUseUI.SetActive(currentInteractable != null && currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab && currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable);
+            // Senaryo A: Elim boþ.
+            // Býçaklýða da baksam, ýþýða da baksam etkileþime girebilirim.
+            if (!isHoldingItem)
+            {
+                showInteract = true;
+            }
+            // Senaryo B: Elim dolu.
+            // Sadece "Eþya Vermeyen" (Yani tipi SingleHandGrab OLMAYAN) þeylerle etkileþime girebilirim.
+            // Örn: Iþýk düðmesi, Kapý kolu.
+            else if (currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab)
+            {
+                showInteract = true;
+            }
+            // Senaryo C: Elim dolu ve Býçaklýða bakýyorum.
+            // showInteract = false kalýr. Çünkü elimdekini býrakmadan býçak alamam.
         }
+
+
+        // --- DÝÐERLERÝ AYNI ---
+        bool showTake = isLookingAtGrabbable && !isHoldingItem;
+        bool showUse = isHoldingItem && currentGrabable.IsUseable;
+        bool showDrop = isHoldingItem;
+        bool showThrow = isHoldingItem;
+
+
+        // --- 4. UYGULAMA ---
+        if (interactUI) interactUI.SetActive(showInteract);
+        if (takeUI) takeUI.SetActive(showTake);
+        if (useUI) useUI.SetActive(showUse);
+        if (dropUI) dropUI.SetActive(showDrop);
+        if (throwUI) throwUI.SetActive(showThrow);
+
+        // --- 5. PARENT YÖNETÝMÝ ---
+        if (useTakeInteractParent != null)
+        {
+            bool parentActive = showUse || showTake || showInteract;
+            useTakeInteractParent.SetActive(parentActive);
+        }
+
+        if (throwDropParent != null)
+        {
+            bool parentActive = showDrop || showThrow;
+            throwDropParent.SetActive(parentActive);
+        }
+    }
+
+    // Yardýmcý fonksiyonu da güncelle ki hepsini kapatsýn
+    private void SetAllPrompts(bool isActive)
+    {
+        if (interactUI) interactUI.SetActive(isActive);
+        if (takeUI) takeUI.SetActive(isActive);
+        if (useUI) useUI.SetActive(isActive);
+        if (dropUI) dropUI.SetActive(isActive);
+        if (throwUI) throwUI.SetActive(isActive);
+
+        // Parentlarý da kapat
+        if (useTakeInteractParent) useTakeInteractParent.SetActive(isActive);
+        if (throwDropParent) throwDropParent.SetActive(isActive);
     }
 
     private void DecideOutlineAndCrosshair()
@@ -1379,13 +1441,12 @@ public class FirstPersonController : MonoBehaviour
         characterController.Move(moveDirection * Time.deltaTime);
     }
 
-    private void ChangeCrosshairSize(float size, Vector2 pos)
+    private void ChangeCrosshairSize(Vector2 size)
     {
-        crosshairText.fontSize = size;
-        crosshairText.rectTransform.anchoredPosition = pos;
+        crosshair.rectTransform.sizeDelta = size;
     }
 
-    private void ChangeCrosshairColor(Color color) => crosshairText.color = color;
+    private void ChangeCrosshairColor(Color color) => crosshair.color = color;
 
     private int GetSubMeshIndex(Mesh mesh, int triangleIndex)
     {

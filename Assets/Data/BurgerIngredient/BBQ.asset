@@ -31,7 +31,7 @@ MonoBehaviour:
   grabLocalPositionOffset: {x: 0.00010675803, y: 0.0006777254, z: 0.00015923989}
   grabLocalRotationOffset: {x: 306.82666, y: 186.3378, z: 188.63396}
   focusTextKeys:
-  - GRABABLE_LETTUCE_SLICE
+  - GRABABLE_BBQ
   dropParticles:
   - {fileID: 8670732574423207768, guid: 8d640f7fd53bcc8458929bebc846745f, type: 3}
   throwParticles:
