@@ -16,8 +16,8 @@ MonoBehaviour:
   drinkType: 2
   handGrabType: 1
   isUseable: 0
-  grabPositionOffset: {x: 0.0007808562, y: 0.00027466269, z: 0.00023974007}
-  grabRotationOffset: {x: 65.7607, y: 191.15587, z: 280.815}
+  grabPositionOffset: {x: -0.0008891219, y: 0.0004122476, z: 0.00028091593}
+  grabRotationOffset: {x: 294.2245, y: 11.175789, z: 259.16498}
   audioClips:
   - {fileID: 8300000, guid: ae7df4ee2fc19fd4a89c3bfb6446b5b1, type: 3}
   - {fileID: 8300000, guid: 5a5f45b1083b46441aa9b227335ba150, type: 3}
