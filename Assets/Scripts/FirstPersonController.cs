@@ -1424,24 +1424,25 @@ public class FirstPersonController : MonoBehaviour
 
         if (footstepTimer <= 0f)
         {
-            // Mesafeyi biraz arttýrdým, yokuþ aþaðý inerken raycast boþa düþmesin
-            FindCurrentGroundMaterial(2.5f);
+            FindCurrentGroundMaterial(1.9f);
 
-            if (currentGroundMaterial != null)
+            if(currentGroundMaterial != null)
             {
-                // Contains yerine StringComparison kullanarak azýcýk daha optimize edelim
-                string matName = currentGroundMaterial.name;
-
-                if (matName.Contains("Wood")) PlayFootstep(woodClips);
-                else if (matName.Contains("Metal")) PlayFootstep(metalClips);
-                else if (matName.Contains("Grass")) PlayFootstep(grassClips);
-                else if (matName.Contains("Stone")) PlayFootstep(stoneClips);
-                else if (matName.Contains("Tile")) PlayFootstep(tileClips);
-                else if (matName.Contains("Gravel")) PlayFootstep(gravelClips);
-                // Varsayýlan ses (Concrete/Beton) için else ekleyebilirsin
+                if (currentGroundMaterial.name.Contains("Wood"))
+                    PlayFootstep(woodClips);
+                else if (currentGroundMaterial.name.Contains("Metal"))
+                    PlayFootstep(metalClips);
+                else if (currentGroundMaterial.name.Contains("Grass"))
+                    PlayFootstep(grassClips);
+                else if (currentGroundMaterial.name.Contains("Stone"))
+                    PlayFootstep(stoneClips);
+                else if (currentGroundMaterial.name.Contains("Tile"))
+                    PlayFootstep(tileClips);
+                else if (currentGroundMaterial.name.Contains("Gravel"))
+                    PlayFootstep(gravelClips);
 
                 footstepTimer = GetCurrentOffset;
-            }
+            }      
         }
     }
 
@@ -1480,59 +1481,34 @@ public class FirstPersonController : MonoBehaviour
 
     private void FindCurrentGroundMaterial(float rayDistance)
     {
-        // LayerMask eklemen iyi olur, sadece zemine çarpsýn (Player'a çarpmasýn)
         Physics.Raycast(groundTypeCheckRayPoint.transform.position, Vector3.down, out RaycastHit hit, rayDistance, groundTypeLayers);
 
         if (hit.collider)
         {
-            // TryGetComponent performanslýdýr, kalsýn.
-            if (hit.collider.TryGetComponent<MeshRenderer>(out var renderer))
+            hit.collider.TryGetComponent<MeshRenderer>(out var renderer);
+
+            if (renderer != null)
             {
-                // --- KRÝTÝK DEÐÝÞÝKLÝK ---
-                // .materials yerine .sharedMaterials kullanýyoruz.
-                // .materials kopya oluþturur (Memory Leak), sharedMaterials orijinali okur.
-                var materials = renderer.sharedMaterials;
-
-                // Eðer mesh readable deðilse patlamasýn diye kontrol
-                MeshFilter mf = hit.transform.GetComponent<MeshFilter>();
-                if (mf == null || mf.sharedMesh == null || !mf.sharedMesh.isReadable) return;
-
-                var mesh = mf.sharedMesh;
+                var materials = renderer.materials;
                 var index = hit.triangleIndex;
-
+                var mesh = hit.transform.GetComponent<MeshFilter>().mesh;
                 var subMeshIndex = GetSubMeshIndex(mesh, index);
-
-                // Array sýnýrlarýný aþmayalým (Güvenlik)
-                if (subMeshIndex < materials.Length)
-                {
-                    currentGroundMaterial = materials[subMeshIndex];
-                }
+                currentGroundMaterial = materials[subMeshIndex];
             }
         }
     }
 
     private void PlayFootstep(AudioClip[] audioClips)
     {
-        if (audioClips.Length == 0) return;
+        var audio = audioClips[Random.Range(0, audioClips.Length - 1)];
 
-        // --- KRÝTÝK DEÐÝÞÝKLÝK ---
-        // Recursive (kendi kendini çaðýrma) yerine döngü kuralým.
-        // Stack Overflow riskini sýfýrlar.
-
-        int randomIndex;
-        int attempts = 0; // Sonsuz döngü korumasý (tek ses varsa takýlmasýn)
-
-        do
+        if (audio == lastPlayedFootstep)
+            PlayFootstep(audioClips);
+        else
         {
-            randomIndex = Random.Range(0, audioClips.Length);
-            attempts++;
+            footstepAudioSource.PlayOneShot(audio);
+            lastPlayedFootstep = audio;
         }
-        while (audioClips[randomIndex] == lastPlayedFootstep && attempts < 10);
-
-        var audio = audioClips[randomIndex];
-
-        footstepAudioSource.PlayOneShot(audio);
-        lastPlayedFootstep = audio;
     }
 
     private void PlayJumpLand(AudioClip[] audioClips, bool isJumping)
