@@ -102,18 +102,6 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.CanFootstep = can;
         crosshairGO.SetActive(can);
     }
-
-    public void SetPlayerMovementsForPhone(bool can)
-    {
-        firstPersonController.CanMove = can;
-        firstPersonController.CanSprint = can;
-        firstPersonController.CanJump = can;
-        firstPersonController.CanCrouch = can;
-        firstPersonController.CanInteract = can;
-        firstPersonController.CanGrab = can;
-        firstPersonController.CanFootstep = can;
-        crosshairGO.SetActive(can);
-    }
     public void SetPlayerCanInteract(bool can)
     {
         firstPersonController.CanInteract = can;

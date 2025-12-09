@@ -12,6 +12,8 @@ public class PhoneManager : MonoBehaviour
 
     public Phone PhoneSC;
 
+    public Camera phoneWorldCamera;
+
     public enum PhoneMenuType
     {
         MainMenu,
@@ -74,12 +76,18 @@ public class PhoneManager : MonoBehaviour
         previousMenu = PhoneMenuType.Null;
     }
 
+    private void Start()
+    {
+        UpdatePhoneWorldVisual();
+    }
+
     private void Update()
     {
         if (IsFocused)
         {
             if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Mouse1))
             {
+                UpdatePhoneWorldVisual();
                 PhoneSC.FinishPhoneUI();
                 IsFocused = false;
             }
@@ -90,6 +98,18 @@ public class PhoneManager : MonoBehaviour
                 UpdateCallTimeText();
             }
         }
+    }
+
+    private void UpdatePhoneWorldVisual()
+    {
+        // 1. Kamerayý anlýk aç
+        phoneWorldCamera.enabled = true;
+
+        // 2. Tek bir kare render aldýr (Manuel Deklanþör)
+        phoneWorldCamera.Render();
+
+        // 3. Kamerayý geri kapat
+        phoneWorldCamera.enabled = false;
     }
 
     private void UpdateCallTimeText()

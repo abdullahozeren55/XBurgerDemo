@@ -140,6 +140,7 @@ public class Phone : MonoBehaviour, IGrabable
 
     public void FinishPhoneUI()
     {
+
         phoneUITween?.Kill();
 
         phoneUITween = phoneUIRectTransform.DOScale(new Vector3(0.75f, 0.75f, 0.75f), timeToUse / 1.2f)
@@ -163,7 +164,7 @@ public class Phone : MonoBehaviour, IGrabable
         PlayerManager.Instance.SetPlayerUseHandLerp(usePositionOffset, useRotationOffset, timeToUse);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
-        PlayerManager.Instance.SetPlayerMovementsForPhone(false);
+        PlayerManager.Instance.SetPlayerBasicMovements(false);
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.PhoneLook);
 
@@ -172,12 +173,13 @@ public class Phone : MonoBehaviour, IGrabable
 
     public void OnUseRelease()
     {
+        Debug.Log("THIS");
         PlayerManager.Instance.SetPlayerUseHandLerp(GrabPositionOffset, GrabRotationOffset, timeToUse / 2f);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.FirstPerson);
 
-        PlayerManager.Instance.SetPlayerMovementsForPhone(true);
+        PlayerManager.Instance.SetPlayerBasicMovements(true);
     }
 
     public void OutlineChangeCheck()

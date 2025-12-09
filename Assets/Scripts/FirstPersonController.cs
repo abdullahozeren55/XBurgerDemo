@@ -392,10 +392,9 @@ public class FirstPersonController : MonoBehaviour
             if (CanLook)
             {
                 HandleMouseAndHandControl();
-
-                HandleHandTargetPositions();
             }
-            
+
+            HandleHandTargetPositions();
         }
 
         if (CanUseHeadbob)
