@@ -33,6 +33,25 @@ public class GameManager : MonoBehaviour
         WhitePop
     }
 
+    public enum CursorType
+    {
+        Default,
+        Hand,
+        Retro
+    }
+
+    [System.Serializable]
+    public class CursorSettings
+    {
+        public CursorType type;
+        public Texture2D texture; // Ýmleç resmi
+        public Vector2 hotspot;   // Týklama noktasý (Aþaðýda açýklayacaðým)
+    }
+
+    [Header("Cursor Settings")]
+    public CursorSettings[] cursors;
+    public CursorMode cursorMode = CursorMode.Auto;
+
     [Header("Burger Lists")]
     public List<BurgerIngredientData.IngredientType> classicBurger = new List<BurgerIngredientData.IngredientType>();
     public List <SauceBottle.SauceType> classicBurgerSauces = new List<SauceBottle.SauceType>();
@@ -211,6 +230,30 @@ public class GameManager : MonoBehaviour
     }
 
     public void SetOrderThrowArea(bool shouldReceive) { if (orderThrowArea != null) orderThrowArea.ShouldReceive = shouldReceive; }
+
+    public void SetCursor(CursorType type)
+    {
+        // Array içinde enum tipi eþleþen ayarý bul
+        CursorSettings setting = System.Array.Find(cursors, x => x.type == type);
+
+        if (setting != null)
+        {
+            // Bulduysa uygula
+            // Eðer texture boþ býrakýldýysa (null), Unity sistemin varsayýlan okuna döner.
+            Cursor.SetCursor(setting.texture, setting.hotspot, cursorMode);
+        }
+        else
+        {
+            Debug.LogWarning($"CursorManager: '{type}' tipi için ayar bulunamadý! Inspector'ý kontrol et.");
+        }
+    }
+
+    // Mouse'u Kilitle/Aç ve Gizle/Göster
+    public void SetCursorLock(bool isLocked)
+    {
+        Cursor.lockState = isLocked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !isLocked;
+    }
 
     public void CheckBurgerType(List<BurgerIngredientData.IngredientType> type, List<SauceBottle.SauceType> sauces, BurgerBox box)
     {

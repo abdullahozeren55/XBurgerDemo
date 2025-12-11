@@ -133,8 +133,8 @@ public class Phone : MonoBehaviour, IGrabable
         .SetUpdate(true)
         .OnComplete(() =>
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            GameManager.Instance.SetCursor(GameManager.CursorType.Hand);
+            GameManager.Instance.SetCursorLock(false);
         });
     }
 
@@ -152,8 +152,6 @@ public class Phone : MonoBehaviour, IGrabable
 
     private void FinishPhoneUIP2()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         phoneUI.SetActive(false);
         OnUseRelease();
         PlayerManager.Instance.PlayerStopUsingObject();
@@ -173,11 +171,13 @@ public class Phone : MonoBehaviour, IGrabable
 
     public void OnUseRelease()
     {
-        Debug.Log("THIS");
         PlayerManager.Instance.SetPlayerUseHandLerp(GrabPositionOffset, GrabRotationOffset, timeToUse / 2f);
         PlayerManager.Instance.SetPlayerIsUsingItemXY(false, false);
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.FirstPerson);
+
+        GameManager.Instance.SetCursor(GameManager.CursorType.Default);
+        GameManager.Instance.SetCursorLock(true);
 
         PlayerManager.Instance.SetPlayerBasicMovements(true);
     }

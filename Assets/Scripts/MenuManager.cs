@@ -83,8 +83,6 @@ public class MenuManager : MonoBehaviour
             // Ana Ayarlar Sayfasý: SettingsMenu'nun içinde ortada
             settingsMainRect.anchoredPosition = Vector2.zero;
         }
-
-        HandleCursorState(true);
     }
 
     private void Start()
@@ -113,7 +111,10 @@ public class MenuManager : MonoBehaviour
             // Basitlik için: Pause menüsü mantýðý aynen kalsýn.
             HandlePauseMenu(!pauseMenu.activeSelf);
             HandleTimeScale(pauseMenu.activeSelf ? 0f : 1f);
-            HandleCursorState(pauseMenu.activeSelf);
+
+            GameManager.Instance.SetCursor(GameManager.CursorType.Default);
+            GameManager.Instance.SetCursorLock(!pauseMenu.activeSelf);
+
             SetPlayerCanPlay(!pauseMenu.activeSelf);
         }
     }
@@ -379,12 +380,6 @@ public class MenuManager : MonoBehaviour
     public void SetCanPause(bool pause) => CanPause = pause;
     public void SetPlayerCanPlay(bool can) => PlayerManager.Instance.SetPlayerBasicMovements(can);
 
-    public void HandleCursorState(bool shouldBeFree)
-    {
-        Cursor.lockState = shouldBeFree ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = shouldBeFree;
-    }
-
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
@@ -418,7 +413,8 @@ public class MenuManager : MonoBehaviour
 
                 SetPlayerCanPlay(true);
                 HandleTimeScale(1);
-                HandleCursorState(false);
+                GameManager.Instance.SetCursor(GameManager.CursorType.Default);
+                GameManager.Instance.SetCursorLock(true);
                 HandleMainMenu(false);
                 HandlePauseMenu(false);
                 SetCanPause(true);
@@ -430,7 +426,8 @@ public class MenuManager : MonoBehaviour
                 DayManager.Instance.ResetForMainMenu();
 
                 HandleTimeScale(1);
-                HandleCursorState(true);
+                GameManager.Instance.SetCursor(GameManager.CursorType.Default);
+                GameManager.Instance.SetCursorLock(false);
                 HandleMainMenu(true);
                 HandlePauseMenu(false);
                 SetCanPause(false);
