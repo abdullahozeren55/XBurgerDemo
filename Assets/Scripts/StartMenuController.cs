@@ -22,12 +22,6 @@ public class StartMenuController : MonoBehaviour, IPointerClickHandler
 
     private bool isOpen = false;
 
-    private void Start()
-    {
-        // Baþlangýçta kapalý ve normal
-        CloseMenu();
-    }
-
     // Týklama Algýlama
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -47,6 +41,17 @@ public class StartMenuController : MonoBehaviour, IPointerClickHandler
     {
         isOpen = false;
         UpdateVisuals();
+    }
+
+    public void OpenMenuVisual()
+    {
+        isOpen = true;
+
+        if (buttonImage != null)
+            buttonImage.sprite = isOpen ? pressedSprite : normalSprite;
+
+        if (buttonImageWorld != null)
+            buttonImageWorld.sprite = isOpen ? pressedSprite : normalSprite;
     }
 
     private void UpdateVisuals()

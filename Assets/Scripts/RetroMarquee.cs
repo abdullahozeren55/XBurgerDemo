@@ -5,33 +5,34 @@ using System.Collections;
 public class RetroMarquee : MonoBehaviour
 {
     [Header("Hýz Ayarlarý")]
-    public float stepInterval = 0.1f;
-    public float pixelsPerStep = 5f;
-    public float gap = 50f;
+    // stepInterval'ý artýk Manager yönetecek, buradaki sadece bilgi amaçlý durabilir
+    public float pixelsPerStep = 16f;
+    public float gap = 64f;
 
     private RectTransform rect1;
     private RectTransform rect2;
     private float textWidth;
-    private float parentWidth; // Ekranýn geniþliði
-    private bool isScrolling = true;
+    private float parentWidth;
 
-    private void Start()
+    // Manager'ýn "Hazýr mýsýn?" diye sormasý için
+    public bool IsReady { get; private set; } = false;
+
+    private void Awake()
     {
         rect1 = GetComponent<RectTransform>();
-        TextMeshProUGUI tmp = GetComponent<TextMeshProUGUI>();
-
-        StartCoroutine(SetupMarquee(tmp));
     }
 
-    IEnumerator SetupMarquee(TextMeshProUGUI originalTMP)
+    // Bu artýk Coroutine deðil, tek seferlik kurulum fonksiyonu
+    IEnumerator SetupMarqueeRoutine()
     {
-        // Unity UI'ý oturtana kadar bekle
+        IsReady = false; // Kurulum bitene kadar bekle
+
+        // Unity UI'ý oturtana kadar bekle (Bu obje aktifken çalýþmak zorunda)
         yield return new WaitForEndOfFrame();
 
         textWidth = rect1.rect.width;
 
-        // --- KRÝTÝK EKLEME: PARENT GENÝÞLÝÐÝNÝ BUL ---
-        // Yazýnýn içinde durduðu Panelin (Maskenin) geniþliðini alýyoruz.
+        // Parent Geniþliði
         if (transform.parent != null)
         {
             RectTransform pRect = transform.parent.GetComponent<RectTransform>();
@@ -39,38 +40,42 @@ public class RetroMarquee : MonoBehaviour
         }
         else
         {
-            // Eðer parent yoksa (ki olmalý) rastgele bir geniþlik ver ki hata vermesin
             parentWidth = 500f;
         }
 
+        // Varsa eski klonu temizle (Refresh durumunda)
+        string cloneName = gameObject.name + "_Clone";
+        Transform oldClone = transform.parent.Find(cloneName);
+        if (oldClone != null) Destroy(oldClone.gameObject);
+
         // Kopyayý oluþtur
         GameObject cloneObj = Instantiate(gameObject, transform.parent);
-        cloneObj.name = gameObject.name + "_Clone";
+        cloneObj.name = cloneName;
+
+        // Kopyadaki scripti yok et
         Destroy(cloneObj.GetComponent<RetroMarquee>());
 
         rect2 = cloneObj.GetComponent<RectTransform>();
 
         // --- KONUMLARI GÜNCELLE ---
-
-        // Rect1 (Asýl): Artýk 0'da deðil, Panelin EN SAÐINDA baþlýyor.
+        // Rect1: Panelin EN SAÐINDA
         rect1.anchoredPosition = new Vector2(parentWidth, rect1.anchoredPosition.y);
 
-        // Rect2 (Kopya): Rect1'in arkasýnda, vagon gibi takip ediyor.
-        // Konumu: Ekran Geniþliði + Metin Geniþliði + Boþluk
+        // Rect2: Rect1'in arkasýnda
         rect2.anchoredPosition = new Vector2(parentWidth + textWidth + gap, rect1.anchoredPosition.y);
 
-        StartCoroutine(ScrollRoutine());
+        IsReady = true; // Artýk Manager beni hareket ettirebilir
     }
 
-    IEnumerator ScrollRoutine()
+    // --- MANAGER BURAYI ÇAÐIRACAK ---
+    public void Step()
     {
-        while (isScrolling)
-        {
-            yield return new WaitForSeconds(stepInterval);
+        if (!IsReady || rect1 == null || rect2 == null) return;
 
-            MoveRect(rect1);
-            MoveRect(rect2);
-        }
+        MoveRect(rect1);
+        MoveRect(rect2);
+
+        Debug.Log("ben gidiyon");
     }
 
     void MoveRect(RectTransform rect)
@@ -78,7 +83,6 @@ public class RetroMarquee : MonoBehaviour
         Vector2 pos = rect.anchoredPosition;
         pos.x -= pixelsPerStep;
 
-        // Döngü mantýðý ayný: Ekrandan tamamen çýkýnca arkaya ýþýnla
         if (pos.x < -textWidth)
         {
             RectTransform otherRect = (rect == rect1) ? rect2 : rect1;
@@ -91,8 +95,14 @@ public class RetroMarquee : MonoBehaviour
     public void RefreshText(string newText)
     {
         GetComponent<TextMeshProUGUI>().text = newText;
-        if (rect2 != null) Destroy(rect2.gameObject);
         StopAllCoroutines();
-        StartCoroutine(SetupMarquee(GetComponent<TextMeshProUGUI>()));
+
+        // Eðer obje o an kapalýysa Coroutine çalýþmaz, 
+        // o yüzden açýlýnca çalýþsýn diye OnEnable kullanabilirsin 
+        // ama þimdilik aktif olduðunu varsayýyoruz.
+        if (gameObject.activeInHierarchy)
+        {
+            StartCoroutine(SetupMarqueeRoutine());
+        }
     }
 }

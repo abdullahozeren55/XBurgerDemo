@@ -12,8 +12,6 @@ public class MonitorManager : MonoBehaviour
 
     public Monitor MonitorSC;
 
-    public Camera monitorWorldCamera;
-
     [System.Serializable]
     public struct SongData
     {
@@ -63,6 +61,12 @@ public class MonitorManager : MonoBehaviour
     public GameObject deletedNotePageWorld;
 
     [Header("Music Player Settings")]
+    public GameObject musicPlayerPage;
+    public GameObject musicPlayerPageWorld;
+    public GameObject musicPlayerButton;
+    public GameObject musicPlayerButtonWorld;
+    public StartMenuController musicPlayerButtonScript;
+    [Space]
     public AudioSource musicSource;
     public List<SongData> playlist;
     public bool MusicIsPlaying = false;
@@ -71,9 +75,11 @@ public class MonitorManager : MonoBehaviour
     private int currentIndex = 0;
     [Space]
     public RetroMarquee marqueeScript;
+    public RetroMarquee marqueeScriptWorld;
+    public float marqueeStepInterval = 0.4f; // Týrtýklý kayma hýzý burada
     [Space]
     public Image playPauseImage;
-    //public Image playPauseImageWorld;
+    public Image playPauseImageWorld;
     public Sprite[] playPauseSprites; //0 play, 1 pause
     
 
@@ -89,12 +95,13 @@ public class MonitorManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateMonitorWorldVisual();
 
         if (playlist.Count > 0)
         {
             LoadTrack(0, false); // false = Otomatik baþlatma
         }
+
+        StartCoroutine(MarqueeDriverLoop());
     }
 
     private void Update()
@@ -105,8 +112,6 @@ public class MonitorManager : MonoBehaviour
             {
 
                 notePadInputMirror.SyncInputs();
-
-                UpdateMonitorWorldVisual();
                 MonitorSC.FinishMonitorUI();
                 IsFocused = false;
             }
@@ -188,12 +193,34 @@ public class MonitorManager : MonoBehaviour
         deletedNotePageWorld.SetActive(open);
     }
 
+    public void HandleMusicPlayerPage(bool open)
+    {
+        musicPlayerPage.SetActive(open);
+        musicPlayerPageWorld.SetActive(open);
+
+        musicPlayerButton.SetActive(open);
+        musicPlayerButtonWorld.SetActive(open);
+
+        if (open)
+        {
+            musicPlayerButtonScript.OpenMenuVisual();
+
+            if (!MusicIsPlaying)
+                LoadTrack(currentIndex, false);
+        }
+        else
+        {
+            if (MusicIsPlaying)
+                PlayPauseMusic();
+        }
+    }
+
     public void PlayPauseMusic()
     {
         MusicIsPlaying = !MusicIsPlaying;
 
         playPauseImage.sprite = MusicIsPlaying ? playPauseSprites[1] : playPauseSprites[0]; //if playing image should be pause, if paused image should be play
-        //playPauseImageWorld.sprite = playPauseImage.sprite;
+        playPauseImageWorld.sprite = playPauseImage.sprite;
 
         if (MusicIsPlaying)
             musicSource.Play();
@@ -261,6 +288,11 @@ public class MonitorManager : MonoBehaviour
             marqueeScript.RefreshText(displayName);
         }
 
+        if (marqueeScriptWorld != null)
+        {
+            marqueeScriptWorld.RefreshText(displayName);
+        }
+
         if (autoPlay || musicSource.isPlaying)
         {
             musicSource.Play();
@@ -273,15 +305,28 @@ public class MonitorManager : MonoBehaviour
         musicSource.volume = value * musicVolumeMultiplier;
     }
 
-    private void UpdateMonitorWorldVisual()
+    private IEnumerator MarqueeDriverLoop()
     {
-        // 1. Kamerayý anlýk aç
-        monitorWorldCamera.enabled = true;
+        WaitForSeconds wait = new WaitForSeconds(marqueeStepInterval);
 
-        // 2. Tek bir kare render aldýr (Manuel Deklanþör)
-        monitorWorldCamera.Render();
+        while (true)
+        {
+            // Bekle
+            yield return wait;
 
-        // 3. Kamerayý geri kapat
-        monitorWorldCamera.enabled = false;
+            // Eðer kayýtlý bir marquee varsa ve hazýrsa, onu dürtekle
+            if (marqueeScript != null && marqueeScript.IsReady)
+            {
+                // UI kapalý (SetActive false) olsa bile
+                // C# referansý memory'de yaþadýðý için bu fonksiyon çalýþýr
+                // ve RectTransform deðerlerini günceller!
+                marqueeScript.Step();
+            }
+
+            if (marqueeScriptWorld != null && marqueeScriptWorld.IsReady)
+            {
+                marqueeScriptWorld.Step();
+            }
+        }
     }
 }
