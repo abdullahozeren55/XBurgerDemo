@@ -16,7 +16,7 @@ public class Monitor : MonoBehaviour, IInteractable
 
     [Header("UI Settings")]
     public GameObject monitorUI;
-    public RectTransform monitorUIRectTransform;
+    public RectTransform monitorScaler;
     public float monitorUIStartAppearDelay = 0.2f;
     public float monitorUIFinishDelay = 0.2f;
     public float monitorUILerpTime = 0.2f;
@@ -88,8 +88,8 @@ public class Monitor : MonoBehaviour, IInteractable
 
         monitorUITween?.Kill();
 
-        monitorUITween = monitorUIRectTransform.DOScale(Vector3.one, monitorUILerpTime)
-        .SetEase(Ease.OutBack)
+        monitorUITween = monitorScaler.DOScale(Vector3.one, monitorUILerpTime)
+        .SetEase(Ease.OutBack, 3.5f)
         .SetUpdate(true)
         .OnComplete(() =>
         {
@@ -108,8 +108,8 @@ public class Monitor : MonoBehaviour, IInteractable
 
         monitorUITween?.Kill();
 
-        monitorUITween = monitorUIRectTransform.DOScale(monitorUImin, monitorUIReverseLerpTime)
-        .SetEase(Ease.OutBack)
+        monitorUITween = monitorScaler.DOScale(monitorUImin, monitorUIReverseLerpTime)
+        .SetEase(Ease.InQuad)
         .SetUpdate(true);
 
         Invoke("FinishMonitorUIP2", monitorUIFinishDelay);

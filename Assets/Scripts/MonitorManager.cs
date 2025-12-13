@@ -211,7 +211,13 @@ public class MonitorManager : MonoBehaviour
         else
         {
             if (MusicIsPlaying)
-                PlayPauseMusic();
+            {
+                MusicIsPlaying = false;
+                musicSource.Stop();
+
+                playPauseImage.sprite = MusicIsPlaying ? playPauseSprites[1] : playPauseSprites[0]; //if playing image should be pause, if paused image should be play
+                playPauseImageWorld.sprite = playPauseImage.sprite;
+            }
         }
     }
 
