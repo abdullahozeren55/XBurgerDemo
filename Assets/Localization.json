@@ -1409,6 +1409,31 @@
     "key": "UI_VOLUME",
     "tr": "Ses",
     "en": "Volume"
+  },
+  {
+    "key": "UI_INTERACT",
+    "tr": "Etkileşim",
+    "en": "Interact"
+  },
+  {
+    "key": "UI_TAKE",
+    "tr": "Al",
+    "en": "Take"
+  },
+  {
+    "key": "UI_USE",
+    "tr": "Kullan",
+    "en": "Use"
+  },
+  {
+    "key": "UI_DROP",
+    "tr": "Bırak",
+    "en": "Drop"
+  },
+  {
+    "key": "UI_THROW",
+    "tr": "Fırlat",
+    "en": "Throw"
   }
 ]
 

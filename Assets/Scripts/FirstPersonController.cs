@@ -1865,4 +1865,45 @@ public class FirstPersonController : MonoBehaviour
         characterController.height = targetHeight;
         characterController.center = targetCenter; 
     }
+
+    private void OnEnable()
+    {
+        if (LocalizationManager.Instance != null)
+            LocalizationManager.Instance.OnLanguageChanged += ForceUpdateFocusText;
+    }
+
+    private void OnDisable()
+    {
+        if (LocalizationManager.Instance != null)
+            LocalizationManager.Instance.OnLanguageChanged -= ForceUpdateFocusText;
+    }
+
+    private void ForceUpdateFocusText()
+    {
+        // Hangi objeye baktýðýmýzý bulalým
+        string keyToUse = "";
+
+        if (currentInteractable != null)
+        {
+            keyToUse = currentInteractable.FocusTextKey;
+        }
+        else if (currentGrabable != null && !currentGrabable.IsGrabbed)
+        {
+            keyToUse = currentGrabable.FocusTextKey;
+        }
+        else if (otherGrabable != null)
+        {
+            keyToUse = otherGrabable.FocusTextKey;
+        }
+
+        // Eðer geçerli bir key bulduysak ve metin görünüyorsa
+        if (!string.IsNullOrEmpty(keyToUse) && showInteractText)
+        {
+            string newText = LocalizationManager.Instance.GetText(keyToUse);
+
+            focusTextAnim.ShowText(newText);
+            focusTextAnim.SkipTypewriter();
+            SetFocusTextComplete(true);
+        }
+    }
 }
