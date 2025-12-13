@@ -166,6 +166,11 @@
     "en": "Use The Computer"
   },
   {
+    "key": "INTERACTABLE_LEAVE_COMPUTER",
+    "tr": "Bilgisayardan Ayrıl",
+    "en": "Leave The Computer"
+  },
+  {
     "key": "GRABABLE_BUN",
     "tr": "Ekmek",
     "en": "Bun"
@@ -1344,6 +1349,66 @@
     "key": "UI_OFF",
     "tr": "Kapalı",
     "en": "Off"
+  },
+  {
+    "key": "UI_MONITOR_BURGER_LIST",
+    "tr": "Burger Listesi",
+    "en": "Burger List"
+  },
+  {
+    "key": "UI_MONITOR_NOTEPAD",
+    "tr": "Not Defteri",
+    "en": "Notepad"
+  },
+  {
+    "key": "UI_MONITOR_MUSIC_PLAYER",
+    "tr": "Müzik Çalar",
+    "en": "Music Player"
+  },
+  {
+    "key": "UI_MONITOR_RECYCLE_BIN",
+    "tr": "Geri Dönüşüm Kutusu",
+    "en": "Recycle Bin"
+  },
+  {
+    "key": "UI_START",
+    "tr": "Başlat",
+    "en": "Start"
+  },
+  {
+    "key": "UI_SHUT_DOWN",
+    "tr": "Kapat",
+    "en": "Shut Down"
+  },
+  {
+    "key": "UI_MONITOR_HOW_TO_PREPARE_BURGER",
+    "tr": "Burger Nasıl Hazırlanır?",
+    "en": "How To Prepare Burger?"
+  },
+  {
+    "key": "UI_MONITOR_HOW_TO_INSTRUCTIONS",
+    "tr": "1. Malzemeleri soğuk odadan temin edin.\n2. Bıçakla paketleri açın ve ekmeği bölün.\n3. Köfte ve ekmeği ızgarada yakmadan pişirin.\n4. Sebzeleri dilimleyin.\n5. Alt Ekmek ile başlayın, sos/malzemeleri dizin, Üst Ekmek ile bitirin.\n6. Ürünü paketleyip servis edin.\n\nDÜZELTME: Hatalı malzemeyi en üstten tıklayarak geri alabilirsiniz.",
+    "en": "1. Retrieve ingredients from cold storage.\n2. Open packs and slice the bun.\n3. Grill patty and bun (avoid burning).\n4. Slice the vegetables.\n5. Start with Bottom Bun, add sauce/toppings, end with Top Bun.\n6. Pack and serve the order.\n\nCORRECTION: Click the top item to remove/undo layers."
+  },
+  {
+    "key": "UI_MONITOR_NOTEPAD_PLACEHOLDER",
+    "tr": "Metin giriniz…",
+    "en": "Enter text…"
+  },
+  {
+    "key": "UI_MONITOR_NOTEPAD_DELETED_NOTE_HEADER",
+    "tr": ":) - Not Defteri",
+    "en": ":) - Notepad"
+  },
+  {
+    "key": "UI_MONITOR_NOTEPAD_DELETED_NOTE",
+    "tr": "seni görüyorum :)",
+    "en": "i see you :)"
+  },
+  {
+    "key": "UI_VOLUME",
+    "tr": "Ses",
+    "en": "Volume"
   }
 ]
 

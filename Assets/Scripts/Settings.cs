@@ -122,6 +122,9 @@ public class Settings : MonoBehaviour
         // Eðer oyun içindeysek anlýk güncelle
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.UpdateGameplaySettings();
+
+        if (MonitorManager.Instance != null)
+            MonitorManager.Instance.UpadateShowHint();
     }
 
     public void SetInteractText(int index)

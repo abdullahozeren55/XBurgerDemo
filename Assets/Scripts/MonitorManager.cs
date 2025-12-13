@@ -44,6 +44,8 @@ public class MonitorManager : MonoBehaviour
     public TMP_Text headerTMP;
     public TMP_Text headerTMPWorld;
     public string[] headerKeys;
+    [Space]
+    private int currentBurgerIndex = 0;
 
     [Header("Notepad Page Settings")]
     public InputMirror notePadInputMirror;
@@ -69,6 +71,23 @@ public class MonitorManager : MonoBehaviour
 
     // --- EKLENEN KISIM: SEÇÝM YÖNETÝMÝ ---
     public DesktopIcon CurrentSelectedIcon { get; private set; }
+
+    private void OnEnable()
+    {
+        if (LocalizationManager.Instance != null)
+        {
+            // Dil deðiþirse "RefreshPage" çalýþsýn
+            LocalizationManager.Instance.OnLanguageChanged += RefreshPage;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (LocalizationManager.Instance != null)
+        {
+            LocalizationManager.Instance.OnLanguageChanged -= RefreshPage;
+        }
+    }
 
     private void Awake()
     {
@@ -190,17 +209,43 @@ public class MonitorManager : MonoBehaviour
     // ... (Burger Page kodlarýn aynen kalýyor) ...
     public void SetBurgerPage(int value)
     {
-        burgerImage.sprite = burgerSprites[value];
+        // 1. Önce hafýzaya at: "Kardeþim biz þu an 3 numaralý burgerdeyiz"
+        currentBurgerIndex = value;
+
+        // 2. Sonra sayfayý yenile
+        RefreshPage();
+    }
+
+    // --- OTOMATÝK ÇALIÞAN FONKSÝYON ---
+    // Hem SetBurgerPage çaðýrýr, hem de Dil Deðiþimi çaðýrýr
+    private void RefreshPage()
+    {
+        // Güvenlik kontrolü (Index dizi dýþýna taþmasýn)
+        if (currentBurgerIndex < 0 || currentBurgerIndex >= burgerSprites.Length) return;
+
+        // --- GÖRSEL ---
+        // Görsel dil deðiþiminden etkilenmez ama yine de burada durabilir
+        burgerImage.sprite = burgerSprites[currentBurgerIndex];
         burgerImageWorld.sprite = burgerImage.sprite;
 
-        ingredientsTMP.text = LocalizationManager.Instance.GetText(ingredientKeys[value]);
-        ingredientsTMPWorld.text = ingredientsTMP.text;
+        // --- METÝNLER (LocalizationManager'dan çekilecek) ---
+        if (LocalizationManager.Instance != null)
+        {
+            // Malzemeler
+            string ingText = LocalizationManager.Instance.GetText(ingredientKeys[currentBurgerIndex]);
+            ingredientsTMP.text = ingText;
+            ingredientsTMPWorld.text = ingText;
 
-        descriptionTMP.text = LocalizationManager.Instance.GetText(descriptionKeys[value]);
-        descriptionTMPWorld.text = descriptionTMP.text;
+            // Açýklama
+            string descText = LocalizationManager.Instance.GetText(descriptionKeys[currentBurgerIndex]);
+            descriptionTMP.text = descText;
+            descriptionTMPWorld.text = descText;
 
-        headerTMP.text = LocalizationManager.Instance.GetText(headerKeys[value]);
-        headerTMPWorld.text = headerTMP.text;
+            // Baþlýk
+            string headText = LocalizationManager.Instance.GetText(headerKeys[currentBurgerIndex]);
+            headerTMP.text = headText;
+            headerTMPWorld.text = headText;
+        }
     }
 
     public void HandleMusicPlayerPage(bool open)
@@ -319,6 +364,11 @@ public class MonitorManager : MonoBehaviour
     public void SetMusicVolume(float value)
     {
         musicSource.volume = value * musicVolumeMultiplier;
+    }
+
+    public void UpadateShowHint()
+    {
+        MonitorSC.UpdateShowHint();
     }
 
     private IEnumerator MarqueeDriverLoop()

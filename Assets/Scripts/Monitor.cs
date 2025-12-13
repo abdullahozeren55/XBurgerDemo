@@ -17,6 +17,7 @@ public class Monitor : MonoBehaviour, IInteractable
     [Header("UI Settings")]
     public GameObject monitorUI;
     public RectTransform monitorScaler;
+    public GameObject monitorUIHintGO;
     public float monitorUIStartAppearDelay = 0.2f;
     public float monitorUIFinishDelay = 0.2f;
     public float monitorUILerpTime = 0.2f;
@@ -26,7 +27,8 @@ public class Monitor : MonoBehaviour, IInteractable
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
-    private int uninteractableLayer;
+
+    private bool showHint;
 
     private Tween monitorUITween;
 
@@ -35,7 +37,8 @@ public class Monitor : MonoBehaviour, IInteractable
         interactableLayer = LayerMask.NameToLayer("Interactable");
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
-        uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
+
+        showHint = PlayerPrefs.GetInt("ShowHints", 0) == 0;
     }
 
     public void ChangeLayer(int layer)
@@ -86,6 +89,9 @@ public class Monitor : MonoBehaviour, IInteractable
 
         MonitorManager.Instance.IsFocused = true;
 
+        if (showHint)
+            monitorUIHintGO.SetActive(true);
+
         monitorUITween?.Kill();
 
         monitorUITween = monitorScaler.DOScale(Vector3.one, monitorUILerpTime)
@@ -106,6 +112,8 @@ public class Monitor : MonoBehaviour, IInteractable
         GameManager.Instance.SetCursor(GameManager.CursorType.Default);
         GameManager.Instance.SetCursorLock(true);
 
+        monitorUIHintGO.SetActive(false);
+
         monitorUITween?.Kill();
 
         monitorUITween = monitorScaler.DOScale(monitorUImin, monitorUIReverseLerpTime)
@@ -119,5 +127,15 @@ public class Monitor : MonoBehaviour, IInteractable
     {
         monitorUI.SetActive(false);
         ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
+    }
+
+    public void UpdateShowHint()
+    {
+        showHint = PlayerPrefs.GetInt("ShowHints", 0) == 0;
+
+        if (!showHint)
+        {
+            monitorUIHintGO.SetActive(false);
+        }
     }
 }
