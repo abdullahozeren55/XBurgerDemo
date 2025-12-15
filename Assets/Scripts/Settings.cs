@@ -36,6 +36,7 @@ public class Settings : MonoBehaviour
     public TMP_Dropdown invertYDropdown;
     public TMP_Dropdown sprintModeDropdown;
     public TMP_Dropdown crouchModeDropdown;
+    public TMP_Dropdown stickLayoutDropdown;
 
     [Header("Audio Sliders")]
     public Slider masterSlider;
@@ -92,6 +93,12 @@ public class Settings : MonoBehaviour
         "UI_TOGGLE" 
     };
 
+    private readonly List<string> stickLayoutKeys = new List<string>
+    {
+        "UI_DEFAULT", // 0: Normal
+        "UI_SWAPPED"  // 1: Ters (Solak)
+    };
+
     void Start()
     {
         DecideResolutions();
@@ -120,6 +127,7 @@ public class Settings : MonoBehaviour
         PopulateDropdown(invertYDropdown, onOffKeys);
         PopulateDropdown(sprintModeDropdown, holdToggleKeys);
         PopulateDropdown(crouchModeDropdown, holdToggleKeys);
+        PopulateDropdown(stickLayoutDropdown, stickLayoutKeys);
 
         // 4. Kayýtlý Deðerleri Ata
         invertYDropdown.value = PlayerPrefs.GetInt("InvertY", 0); // 0: Off, 1: On
@@ -130,6 +138,15 @@ public class Settings : MonoBehaviour
 
         crouchModeDropdown.value = PlayerPrefs.GetInt("CrouchMode", 0);
         crouchModeDropdown.RefreshShownValue();
+
+        // YENÝ: Stick Layout Baþlangýç Deðeri
+        int savedStickLayout = PlayerPrefs.GetInt("StickLayout", 0); // 0: Default, 1: Swapped
+        stickLayoutDropdown.value = savedStickLayout;
+        stickLayoutDropdown.RefreshShownValue();
+
+        // Baþlangýçta InputManager'a bildir (Eðer varsa)
+        if (InputManager.Instance != null)
+            InputManager.Instance.SetSwapSticks(savedStickLayout == 1);
     }
 
     // Dropdown Doldurma Yardýmcýsý (Kod tekrarýný önlemek için)
@@ -186,6 +203,13 @@ public class Settings : MonoBehaviour
     {
         PlayerPrefs.SetInt("CrouchMode", index);
         if (InputManager.Instance != null) InputManager.Instance.SetCrouchMode(index == 1);
+    }
+
+    public void OnStickLayoutChanged(int index)
+    {
+        PlayerPrefs.SetInt("StickLayout", index);
+        // 0: Normal (False), 1: Swapped (True)
+        if (InputManager.Instance != null) InputManager.Instance.SetSwapSticks(index == 1);
     }
 
     private void InitializeGameplaySettings()

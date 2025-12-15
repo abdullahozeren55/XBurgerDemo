@@ -432,8 +432,8 @@
   },
   {
     "key": "BURGER_TOMATO_LOVER",
-    "tr": "Domates Sever Burger",
-    "en": "Tomato Lover Burger"
+    "tr": "Domburger",
+    "en": "Tomburger"
   },
   {
     "key": "BURGER_BBQ",
@@ -1462,7 +1462,7 @@
   },
   {
     "key": "UI_MAIN_MENU_CROUCH_MODE",
-    "tr": "Çömelme Modu",
+    "tr": "Eğilme Modu",
     "en": "Crouch Mode"
   },
   {
@@ -1474,6 +1474,66 @@
     "key": "UI_MAIN_MENU_GAMEPAD_BINDINGS",
     "tr": "Oyun Kolu Atamaları",
     "en": "Gamepad Bindings"
+  },
+  {
+    "key": "UI_MOVE_FORWARD",
+    "tr": "İleri Git",
+    "en": "Move Forward"
+  },
+  {
+    "key": "UI_MOVE_BACKWARD",
+    "tr": "Geri Git",
+    "en": "Move Backward"
+  },
+  {
+    "key": "UI_MOVE_LEFT",
+    "tr": "Sola Git",
+    "en": "Move Left"
+  },
+  {
+    "key": "UI_MOVE_RIGHT",
+    "tr": "Sağa Git",
+    "en": "Move Right"
+  },
+  {
+    "key": "UI_JUMP",
+    "tr": "Zıpla",
+    "en": "Jump"
+  },
+  {
+    "key": "UI_SPRINT",
+    "tr": "Koş",
+    "en": "Sprint"
+  },
+  {
+    "key": "UI_CROUCH",
+    "tr": "Eğil",
+    "en": "Crouch"
+  },
+  {
+    "key": "UI_PHONE",
+    "tr": "Telefon",
+    "en": "Phone"
+  },
+  {
+    "key": "UI_PRESS_ANY_KEY",
+    "tr": "Bir tuşa basın…",
+    "en": "Press any key…"
+  },
+  {
+    "key": "UI_STICK_LAYOUT",
+    "tr": "Analog Düzeni",
+    "en": "Stick Layout"
+  },
+  {
+    "key": "UI_DEFAULT",
+    "tr": "Normal",
+    "en": "Default"
+  },
+  {
+    "key": "UI_SWAPPED",
+    "tr": "Ters",
+    "en": "Swapped"
   }
 ]
 

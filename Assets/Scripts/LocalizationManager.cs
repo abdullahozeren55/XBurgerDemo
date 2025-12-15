@@ -59,6 +59,8 @@ public class LocalizationManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public string GetCurrentLanguageCode() { return currentLanguage == GameLanguage.English ? "en" : "tr"; }
+
     // --- YENÝ: DÝL DEÐÝÞTÝRME FONKSÝYONU (STRING ÝLE - Settings.cs ÝÇÝN) ---
     public void ChangeLanguage(string langCode)
     {

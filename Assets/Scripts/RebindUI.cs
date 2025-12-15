@@ -43,9 +43,20 @@ public class RebindUI : MonoBehaviour
         UpdateUI();
     }
 
+    private void OnEnable()
+    {
+        if (LocalizationManager.Instance != null)
+            LocalizationManager.Instance.OnLanguageChanged += UpdateUI;
+
+        UpdateUI(); // Açýlýr açýlmaz güncelle
+    }
+
     private void OnDisable()
     {
         StopRebindingLogic();
+
+        if (LocalizationManager.Instance != null)
+            LocalizationManager.Instance.OnLanguageChanged -= UpdateUI;
     }
 
     // Butona basýnca artýk Coroutine baþlatýyoruz (Bekleme için)
@@ -152,10 +163,90 @@ public class RebindUI : MonoBehaviour
     {
         if (_targetAction != null)
         {
-            string keyName = _targetAction.GetBindingDisplayString(selectedBindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
+            // 1. Ham veriyi al
+            string rawName = _targetAction.GetBindingDisplayString(selectedBindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
 
-            if (string.IsNullOrEmpty(keyName)) keyName = "NONE";
-            if (bindingText != null) bindingText.text = keyName.ToUpper();
+            // 2. Çeviriye sok
+            string prettyName = GetPrettyName(rawName);
+
+            // 3. Ekrana yaz (Invariant kullanarak)
+            if (bindingText != null)
+            {
+                bindingText.text = prettyName.ToUpperInvariant();
+            }
+        }
+    }
+
+    private string GetPrettyName(string originalName)
+    {
+        if (string.IsNullOrEmpty(originalName)) return "NONE";
+
+        // Mevcut dil kodunu al (Senin LocalizationManager'dan)
+        // Eðer Manager'da "CurrentLanguage" diye public deðiþken yoksa PlayerPrefs'ten de bakabiliriz.
+        // Ama en temizi Manager'a sormaktýr. 
+        // Varsayalým ki LocalizationManager.Instance.CurrentLanguageKey bize "tr" veya "en" veriyor.
+
+        string lang = "en";
+        if (LocalizationManager.Instance != null)
+            lang = LocalizationManager.Instance.GetCurrentLanguageCode(); // Veya senin deðiþkenin adý neyse
+        else
+            lang = PlayerPrefs.GetString("Language", "en");
+
+        bool isTR = lang == "tr";
+
+        // Unity bazen "Left Button" bazen "LMB" döndürebilir ayarlara göre.
+        // Gelen stringi temizleyelim
+        string cleanName = originalName.Trim();
+
+        // --- TÜRKÇE ÇEVÝRÝLER ---
+        if (isTR)
+        {
+            switch (cleanName)
+            {
+                case "Space": return "BOÞLUK";
+                case "Enter": return "GÝRÝÞ";
+                case "Left Shift": return "SOL SHIFT";
+                case "Right Shift": return "SAÐ SHIFT";
+                case "Left Ctrl": return "SOL CTRL";
+                case "Right Ctrl": return "SAÐ CTRL";
+                case "Left Alt": return "SOL ALT";
+                case "Right Alt": return "SAÐ ALT";
+                case "Left Button": return "SOL TIK";
+                case "Right Button": return "SAÐ TIK";
+                case "Middle Button": return "ORTA TIK";
+                case "Escape": return "ESC";
+                case "Tab": return "TAB";
+                case "Caps Lock": return "CAPS LOCK";
+                case "Backspace": return "SÝLME";
+                // Ok Tuþlarý
+                case "Up Arrow": return "YUKARI OK";
+                case "Down Arrow": return "AÞAÐI OK";
+                case "Left Arrow": return "SOL OK";
+                case "Right Arrow": return "SAÐ OK";
+                // Numpad
+                case "Numpad Enter": return "NUM GÝRÝÞ";
+                // Eksik varsa buraya eklersin...
+                case "Forward": return "ÝLERÝ";
+                case "Back": return "GERÝ";
+                default:
+                    // Eðer listede yoksa (örn: "W", "A", "5") olduðu gibi döndür ama TR karakter sorunu olmasýn
+                    return cleanName;
+            }
+        }
+        // --- ÝNGÝLÝZCE CÝLALAMA (Opsiyonel) ---
+        else
+        {
+            switch (cleanName)
+            {
+                case "Left Button": return "LEFT CLICK";
+                case "Right Button": return "RIGHT CLICK";
+                case "Middle Button": return "MIDDLE CLICK";
+                case "Up Arrow": return "UP";
+                case "Down Arrow": return "DOWN";
+                case "Left Arrow": return "LEFT";
+                case "Right Arrow": return "RIGHT";
+                default: return cleanName;
+            }
         }
     }
 }

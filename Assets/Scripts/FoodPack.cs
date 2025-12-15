@@ -140,7 +140,7 @@ public class FoodPack : MonoBehaviour, IGrabable
 
     public void Open(bool shouldExplode)
     {
-        ChangeLayer(ungrabableLayer);
+        gameObject.layer = ungrabableLayer; //ONLY THIS SO INGREDIENTS STAY GRABABLE
         meshRenderer.enabled = false;
         col.enabled = false;
 

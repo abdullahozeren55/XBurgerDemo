@@ -21,6 +21,11 @@ public class InputManager : MonoBehaviour
     public bool sprintIsToggle = false;
     public bool crouchIsToggle = false;
 
+    [Header("Gamepad Settings")]
+    public bool swapSticks = false; // Settings.cs'den bunu true/false yapacaðýz
+
+    public void SetSwapSticks(bool isSwapped) => swapSticks = isSwapped;
+
     // Toggle mantýðý için state takibi
     private bool _isSprintingToggled = false;
     private bool _isCrouchingToggled = false;
@@ -121,51 +126,65 @@ public class InputManager : MonoBehaviour
     // Hareket (WASD) - Bize Vector2 (x,y) verir
     public Vector2 GetMovementInput()
     {
-        Vector2 rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
+        // 1. Ham verileri oku
+        Vector2 moveInput = _gameControls.Player.Movement.ReadValue<Vector2>(); // WASD veya Sol Stick
+        Vector2 lookInput = _gameControls.Player.Look.ReadValue<Vector2>(); // Mouse veya Sað Stick
 
-        // Vektörün büyüklüðünü 1 ile sýnýrla.
-        // Böylece (1, 1) gelirse onu (0.707, 0.707) yapar. Hýz sabit kalýr.
-        // Ama analog stick'i az itince (0.5) ona dokunmaz.
+        // 2. Cihaz Gamepad mi?
+        var device = _gameControls.Player.Movement.activeControl?.device;
+        bool isGamepad = device is Gamepad;
 
-        return Vector2.ClampMagnitude(rawInput, 1f);
+        // 3. Eðer Gamepad ise ve Swap açýksa -> LOOK verisini döndür (Sað Stick ile yürü)
+        if (isGamepad && swapSticks)
+        {
+            // Look input genelde ham gelir, movement için clamp gerekebilir
+            return Vector2.ClampMagnitude(lookInput, 1f);
+        }
+
+        // Normal durum
+        return Vector2.ClampMagnitude(moveInput, 1f);
     }
 
     // Bakýþ (Mouse) - Bize Vector2 (x,y) verir
     public Vector2 GetLookInput()
     {
-        Vector2 rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
+        Vector2 rawInput;
 
-        // 1. Cihazý Algýla
+        // 1. Cihaz kontrolü
+        // Not: Look aksiyonunun aktif kontrolüne bakýyoruz
         var device = _gameControls.Player.Look.activeControl?.device;
         bool isMouse = device is Mouse;
+        bool isGamepad = device is Gamepad; //veya !isMouse
 
-        // 2. Hassasiyet Çarpaný
+        // 2. Veriyi Seç (Swap varsa Move verisini al)
+        if (isGamepad && swapSticks)
+        {
+            // Hareket verisini (Sol Stick) alýp Bakýþ verisi gibi kullanacaðýz
+            rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
+        }
+        else
+        {
+            // Normal (Mouse veya Sað Stick)
+            rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
+        }
+
+        // 3. Hassasiyet Hesaplamalarý (Senin mevcut kodun)
         float uiSensValue = isMouse ? mouseSensitivity : gamepadSensitivity;
-
-        // Slider 0 iken 0.1, 100 iken 3.0
         float userMultiplier = Mathf.Lerp(0.1f, 3.0f, uiSensValue / 100f);
-
         float finalSens = 0f;
 
         if (isMouse)
         {
-            // Mouse Delta zaten "Ne kadar yol aldým" bilgisidir. 
-            // Frame rate artsa da toplam yol deðiþmez. Time.deltaTime GEREKMEZ.
             finalSens = BASE_MOUSE_MULTIPLIER * userMultiplier;
         }
         else
         {
-            // Gamepad bir "Durum"dur (State). 
-            // 144 FPS'de 144 kere "1 birim dön" derse uçarsýn.
-            // O yüzden "Bu kare ne kadar sürdüyse o kadar dön" demeliyiz.
-
-            // BURAYA Time.deltaTime EKLÝYORUZ:
+            // Gamepad (Normal veya Swapped fark etmez, Time.deltaTime ile çarp)
             finalSens = BASE_GAMEPAD_MULTIPLIER * userMultiplier * Time.deltaTime;
         }
 
         rawInput *= finalSens;
 
-        // 4. Invert Y
         if (invertY) rawInput.y *= -1;
 
         return rawInput;
