@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour
     private const float BASE_MOUSE_MULTIPLIER = 0.05f;
 
     private const float STICK_DEADZONE = 0.15f; // %15 ölü bölge (Drift önler)
-    private const float RESPONSE_CURVE = 2.0f;
+    private const float RESPONSE_CURVE = 1.8f;
     // Gamepad 0-1 arası gelir, onu hızlandırmak lazım.
     private const float BASE_GAMEPAD_MULTIPLIER = 50.0f;
 
@@ -25,6 +25,14 @@ public class InputManager : MonoBehaviour
 
     [Header("Gamepad Settings")]
     public bool swapSticks = false; // Settings.cs'den bunu true/false yapacağız
+
+    [Header("Gamepad Feel Settings")]
+    [Range(0.01f, 0.5f)]
+    public float lookSmoothTime = 0.1f; // Gecikme süresi (Düşük = Keskin, Yüksek = Ağır)
+
+    // SmoothDamp fonksiyonu için referans değişkeni (Hafıza)
+    private Vector2 _currentLookVelocity;
+    private Vector2 _currentLookValue; // Anlık yumuşatılmış değer
 
     public void SetSwapSticks(bool isSwapped) => swapSticks = isSwapped;
 
@@ -162,60 +170,67 @@ public class InputManager : MonoBehaviour
         var lookDevice = _gameControls.Player.Look.activeControl?.device;
         bool isMouse = lookDevice is Mouse;
 
-        // 2. HAM VERİYİ SEÇ
+        // 2. HAM VERİ (RAW)
         if (isMouse)
         {
             rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
-        }
-        else
-        {
-            // Gamepad (Swap Kontrolü)
-            if (swapSticks)
-                rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
-            else
-                rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
-        }
 
-        // 3. MATEMATİK
-        if (isMouse)
-        {
+            // Mouse için smoothing'e gerek yok (Mouse zaten keskin olmalı)
             float userMultiplier = Mathf.Lerp(0.1f, 3.0f, mouseSensitivity / 100f);
             return rawInput * BASE_MOUSE_MULTIPLIER * userMultiplier;
         }
         else
         {
-            // --- GAMEPAD AKILLI DEADZONE ---
+            // --- GAMEPAD İŞLEMLERİ ---
 
+            // A. Ham veriyi al (Swap kontrolü ile)
+            if (swapSticks)
+                rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
+            else
+                rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
+
+            // B. Hedef Değeri Hesapla (Matematiksel İdeal Değer)
+            Vector2 targetValue = Vector2.zero;
             float rawMagnitude = rawInput.magnitude;
 
-            // A. Deadzone Altındaysa Kes
-            if (rawMagnitude < STICK_DEADZONE)
-                return Vector2.zero;
+            if (rawMagnitude >= STICK_DEADZONE)
+            {
+                // Deadzone Rescaling (Yumuşak Başlangıç)
+                float effectiveInput = (rawMagnitude - STICK_DEADZONE) / (1f - STICK_DEADZONE);
 
-            // B. YENİDEN ÖLÇEKLEME (Rescaling) - İŞTE KİLİT NOKTA BURASI 🔑
-            // Gelen veri 0.15 ile 1.0 arasında.
-            // Biz bunu 0.0 ile 1.0 arasına matematiksel olarak çekiyoruz.
-            // Böylece 0.16 geldiğinde "küt" diye değil, "yumuşacık" başlar.
+                // Curve (Kavis) - 1.8f daha geniş bir hassasiyet aralığı sağlar
+                float curvedMagnitude = Mathf.Pow(effectiveInput, RESPONSE_CURVE);
 
-            float effectiveInput = (rawMagnitude - STICK_DEADZONE) / (1f - STICK_DEADZONE);
+                Vector2 inputDirection = rawInput.normalized;
 
-            // C. Kavis Uygula (Hassasiyet için)
-            // effectiveInput artık 0'dan başladığı için karesini alınca çok hassas davranır.
-            float curvedMagnitude = Mathf.Pow(effectiveInput, RESPONSE_CURVE);
+                // Kullanıcı Hassasiyeti
+                float userSens = Mathf.Lerp(0.5f, 3.5f, gamepadSensitivity / 100f);
 
-            // D. Yönü Geri Ver
-            Vector2 inputDirection = rawInput.normalized;
+                // Hedef Vektör
+                targetValue = inputDirection * curvedMagnitude * BASE_GAMEPAD_MULTIPLIER * userSens;
 
-            // E. Sonuç
-            float userSens = Mathf.Lerp(0.5f, 3.5f, gamepadSensitivity / 100f);
-            Vector2 finalInput = inputDirection * curvedMagnitude * BASE_GAMEPAD_MULTIPLIER * userSens * Time.deltaTime;
+                // Dikey yavaşlatma (Y ekseni)
+                targetValue.y *= 0.7f;
+                if (invertY) targetValue.y *= -1;
+            }
+            else
+            {
+                // Deadzone içindeyse hedef sıfır
+                targetValue = Vector2.zero;
+            }
 
-            // F. Dikey Yavaşlatma
-            finalInput.y *= 0.7f;
+            // C. SMOOTHING (YUMUŞATMA) - İŞTE OLAY BURADA! 🧈
+            // Anlık değerden (_currentLookValue), hedef değere (targetValue)
+            // belli bir sürede (lookSmoothTime) yumuşakça geçiş yap.
 
-            if (invertY) finalInput.y *= -1;
+            // Not: SmoothDamp Update içinde çağrılmalı. Burası her frame çağrılıyorsa sorun yok.
+            // Ama InputManager'ın Update'inde değil, PlayerController burayı her frame çağırıyorsa çalışır.
+            // InputManager.GetLookInput() genelde Update'te çağrılır.
 
-            return finalInput;
+            _currentLookValue = Vector2.SmoothDamp(_currentLookValue, targetValue, ref _currentLookVelocity, lookSmoothTime);
+
+            // Sonuç olarak yumuşatılmış değeri Time.deltaTime ile çarpıp döndür
+            return _currentLookValue * Time.deltaTime;
         }
     }
 
