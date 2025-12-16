@@ -12,7 +12,7 @@ public class InputManager : MonoBehaviour
     private const float BASE_MOUSE_MULTIPLIER = 0.05f;
 
     // Gamepad 0-1 arasý gelir, onu hýzlandýrmak lazým.
-    private const float BASE_GAMEPAD_MULTIPLIER = 120.0f;
+    private const float BASE_GAMEPAD_MULTIPLIER = 40.0f;
 
     [Header("Control Settings")]
     public float mouseSensitivity = 1.0f;
@@ -32,6 +32,8 @@ public class InputManager : MonoBehaviour
 
     // Unity'nin oluþturduðu o C# sýnýfý
     private GameControls _gameControls;
+
+    public event System.Action OnBindingsReset;
 
     private void Awake()
     {
@@ -124,51 +126,67 @@ public class InputManager : MonoBehaviour
     // --- OYUNCU ÝÇÝN TERCÜMELER ---
 
     // Hareket (WASD) - Bize Vector2 (x,y) verir
+    // Hareket (WASD) - Bize Vector2 (x,y) verir
     public Vector2 GetMovementInput()
     {
-        // 1. Ham verileri oku
-        Vector2 moveInput = _gameControls.Player.Movement.ReadValue<Vector2>(); // WASD veya Sol Stick
-        Vector2 lookInput = _gameControls.Player.Look.ReadValue<Vector2>(); // Mouse veya Sað Stick
+        // 1. Ham verileri oku (WASD veya Sol Stick)
+        Vector2 defaultMove = _gameControls.Player.Movement.ReadValue<Vector2>();
 
-        // 2. Cihaz Gamepad mi?
-        var device = _gameControls.Player.Movement.activeControl?.device;
-        bool isGamepad = device is Gamepad;
-
-        // 3. Eðer Gamepad ise ve Swap açýksa -> LOOK verisini döndür (Sað Stick ile yürü)
-        if (isGamepad && swapSticks)
+        // 2. SWAP KONTROLÜ
+        if (swapSticks)
         {
-            // Look input genelde ham gelir, movement için clamp gerekebilir
-            return Vector2.ClampMagnitude(lookInput, 1f);
+            // Swap açýksa: Hareket için SAÐ STICK (Look Action) kullanýlacak.
+            // O yüzden "Look" aksiyonunun cihazýna bakýyoruz.
+            var lookDevice = _gameControls.Player.Look.activeControl?.device;
+
+            // Eðer Sað Stick oynatýlýyorsa (ve bu bir Gamepad ise)
+            if (lookDevice is Gamepad)
+            {
+                // Sað Stick verisini al, hareket verisi olarak döndür
+                Vector2 rightStickVal = _gameControls.Player.Look.ReadValue<Vector2>();
+                return Vector2.ClampMagnitude(rightStickVal, 1f);
+            }
         }
 
-        // Normal durum
-        return Vector2.ClampMagnitude(moveInput, 1f);
+        // Swap kapalýysa veya klavye kullanýlýyorsa normal Movement verisi
+        return Vector2.ClampMagnitude(defaultMove, 1f);
     }
 
     // Bakýþ (Mouse) - Bize Vector2 (x,y) verir
+    // Bakýþ (Mouse) - Bize Vector2 (x,y) verir
     public Vector2 GetLookInput()
     {
-        Vector2 rawInput;
+        Vector2 rawInput = Vector2.zero;
 
-        // 1. Cihaz kontrolü
-        // Not: Look aksiyonunun aktif kontrolüne bakýyoruz
-        var device = _gameControls.Player.Look.activeControl?.device;
-        bool isMouse = device is Mouse;
-        bool isGamepad = device is Gamepad; //veya !isMouse
+        // 1. Önce Look aksiyonunun kaynaðýna bakalým (Mouse mu?)
+        var lookDevice = _gameControls.Player.Look.activeControl?.device;
+        bool isMouse = lookDevice is Mouse;
 
-        // 2. Veriyi Seç (Swap varsa Move verisini al)
-        if (isGamepad && swapSticks)
+        // 2. Eðer Mouse ise Swap dinlemez, direkt Mouse verisini al
+        if (isMouse)
         {
-            // Hareket verisini (Sol Stick) alýp Bakýþ verisi gibi kullanacaðýz
-            rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
+            rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
         }
         else
         {
-            // Normal (Mouse veya Sað Stick)
-            rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
+            // Cihaz Mouse deðil (Gamepad veya Boþta)
+
+            if (swapSticks)
+            {
+                // SWAP AÇIK: Bakýþ için SOL STICK (Movement) verisini kullanacaðýz.
+                rawInput = _gameControls.Player.Movement.ReadValue<Vector2>();
+
+                // Eðer sol stick oynatýlýyorsa bu kesin gamepad'dir (Klavye olsa yukarýda isMouse false olmazdý genelde ama garanti olsun)
+                // isMouse zaten false, gamepadSensitivity kullanýlacak.
+            }
+            else
+            {
+                // SWAP KAPALI: Bakýþ için normal SAÐ STICK (Look) verisi.
+                rawInput = _gameControls.Player.Look.ReadValue<Vector2>();
+            }
         }
 
-        // 3. Hassasiyet Hesaplamalarý (Senin mevcut kodun)
+        // 3. Hassasiyet Hesaplamalarý (Senin orijinal kodun)
         float uiSensValue = isMouse ? mouseSensitivity : gamepadSensitivity;
         float userMultiplier = Mathf.Lerp(0.1f, 3.0f, uiSensValue / 100f);
         float finalSens = 0f;
@@ -284,5 +302,42 @@ public class InputManager : MonoBehaviour
     {
         // Guid parse etmeye gerek yok, FindAction string olarak ID de kabul eder
         return _gameControls.FindAction(actionId);
+    }
+
+    public void ResetBindingsForDevice(bool isGamepad)
+    {
+        // 1. Tüm aksiyonlarý gez (Jump, Move, Look vs.)
+        foreach (InputAction action in _gameControls)
+        {
+            // 2. Aksiyonun tüm bindinglerini gez (Klavye, Gamepad varyasyonlarý)
+            for (int i = 0; i < action.bindings.Count; i++)
+            {
+                InputBinding binding = action.bindings[i];
+
+                // Binding'in yolu (örn: "<Keyboard>/space" veya "<Gamepad>/buttonSouth")
+                // Override edilmiþse overridePath, edilmemiþse path gelir.
+                // Biz orijinal path'e bakarak hangi gruba ait olduðunu anlarýz.
+                string path = binding.path;
+
+                bool isGamepadBinding = path.Contains("<Gamepad>");
+                bool isMouseKeyboardBinding = path.Contains("<Keyboard>") || path.Contains("<Mouse>");
+
+                // 3. Eþleþme kontrolü
+                if (isGamepad && isGamepadBinding)
+                {
+                    action.RemoveBindingOverride(i);
+                }
+                else if (!isGamepad && isMouseKeyboardBinding)
+                {
+                    action.RemoveBindingOverride(i);
+                }
+            }
+        }
+
+        // 4. Temizlenen hali kaydet
+        SaveBindingOverrides();
+
+        // 5. Herkese haber ver! (RebindUI güncellensin)
+        OnBindingsReset?.Invoke();
     }
 }

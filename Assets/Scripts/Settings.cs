@@ -41,6 +41,7 @@ public class Settings : MonoBehaviour
     public TMP_Dropdown controllerPromptsDropdown;
 
     public static event Action OnPromptsChanged;
+    public static event Action OnStickLayoutChangedEvent;
     public static bool IsXboxPrompts = true;
 
     [Header("Audio Sliders")]
@@ -230,6 +231,8 @@ public class Settings : MonoBehaviour
         PlayerPrefs.SetInt("StickLayout", index);
         // 0: Normal (False), 1: Swapped (True)
         if (InputManager.Instance != null) InputManager.Instance.SetSwapSticks(index == 1);
+
+        OnStickLayoutChangedEvent?.Invoke();
     }
 
     public void OnControllerPromptsChanged(int index)
@@ -663,5 +666,32 @@ public class Settings : MonoBehaviour
         InitializeUIScale();
         InitializeGameplaySettings();
         InitializeControls();
+    }
+
+    public void ResetGamepadUISettings()
+    {
+        // 1. Stick Layout (Varsayýlan: 0 -> Normal)
+        if (stickLayoutDropdown != null)
+        {
+            stickLayoutDropdown.value = 0;
+            stickLayoutDropdown.RefreshShownValue();
+            OnStickLayoutChanged(0); // PlayerPrefs kaydet ve InputManager'a bildir
+        }
+
+        // 2. Controller Prompts (Varsayýlan: 0 -> Xbox)
+        if (controllerPromptsDropdown != null)
+        {
+            controllerPromptsDropdown.value = 0;
+            controllerPromptsDropdown.RefreshShownValue();
+            OnControllerPromptsChanged(0); // PlayerPrefs kaydet ve Event fýrlat
+        }
+
+        // Eðer gamepad sensivity de sýfýrlansýn istersen:
+        /*
+        gamepadSensSlider.value = 50; // Veya varsayýlanýn kaçsa
+        OnGamepadSensChanged(50);
+        */
+
+        Debug.Log("Gamepad Dropdownlarý ve Ayarlarý Sýfýrlandý.");
     }
 }

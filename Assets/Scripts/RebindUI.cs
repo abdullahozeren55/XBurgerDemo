@@ -27,6 +27,7 @@ public class RebindUI : MonoBehaviour
     [Header("Mouse Sprite Tanımları")]
     [Tooltip("Unity'den gelen tuş ismi (örn: leftButton) ile Sprite eşleşmesi")]
     [SerializeField] private Sprite defaultMouseIcon;
+    [SerializeField] private Sprite defaultGamepadIcon;
     [SerializeField] private List<MouseIconMap> mouseIcons;
 
     [Header("Helper (Yanıp Sönen Yazı)")]
@@ -81,7 +82,12 @@ public class RebindUI : MonoBehaviour
         if (LocalizationManager.Instance != null)
             LocalizationManager.Instance.OnLanguageChanged += UpdateUI;
 
+        // Ayarlardan ikon tipi değişirse
         Settings.OnPromptsChanged += UpdateUI;
+
+        // --- YENİ: Reset atılırsa ---
+        if (InputManager.Instance != null)
+            InputManager.Instance.OnBindingsReset += UpdateUI;
 
         UpdateUI();
     }
@@ -94,6 +100,10 @@ public class RebindUI : MonoBehaviour
             LocalizationManager.Instance.OnLanguageChanged -= UpdateUI;
 
         Settings.OnPromptsChanged -= UpdateUI;
+
+        // --- YENİ: Abonelikten çık ---
+        if (InputManager.Instance != null)
+            InputManager.Instance.OnBindingsReset -= UpdateUI;
     }
 
     // --- REBIND BAŞLATMA ---
@@ -149,6 +159,8 @@ public class RebindUI : MonoBehaviour
         {
             // Gamepad Modu
             rebindOperation.WithControlsHavingToMatchPath("<Gamepad>");
+            rebindOperation.WithControlsExcluding("<Gamepad>/leftStick");
+            rebindOperation.WithControlsExcluding("<Gamepad>/rightStick");
         }
 
         rebindOperation.WithControlsExcluding("<Pointer>/position");
@@ -312,7 +324,7 @@ public class RebindUI : MonoBehaviour
             default:
                 // Bilinmeyen bir tuşsa (örn: dpad tek başına) logla ve çık
                 Debug.LogWarning($"Gamepad tuşu tanımlı değil: {unityControlName}");
-                return defaultMouseIcon; // Fallback olarak M ikonu veya boş dönebiliriz
+                return defaultGamepadIcon; // Fallback olarak M ikonu veya boş dönebiliriz
         }
 
         // 3. Tam ismi oluştur (örn: xb_a)
@@ -326,7 +338,7 @@ public class RebindUI : MonoBehaviour
         }
 
         Debug.LogWarning($"Sprite bulunamadı: {finalName}");
-        return defaultMouseIcon;
+        return defaultGamepadIcon;
     }
 
     // Mouse ismine göre Sprite getiren fonksiyon

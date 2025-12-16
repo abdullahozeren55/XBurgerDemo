@@ -1564,6 +1564,26 @@
     "key": "UI_PS",
     "tr": "PlayStation",
     "en": "PlayStation"
+  },
+  {
+    "key": "UI_RESET_TO_DEFAULTS",
+    "tr": "Varsayılanlara Sıfırla",
+    "en": "Reset To Defaults"
+  },
+  {
+    "key": "UI_GAMEPAD_ICONS",
+    "tr": "Oyun Kolu İkonları",
+    "en": "Gamepad Icons"
+  },
+  {
+    "key": "UI_MOVE",
+    "tr": "Yürü:",
+    "en": "Move:"
+  },
+  {
+    "key": "UI_CAN_BE_SWAPPED",
+    "tr": "SABİT AMA TERS ÇEVRİLEBİLİR",
+    "en": "FIXED BUT CAN BE SWAPPED"
   }
 ]
 
