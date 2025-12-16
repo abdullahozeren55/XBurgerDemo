@@ -26,11 +26,16 @@ public class RebindUI : MonoBehaviour
 
     [Header("Mouse Sprite Tanımları")]
     [Tooltip("Unity'den gelen tuş ismi (örn: leftButton) ile Sprite eşleşmesi")]
+    [SerializeField] private Sprite defaultMouseIcon;
     [SerializeField] private List<MouseIconMap> mouseIcons;
 
     [Header("Helper (Yanıp Sönen Yazı)")]
     [SerializeField] private GameObject helperTextObj;     // "Bir tuşa basın..." objesi
     [SerializeField] private TMP_Text helperTextComp;      // Alpha ayarı için Text bileşeni
+
+    [Header("Gamepad Sprite Tanımları")]
+    [Tooltip("Buraya 'xb_a', 'ps_cross', 'xb_lb' gibi isimlerle sprite'ları ekle")]
+    [SerializeField] private List<GamepadIconMap> gamepadIcons;
 
     private InputActionRebindingExtensions.RebindingOperation _rebindingOperation;
     private InputAction _targetAction;
@@ -41,6 +46,13 @@ public class RebindUI : MonoBehaviour
     public struct MouseIconMap
     {
         public string controlName; // örn: "leftButton", "rightButton", "middleButton"
+        public Sprite icon;
+    }
+
+    [System.Serializable]
+    public struct GamepadIconMap
+    {
+        public string spriteName; // Dosya adı (örn: xb_a)
         public Sprite icon;
     }
 
@@ -69,6 +81,8 @@ public class RebindUI : MonoBehaviour
         if (LocalizationManager.Instance != null)
             LocalizationManager.Instance.OnLanguageChanged += UpdateUI;
 
+        Settings.OnPromptsChanged += UpdateUI;
+
         UpdateUI();
     }
 
@@ -78,12 +92,15 @@ public class RebindUI : MonoBehaviour
 
         if (LocalizationManager.Instance != null)
             LocalizationManager.Instance.OnLanguageChanged -= UpdateUI;
+
+        Settings.OnPromptsChanged -= UpdateUI;
     }
 
     // --- REBIND BAŞLATMA ---
     // Bu fonksiyonu hem Klavye Butonuna hem Mouse Butonuna onClick olarak vereceksin.
     public void StartRebinding()
     {
+        MenuManager.Instance.SetRebindBlocker(true);
         StartCoroutine(StartRebindingRoutine());
     }
 
@@ -94,21 +111,26 @@ public class RebindUI : MonoBehaviour
 
         isAnyRebindingInProgress = true;
 
-        // 1. Tıklamayı engelle
+        // Blocker'ı aç (Tıklamaları kessin)
+        MenuManager.Instance.SetRebindBlocker(true);
+
+        // 1. UI Butonlarının etkileşimini kapat (Görsel olarak disable olmadan önce)
         if (keyboardButtonComp) keyboardButtonComp.interactable = false;
         if (mouseButtonComp) mouseButtonComp.interactable = false;
 
-        yield return new WaitForSecondsRealtime(0.1f);
+        // --- DEĞİŞİKLİK BURADA: 0.1sn YERİNE 1 KARE BEKLE ---
+        // Bu, "Tıklama anı" ile "Dinleme anı"nı birbirinden ayırır ama kullanıcı hissetmez.
+        yield return null;
 
         // 2. Aksiyonu durdur
         _targetAction.Disable();
 
-        // 3. GÖRSEL DÜZENLEME (Senin istediğin yapı)
-        keyboardButtonObj.SetActive(false); // Butonları gizle
+        // 3. GÖRSEL DÜZENLEME
+        if (keyboardButtonObj != null) keyboardButtonObj.SetActive(false);
         mouseButtonObj.SetActive(false);
-        helperTextObj.SetActive(true);      // Helper'ı aç
+        helperTextObj.SetActive(true);
 
-        // 4. Animasyonu Başlat (Ping Pong)
+        // 4. Animasyonu Başlat
         if (_pulseCoroutine != null) StopCoroutine(_pulseCoroutine);
         _pulseCoroutine = StartCoroutine(PulseHelperText());
 
@@ -121,6 +143,7 @@ public class RebindUI : MonoBehaviour
             rebindOperation.WithControlsExcluding("<Gamepad>");
             rebindOperation.WithControlsExcluding("<Mouse>/position");
             rebindOperation.WithControlsExcluding("<Mouse>/delta");
+            rebindOperation.WithControlsExcluding("<Mouse>/scroll"); // Tekerleği de engellemiştik
         }
         else
         {
@@ -180,21 +203,20 @@ public class RebindUI : MonoBehaviour
         // Helper'ı kapat
         if (helperTextObj != null) helperTextObj.SetActive(false);
 
-        // Kilitleri kaldır ama hemen açma (Gecikmeli)
         isAnyRebindingInProgress = false;
 
-        // UI'ı güncelle (Bu fonksiyon butonları tekrar açacak)
+        // --- SERİ ÇÖZÜM ---
+        // Blocker'ı kaldır
+        MenuManager.Instance.SetRebindBlocker(false);
+
+        // UI'ı güncelle (Görseller yerine gelsin)
         UpdateUI();
 
-        // Butonları tıklanabilir yap (Gecikmeli)
-        StartCoroutine(EnableButtonsAfterDelay());
-    }
-
-    private IEnumerator EnableButtonsAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(0.1f);
+        // Butonları ANINDA tıklanabilir yap (Delay yok, lag yok)
         if (keyboardButtonComp) keyboardButtonComp.interactable = true;
         if (mouseButtonComp) mouseButtonComp.interactable = true;
+
+        // EnableButtonsAfterDelay coroutine'ini sildik, gerek kalmadı.
     }
 
     // --- KRİTİK BÖLÜM: UI GÜNCELLEME ---
@@ -202,24 +224,16 @@ public class RebindUI : MonoBehaviour
     {
         if (_targetAction == null) return;
 
-        // 1. Ham path'i al (örn: "<Keyboard>/space" veya "<Mouse>/leftButton")
-        // Not: effectivePath kullanmak daha garantidir
+        // 1. Path kontrolü
         string bindingPath = _targetAction.bindings[selectedBindingIndex].effectivePath;
-
-        // Eğer override varsa onu, yoksa default'u alır
-        // Ancak biz Unity'nin o an neyi seçili tuttuğunu binding mask'ten de anlayabiliriz
-        // Daha güvenli yöntem: GetBindingDisplayString kullanıp cihazı tahmin etmek
-        // Ama senin durumunda Path kontrolü en temizi.
-
-        // Eğer binding override yapılmışsa path değişmiş olabilir.
-        // Garanti olsun diye binding'in override path'ine bakalım.
         if (!string.IsNullOrEmpty(_targetAction.bindings[selectedBindingIndex].overridePath))
         {
             bindingPath = _targetAction.bindings[selectedBindingIndex].overridePath;
         }
 
-        // 2. Ayrımı Yap: Klavye mi, Mouse mu?
+        // 2. Cihaz Türünü Belirle
         bool isMouse = bindingPath.Contains("<Mouse>");
+        bool isGamepad = bindingPath.Contains("<Gamepad>");
 
         if (isMouse)
         {
@@ -227,12 +241,18 @@ public class RebindUI : MonoBehaviour
             keyboardButtonObj.SetActive(false);
             mouseButtonObj.SetActive(true);
 
-            // İkonu ayarla
-            // Path genelde "<Mouse>/leftButton" şeklindedir.
-            // Sadece "leftButton" kısmını alalım.
             string controlName = bindingPath.Replace("<Mouse>/", "").Trim();
-
             Sprite icon = GetMouseSprite(controlName);
+            if (mouseButtonImage != null) mouseButtonImage.sprite = icon;
+        }
+        else if (isGamepad)
+        {
+            mouseButtonObj.SetActive(true); // Aynı resim objesini kullanıyoruz
+
+            // Path örn: "<Gamepad>/buttonSouth"
+            string controlName = bindingPath.Replace("<Gamepad>/", "").Trim();
+
+            Sprite icon = GetGamepadSprite(controlName);
             if (mouseButtonImage != null) mouseButtonImage.sprite = icon;
         }
         else
@@ -241,12 +261,72 @@ public class RebindUI : MonoBehaviour
             mouseButtonObj.SetActive(false);
             keyboardButtonObj.SetActive(true);
 
-            // Yazıyı ayarla
             string displayString = _targetAction.GetBindingDisplayString(selectedBindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
             string prettyName = GetKeyboardKeyText(displayString);
 
             if (keyboardButtonText != null) keyboardButtonText.text = prettyName;
         }
+    }
+
+    private Sprite GetGamepadSprite(string unityControlName)
+    {
+        // 1. Ayarlardan tercihi öğren (Xbox mı PS mi?)
+        bool isXbox = Settings.IsXboxPrompts;
+        string prefix = isXbox ? "xb_" : "ps_";
+
+        // 2. Unity ismini bizim dosya ismimize (suffix) çevir
+        string suffix = "";
+
+        switch (unityControlName)
+        {
+            // Yüz Tuşları
+            case "buttonSouth": suffix = isXbox ? "a" : "cross"; break;
+            case "buttonEast": suffix = isXbox ? "b" : "circle"; break;
+            case "buttonWest": suffix = isXbox ? "x" : "square"; break;
+            case "buttonNorth": suffix = isXbox ? "y" : "triangle"; break;
+
+            // Omuzlar ve Tetikler
+            case "leftShoulder": suffix = isXbox ? "lb" : "l1"; break;
+            case "rightShoulder": suffix = isXbox ? "rb" : "r1"; break;
+            case "leftTrigger": suffix = isXbox ? "lt" : "l2"; break;
+            case "rightTrigger": suffix = isXbox ? "rt" : "r2"; break;
+
+            // Stick Basma
+            case "leftStickPress": suffix = isXbox ? "ls" : "l3"; break; // xb_ls veya ps_l3
+            case "rightStickPress": suffix = isXbox ? "rs" : "r3"; break;
+
+            // Menü Tuşları
+            case "start": suffix = "start"; break;  // xb_start / ps_start
+            case "select": suffix = "select"; break; // xb_select / ps_select
+
+            // D-Pad
+            case "dpad/up": suffix = "dpad_up"; break;
+            case "dpad/down": suffix = "dpad_down"; break;
+            case "dpad/left": suffix = "dpad_left"; break;
+            case "dpad/right": suffix = "dpad_right"; break;
+
+            // Analog Hareket (Move/Look bindinglerinde genelde tüm stick gelir)
+            case "leftStick": suffix = "stick_l"; break; // xb_stick_l
+            case "rightStick": suffix = "stick_r"; break; // xb_stick_r
+
+            default:
+                // Bilinmeyen bir tuşsa (örn: dpad tek başına) logla ve çık
+                Debug.LogWarning($"Gamepad tuşu tanımlı değil: {unityControlName}");
+                return defaultMouseIcon; // Fallback olarak M ikonu veya boş dönebiliriz
+        }
+
+        // 3. Tam ismi oluştur (örn: xb_a)
+        string finalName = prefix + suffix;
+
+        // 4. Listede ara
+        foreach (var item in gamepadIcons)
+        {
+            if (item.spriteName == finalName)
+                return item.icon;
+        }
+
+        Debug.LogWarning($"Sprite bulunamadı: {finalName}");
+        return defaultMouseIcon;
     }
 
     // Mouse ismine göre Sprite getiren fonksiyon
@@ -260,8 +340,7 @@ public class RebindUI : MonoBehaviour
         }
 
         // Bulamazsa ilkini veya null döndür
-        Debug.LogWarning($"Mouse ikonu bulunamadı: {controlName}");
-        return null;
+        return defaultMouseIcon;
     }
 
     // ... (Senin GetKeyboardKeyText fonksiyonun AYNEN BURAYA GELECEK) ...

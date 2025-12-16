@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -37,6 +38,10 @@ public class Settings : MonoBehaviour
     public TMP_Dropdown sprintModeDropdown;
     public TMP_Dropdown crouchModeDropdown;
     public TMP_Dropdown stickLayoutDropdown;
+    public TMP_Dropdown controllerPromptsDropdown;
+
+    public static event Action OnPromptsChanged;
+    public static bool IsXboxPrompts = true;
 
     [Header("Audio Sliders")]
     public Slider masterSlider;
@@ -99,6 +104,12 @@ public class Settings : MonoBehaviour
         "UI_SWAPPED"  // 1: Ters (Solak)
     };
 
+    private readonly List<string> promptsKeys = new List<string>
+    {
+        "UI_XBOX", // 0
+        "UI_PS"    // 1
+    };
+
     void Start()
     {
         DecideResolutions();
@@ -147,6 +158,15 @@ public class Settings : MonoBehaviour
         // Baþlangýçta InputManager'a bildir (Eðer varsa)
         if (InputManager.Instance != null)
             InputManager.Instance.SetSwapSticks(savedStickLayout == 1);
+
+        PopulateDropdown(controllerPromptsDropdown, promptsKeys);
+
+        int savedPrompts = PlayerPrefs.GetInt("ControllerPrompts", 0); // 0: Xbox, 1: PS
+        controllerPromptsDropdown.value = savedPrompts;
+        controllerPromptsDropdown.RefreshShownValue();
+
+        // Static deðiþkeni güncelle
+        IsXboxPrompts = (savedPrompts == 0);
     }
 
     // Dropdown Doldurma Yardýmcýsý (Kod tekrarýný önlemek için)
@@ -210,6 +230,14 @@ public class Settings : MonoBehaviour
         PlayerPrefs.SetInt("StickLayout", index);
         // 0: Normal (False), 1: Swapped (True)
         if (InputManager.Instance != null) InputManager.Instance.SetSwapSticks(index == 1);
+    }
+
+    public void OnControllerPromptsChanged(int index)
+    {
+        PlayerPrefs.SetInt("ControllerPrompts", index);
+        IsXboxPrompts = (index == 0);
+
+        OnPromptsChanged?.Invoke();
     }
 
     private void InitializeGameplaySettings()

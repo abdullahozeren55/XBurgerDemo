@@ -29,6 +29,8 @@ public class MenuManager : MonoBehaviour
     public RectTransform settingsAudioRect;
     public RectTransform settingsControlsRect;
 
+    public GameObject rebindBlocker;
+
     // Þu an hangi alt menüdeyiz? (Back tuþu için önemli)
     private enum SettingsState { Main, General, Audio, Controls }
     private SettingsState currentSettingsState = SettingsState.Main;
@@ -566,5 +568,10 @@ public class MenuManager : MonoBehaviour
             if (scaler != null)
                 scaler.UpdateScale(offset);
         }
+    }
+
+    public void SetRebindBlocker(bool on)
+    {
+        rebindBlocker.SetActive(on);
     }
 }

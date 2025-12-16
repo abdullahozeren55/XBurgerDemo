@@ -1477,43 +1477,43 @@
   },
   {
     "key": "UI_MOVE_FORWARD",
-    "tr": "İleri Git",
-    "en": "Move Forward"
+    "tr": "İleri Git:",
+    "en": "Move Forward:"
   },
   {
     "key": "UI_MOVE_BACKWARD",
-    "tr": "Geri Git",
-    "en": "Move Backward"
+    "tr": "Geri Git:",
+    "en": "Move Backward:"
   },
   {
     "key": "UI_MOVE_LEFT",
-    "tr": "Sola Git",
-    "en": "Move Left"
+    "tr": "Sola Git:",
+    "en": "Move Left:"
   },
   {
     "key": "UI_MOVE_RIGHT",
-    "tr": "Sağa Git",
-    "en": "Move Right"
+    "tr": "Sağa Git:",
+    "en": "Move Right:"
   },
   {
     "key": "UI_JUMP",
-    "tr": "Zıpla",
-    "en": "Jump"
+    "tr": "Zıpla:",
+    "en": "Jump:"
   },
   {
     "key": "UI_SPRINT",
-    "tr": "Koş",
-    "en": "Sprint"
+    "tr": "Koş:",
+    "en": "Sprint:"
   },
   {
     "key": "UI_CROUCH",
-    "tr": "Eğil",
-    "en": "Crouch"
+    "tr": "Eğil:",
+    "en": "Crouch:"
   },
   {
     "key": "UI_PHONE",
-    "tr": "Telefon",
-    "en": "Phone"
+    "tr": "Telefon:",
+    "en": "Phone:"
   },
   {
     "key": "UI_PRESS_ANY_KEY",
@@ -1534,6 +1534,36 @@
     "key": "UI_SWAPPED",
     "tr": "Ters",
     "en": "Swapped"
+  },
+  {
+    "key": "UI_CANCEL",
+    "tr": "İPTAL",
+    "en": "CANCEL"
+  },
+  {
+    "key": "UI_FIXED",
+    "tr": "SABİT",
+    "en": "FIXED"
+  },
+  {
+    "key": "UI_LOOK",
+    "tr": "Bak:",
+    "en": "Look:"
+  },
+  {
+    "key": "UI_PAUSE",
+    "tr": "Duraklat:",
+    "en": "Pause:"
+  },
+  {
+    "key": "UI_XBOX",
+    "tr": "Xbox",
+    "en": "Xbox"
+  },
+  {
+    "key": "UI_PS",
+    "tr": "PlayStation",
+    "en": "PlayStation"
   }
 ]
 
