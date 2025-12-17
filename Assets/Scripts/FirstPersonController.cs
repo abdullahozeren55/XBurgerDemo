@@ -28,7 +28,6 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("Gamepad Interaction Assist")]
     [SerializeField] private float assistRadius = 0.15f; // Iþýnýn kalýnlýðý (Burger köftesi tutturmak için ideal)
-    [SerializeField] private float magnetStrength = 0.4f; // Objeye bakarken hýz %40'a düþsün
 
     [Header("Movement Parameters")]
     [SerializeField] private float movementSmoothTime = 0.1f;
@@ -225,7 +224,6 @@ public class FirstPersonController : MonoBehaviour
     private Animator anim;
 
     private Vector3 moveDirection;
-    private Vector2 currentInput;
 
     private int uninteractableLayer;
 
@@ -1439,7 +1437,14 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleFootsteps()
     {
-        if (!characterController.isGrounded || currentInput == Vector2.zero) return;
+        // 1. Önce karakterin YATAY hýzýný (Horizontal Velocity) ölçelim.
+        // Y eksenini (zýplama/düþme) sýfýrlýyoruz ki sadece yürüme hýzýný alalým.
+        float horizontalSpeed = new Vector3(characterController.velocity.x, 0, characterController.velocity.z).magnitude;
+
+        // 2. KURAL:
+        // - Eðer yerde deðilsek (isGrounded false) -> ÇALMA.
+        // - Eðer hýzýmýz çok düþükse (0.2f'den azsa, yani duruyorsak veya duvara takýldýysak) -> ÇALMA.
+        if (!characterController.isGrounded || horizontalSpeed < 0.2f) return;
 
         footstepTimer -= Time.deltaTime;
 
@@ -1447,7 +1452,7 @@ public class FirstPersonController : MonoBehaviour
         {
             CheckSurfaceAndPlaySound(1.9f, false, false);
 
-            footstepTimer = GetCurrentOffset;   
+            footstepTimer = GetCurrentOffset;
         }
     }
 

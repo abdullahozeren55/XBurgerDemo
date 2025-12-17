@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -45,8 +45,8 @@ public class GameManager : MonoBehaviour
     public class CursorSettings
     {
         public CursorType type;
-        public Sprite sprite; // Ýmleç resmi
-        public Vector2 hotspot;   // Týklama noktasý (Aþaðýda açýklayacaðým)
+        public Sprite sprite; // Ä°mleÃ§ resmi
+        public Vector2 hotspot;   // TÄ±klama noktasÄ± (AÅŸaÄŸÄ±da aÃ§Ä±klayacaÄŸÄ±m)
     }
 
     [Header("Cursor Settings")]
@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
     public Vector2 targetCursorSize = new Vector2(32f, 32f);
     public RectTransform cursorRect; // CursorImage'in RectTransform'u
     public Image cursorImage;        // CursorImage'in Image componenti
-    public Canvas cursorCanvas;      // CursorCanvas (FPS modunda kapatmak için)
+    public Canvas cursorCanvas;      // CursorCanvas (FPS modunda kapatmak iÃ§in)
     private Vector2 currentHotspot;  // O anki offset
     private Vector2 _virtualMousePosition;
 
@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
     {
         if (Cursor.lockState == CursorLockMode.None)
         {
-            // Resmi fare pozisyonuna taþý
+            // Resmi fare pozisyonuna taÅŸÄ±
             UpdateCursorPosition();
         }
     }
@@ -253,34 +253,34 @@ public class GameManager : MonoBehaviour
         {
             cursorImage.sprite = setting.sprite;
 
-            // YENÝSÝ (GARANTÝ ÇÖZÜM):
-            // RectTransform'un boyutunu (Width/Height) zorla 32x32 yapýyoruz.
+            // YENÄ°SÄ° (GARANTÄ° Ã‡Ã–ZÃœM):
+            // RectTransform'un boyutunu (Width/Height) zorla 32x32 yapÄ±yoruz.
             cursorRect.sizeDelta = targetCursorSize;
 
-            // Scale'i 1'de tutuyoruz (Canvas Scaler zaten büyütecek)
+            // Scale'i 1'de tutuyoruz (Canvas Scaler zaten bÃ¼yÃ¼tecek)
             cursorRect.localScale = Vector3.one;
 
             currentHotspot = setting.hotspot;
         }
         else
         {
-            Debug.LogWarning($"CursorManager: '{type}' ayarý bulunamadý!");
+            Debug.LogWarning($"CursorManager: '{type}' ayarÄ± bulunamadÄ±!");
         }
     }
 
-    // Mouse'u Kilitle/Aç ve Gizle/Göster
+    // Mouse'u Kilitle/AÃ§ ve Gizle/GÃ¶ster
     public void SetCursorLock(bool isLocked)
     {
-        // 1. Ýþletim sistemi faresini kilitle/aç
+        // 1. Ä°ÅŸletim sistemi faresini kilitle/aÃ§
         Cursor.lockState = isLocked ? CursorLockMode.Locked : CursorLockMode.None;
 
-        // 2. Bizim sahte imleci Göster/Gizle
-        // Kilitliyken (FPS modu) bizim resmimiz görünmemeli.
+        // 2. Bizim sahte imleci GÃ¶ster/Gizle
+        // Kilitliyken (FPS modu) bizim resmimiz gÃ¶rÃ¼nmemeli.
         if (cursorCanvas != null)
             cursorCanvas.enabled = !isLocked;
 
         // 3. Garanti olsun diye sistem faresini hep gizli tutuyoruz
-        // çünkü görünürlüðü bizim Canvas saðlýyor.
+        // Ã§Ã¼nkÃ¼ gÃ¶rÃ¼nÃ¼rlÃ¼ÄŸÃ¼ bizim Canvas saÄŸlÄ±yor.
         Cursor.visible = false;
     }
 
@@ -452,45 +452,44 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCursorPosition()
     {
-        // 1. Hangi cihazý kullanýyoruz?
+        // 1. Cihaz Tespiti
         bool isMouse = true;
         if (InputManager.Instance != null) isMouse = InputManager.Instance.IsUsingMouse();
 
-        // 2. POZÝSYON HESAPLAMA
+        // 2. POZÄ°SYON HESAPLAMA
         if (isMouse)
         {
-            // Mouse kullanýyorsa gerçek veriyi al
             _virtualMousePosition = Input.mousePosition;
         }
         else
         {
-            // Gamepad kullanýyorsa sanal veriyi güncelle
+            // Gamepad kullanÄ±yorsa
             if (InputManager.Instance != null)
             {
                 Vector2 input = InputManager.Instance.GetVirtualCursorInput();
 
                 if (input.magnitude > 0.1f)
                 {
-                    // Hýz ekle
-                    _virtualMousePosition += input * InputManager.Instance.virtualCursorSpeed * Time.unscaledDeltaTime;
+                    float uiScaleFactor = cursorCanvas.scaleFactor;
+                    if (uiScaleFactor <= 0) uiScaleFactor = 1f;
+
+                    _virtualMousePosition += input * InputManager.Instance.virtualCursorSpeed * uiScaleFactor * Time.unscaledDeltaTime;
                 }
             }
 
-            // 3. CLAMP (Ekran dýþýna çýkmasýn)
+            // 3. CLAMP (Ekran dÄ±ÅŸÄ±na Ã§Ä±kmasÄ±n)
             _virtualMousePosition.x = Mathf.Clamp(_virtualMousePosition.x, 0f, Screen.width);
             _virtualMousePosition.y = Mathf.Clamp(_virtualMousePosition.y, 0f, Screen.height);
 
-            // --- BÜYÜ BURADA: SÝSTEM FARESÝNÝ IÞINLA ---
-            // Eðer Input System kullanýyorsak ve Mouse cihazý varsa
+            // 4. SÄ°STEM FARESÄ°NÄ° IÅžINLA (HER ZAMAN)
+            // Mouse'u hep takip ettiriyoruz, gizleme saklama yok.
             if (UnityEngine.InputSystem.Mouse.current != null)
             {
-                // Windows faresini sprite'ýn olduðu yere ýþýnlýyoruz.
-                // Böylece Hover, Click vs. Unity tarafýndan otomatik algýlanýyor.
                 UnityEngine.InputSystem.Mouse.current.WarpCursorPosition(_virtualMousePosition);
             }
         }
 
-        // 4. KANVAS KOORDÝNATINA ÇEVÝRME (Görsel Ýmleç Ýçin)
+        // 5. KANVAS KOORDÄ°NATINA Ã‡EVÄ°RME
         Vector2 localPoint;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             cursorCanvas.transform as RectTransform,
@@ -499,11 +498,11 @@ public class GameManager : MonoBehaviour
             out localPoint
         );
 
-        // 5. HOTSPOT AYARI
+        // 6. HOTSPOT AYARI
         localPoint.x -= currentHotspot.x;
         localPoint.y += currentHotspot.y;
 
-        // 6. UYGULA
+        // 7. UYGULA
         cursorRect.localPosition = localPoint;
     }
 }

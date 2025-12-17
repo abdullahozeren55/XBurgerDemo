@@ -1584,6 +1584,11 @@
     "key": "UI_CAN_BE_SWAPPED",
     "tr": "SABİT AMA TERS ÇEVRİLEBİLİR",
     "en": "FIXED BUT CAN BE SWAPPED"
+  },
+  {
+    "key": "UI_AIM_ASSIST",
+    "tr": "Nişan Yardımı",
+    "en": "Aim Assist"
   }
 ]
 

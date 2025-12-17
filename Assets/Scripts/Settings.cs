@@ -94,6 +94,12 @@ public class Settings : MonoBehaviour
         "UI_OFF"
     };
 
+    private readonly List<string> offOnKeys = new List<string>
+    {
+        "UI_OFF",
+        "UI_ON"
+    };
+
     private readonly List<string> holdToggleKeys = new List<string>
     {
         "UI_HOLD",
@@ -135,7 +141,7 @@ public class Settings : MonoBehaviour
     {
         // 1. Mouse Sens (0-100 arasý tamsayý olarak çekiyoruz)
         // Varsayýlan 50 olsun (Ortalama hýz)
-        float mSens = PlayerPrefs.GetFloat("MouseSens", 50f);
+        float mSens = PlayerPrefs.GetFloat("MouseSens", 30f);
         mouseSensSlider.value = mSens;
         UpdateSensText(mouseSensText, mSens);
 
@@ -145,7 +151,7 @@ public class Settings : MonoBehaviour
         UpdateSensText(gamepadSensText, gSens);
 
         // 3. Dropdown Ýçeriklerini Doldur (Localization)
-        PopulateDropdown(invertYDropdown, onOffKeys);
+        PopulateDropdown(invertYDropdown, offOnKeys);
         PopulateDropdown(sprintModeDropdown, holdToggleKeys);
         PopulateDropdown(crouchModeDropdown, holdToggleKeys);
         PopulateDropdown(stickLayoutDropdown, stickLayoutKeys);
@@ -179,7 +185,7 @@ public class Settings : MonoBehaviour
         // Static deðiþkeni güncelle
         IsXboxPrompts = (savedPrompts == 0);
 
-        int savedAssist = PlayerPrefs.GetInt("AimAssist", 2);
+        int savedAssist = PlayerPrefs.GetInt("AimAssist", 1);
         aimAssistDropdown.value = savedAssist;
         aimAssistDropdown.RefreshShownValue();
 
@@ -235,7 +241,7 @@ public class Settings : MonoBehaviour
     public void OnInvertYChanged(int index)
     {
         PlayerPrefs.SetInt("InvertY", index);
-        if (InputManager.Instance != null) InputManager.Instance.SetInvertY(index == 0);
+        if (InputManager.Instance != null) InputManager.Instance.SetInvertY(index == 1);
     }
 
     public void OnSprintModeChanged(int index)
@@ -712,11 +718,164 @@ public class Settings : MonoBehaviour
 
         if (aimAssistDropdown != null)
         {
-            aimAssistDropdown.value = 2;
+            aimAssistDropdown.value = 1;
             aimAssistDropdown.RefreshShownValue();
-            OnAimAssistChanged(2);
+            OnAimAssistChanged(1);
         }
 
         Debug.Log("Gamepad Dropdownlarý ve Ayarlarý Sýfýrlandý.");
+    }
+
+    public void ResetControlsSettings()
+    {
+        // 1. Mouse Hassasiyeti (Varsayýlan: 30)
+        if (mouseSensSlider != null)
+        {
+            mouseSensSlider.value = 30f;
+            OnMouseSensChanged(30f);
+        }
+
+        // 2. Gamepad Hassasiyeti (Varsayýlan: 50)
+        if (gamepadSensSlider != null)
+        {
+            gamepadSensSlider.value = 50f;
+            OnGamepadSensChanged(50f);
+        }
+
+        // 3. Invert Y (Varsayýlan: Kapalý / 1)
+        if (invertYDropdown != null)
+        {
+            invertYDropdown.value = 0;
+            invertYDropdown.RefreshShownValue();
+            OnInvertYChanged(0);
+        }
+
+        // 4. Sprint Mode (Varsayýlan: Hold / 0)
+        if (sprintModeDropdown != null)
+        {
+            sprintModeDropdown.value = 0;
+            sprintModeDropdown.RefreshShownValue();
+            OnSprintModeChanged(0);
+        }
+
+        // 5. Crouch Mode (Varsayýlan: Hold / 0)
+        if (crouchModeDropdown != null)
+        {
+            crouchModeDropdown.value = 0;
+            crouchModeDropdown.RefreshShownValue();
+            OnCrouchModeChanged(0);
+        }
+
+        // NOT: Senin daha önce yazdýðýn "ResetGamepadUISettings" fonksiyonunu da 
+        // buraya dahil etmek istersen (Stick Layout, Aim Assist vb. de sýfýrlansýn diye)
+        // þu satýrý açabilirsin:
+        // ResetGamepadUISettings(); 
+
+        Debug.Log("Kontrol Ayarlarý Varsayýlanlara Döndü.");
+    }
+
+    // ==================================================================================
+    // 2. SES AYARLARI SIFIRLAMA
+    // ==================================================================================
+    public void ResetAudioSettings()
+    {
+        // Settings.cs baþýnda tanýmladýðýn "default...Volume" deðiþkenlerini kullanýyoruz.
+
+        // Ana Ses
+        if (masterSlider != null)
+        {
+            masterSlider.value = defaultMasterVolume;
+            OnMasterSliderChanged(defaultMasterVolume);
+        }
+
+        // Ses Efektleri
+        if (soundFXSlider != null)
+        {
+            soundFXSlider.value = defaultSoundFXVolume;
+            OnSoundFXSliderChanged(defaultSoundFXVolume);
+        }
+
+        // Müzik
+        if (musicSlider != null)
+        {
+            musicSlider.value = defaultMusicVolume;
+            OnMusicSliderChanged(defaultMusicVolume);
+        }
+
+        // Ambiyans
+        if (ambianceSlider != null)
+        {
+            ambianceSlider.value = defaultAmbianceVolume;
+            OnAmbianceSliderChanged(defaultAmbianceVolume);
+        }
+
+        // Typewriter (Daktilo Sesi)
+        if (typewriterSlider != null)
+        {
+            typewriterSlider.value = defaultTypewriterVolume;
+            OnTypewriterSliderChanged(defaultTypewriterVolume);
+        }
+
+        // UI Sesi
+        if (uiSlider != null)
+        {
+            uiSlider.value = defaultUIVolume;
+            OnUISliderChanged(defaultUIVolume);
+        }
+
+        Debug.Log("Ses Ayarlarý Varsayýlanlara Döndü.");
+    }
+
+    // ==================================================================================
+    // 3. GENEL AYARLAR SIFIRLAMA
+    // ==================================================================================
+    public void ResetGeneralSettings()
+    {
+        // --- ÇÖZÜNÜRLÜK KISMI ÝPTAL EDÝLDÝ ---
+        // Çözünürlük deðiþimi donanýmý yoruyor ve ekraný kilitleyebiliyor.
+        // O yüzden çözünürlüðe dokunmuyoruz, oyuncu ne seçtiyse o kalsýn.
+        // ------------------------------------
+
+        // 1. Kalite (Varsayýlan: Medium / 2)
+        if (qualityDropdown != null)
+        {
+            qualityDropdown.value = 2;
+            qualityDropdown.RefreshShownValue();
+            SetQuality(2);
+        }
+
+        // 3. Arayüz Boyutu (Varsayýlan: 0 - Offset Yok)
+        if (uiScaleDropdown != null)
+        {
+            uiScaleDropdown.value = 0;
+            uiScaleDropdown.RefreshShownValue();
+            OnUIScaleChanged(0);
+        }
+
+        // 4. Ýpuçlarý (Varsayýlan: Görünür / 0)
+        if (hintsDropdown != null)
+        {
+            hintsDropdown.value = 0;
+            hintsDropdown.RefreshShownValue();
+            SetHints(0);
+        }
+
+        // 5. Etkileþim Metni (Varsayýlan: Görünür / 0)
+        if (interactTextDropdown != null)
+        {
+            interactTextDropdown.value = 0;
+            interactTextDropdown.RefreshShownValue();
+            SetInteractText(0);
+        }
+
+        // 6. Pikselleþme (Varsayýlan: HD / 0)
+        if (pixelationDropdown != null)
+        {
+            pixelationDropdown.value = 0; // 0: En net
+            pixelationDropdown.RefreshShownValue();
+            SetPixelation(0);
+        }
+
+        Debug.Log("Genel Ayarlar (Çözünürlük Hariç) Varsayýlanlara Döndü.");
     }
 }

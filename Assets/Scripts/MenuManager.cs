@@ -132,6 +132,8 @@ public class MenuManager : MonoBehaviour
             if (settingsControlsKeyboardRect) settingsControlsKeyboardRect.gameObject.SetActive(false);
             if (settingsControlsGamepadRect) settingsControlsGamepadRect.gameObject.SetActive(false);
         }
+
+        InputManager.Instance.SwitchToUIMode();
     }
 
     private void Update()
@@ -147,6 +149,15 @@ public class MenuManager : MonoBehaviour
             GameManager.Instance.SetCursorLock(!pauseMenu.activeSelf);
 
             SetPlayerCanPlay(!pauseMenu.activeSelf);
+
+            if (pauseMenu.activeSelf)
+            {
+                InputManager.Instance.SwitchToUIMode();
+            }
+            else
+            {
+                InputManager.Instance.SwitchToGameplayMode();
+            }
         }
     }
 
@@ -662,6 +673,8 @@ public class MenuManager : MonoBehaviour
             {
                 DayManager.Instance.ResetForGameplay();
 
+                InputManager.Instance.SwitchToGameplayMode();
+
                 SetPlayerCanPlay(true);
                 HandleTimeScale(1);
                 GameManager.Instance.SetCursor(GameManager.CursorType.Default);
@@ -675,6 +688,8 @@ public class MenuManager : MonoBehaviour
             else if (scene.name == "MainMenu")
             {
                 DayManager.Instance.ResetForMainMenu();
+
+                InputManager.Instance.SwitchToUIMode();
 
                 HandleTimeScale(1);
                 GameManager.Instance.SetCursor(GameManager.CursorType.Default);
