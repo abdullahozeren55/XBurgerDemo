@@ -354,9 +354,6 @@ public class RebindUI : MonoBehaviour
         // Bulamazsa ilkini veya null döndür
         return defaultMouseIcon;
     }
-
-    // ... (Senin GetKeyboardKeyText fonksiyonun AYNEN BURAYA GELECEK) ...
-    // Kopyala yapıştır yaparken önceki mesajındaki GetKeyboardKeyText'i buraya koymayı unutma.
     private string GetKeyboardKeyText(string originalName)
     {
         if (string.IsNullOrEmpty(originalName)) return "NONE";

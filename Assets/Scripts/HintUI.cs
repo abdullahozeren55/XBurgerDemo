@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.InputSystem;
@@ -16,19 +16,19 @@ public class HintUI : MonoBehaviour
         public Color glowColor;
     }
 
-    [Header("Hangi Tuşu Gösterecek?")]
+    [Header("Hangi TuÅŸu GÃ¶sterecek?")]
     [SerializeField] private InputActionReference actionReference;
 
-    [Header("Bileşenler")]
+    [Header("BileÅŸenler")]
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text keyText;
     [SerializeField] private UIGlowController glowController;
 
-    [Header("Görsel Veritabanı")]
+    [Header("GÃ¶rsel VeritabanÄ±")]
     [SerializeField] private List<InputIconData> gamepadIcons;
     [SerializeField] private List<InputIconData> mouseIcons;
 
-    [Header("Varsayılanlar")]
+    [Header("VarsayÄ±lanlar")]
     [SerializeField] private InputIconData defaultGamepadData;
     [SerializeField] private InputIconData defaultMouseData;
     [ColorUsage(true, true)][SerializeField] private Color keyboardGlowColor = Color.white * 2f;
@@ -73,58 +73,48 @@ public class HintUI : MonoBehaviour
         UpdateVisuals();
     }
 
-    // --- BURASI DEĞİŞTİ ---
+    // --- BURASI DEÄÄ°ÅTÄ° ---
     public void UpdateVisuals()
     {
         if (_targetAction == null) return;
 
-        // 1. Şu an hangi cihazı kullanıyoruz?
         bool useGamepad = false;
         if (InputManager.Instance != null)
             useGamepad = !InputManager.Instance.IsUsingMouse();
 
         int foundBindingIndex = -1;
 
-        // 2. Bindingleri TEK TEK gez ve uygun olanı bul (Manuel Arama)
+        // Binding Bulma DÃ¶ngÃ¼sÃ¼
         for (int i = 0; i < _targetAction.bindings.Count; i++)
         {
             InputBinding b = _targetAction.bindings[i];
-
-            // Binding'in adresini al (Override varsa onu, yoksa orijinalini)
             string path = !string.IsNullOrEmpty(b.overridePath) ? b.overridePath : b.path;
 
-            // Composite (WASD gibi paketler) başlığını atla, içindeki tuşlara bak
             if (b.isComposite) continue;
 
             if (useGamepad)
             {
-                // Gamepad modundayız, içinde <Gamepad> geçen ilk tuşu kap
                 if (path.Contains("<Gamepad>") || path.Contains("<Joystick>"))
                 {
                     foundBindingIndex = i;
-                    break; // Bulduk, döngüden çık
+                    break;
                 }
             }
             else
             {
-                // Klavye modundayız, içinde <Keyboard> veya <Mouse> geçeni kap
                 if (path.Contains("<Keyboard>") || path.Contains("<Mouse>"))
                 {
                     foundBindingIndex = i;
-                    break; // Bulduk, döngüden çık
+                    break;
                 }
             }
         }
 
-        // Eğer uygun binding bulamadıysak (örn: Sadece klavye ataması var ama gamepaddeyiz),
-        // mecburen 0. indexi göster ki boş kalmasın.
         if (foundBindingIndex == -1) foundBindingIndex = 0;
 
-        // Bulduğumuz bindingin path'ini tekrar alalım
         InputBinding finalBinding = _targetAction.bindings[foundBindingIndex];
         string finalPath = !string.IsNullOrEmpty(finalBinding.overridePath) ? finalBinding.overridePath : finalBinding.path;
 
-        // 3. Görseli Güncelle
         if (finalPath.Contains("<Gamepad>"))
         {
             // --- GAMEPAD ---
@@ -150,16 +140,81 @@ public class HintUI : MonoBehaviour
         else
         {
             // --- KLAVYE ---
-            // Display String klavye tuşunun okunabilir ismini verir (E, Space, Enter vb.)
+            // Unity'den ham stringi alÄ±yoruz
             string displayString = _targetAction.GetBindingDisplayString(foundBindingIndex, InputBinding.DisplayStringOptions.DontUseShortDisplayNames);
-            keyText.text = displayString;
+
+            // Bizim Ã¶zel Ã§eviri ve format fonksiyonumuza sokuyoruz
+            keyText.text = GetKeyboardKeyText(displayString);
 
             if (glowController)
                 glowController.SetVisualData(false, null, keyboardGlowColor);
         }
     }
 
-    // --- ARAMA FONKSİYONLARI ---
+    // --- KLAVYE TEXT FORMATLAYICI (RebindUI'dan Ã‡ekildi) ---
+    private string GetKeyboardKeyText(string originalName)
+    {
+        if (string.IsNullOrEmpty(originalName)) return "NONE";
+
+        string cleanName = originalName.Replace("Keyboard/", "").Trim();
+
+        string lowerRaw = cleanName.ToLowerInvariant();
+        if (lowerRaw == "i") return "Ä°";
+        if (lowerRaw == "Ä±") return "I";
+
+        string upperKey = cleanName.ToUpperInvariant();
+
+        string lang = "en";
+        if (LocalizationManager.Instance != null)
+            lang = LocalizationManager.Instance.GetCurrentLanguageCode();
+        else
+            lang = PlayerPrefs.GetString("Language", "en");
+
+        bool isTR = lang == "tr";
+
+        switch (upperKey)
+        {
+            case "SPACE": return isTR ? "BOÅLUK" : "SPACE";
+            case "ENTER": case "RETURN": return isTR ? "GÄ°RÄ°Å" : "ENTER";
+            case "TAB": return "TAB";
+            case "ESCAPE": case "ESC": return "ESC";
+            case "CAPS LOCK": case "CAPSLOCK": return "CAPS";
+            case "BACKSPACE": return isTR ? "SÄ°L" : "BACK";
+            case "LEFT SHIFT": case "LSHIFT": case "SHIFT": return isTR ? "SOL SHIFT" : "L.SHIFT";
+            case "RIGHT SHIFT": case "RSHIFT": return isTR ? "SAÄ SHIFT" : "R.SHIFT";
+            case "LEFT CTRL": case "LCTRL": case "CTRL": case "CONTROL": case "LEFT CONTROL": return isTR ? "SOL CTRL" : "L.CTRL";
+            case "RIGHT CTRL": case "RCTRL": case "RIGHT CONTROL": return isTR ? "SAÄ CTRL" : "R.CTRL";
+            case "LEFT ALT": case "LALT": case "ALT": return isTR ? "SOL ALT" : "L.ALT";
+            case "RIGHT ALT": case "RALT": case "ALT GR": return isTR ? "SAÄ ALT" : "R.ALT";
+            case "UP ARROW": case "UP": return "â†‘";
+            case "DOWN ARROW": case "DOWN": return "â†“";
+            case "LEFT ARROW": case "LEFT": return "â†";
+            case "RIGHT ARROW": case "RIGHT": return "â†’";
+            case "LEFT BUTTON": case "LMB": return isTR ? "SOL TIK" : "L.CLICK";
+            case "RIGHT BUTTON": case "RMB": return isTR ? "SAÄ TIK" : "R.CLICK";
+            case "MIDDLE BUTTON": case "MMB": return isTR ? "ORTA TIK" : "M.CLICK";
+            case "FORWARD": return isTR ? "Ä°LERÄ°" : "FWD";
+            case "BACK": return isTR ? "GERÄ°" : "BACK";
+        }
+
+        if (upperKey.StartsWith("NUM"))
+        {
+            string suffix = upperKey.Replace("NUMPAD", "").Replace("NUM", "").Trim();
+            if (suffix == "ENTER") return isTR ? "NUM GÄ°RÄ°Å" : "NUM ENTER";
+            if (int.TryParse(suffix, out int number)) return "NUM " + number;
+            return "?";
+        }
+
+        if (upperKey.Length == 1)
+        {
+            string allAllowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789Ã‡ÄÄ°Ã–ÅÃœI";
+            if (allAllowed.Contains(upperKey)) return upperKey;
+        }
+
+        return "?";
+    }
+
+    // --- ARAMA FONKSÄ°YONLARI ---
     private InputIconData GetGamepadData(string unityControlName)
     {
         bool isXbox = Settings.IsXboxPrompts;
