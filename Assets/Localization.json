@@ -1246,22 +1246,22 @@
     "en": "Interface Scale"
   },
   {
-    "key": "UI_MAIN_MENU_QUALITY_0",
+    "key": "UI_TOAST_MACHINE",
     "tr": "Tost Makinesi",
     "en": "Toast Machine"
   },
   {
-    "key": "UI_MAIN_MENU_QUALITY_1",
+    "key": "UI_LOW",
     "tr": "Düşük",
     "en": "Low"
   },
   {
-    "key": "UI_MAIN_MENU_QUALITY_2",
+    "key": "UI_MEDIUM",
     "tr": "Orta",
     "en": "Medium"
   },
   {
-    "key": "UI_MAIN_MENU_QUALITY_3",
+    "key": "UI_HIGH",
     "tr": "Yüksek",
     "en": "High"
   },

@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
     public Image cursorImage;        // CursorImage'in Image componenti
     public Canvas cursorCanvas;      // CursorCanvas (FPS modunda kapatmak için)
     private Vector2 currentHotspot;  // O anki offset
+    private Vector2 _virtualMousePosition;
 
     [Header("Burger Lists")]
     public List<BurgerIngredientData.IngredientType> classicBurger = new List<BurgerIngredientData.IngredientType>();
@@ -451,33 +452,58 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCursorPosition()
     {
-        // 1. Mouse'un ekran pozisyonunu al
-        Vector2 screenMousePos = Input.mousePosition;
+        // 1. Hangi cihazý kullanýyoruz?
+        bool isMouse = true;
+        if (InputManager.Instance != null) isMouse = InputManager.Instance.IsUsingMouse();
 
-        // 2. Bu ekran pozisyonunu, Canvas'ýn yerel koordinatýna çevir.
-        // Bu fonksiyon; Canvas'ýn Overlay mi Camera mý olduðuna, Scale'ine,
-        // Duruþuna, her þeye bakýp doðru noktayý verir.
+        // 2. POZÝSYON HESAPLAMA
+        if (isMouse)
+        {
+            // Mouse kullanýyorsa gerçek veriyi al
+            _virtualMousePosition = Input.mousePosition;
+        }
+        else
+        {
+            // Gamepad kullanýyorsa sanal veriyi güncelle
+            if (InputManager.Instance != null)
+            {
+                Vector2 input = InputManager.Instance.GetVirtualCursorInput();
+
+                if (input.magnitude > 0.1f)
+                {
+                    // Hýz ekle
+                    _virtualMousePosition += input * InputManager.Instance.virtualCursorSpeed * Time.unscaledDeltaTime;
+                }
+            }
+
+            // 3. CLAMP (Ekran dýþýna çýkmasýn)
+            _virtualMousePosition.x = Mathf.Clamp(_virtualMousePosition.x, 0f, Screen.width);
+            _virtualMousePosition.y = Mathf.Clamp(_virtualMousePosition.y, 0f, Screen.height);
+
+            // --- BÜYÜ BURADA: SÝSTEM FARESÝNÝ IÞINLA ---
+            // Eðer Input System kullanýyorsak ve Mouse cihazý varsa
+            if (UnityEngine.InputSystem.Mouse.current != null)
+            {
+                // Windows faresini sprite'ýn olduðu yere ýþýnlýyoruz.
+                // Böylece Hover, Click vs. Unity tarafýndan otomatik algýlanýyor.
+                UnityEngine.InputSystem.Mouse.current.WarpCursorPosition(_virtualMousePosition);
+            }
+        }
+
+        // 4. KANVAS KOORDÝNATINA ÇEVÝRME (Görsel Ýmleç Ýçin)
         Vector2 localPoint;
-
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            cursorCanvas.transform as RectTransform, // Referans dikdörtgen (Canvas'ýn kendisi)
-            screenMousePos,                          // Mouse nerede?
-            cursorCanvas.worldCamera,                // Hangi kamera çekiyor?
-            out localPoint                           // Sonucu buraya yaz
+            cursorCanvas.transform as RectTransform,
+            _virtualMousePosition,
+            cursorCanvas.worldCamera,
+            out localPoint
         );
 
-        // 3. Hotspot Ayarý (Pivot Top-Left / 0,1 varsayýmýyla)
-        // Artýk scale ile çarpmýyoruz çünkü localPoint zaten scale edilmiþ Canvas uzayýnda.
-        // Ve cursorRect'in boyutu da sizeDelta ile sabitlendiði için birimler eþleþiyor.
-
-        // X: Saða gittikçe artar -> Hotspot kadar sola çek
+        // 5. HOTSPOT AYARI
         localPoint.x -= currentHotspot.x;
-
-        // Y: Yukarý gittikçe artar -> Hotspot kadar yukarý it (Pivot üstte olduðu için)
-        // Not: Eðer hotspot beklediðinin tersine kayarsa burayý -= yaparsýn.
         localPoint.y += currentHotspot.y;
 
-        // 4. Pozisyonu Ata (LocalPosition kullanýyoruz!)
+        // 6. UYGULA
         cursorRect.localPosition = localPoint;
     }
 }

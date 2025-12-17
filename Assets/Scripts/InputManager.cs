@@ -7,6 +7,16 @@ public class InputManager : MonoBehaviour
     // Singleton (Her yerden erişmek için)
     public static InputManager Instance;
 
+    public enum AimAssistLevel { Off, Low, Medium, High }
+
+    [Header("Cursor Settings")]
+    public float virtualCursorSpeed = 1500.0f;
+
+    [Header("Aim Assist Settings")]
+    public AimAssistLevel aimAssistLevel = AimAssistLevel.Medium;
+
+    private bool _lastInputWasMouse = true;
+
     [Header("Base Settings")]
     // Mouse Delta genelde çok büyük gelir (pixel pixel), o yüzden onu dizginlemek lazım.
     private const float BASE_MOUSE_MULTIPLIER = 0.05f;
@@ -92,6 +102,8 @@ public class InputManager : MonoBehaviour
         {
             _isCrouchingToggled = !_isCrouchingToggled;
         }
+
+        CheckActiveDevice();
     }
 
     private void OnEnable()
@@ -132,6 +144,13 @@ public class InputManager : MonoBehaviour
         _gameControls.RemoveAllBindingOverrides();
         PlayerPrefs.DeleteKey("Rebinds");
         // İstersen burada UI'ı yenilemek için bir event tetikleyebilirsin
+    }
+
+    public Vector2 GetVirtualCursorInput()
+    {
+        // Direkt sol stick okuyoruz. Swap vs. yok.
+        // Menüde herkes sol stick kullanır.
+        return _gameControls.Player.Movement.ReadValue<Vector2>();
     }
 
     // --- OYUNCU İÇİN TERCÜMELER ---
@@ -366,5 +385,81 @@ public class InputManager : MonoBehaviour
 
         // 5. Herkese haber ver! (RebindUI güncellensin)
         OnBindingsReset?.Invoke();
+    }
+
+    public float GetAssistRadius()
+    {
+        switch (aimAssistLevel)
+        {
+            case AimAssistLevel.Low: return 0.1f;
+            case AimAssistLevel.Medium: return 0.2f; // Dünkü 0.15-0.20 civarıydı
+            case AimAssistLevel.High: return 0.3f;
+            default: return 0f; // Off
+        }
+    }
+
+    // Magnetism (Yavaşlatma Gücü - 1.0 Normal, 0.1 Çok Yavaş)
+    public float GetMagnetStrength()
+    {
+        switch (aimAssistLevel)
+        {
+            case AimAssistLevel.Low: return 0.75f;  // Hafif fren
+            case AimAssistLevel.Medium: return 0.5f; // İdeal fren
+            case AimAssistLevel.High: return 0.25f; // Zamk gibi yapışır
+            default: return 1.0f; // Fren yok
+        }
+    }
+
+    // O anki cihaz Mouse mu?
+    public bool IsUsingMouse()
+    {
+        return _lastInputWasMouse;
+    }
+
+    // Ayarı Değiştirme Fonksiyonu
+    public void SetAimAssistLevel(int index)
+    {
+        // Dropdown sırası: 0: Kapalı, 1: Az, 2: Orta, 3: Çok
+        aimAssistLevel = (AimAssistLevel)index;
+    }
+
+    private void CheckActiveDevice()
+    {
+        // 1. Mouse Hareketini Kontrol Et
+        // Mouse'un hareketi (delta) belli bir eşiği geçerse Mouse moduna geç.
+        // Mouse.current null kontrolü yapıyoruz (Gamepad takılı değilken hata vermesin diye)
+        if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 1.0f)
+        {
+            _lastInputWasMouse = true;
+        }
+        // Ayrıca herhangi bir Mouse tuşuna basılırsa da geç
+        else if (Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame))
+        {
+            _lastInputWasMouse = true;
+        }
+
+        // 2. Gamepad Hareketini Kontrol Et
+        // Gamepad'e geçmek için analogların DEADZONE'u aşması lazım.
+        // Yoksa masada duran kolun titremesi (Drift) bizi gamepad moduna sokar.
+        if (Gamepad.current != null)
+        {
+            // Sağ Stick (Look) veya Sol Stick (Move)
+            Vector2 rightStick = Gamepad.current.rightStick.ReadValue();
+            Vector2 leftStick = Gamepad.current.leftStick.ReadValue();
+
+            // Eşik değeri (0.2f güvenli bir aralıktır)
+            if (rightStick.magnitude > 0.2f || leftStick.magnitude > 0.2f)
+            {
+                _lastInputWasMouse = false;
+            }
+            // Ayrıca butonlara basılırsa da geç (A, B, X, Y vs.)
+            else if (Gamepad.current.buttonSouth.wasPressedThisFrame || // A / Cross
+                     Gamepad.current.buttonEast.wasPressedThisFrame ||  // B / Circle
+                     Gamepad.current.buttonWest.wasPressedThisFrame ||  // X / Square
+                     Gamepad.current.buttonNorth.wasPressedThisFrame)   // Y / Triangle
+            {
+                _lastInputWasMouse = false;
+            }
+        }
     }
 }

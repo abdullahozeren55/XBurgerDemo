@@ -39,6 +39,7 @@ public class Settings : MonoBehaviour
     public TMP_Dropdown crouchModeDropdown;
     public TMP_Dropdown stickLayoutDropdown;
     public TMP_Dropdown controllerPromptsDropdown;
+    public TMP_Dropdown aimAssistDropdown;
 
     public static event Action OnPromptsChanged;
     public static event Action OnStickLayoutChangedEvent;
@@ -74,10 +75,10 @@ public class Settings : MonoBehaviour
 
     private readonly List<string> qualityKeys = new List<string>
     {
-        "UI_MAIN_MENU_QUALITY_0",
-        "UI_MAIN_MENU_QUALITY_1",
-        "UI_MAIN_MENU_QUALITY_2",
-        "UI_MAIN_MENU_QUALITY_3"
+        "UI_TOAST_MACHINE",
+        "UI_LOW",
+        "UI_MEDIUM",
+        "UI_HIGH"
     };
 
     private readonly List<string> pixelationKeys = new List<string>
@@ -111,6 +112,14 @@ public class Settings : MonoBehaviour
         "UI_PS"    // 1
     };
 
+    private readonly List<string> aimAssistKeys = new List<string>
+    {
+        "UI_OFF",    // 0
+        "UI_LOW",    // 1
+        "UI_MEDIUM", // 2
+        "UI_HIGH"    // 3
+    };
+
     void Start()
     {
         DecideResolutions();
@@ -140,6 +149,7 @@ public class Settings : MonoBehaviour
         PopulateDropdown(sprintModeDropdown, holdToggleKeys);
         PopulateDropdown(crouchModeDropdown, holdToggleKeys);
         PopulateDropdown(stickLayoutDropdown, stickLayoutKeys);
+        PopulateDropdown(aimAssistDropdown, aimAssistKeys);
 
         // 4. Kayýtlý Deðerleri Ata
         invertYDropdown.value = PlayerPrefs.GetInt("InvertY", 0); // 0: Off, 1: On
@@ -168,6 +178,13 @@ public class Settings : MonoBehaviour
 
         // Static deðiþkeni güncelle
         IsXboxPrompts = (savedPrompts == 0);
+
+        int savedAssist = PlayerPrefs.GetInt("AimAssist", 2);
+        aimAssistDropdown.value = savedAssist;
+        aimAssistDropdown.RefreshShownValue();
+
+        if (InputManager.Instance != null)
+            InputManager.Instance.SetAimAssistLevel(savedAssist);
     }
 
     // Dropdown Doldurma Yardýmcýsý (Kod tekrarýný önlemek için)
@@ -193,6 +210,13 @@ public class Settings : MonoBehaviour
     }
 
     // --- EVENT CALLBACKS (Inspector'dan Baðlanacaklar) ---
+
+    public void OnAimAssistChanged(int index)
+    {
+        PlayerPrefs.SetInt("AimAssist", index);
+        if (InputManager.Instance != null)
+            InputManager.Instance.SetAimAssistLevel(index);
+    }
 
     public void OnMouseSensChanged(float val)
     {
@@ -686,11 +710,12 @@ public class Settings : MonoBehaviour
             OnControllerPromptsChanged(0); // PlayerPrefs kaydet ve Event fýrlat
         }
 
-        // Eðer gamepad sensivity de sýfýrlansýn istersen:
-        /*
-        gamepadSensSlider.value = 50; // Veya varsayýlanýn kaçsa
-        OnGamepadSensChanged(50);
-        */
+        if (aimAssistDropdown != null)
+        {
+            aimAssistDropdown.value = 2;
+            aimAssistDropdown.RefreshShownValue();
+            OnAimAssistChanged(2);
+        }
 
         Debug.Log("Gamepad Dropdownlarý ve Ayarlarý Sýfýrlandý.");
     }

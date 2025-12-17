@@ -272,6 +272,11 @@ public class FirstPersonController : MonoBehaviour
     {
         if (CanPlay)
         {
+            // Her karenin baþýnda hýzý varsayýlan (1.0) kabul edelim.
+            // Aþaðýdaki fonksiyonlar gerekirse bunu düþürecek.
+            if (InputManager.Instance != null)
+                InputManager.Instance.aimAssistSlowdown = 1f;
+
             if (CanMove)
                 HandleMovementInput();
             else
@@ -833,7 +838,7 @@ public class FirstPersonController : MonoBehaviour
                 {
 
                     // Bir interactable bulduk! Kamerayý yavaþlat.
-                    InputManager.Instance.aimAssistSlowdown = magnetStrength;
+                    InputManager.Instance.aimAssistSlowdown = InputManager.Instance.GetMagnetStrength();
 
                     if (currentInteractable == null)
                     {
@@ -863,8 +868,6 @@ public class FirstPersonController : MonoBehaviour
                 }
                 else
                 {
-                    // Interactable deðilse hýzý normale döndür
-                    InputManager.Instance.aimAssistSlowdown = 1f;
 
                     if (currentInteractable != null)
                     {
@@ -876,8 +879,6 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                // Collider yoksa hýzý normale döndür
-                InputManager.Instance.aimAssistSlowdown = 1f;
 
                 if (currentInteractable != null)
                 {
@@ -889,8 +890,6 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-            // Hiçbir þeye çarpmadýk, hýzý normale döndür
-            InputManager.Instance.aimAssistSlowdown = 1f;
 
             if (currentInteractable != null)
             {
@@ -1012,7 +1011,7 @@ public class FirstPersonController : MonoBehaviour
                 {
                     // --- MAGNETISM ---
                     // Eþya bulduk, yavaþlat
-                    InputManager.Instance.aimAssistSlowdown = magnetStrength;
+                    InputManager.Instance.aimAssistSlowdown = InputManager.Instance.GetMagnetStrength();
 
                     if (currentGrabable == null)
                     {
@@ -1070,7 +1069,6 @@ public class FirstPersonController : MonoBehaviour
                 }
                 else
                 {
-                    InputManager.Instance.aimAssistSlowdown = 1f; // Yavaþlatmayý kapat
 
                     if (currentGrabable != null && !currentGrabable.IsGrabbed)
                     {
@@ -1090,7 +1088,6 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                InputManager.Instance.aimAssistSlowdown = 1f; // Yavaþlatmayý kapat
 
                 if (currentGrabable != null && !currentGrabable.IsGrabbed)
                 {
@@ -1109,7 +1106,6 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-            InputManager.Instance.aimAssistSlowdown = 1f; // Yavaþlatmayý kapat
 
             if (currentGrabable != null && !currentGrabable.IsGrabbed)
             {
@@ -1924,13 +1920,24 @@ public class FirstPersonController : MonoBehaviour
             // Eðer duvara çarptýysa buraya girmez, aþaðýya (SphereCast'e) devam eder.
         }
 
+        // 2. CÝHAZ VE AYAR KONTROLÜ
+        // Eðer Mouse kullanýyorsak VEYA Ayarlardan "Kapalý" seçildiyse SphereCast yapma.
+        if (InputManager.Instance.IsUsingMouse() || InputManager.Instance.aimAssistLevel == InputManager.AimAssistLevel.Off)
+        {
+            return false;
+        }
+
         // -------------------------------------------------------------
         // 2. AÞAMA: SPHERE CAST (Aim Assist / Kalýn Iþýn)
         // -------------------------------------------------------------
         // Merkezde eþya yok (ya boþluk ya da duvar var).
         // Þimdi etrafý tarayalým.
 
-        RaycastHit[] hits = Physics.SphereCastAll(ray, assistRadius, distance, mask);
+        // 3. SPHERE CAST ALL (Dinamik Radius ile)
+        // Yarýçapý InputManager'dan alýyoruz
+        float dynamicRadius = InputManager.Instance.GetAssistRadius();
+
+        RaycastHit[] hits = Physics.SphereCastAll(ray, dynamicRadius, distance, mask);
 
         if (hits.Length == 0) return false;
 
