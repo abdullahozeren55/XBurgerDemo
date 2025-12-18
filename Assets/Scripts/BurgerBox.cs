@@ -50,6 +50,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
     private int grabableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int ungrabableLayer;
+    private int grabbedLayer;
     private int onTrayLayer;
 
     [HideInInspector] public bool isJustThrowed;
@@ -72,6 +73,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
+        grabbedLayer = LayerMask.NameToLayer("Grabbed");
         onTrayLayer = LayerMask.NameToLayer("OnTray");
 
         IsGrabbed = false;
@@ -107,7 +109,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
         Sequence seq = DOTween.Sequence();
         seq.Append(transform.DOMove(trayPos, data.timeToPutOnTray).SetEase(Ease.OutQuad));
-        seq.Join(transform.DORotateQuaternion(Quaternion.identity, data.timeToPutOnTray).SetEase(Ease.OutCubic));
+        seq.Join(transform.DORotateQuaternion(Quaternion.Euler(data.trayRotation), data.timeToPutOnTray).SetEase(Ease.OutCubic));
         seq.OnComplete(() =>
         {
             SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.closeSoundVolume, data.closeSoundMinPitch, data.closeSoundMaxPitch);
@@ -118,7 +120,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public void OnGrab(Transform grabPoint)
     {
-        ChangeLayer(ungrabableLayer);
+        ChangeLayer(grabbedLayer);
         isGettingPutOnTray = false;
 
         CanBeReceived = true;

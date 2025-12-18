@@ -37,6 +37,7 @@ public class Drink : MonoBehaviour, IGrabable
     private int grabableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int ungrabableLayer;
+    private int grabbedLayer;
 
     [HideInInspector] public bool isJustThrowed;
     [HideInInspector] public bool isJustDropped;
@@ -53,6 +54,7 @@ public class Drink : MonoBehaviour, IGrabable
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
+        grabbedLayer = LayerMask.NameToLayer("Grabbed");
 
         IsGrabbed = false;
 
@@ -63,7 +65,7 @@ public class Drink : MonoBehaviour, IGrabable
 
     public void OnGrab(Transform grabPoint)
     {
-        gameObject.layer = ungrabableLayer;
+        ChangeLayer(grabbedLayer);
 
         CanBeReceived = true;
 
@@ -85,12 +87,12 @@ public class Drink : MonoBehaviour, IGrabable
     public void OnFocus()
     {
         if (!isJustDropped && !isJustThrowed)
-            gameObject.layer = grabableOutlinedLayer;
+            ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
         if (!isJustDropped && !isJustThrowed)
-            gameObject.layer = grabableLayer;
+            ChangeLayer(grabableLayer);
     }
 
     public void OnDrop(Vector3 direction, float force)
@@ -132,11 +134,11 @@ public class Drink : MonoBehaviour, IGrabable
     {
         if (gameObject.layer == grabableOutlinedLayer && OutlineShouldBeRed)
         {
-            gameObject.layer = interactableOutlinedRedLayer;
+            ChangeLayer(interactableOutlinedRedLayer);
         }
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
         {
-            gameObject.layer = grabableOutlinedLayer;
+            ChangeLayer(grabableOutlinedLayer);
         }
     }
 
@@ -194,13 +196,13 @@ public class Drink : MonoBehaviour, IGrabable
         {
             if (isJustThrowed)
             {
-                gameObject.layer = grabableLayer;
+                ChangeLayer(grabableLayer);
 
                 isJustThrowed = false;
             }
             else if (isJustDropped)
             {
-                gameObject.layer = grabableLayer;
+                ChangeLayer(grabableLayer);
 
                 isJustDropped = false;
             }

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: BURGERBOX
   m_EditorClassIdentifier: 
   isUseable: 0
+  isThrowable: 1
   handGrabTypes: 050000000a000000
   timeToPutOnTray: 0.2
+  throwMultiplier: 1
+  trayRotation: {x: 0, y: -90, z: 0}
   grabPositionOffset:
   - {x: 0.4, y: 0.5, z: 2}
   - {x: 0.4, y: 0.5, z: 2}

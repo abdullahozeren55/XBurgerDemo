@@ -12,6 +12,7 @@ public class BurgerBoxData : ScriptableObject
     [Space]
     public float timeToPutOnTray = 0.3f;
     public float throwMultiplier = 1f;
+    public Vector3 trayRotation = new Vector3(0, 0, -90);
     [Space]
     public Vector3[] grabPositionOffset; //0 for open, 1 for close
     public Vector3[] grabRotationOffset; //0 for open, 1 for close
