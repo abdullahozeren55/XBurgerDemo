@@ -575,7 +575,7 @@ public class MenuManager : MonoBehaviour
 
     void FindAndAssignCamera()
     {
-        GameObject camObj = GameObject.Find("UI_Camera");
+        GameObject camObj = GameObject.Find("UIMainMenu_Camera");
         if (camObj != null)
         {
             Camera uiCam = camObj.GetComponent<Camera>();
