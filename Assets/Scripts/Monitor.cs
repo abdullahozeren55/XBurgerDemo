@@ -86,17 +86,15 @@ public class Monitor : MonoBehaviour, IInteractable
     private void HandleMonitorUI()
     {
         monitorUI.SetActive(true);
-
         MonitorManager.Instance.IsFocused = true;
 
-        if (showHint)
-            monitorUIHintGO.SetActive(true);
+        if (showHint) monitorUIHintGO.SetActive(true);
 
         monitorUITween?.Kill();
 
         monitorUITween = monitorScaler.DOScale(Vector3.one, monitorUILerpTime)
         .SetEase(Ease.OutBack, 3.5f)
-        .SetUpdate(true)
+        // .SetUpdate(true)  <--- BU SATIRI SÝLÝYORUZ (Varsayýlan false olsun)
         .OnComplete(() =>
         {
             GameManager.Instance.SetCursor(GameManager.CursorType.Retro);
@@ -117,9 +115,10 @@ public class Monitor : MonoBehaviour, IInteractable
         monitorUITween?.Kill();
 
         monitorUITween = monitorScaler.DOScale(monitorUImin, monitorUIReverseLerpTime)
-        .SetEase(Ease.InQuad)
-        .SetUpdate(true);
+        .SetEase(Ease.InQuad);
+        // .SetUpdate(true); <--- BUNU DA SÝLÝYORUZ
 
+        // Invoke zaten TimeScale'e duyarlýdýr, SetUpdate'i silince ikisi senkronize olur.
         Invoke("FinishMonitorUIP2", monitorUIFinishDelay);
     }
 

@@ -23,6 +23,7 @@ public class MenuManager : MonoBehaviour
     public GameObject mainMenu;
     public GameObject pauseMenu;
     public GameObject settingsMenu;
+    public GameObject raycastBlockerForPause;
     public GameObject rebindBlocker;
 
     [Header("Rebind Ýpuçlarý")]
@@ -186,6 +187,7 @@ public class MenuManager : MonoBehaviour
             }
         }
 
+        raycastBlockerForPause.SetActive(isGamePaused);
         UpdateDoFState(isGamePaused);
         HandleTimeScale(isGamePaused ? 0f : 1f);
         SetPlayerCanPlay(!isGamePaused);
