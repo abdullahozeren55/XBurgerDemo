@@ -137,6 +137,14 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
 
+        //TODO: BU KALDIRILACAK AYARLARA TAŞINACAK DENEMELİK
+        // VSync'i AÇIYORUZ (0 kapalı, 1 açık demektir)
+        // Bu ayar, FPS'i monitörünün Hz değerine (300'e) kilitler.
+        QualitySettings.vSyncCount = 1;
+
+        // Unity'nin manuel frenini kaldırıyoruz, kontrolü VSync'e bırakıyoruz.
+        Application.targetFrameRate = -1;
+
         allBurgerMenus = new List<List<BurgerIngredientData.IngredientType>>()
         {
             classicBurger,
