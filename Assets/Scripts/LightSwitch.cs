@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VLB; // <--- 1. VLB KÜTÜPHANESÝ EKLENDÝ
 
 public class LightSwitch : MonoBehaviour, IInteractable
 {
-    // --- STANDART DEÐÝÞKENLERÝN AYNEN KALIYOR ---
+    // --- STANDART DEÐÝÞKENLER ---
     public bool CanInteract { get => canInteract; set => canInteract = value; }
     [SerializeField] private bool canInteract = true;
 
@@ -53,10 +54,6 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
     private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
 
-    // BURASI DEÐÝÞTÝ: Tek bir coroutine yetmez, çünkü 5 ýþýk ayný anda flicker yapabilir.
-    // Kapatýrken StopAllCoroutines kullanacaðýz veya listeye alacaðýz.
-    // Þimdilik kafa karýþmasýn diye basit tuttum.
-
     [Header("Audio Settings")]
     public AudioClip lightSwitchSound;
     public float minPitchForOn = 1f;
@@ -84,12 +81,14 @@ public class LightSwitch : MonoBehaviour, IInteractable
         {
             Renderer rend = settings.lightGO.GetComponentInChildren<Renderer>();
             if (rend != null)
+            {
                 rend.material = new Material(lightMatToCopy);
                 rend.material.SetColor("_EmissionColor", Color.black);
+            }
         }
     }
 
-    // --- INTERFACE METOTLARI AYNEN KALIYOR ---
+    // --- INTERFACE METOTLARI ---
     public void ChangeLayer(int layerIndex) { gameObject.layer = layerIndex; switchPart.layer = layerIndex; }
     public void HandleFinishDialogue() { }
     public void OnFocus() { if (!CanInteract) return; ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer); }
@@ -130,21 +129,11 @@ public class LightSwitch : MonoBehaviour, IInteractable
         switchPart.transform.localRotation = targetRotation;
     }
 
-    // --- ASIL DEÐÝÞÝKLÝK BURADA ---
     private void HandleLights()
     {
-        // Önceki flicker iþlemlerini durdur. 
-        // DÝKKAT: Bu switch üzerindeki TÜM coroutine'leri durdurur (Rotate hariç tutulmalýydý ama
-        // Rotate zaten kýsa sürdüðü için sorun olmaz, yine de clean olsun diye rotate'i ayrý tutabilirsin)
-        // Ama en temizi flicker'larý bir listede tutmak. 
-        // Þimdilik "StopAllCoroutines" kullanýyorum ama RotateCoroutine'i tekrar baþlatmamak için dikkatli ol.
-        // Flicker için StopAllCoroutines yapmak yerine, kapatma bloðunda manuel kontrol yapalým.
-
-        Color currentBaseEmission = Color.white; // Default
+        Color currentBaseEmission = Color.white;
         if (DayManager.Instance != null)
         {
-            // LightSwitch'in kullandýðý orijinal materyal "lightMatToCopy" idi.
-            // DayManager'da kayýtlý olan da odur.
             currentBaseEmission = DayManager.Instance.GetOriginalEmissionColor(lightMatToCopy);
         }
 
@@ -155,26 +144,34 @@ public class LightSwitch : MonoBehaviour, IInteractable
             {
                 Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
                 Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+
+                // 2. VLB'yi BUL
+                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+
                 if (lightComp == null || rend == null) continue;
 
                 Material matInstance = rend.material;
                 matInstance.EnableKeyword("_EMISSION");
                 lightComp.enabled = true;
 
+                // 3. VLB'yi AÇ (Varsayýlan olarak)
+                if (vlb != null) vlb.enabled = true;
+
                 // Flicker olacak mý?
                 bool willFlicker = Random.Range(0, 100) < setting.flickerPossibility;
 
                 if (willFlicker)
                 {
-                    // FLICKER VARSA: Coroutine baþlat, o bitince BuzzManager'a haber verecek
+                    // FLICKER VARSA: VLB'yi parametre olarak gönder
                     int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
-                    StartCoroutine(FlickerLightRoutine(lightComp, matInstance, currentBaseEmission, flickerCount));
+                    StartCoroutine(FlickerLightRoutine(lightComp, vlb, matInstance, currentBaseEmission, flickerCount));
                 }
                 else
                 {
-                    // FLICKER YOKSA: Direkt aç ve BuzzManager'a haber ver
+                    // FLICKER YOKSA: Direkt aç
                     lightComp.intensity = baseIntensity;
                     matInstance.SetColor("_EmissionColor", currentBaseEmission);
+                    // VLB zaten yukarýda açýldý
 
                     buzzSoundSource.volume += buzzSoundIncreasePerLight;
                 }
@@ -183,24 +180,27 @@ public class LightSwitch : MonoBehaviour, IInteractable
         else
         {
             // IÞIKLARI KAPATIYORUZ
-            StopAllCoroutines(); // Flickerlarý anýnda kes
-            // Rotate durduysa tekrar baþlatmak gerekebilir ama basit çözüm:
+            StopAllCoroutines();
             if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
-            rotateCoroutine = StartCoroutine(ToogleRotate(isOn)); // Rotasyon bozulmasýn diye tekrar tetikledim
+            rotateCoroutine = StartCoroutine(ToogleRotate(isOn));
 
             foreach (var setting in lightsToEffect)
             {
                 Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
                 Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
 
-                // Eðer ýþýk zaten açýksa, BuzzManager'dan düþmeliyiz
-                // (lightComp.enabled true ise yanýyordur veya flicker yapýyordur)
+                // 4. VLB'yi BUL
+                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+
+                // Eðer ýþýk zaten açýksa, BuzzManager'dan düþ
                 if (lightComp != null && lightComp.enabled)
                 {
                     buzzSoundSource.volume = 0f;
-
                     lightComp.enabled = false;
                 }
+
+                // 5. VLB'yi KAPAT
+                if (vlb != null) vlb.enabled = false;
 
                 if (rend != null)
                 {
@@ -210,12 +210,13 @@ public class LightSwitch : MonoBehaviour, IInteractable
         }
     }
 
-    private IEnumerator FlickerLightRoutine(Light light, Material mat, Color targetEmission, int flickerCount)
+    // 6. Parametreyi GÜNCELLE
+    private IEnumerator FlickerLightRoutine(Light light, VolumetricLightBeamSD vlb, Material mat, Color targetEmission, int flickerCount)
     {
         // Flicker sýrasýnda ýþýk bir yanýp bir sönecek
         for (int i = 0; i < flickerCount; i++)
         {
-            // Rastgele kýsýk yan
+            // Rastgele kýsýk yan (SÖNME ANI)
             float randomIntensity = Random.Range(0.01f, baseIntensity * 0.3f);
             float emissionMultiplier = randomIntensity / (baseIntensity * 2);
             Color flickerEmission = targetEmission * Mathf.LinearToGammaSpace(emissionMultiplier);
@@ -223,11 +224,17 @@ public class LightSwitch : MonoBehaviour, IInteractable
             light.intensity = randomIntensity;
             mat.SetColor("_EmissionColor", flickerEmission);
 
+            // 7. VLB'yi KAPAT
+            if (vlb != null) vlb.enabled = false;
+
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
 
-            // Normale dön (Kýsa süreliðine)
+            // Normale dön (Kýsa süreliðine - YANMA ANI)
             light.intensity = baseIntensity;
             mat.SetColor("_EmissionColor", targetEmission);
+
+            // 8. VLB'yi AÇ
+            if (vlb != null) vlb.enabled = true;
 
             SoundManager.Instance.PlayRandomSoundFX(flickClips, light.transform, flickVolume, flickMinPitch, flickMaxPitch);
 
@@ -237,6 +244,9 @@ public class LightSwitch : MonoBehaviour, IInteractable
         // --- FLICKER BÝTTÝ, SON HALÝNÝ VER ---
         light.intensity = baseIntensity;
         mat.SetColor("_EmissionColor", targetEmission);
+
+        // 9. VLB'yi AÇIK BIRAK
+        if (vlb != null) vlb.enabled = true;
 
         buzzSoundSource.volume += buzzSoundIncreasePerLight;
     }

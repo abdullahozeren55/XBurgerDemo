@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 using static LightSwitch;
+using VLB; // <--- EKLEME: VLB Kütüphanesi
 
 public class PlayerInOutTrigger : MonoBehaviour
 {
@@ -63,7 +64,6 @@ public class PlayerInOutTrigger : MonoBehaviour
 
     private void Awake()
     {
-
         lightsOn = false;
 
         if (lightMatToCopy != null)
@@ -104,7 +104,7 @@ public class PlayerInOutTrigger : MonoBehaviour
                         if (!lightsOn)
                             HandleLights(true);
                     }
-                        
+
                     else if (action == InOutTriggerType.TurnOffLights && lightsOn)
                     {
                         if (currentHandieLightCoroutine != null)
@@ -116,7 +116,7 @@ public class PlayerInOutTrigger : MonoBehaviour
                         currentHandieLightCoroutine = StartCoroutine(HandleLightsWithDelay());
                     }
                 }
-                
+
             }
             else
             {
@@ -155,13 +155,6 @@ public class PlayerInOutTrigger : MonoBehaviour
 
     private void HandleLights(bool shouldOn)
     {
-        // Önceki flicker iþlemlerini durdur. 
-        // DÝKKAT: Bu switch üzerindeki TÜM coroutine'leri durdurur (Rotate hariç tutulmalýydý ama
-        // Rotate zaten kýsa sürdüðü için sorun olmaz, yine de clean olsun diye rotate'i ayrý tutabilirsin)
-        // Ama en temizi flicker'larý bir listede tutmak. 
-        // Þimdilik "StopAllCoroutines" kullanýyorum ama RotateCoroutine'i tekrar baþlatmamak için dikkatli ol.
-        // Flicker için StopAllCoroutines yapmak yerine, kapatma bloðunda manuel kontrol yapalým.
-
         lightsOn = shouldOn;
 
         if (lightsOn)
@@ -172,26 +165,35 @@ public class PlayerInOutTrigger : MonoBehaviour
             {
                 Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
                 Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+
+                // --- EKLEME: VLB Componentini al ---
+                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+
                 if (lightComp == null || rend == null) continue;
 
                 Material matInstance = rend.material;
                 matInstance.EnableKeyword("_EMISSION");
                 lightComp.enabled = true;
 
+                // Flicker yoksa hemen açýyoruz, flicker varsa coroutine içinde açacaðýz
+                // Ama varsayýlan olarak açýk kalsýn, flicker yönetecek
+                if (vlb != null) vlb.enabled = true;
+
                 // Flicker olacak mý?
                 bool willFlicker = Random.Range(0, 100) < setting.flickerPossibility;
 
                 if (willFlicker)
                 {
-                    // FLICKER VARSA: Coroutine baþlat, o bitince BuzzManager'a haber verecek
+                    // FLICKER VARSA: VLB'yi de gönderiyoruz
                     int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
-                    StartCoroutine(FlickerLightRoutine(lightComp, matInstance, baseEmission, flickerCount));
+                    StartCoroutine(FlickerLightRoutine(lightComp, vlb, matInstance, baseEmission, flickerCount));
                 }
                 else
                 {
-                    // FLICKER YOKSA: Direkt aç ve BuzzManager'a haber ver
+                    // FLICKER YOKSA: Direkt aç
                     lightComp.intensity = baseIntensity;
                     matInstance.SetColor("_EmissionColor", baseEmission);
+                    // VLB zaten yukarýda açýldý
 
                     buzzSoundSource.volume += buzzSoundIncreasePerLight;
                 }
@@ -208,14 +210,17 @@ public class PlayerInOutTrigger : MonoBehaviour
                 Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
                 Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
 
-                // Eðer ýþýk zaten açýksa, BuzzManager'dan düþmeliyiz
-                // (lightComp.enabled true ise yanýyordur veya flicker yapýyordur)
+                // --- EKLEME: VLB Componentini al ---
+                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+
                 if (lightComp != null && lightComp.enabled)
                 {
                     buzzSoundSource.volume = 0f;
-
                     lightComp.enabled = false;
                 }
+
+                // --- EKLEME: VLB'yi kapat ---
+                if (vlb != null) vlb.enabled = false;
 
                 if (rend != null)
                 {
@@ -232,12 +237,13 @@ public class PlayerInOutTrigger : MonoBehaviour
         HandleLights(false);
     }
 
-    private IEnumerator FlickerLightRoutine(Light light, Material mat, Color targetEmission, int flickerCount)
+    // --- GÜNCELLEME: VLB parametresi eklendi ---
+    private IEnumerator FlickerLightRoutine(Light light, VolumetricLightBeamSD vlb, Material mat, Color targetEmission, int flickerCount)
     {
         // Flicker sýrasýnda ýþýk bir yanýp bir sönecek
         for (int i = 0; i < flickerCount; i++)
         {
-            // Rastgele kýsýk yan
+            // Rastgele kýsýk yan (SÖNME ANI)
             float randomIntensity = Random.Range(0.01f, baseIntensity * 0.3f);
             float emissionMultiplier = randomIntensity / (baseIntensity * 2);
             Color flickerEmission = targetEmission * Mathf.LinearToGammaSpace(emissionMultiplier);
@@ -245,11 +251,17 @@ public class PlayerInOutTrigger : MonoBehaviour
             light.intensity = randomIntensity;
             mat.SetColor("_EmissionColor", flickerEmission);
 
+            // --- VLB: Iþýk kýsýldýðýnda hüzmeyi kapat ---
+            if (vlb != null) vlb.enabled = false;
+
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
 
-            // Normale dön (Kýsa süreliðine)
+            // Normale dön (Kýsa süreliðine - YANMA ANI)
             light.intensity = baseIntensity;
             mat.SetColor("_EmissionColor", targetEmission);
+
+            // --- VLB: Iþýk yandýðýnda hüzmeyi aç ---
+            if (vlb != null) vlb.enabled = true;
 
             SoundManager.Instance.PlayRandomSoundFX(flickClips, light.transform, flickVolume, flickMinPitch, flickMaxPitch);
 
@@ -260,39 +272,35 @@ public class PlayerInOutTrigger : MonoBehaviour
         light.intensity = baseIntensity;
         mat.SetColor("_EmissionColor", targetEmission);
 
+        // --- VLB: Son olarak açýk býrak ---
+        if (vlb != null) vlb.enabled = true;
+
         buzzSoundSource.volume += buzzSoundIncreasePerLight;
     }
 
     // --- GÖRSELLEÞTÝRME (GÝZMOS) ---
     private void OnDrawGizmos()
     {
-        // Objenin kendi rotasyonunu ve scale'ini hesaba katarak çizim yap
+        // ... (Gizmos kodun ayný kalabilir) ...
         Matrix4x4 rotationMatrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
         Gizmos.matrix = rotationMatrix;
 
-        // Collider boyutunu al (Varsayýlan 1x1x1 küp üzerinden)
         BoxCollider box = GetComponent<BoxCollider>();
         if (box != null)
         {
-            // Trigger'ýn kendisini þeffaf sarý çiz (Eþik)
             Gizmos.color = new Color(1, 1, 0, 0.3f);
             Gizmos.DrawCube(box.center, box.size);
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(box.center, box.size);
 
-            // --- YEÞÝL BÖLGE (Gidilecek Yer) ---
-            // Z ekseninde ileriye (Forward) ufak bir küre koy
-            Gizmos.color = new Color(0, 1, 0, 0.8f); // Yeþil
+            Gizmos.color = new Color(0, 1, 0, 0.8f);
             Vector3 greenPos = box.center + new Vector3(0, 0, 0.5f);
             Gizmos.DrawSphere(greenPos, 0.2f);
 
-            // --- KIRMIZI BÖLGE (Gelinen Yer) ---
-            // Z ekseninde geriye (Back) ufak bir küre koy
-            Gizmos.color = new Color(1, 0, 0, 0.8f); // Kýrmýzý
+            Gizmos.color = new Color(1, 0, 0, 0.8f);
             Vector3 redPos = box.center - new Vector3(0, 0, 0.5f);
             Gizmos.DrawSphere(redPos, 0.2f);
 
-            // Ok iþareti niyetine çizgi
             Gizmos.color = Color.white;
             Gizmos.DrawLine(redPos, greenPos);
         }
