@@ -171,6 +171,7 @@ public class MenuManager : MonoBehaviour
             }
         }
 
+        UpdateDoFState(isGamePaused);
         HandleTimeScale(isGamePaused ? 0f : 1f);
         GameManager.Instance.SetCursor(GameManager.CursorType.Default);
         GameManager.Instance.SetCursorLock(!isGamePaused);
@@ -199,7 +200,9 @@ public class MenuManager : MonoBehaviour
             if (pauseMenuRect)
             {
                 pauseMenuRect.DOKill(true);
-                pauseMenuRect.DOAnchorPosX(-width, slideDuration).SetEase(slideEase).SetUpdate(true);
+                pauseMenuRect.DOAnchorPosX(-width, slideDuration)
+                    .SetEase(slideEase).SetUpdate(true)
+                    .OnComplete(() => pauseMenuRect.gameObject.SetActive(false));
             }
 
             settingsRect.DOAnchorPosX(0, slideDuration)
@@ -244,7 +247,7 @@ public class MenuManager : MonoBehaviour
             if (pauseMenuRect)
             {
                 pauseMenuRect.DOKill(true);
-                pauseMenu.SetActive(true);
+                pauseMenuRect.gameObject.SetActive(true);
                 pauseMenuRect.anchoredPosition = new Vector2(-width, 0);
                 pauseMenuRect.DOAnchorPosX(0, slideDuration).SetEase(slideEase).SetUpdate(true);
             }
@@ -489,7 +492,7 @@ public class MenuManager : MonoBehaviour
     public void HandlePauseMenu(bool shouldTurnOn) => pauseMenu.SetActive(shouldTurnOn);
     public void HandleTimeScale(float timeScale) => Time.timeScale = timeScale;
     public void SetCanPause(bool pause) => CanPause = pause;
-    public void SetPlayerCanPlay(bool can) => PlayerManager.Instance.SetPlayerBasicMovements(can);
+    public void SetPlayerCanPlay(bool can) => PlayerManager.Instance.SetPlayerCanPlay(can);
 
     public void LoadScene(string sceneName) { SceneManager.LoadScene(sceneName); }
     public void QuitGame() { Application.Quit(); }

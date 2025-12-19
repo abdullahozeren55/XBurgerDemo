@@ -201,7 +201,7 @@ public class Tarik : MonoBehaviour, ICustomer, IInteractable
             HandleHeadHome();
         }
 
-        PlayerManager.Instance.SetPlayerCanPlay(true);
+        PlayerManager.Instance.SetPlayerBasicMovements(true);
 
     }
 

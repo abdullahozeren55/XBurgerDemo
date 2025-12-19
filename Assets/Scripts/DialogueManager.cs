@@ -258,7 +258,6 @@ public class DialogueManager : MonoBehaviour
         talkType = TalkType.TalkWithCustomer;
 
         PlayerManager.Instance.SetPlayerBasicMovements(false);
-        PlayerManager.Instance.SetPlayerCanHeadBob(false);
         dialogueIndex = 0;
 
         currentCustomer = customer;
@@ -283,7 +282,6 @@ public class DialogueManager : MonoBehaviour
         {
             CameraManager.Instance.SwitchToFirstPersonCamera();
             PlayerManager.Instance.SetPlayerBasicMovements(true);
-            PlayerManager.Instance.SetPlayerCanHeadBob(true);
 
             currentCustomer.HandleFinishDialogue();
         }
@@ -337,8 +335,7 @@ public class DialogueManager : MonoBehaviour
 
         talkType = TalkType.TalkWithSeller;
 
-        PlayerManager.Instance.SetPlayerCanPlay(false);
-        PlayerManager.Instance.SetPlayerCanHeadBob(false);
+        PlayerManager.Instance.SetPlayerBasicMovements(false);
 
         PlayerManager.Instance.ResetPlayerInteract(currentInteractable, shouldBeUninteractable);
 
@@ -359,8 +356,7 @@ public class DialogueManager : MonoBehaviour
         currentTextAnim.StartDisappearingText();
 
         CameraManager.Instance.SwitchToFirstPersonCamera();
-        PlayerManager.Instance.SetPlayerCanPlay(true);
-        PlayerManager.Instance.SetPlayerCanHeadBob(true);
+        PlayerManager.Instance.SetPlayerBasicMovements(true);
 
     }
 
