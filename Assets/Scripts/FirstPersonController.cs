@@ -51,7 +51,7 @@ public class FirstPersonController : MonoBehaviour
     private float breatheParticleLastInstantiateTime;
 
     [Header("Look Parameters")]
-    [SerializeField] private Transform headBone;
+    [SerializeField] private Transform head;
     [SerializeField] private Transform cameraFollow;
     [SerializeField, Range(1, 10)] private float lookSpeedX = 2.0f;
     [SerializeField, Range(1, 10)] private float lookSpeedY = 2.0f;
@@ -424,7 +424,7 @@ public class FirstPersonController : MonoBehaviour
         // Vertical look (Pitch)
         rotationX -= mouseY * vertSpeed;
         rotationX = Mathf.Clamp(rotationX, -upperLookLimit, lowerLookLimit);
-        headBone.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        //head.localRotation = Quaternion.Euler(rotationX, 0, 0);
         cameraFollow.localRotation = Quaternion.Euler(rotationX, 0, 0);
 
         // Horizontal look (Yaw)
@@ -1264,7 +1264,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void SetHandAnimBoolsOff()
     {
-        anim.SetBool("regularGrab", false);
+        /*anim.SetBool("regularGrab", false);
         anim.SetBool("bottleGrab", false);
         anim.SetBool("trashGrab", false);
         anim.SetBool("knifeGrab", false);
@@ -1275,12 +1275,12 @@ public class FirstPersonController : MonoBehaviour
         anim.SetBool("kettleGrab", false);
         anim.SetBool("wholeIngredientGrab", false);
         anim.SetBool("bigWholeIngredientGrab", false);
-        anim.SetBool("wholeBunGrab", false);
+        anim.SetBool("wholeBunGrab", false);*/
         anim.SetBool("chargingThrow", false);
     }
     private void DecideGrabAnimBool()
     {
-        if (currentGrabable != null && currentGrabable.IsGrabbed)
+        /*if (currentGrabable != null && currentGrabable.IsGrabbed)
         {
             anim.SetTrigger("endThrowInstantly");
 
@@ -1334,7 +1334,7 @@ public class FirstPersonController : MonoBehaviour
                     anim.SetBool("wholeBunGrab", true);
                     break;
             }
-        }
+        }*/
     }
 
     public void ResetGrabAndInteract()
