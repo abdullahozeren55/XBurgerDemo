@@ -51,7 +51,6 @@ public class FirstPersonController : MonoBehaviour
     private float breatheParticleLastInstantiateTime;
 
     [Header("Look Parameters")]
-    [SerializeField] private Transform head;
     [SerializeField] private Transform cameraFollow;
     [SerializeField, Range(1, 10)] private float lookSpeedX = 2.0f;
     [SerializeField, Range(1, 10)] private float lookSpeedY = 2.0f;
@@ -424,7 +423,6 @@ public class FirstPersonController : MonoBehaviour
         // Vertical look (Pitch)
         rotationX -= mouseY * vertSpeed;
         rotationX = Mathf.Clamp(rotationX, -upperLookLimit, lowerLookLimit);
-        //head.localRotation = Quaternion.Euler(rotationX, 0, 0);
         cameraFollow.localRotation = Quaternion.Euler(rotationX, 0, 0);
 
         // Horizontal look (Yaw)
