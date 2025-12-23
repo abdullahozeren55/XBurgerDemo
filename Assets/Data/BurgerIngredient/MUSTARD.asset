@@ -30,8 +30,8 @@ MonoBehaviour:
     m_Bits: 0
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -20, y: -70, z: -70}
-  grabLocalPositionOffset: {x: 0.00010675803, y: 0.0006777254, z: 0.00015923989}
-  grabLocalRotationOffset: {x: 306.82666, y: 186.3378, z: 188.63396}
+  grabLocalPositionOffset: {x: 0.00045338421, y: 0.04404887, z: 0.067784056}
+  grabLocalRotationOffset: {x: 306.82947, y: 186.33774, z: 188.63446}
   focusTextKeys:
   - GRABABLE_MUSTARD
   dropParticles:

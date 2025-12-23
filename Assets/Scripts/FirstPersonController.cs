@@ -1825,7 +1825,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (shouldGoBack)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.15f);
             if (leftHandRigLerpCoroutine == null)
                 leftHandRigLerpCoroutine = StartCoroutine(LerpLeftHandRig(false, false));
         }
@@ -1867,7 +1867,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (shouldGoBack)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.15f);
             if (rightHandRigLerpCoroutine == null)
                 rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(false, false));
         }

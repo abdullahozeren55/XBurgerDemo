@@ -20,11 +20,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 69249
   throwParticles: {fileID: 8670732574423207768, guid: cc31d56079258774aa559250869c296f, type: 3}
-  grabPositionOffset: {x: 0.3, y: 0, z: 2}
+  grabPositionOffset: {x: 0.2, y: 0.2, z: 2}
   grabRotationOffset: {x: 45, y: -60, z: -90}
   grabLocalPositionOffset: {x: -0.013618964, y: 0.020353079, z: 0.033785075}
   grabLocalRotationOffset: {x: 8.037032, y: 69.726715, z: 281.35193}
-  usePositionOffset: {x: 0.3, y: 0, z: 2}
+  usePositionOffset: {x: 0.2, y: 0.2, z: 2}
   useRotationOffset: {x: 0, y: -70, z: -130}
   useLocalPositionOffset: {x: -0.013618964, y: 0.020353079, z: 0.033785075}
   useLocalRotationOffset: {x: 8.037032, y: 69.726715, z: 281.35193}

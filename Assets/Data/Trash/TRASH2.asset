@@ -16,7 +16,7 @@ MonoBehaviour:
   isThrowable: 1
   throwMultiplier: 1
   handGrabType: 2
-  grabPositionOffset: {x: 0.4, y: 0.5, z: 2}
+  grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: 60, y: -70, z: -70}
   grabLocalPositionOffset: {x: -0.0514, y: 0.0166, z: 0.0997}
   grabLocalRotationOffset: {x: 347.43948, y: 90.76056, z: 316.18842}

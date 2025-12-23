@@ -24,5 +24,5 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 2c7435990fa9a9640afad4068c99d45a, type: 2}
   - {fileID: 2100000, guid: e476f7c2dca7523489a75cc717af5c47, type: 2}
   cookTime:
+  - 10
   - 15
-  - 25

@@ -19,17 +19,17 @@ MonoBehaviour:
   throwMultiplier: 1
   trayRotation: {x: 0, y: -90, z: 0}
   grabPositionOffset:
-  - {x: 0.4, y: 0.5, z: 2}
-  - {x: 0.4, y: 0.5, z: 2}
+  - {x: 0.6, y: 1, z: 2}
+  - {x: 0.6, y: 1, z: 2}
   grabRotationOffset:
   - {x: -5, y: -70, z: -70}
   - {x: -30, y: -70, z: -90}
   grabLocalPositionOffset:
-  - {x: 0.00025837784, y: 0.00089873705, z: -0.0006797007}
-  - {x: -0.00016148196, y: -0.000017137338, z: 0.00066903926}
+  - {x: 0.009603439, y: 0.07083532, z: -0.03651086}
+  - {x: -0.0254, y: -0.044, z: 0.0929}
   grabLocalRotationOffset:
-  - {x: 351.06442, y: 271.22836, z: 132.20628}
-  - {x: 344.64236, y: 354.95905, z: 345.82324}
+  - {x: 351.05927, y: 271.2068, z: 132.21298}
+  - {x: 344.64285, y: 354.9592, z: 345.82364}
   focusTextKeys:
   - BURGER_BOX
   - BURGER_CLASSIC
