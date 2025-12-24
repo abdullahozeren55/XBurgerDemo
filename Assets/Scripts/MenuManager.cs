@@ -59,7 +59,10 @@ public class MenuManager : MonoBehaviour
     public float swingMinPitch = 0.8f;
     public float swingMaxPitch = 1.2f;
 
-    private Canvas myCanvas;
+    [Header("Canvas")]
+    public Canvas menuCanvas;
+    public Canvas mouseCanvas;
+    
     private RectTransform canvasRect;
     private List<PixelPerfectCanvasScaler> activeScalers = new List<PixelPerfectCanvasScaler>();
 
@@ -71,8 +74,7 @@ public class MenuManager : MonoBehaviour
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); }
         else { Destroy(gameObject); }
 
-        myCanvas = GetComponentInChildren<Canvas>();
-        if (myCanvas != null) canvasRect = myCanvas.GetComponent<RectTransform>();
+        if (menuCanvas != null) canvasRect = menuCanvas.GetComponent<RectTransform>();
 
         float width = GetCanvasWidth();
         float height = GetCanvasHeight();
@@ -579,10 +581,15 @@ public class MenuManager : MonoBehaviour
         if (camObj != null)
         {
             Camera uiCam = camObj.GetComponent<Camera>();
-            if (myCanvas != null)
+
+            if (menuCanvas != null)
             {
-                myCanvas.worldCamera = uiCam;
-                myCanvas.planeDistance = 5;
+                menuCanvas.worldCamera = uiCam;
+            }
+
+            if (mouseCanvas != null)
+            {
+                mouseCanvas.worldCamera = uiCam;
             }
 
             Camera mainCam = Camera.main;

@@ -138,11 +138,6 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.ChangeCurrentGrabable(objectToGrab);
     }
 
-    public void SetPlayerPushedByCustomer(bool value)
-    {
-        firstPersonController.isBeingPushedByACustomer = value;
-    }
-
     public void MovePlayer(Vector3 moveForce)
     {
         characterController.Move(moveForce);

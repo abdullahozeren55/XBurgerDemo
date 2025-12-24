@@ -36,8 +36,6 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float sprintSpeed = 6.0f;
     [SerializeField] private float crouchSpeed = 1.5f;
     [SerializeField] private float slopeSpeed = 8.0f;
-    [SerializeField] private float pushForce = 1f;
-    [HideInInspector] public bool isBeingPushedByACustomer = false;
     private Vector2 currentDir = Vector2.zero;
     private Vector2 currentDirVelocity = Vector2.zero;
 
@@ -1794,17 +1792,6 @@ public class FirstPersonController : MonoBehaviour
         IsUsingItemX = false;
         IsUsingItemY = false;
     }
-        
-
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        Rigidbody rb = hit.collider.attachedRigidbody;
-
-        if (rb != null && !rb.isKinematic)
-        {
-            rb.velocity += hit.moveDirection * pushForce;
-        }
-    }
 
     private IEnumerator LerpLeftHandRig(bool shouldReach, bool shouldGoBack)
     {
@@ -2103,6 +2090,8 @@ public class FirstPersonController : MonoBehaviour
             SetFocusTextComplete(true);
         }
     }
+
+    
 
     void CalculateArmLengths()
     {

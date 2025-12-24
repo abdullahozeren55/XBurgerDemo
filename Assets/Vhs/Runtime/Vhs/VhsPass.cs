@@ -93,8 +93,8 @@ namespace VolFx
 			_validateNoise();
 
 			// scale line
-			_yScanline += Time.deltaTime * 0.01f * settings._flow.value;
-			_xScanline -= Time.deltaTime * 0.1f  * settings._pulsation.value;
+			_yScanline += Time.unscaledDeltaTime * 0.01f * settings._flow.value;
+			_xScanline -= Time.unscaledDeltaTime * 0.1f  * settings._pulsation.value;
             
 			var glitch = settings._color.overrideState ? settings._color.value : _colorDefault;
 			
