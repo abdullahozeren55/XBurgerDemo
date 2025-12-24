@@ -51,14 +51,14 @@ TagManager:
   - Grabbed
   - 
   - 
-  - 
+  - PostProcessInGameUI
   - UI_MainMenu
   - MANAGERS
   - ScreenPhone
-  - PostProcessMainCamera
+  - PostProcessGameView
   - PlayerBlocker
   - ScreenMonitor
-  - PostProcess
+  - PostProcessOnTopAll
   m_SortingLayers:
   - name: Default
     uniqueID: 0
