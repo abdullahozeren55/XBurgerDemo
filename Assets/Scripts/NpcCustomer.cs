@@ -287,7 +287,7 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
     {
         if (!CanInteract) return;
 
-        ChangeLayer(interactableOutlinedLayer);
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
     }
 
     public void OnLoseFocus()

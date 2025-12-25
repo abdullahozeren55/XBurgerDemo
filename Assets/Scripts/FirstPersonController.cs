@@ -287,6 +287,11 @@ public class FirstPersonController : MonoBehaviour
     {
         if (CanPlay)
         {
+            if (InputManager.Instance.PlayerInteract())
+            {
+                InteractKeyIsDone = false;
+            }
+
             // Her karenin baþýnda hýzý varsayýlan (1.0) kabul edelim.
             // Aþaðýdaki fonksiyonlar gerekirse bunu düþürecek.
             if (InputManager.Instance != null)
@@ -666,32 +671,41 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-                // Elimiz dolu mu? (Normal eþya veya Telefon)
+                // Elimiz dolu mu?
                 bool isHandFull = (currentGrabable != null && currentGrabable.IsGrabbed) || phoneGrabable.IsGrabbed;
 
-                // Baktýðýmýz þey "Eþya Veren" (SingleHandGrab) tipi mi?
+                // Baktýðýmýz þey "Eþya Veren" tipi mi?
                 bool isItemGiver = currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab;
 
-                // KURAL: El doluysa ve Eþya Verene bakýyorsak...
-                if (isHandFull && isItemGiver)
+                // SENARYO A: Elim Dolu
+                if (isHandFull)
                 {
-                    // DÜZELTME BURADA:
-                    // Eðer Telefon elimizdeyse -> Yine Kýrmýzý (Telefonla konuþurken býçak alamayýz - Tercih senin, istersen kaldýr)
-                    // Eðer Telefon YOKSA ama Cebimizde YER VARSA -> Beyaz (OutlineShouldBeRed = false)
-
-                    if (!phoneGrabable.IsGrabbed && HasEmptySlot())
+                    if (isItemGiver)
                     {
-                        currentInteractable.OutlineShouldBeRed = false; // Alabilirsin, elindekini cebe atarýz.
+                        // Telefon yoksa ve Yer varsa -> Beyaz
+                        if (!phoneGrabable.IsGrabbed && HasEmptySlot())
+                            currentInteractable.OutlineShouldBeRed = false;
+                        else
+                            currentInteractable.OutlineShouldBeRed = true;
                     }
                     else
                     {
-                        currentInteractable.OutlineShouldBeRed = true; // Yer yok veya telefon var, Yasak.
+                        currentInteractable.OutlineShouldBeRed = false;
                     }
                 }
+                // SENARYO B: Elim Boþ (AMA CEP DOLU OLABÝLÝR!) -- DÜZELTME BURADA
                 else
                 {
-                    // Diðer durumlar (Kapý açma, ýþýk yakma vs.) -> Beyaz
-                    currentInteractable.OutlineShouldBeRed = false;
+                    // Eðer eþya veren bir þeye bakýyorsak VE hiç boþ yerimiz yoksa -> KIRMIZI
+                    if (isItemGiver && !HasEmptySlot())
+                    {
+                        currentInteractable.OutlineShouldBeRed = true;
+                    }
+                    else
+                    {
+                        // Yerimiz var veya eþya vermeyen (kapý, ýþýk vb.) bir þey -> BEYAZ
+                        currentInteractable.OutlineShouldBeRed = false;
+                    }
                 }
             }
 
@@ -704,21 +718,22 @@ public class FirstPersonController : MonoBehaviour
         // DURUM 1: Elim dolu ve yerde baþka bir þeye bakýyorum
         if (currentGrabable != null && currentGrabable.IsGrabbed && otherGrabable != null)
         {
-            if (!HasEmptySlot())
+            // DÜZELTME BURADA:
+            // Yer yoksa VEYA Þu an elimdekini kullanýyorsam (örn: fýrlatma þarjý) -> KIRMIZI
+            if (!HasEmptySlot() || isUsingGrabbedItem)
             {
                 otherGrabable.OutlineShouldBeRed = true;
             }
             else
             {
-                // Yer varsa turuncu (normal) kalsýn
                 otherGrabable.OutlineShouldBeRed = false;
             }
+
             otherGrabable.OutlineChangeCheck();
         }
         // DURUM 2: Telefon elimde ve baþka bir þeye bakýyorum
         else if (phoneGrabable.IsGrabbed && currentGrabable != null && currentGrabable != phoneGrabable)
         {
-            // Telefon özel bir durum, telefonla konuþurken yerden bir þey alamayýz (Tercih meselesi, þimdilik kýrmýzý kalsýn)
             currentGrabable.OutlineShouldBeRed = true;
             currentGrabable.OutlineChangeCheck();
         }
@@ -727,13 +742,32 @@ public class FirstPersonController : MonoBehaviour
         {
             if (otherGrabable != null)
             {
-                otherGrabable.OutlineShouldBeRed = false;
+                // BURADA DA AYNISI: Yer yoksa veya Meþgulsek -> KIRMIZI
+                if (!HasEmptySlot() || isUsingGrabbedItem)
+                    otherGrabable.OutlineShouldBeRed = true;
+                else
+                    otherGrabable.OutlineShouldBeRed = false;
+
                 otherGrabable.OutlineChangeCheck();
             }
 
             if (currentGrabable != null && currentGrabable != phoneGrabable)
             {
-                currentGrabable.OutlineShouldBeRed = false;
+                // Yerdeki (henüz alýnmamýþ) eþyalar için:
+                if (!currentGrabable.IsGrabbed)
+                {
+                    // Yer yoksa veya Meþgulsek -> KIRMIZI
+                    if (!HasEmptySlot() || isUsingGrabbedItem)
+                        currentGrabable.OutlineShouldBeRed = true;
+                    else
+                        currentGrabable.OutlineShouldBeRed = false;
+                }
+                else
+                {
+                    // Elimdeki eþya kendi kendine kýrmýzý olmasýn (kullanýrken outline deðiþmesin diyorsan false kalýr)
+                    currentGrabable.OutlineShouldBeRed = false;
+                }
+
                 currentGrabable.OutlineChangeCheck();
             }
         }
@@ -741,9 +775,10 @@ public class FirstPersonController : MonoBehaviour
 
     private void DecideCrosshairColor()
     {
-        // 1. Durum: Kýrmýzý olmasý gereken özel durumlar (Kýrmýzý Outline yanýyorsa veya Eþya Kullanýlýyorsa)
+        // 1. Durum: Kýrmýzý olmasý gereken ZORUNLU durumlar
         if ((currentInteractable != null && currentInteractable.OutlineShouldBeRed) ||
-            (otherGrabable != null && otherGrabable.OutlineShouldBeRed) || // <-- Bunu ekledik: Yer yoksa kýrmýzý outline yanar, o zaman crosshair de kýrmýzý olsun.
+            (otherGrabable != null && otherGrabable.OutlineShouldBeRed) ||
+            (currentGrabable != null && currentGrabable.OutlineShouldBeRed) ||
             (currentGrabable == phoneGrabable && isUsingGrabbedItem))
         {
             ChangeCrosshairColor(useCrosshairColor); // Kýrmýzý
@@ -751,23 +786,28 @@ public class FirstPersonController : MonoBehaviour
         // 2. Durum: Bir Grabable'a bakýyoruz veya elimizde bir þey var
         else if (currentGrabable != null)
         {
-            // Eðer Telefon elimizdeyse ve baþka bir þeye bakýyorsak -> Kýrmýzý (Telefon özel durum)
+            // Telefon kontrolü...
             if (phoneGrabable.IsGrabbed && currentGrabable != phoneGrabable)
             {
                 ChangeCrosshairColor(useCrosshairColor);
             }
-            // Eðer elimiz boþsa ve bir þeye bakýyorsak -> Turuncu (Grab Rengi)
+            // Elim boþsa ve yere bakýyorsam
             else if (!currentGrabable.IsGrabbed)
             {
-                ChangeCrosshairColor(grabCrosshairColor);
+                // Yer varsa VE Elim meþgul deðilse -> TURUNCU
+                if (HasEmptySlot() && !isUsingGrabbedItem)
+                    ChangeCrosshairColor(grabCrosshairColor);
+                else
+                    ChangeCrosshairColor(useCrosshairColor);
             }
-            // Eðer elimiz doluysa AMA yerde baþka bir þeye bakýyorsak (OtherGrabable)
+            // Elim doluysa ve yere (OtherGrabable) bakýyorsam
             else if (otherGrabable != null)
             {
-                if (HasEmptySlot())
+                // Yer varsa VE Elim meþgul deðilse -> TURUNCU
+                if (HasEmptySlot() && !isUsingGrabbedItem)
                     ChangeCrosshairColor(grabCrosshairColor); // Turuncu (Alýnabilir)
                 else
-                    ChangeCrosshairColor(useCrosshairColor);  // Kýrmýzý (Yer yok)
+                    ChangeCrosshairColor(useCrosshairColor);  // Kýrmýzý (Yer yok veya Meþgul)
             }
             // Hiçbiri deðilse standart renk
             else
@@ -866,25 +906,25 @@ public class FirstPersonController : MonoBehaviour
 
     public void DecideUIText()
     {
-        // --- AYAR KONTROLÜ (YENÝ) ---
+        // --- AYAR KONTROLÜ ---
         if (!showHints)
         {
-            SetAllPrompts(false); // Hepsini kapat ve çýk
+            SetAllPrompts(false);
             return;
         }
 
         // --- 1. DURUM ANALÝZÝ ---
         bool isHandBusy = isUsingGrabbedItem;
-
-        // Elimde bir þey var mý?
         bool isHoldingItem = currentGrabable != null && currentGrabable.IsGrabbed;
-
-        // Bir Interactable'a bakýyor muyum?
         bool isLookingAtInteractable = currentInteractable != null;
 
-        // Yerdeki bir Grabable'a bakýyor muyum?
-        bool isLookingAtGrabbable = currentGrabable != null && !currentGrabable.IsGrabbed;
-
+        // --- DÜZELTME BURADA (TANIMLAMA) ---
+        // Yerdeki bir Grabable'a bakýyor muyuz?
+        // Ýki durum var:
+        // 1. Elim BOÞTUR, baktýðým þey 'currentGrabable'dýr.
+        // 2. Elim DOLUDUR, baktýðým þey 'otherGrabable'dýr.
+        bool isLookingAtGrabbable = (currentGrabable != null && !currentGrabable.IsGrabbed) || (otherGrabable != null);
+        // ------------------------------------
 
         // --- 2. ACÝL DURUM ---
         if (isHandBusy)
@@ -897,30 +937,35 @@ public class FirstPersonController : MonoBehaviour
 
         if (isLookingAtInteractable)
         {
+            // Baktýðýmýz þey bir "Eþya Verici" mi?
+            bool isItemGiver = currentInteractable.HandRigType == PlayerManager.HandRigTypes.SingleHandGrab;
+
             // Senaryo A: Elim boþ.
-            // Býçaklýða da baksam, ýþýða da baksam etkileþime girebilirim.
             if (!isHoldingItem)
             {
-                showInteract = true;
+                if (isItemGiver && !HasEmptySlot())
+                    showInteract = false;
+                else
+                    showInteract = true;
             }
             // Senaryo B: Elim dolu.
-            // Sadece "Eþya Vermeyen" (Yani tipi SingleHandGrab OLMAYAN) þeylerle etkileþime girebilirim.
-            // Örn: Iþýk düðmesi, Kapý kolu.
-            else if (currentInteractable.HandRigType != PlayerManager.HandRigTypes.SingleHandGrab || HasEmptySlot())
+            else if (!isItemGiver || HasEmptySlot())
             {
                 showInteract = true;
             }
-            // Senaryo C: Elim dolu ve Býçaklýða bakýyorum.
-            // showInteract = false kalýr. Çünkü elimdekini býrakmadan býçak alamam.
         }
 
+        // --- DÜZELTME BURADA (SHOW TAKE MANTIÐI) ---
+        // Yerdeki eþyayý almak için tek þart: Yerde eþya olmasý VE Boþ slot olmasý.
+        // Elimizin dolu olup olmamasý önemli deðil (çünkü doluysa cebe atar).
 
-        // --- DÝÐERLERÝ AYNI ---
-        bool showTake = isLookingAtGrabbable && !isHoldingItem;
+        bool showTake = isLookingAtGrabbable && HasEmptySlot();
+
+        // -------------------------------------------
+
         bool showUse = isHoldingItem && currentGrabable.IsUseable;
         bool showDrop = isHoldingItem;
         bool showThrow = isHoldingItem;
-
 
         // --- 4. UYGULAMA ---
         if (interactUI) interactUI.SetActive(showInteract);
@@ -1072,18 +1117,26 @@ public class FirstPersonController : MonoBehaviour
             {
                 if (!isUsingGrabbedItem && !InteractKeyIsDone)
                 {
-                    // kýsa týk interact
+                    // Kýsa týk interact
                     TryToInteract();
                 }
                 else if (isUsingGrabbedItem)
                 {
-                    // uzun basma býrakýldý kullaným bitti
+                    // Uzun basma býrakýldý kullaným bitti
                     currentGrabable.OnUseRelease();
+
+                    // YENÝ: Eþyayý kullandýk ve býraktýk. 
+                    // Bu frame içinde baþka bir iþlem (yerden alma gibi) yapýlmasýn diye iþaretliyoruz.
+                    InteractKeyIsDone = true;
                 }
 
                 interactChargeTimer = 0f;
                 isUsingGrabbedItem = false;
-                InteractKeyIsDone = false;
+
+                // SÝLÝNDÝ: InteractKeyIsDone = false; 
+                // Bu satýrý siliyoruz. Çünkü burada false yaparsak, 
+                // hemen arkasýndan çalýþan GrabInput fonksiyonu "aa yasak yokmuþ" deyip eþyayý alýr.
+                // Resetleme iþini artýk Update'in baþýnda yapýyoruz.
 
                 DecideOutlineAndCrosshair();
             }
@@ -1376,7 +1429,30 @@ public class FirstPersonController : MonoBehaviour
         // --- BÖLÜM 2: YERDEN EÞYA ALMA (PICK UP) ---
         // Artýk 'else if' deðil, ayrý bir 'if'. Böylece elimiz doluyken de çalýþýr.
         // Ancak fýrlatma þarjý yaparken (throwChargeTimer) alamasýn diye ufak bir koruma koyuyoruz.
-        if (InputManager.Instance.PlayerInteract() && throwChargeTimer < 0.1f)
+        bool attemptPickUp = false;
+
+        // SENARYO A: Elimde KULLANILABÝLÝR (Useable) bir eþya var
+        if (currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable)
+        {
+            // O zaman alma iþlemini "Basma" (Press) anýnda deðil, "Býrakma" (Release) anýnda yap.
+            // AYRICA: Eðer tuþu basýlý tutup eþyayý kullandýysak (isUsingGrabbedItem), býrakýnca yerden bir þey alma!
+            if (InputManager.Instance.PlayerInteractRelease() && !isUsingGrabbedItem && !InteractKeyIsDone)
+            {
+                attemptPickUp = true;
+            }
+        }
+        // SENARYO B: Elim boþ VEYA Elimdeki eþya kullanýlamaz (Sadece fýrlatmalýk süs eþyasý)
+        else
+        {
+            // Eskisi gibi "Basar basmaz" (Press) al.
+            if (InputManager.Instance.PlayerInteract())
+            {
+                attemptPickUp = true;
+            }
+        }
+
+        // Karar verildi, alma iþlemi deneniyor...
+        if (attemptPickUp && throwChargeTimer < 0.1f)
         {
             // Raycast kontrolü
             if (PerformInteractionCast(out RaycastHit hit, interactionDistance, grabableLayers))
@@ -1672,27 +1748,42 @@ public class FirstPersonController : MonoBehaviour
                 // --- OTO SEÇÝM MANTIÐI (AUTO SWITCH) ---
                 int targetIndex = -1;
 
-                // A) Geriye Bak (Önceki en yakýn komþu)
-                // Örneðin 2'yi attýk. Önce 1'e, sonra 0'a bakar.
-                for (int back = i - 1; back >= 0; back--)
+                // --- YENÝ: BIÇAK ÖNCELÝÐÝ (KNIFE PRIORITY) ---
+                // Envanterde herhangi bir býçak var mý diye tara.
+                for (int k = 0; k < inventoryItems.Length; k++)
                 {
-                    if (inventoryItems[back] != null)
+                    // Slot boþ deðilse VE Tipi Býçak Tutuþu ise
+                    if (inventoryItems[k] != null &&
+                        inventoryItems[k].HandGrabType == PlayerManager.HandGrabTypes.KnifeGrab)
                     {
-                        targetIndex = back;
-                        break;
+                        targetIndex = k;
+                        break; // Býçaðý bulduk, hemen bunu seç!
                     }
                 }
 
-                // B) Ýleriye Bak (Eðer geride bulamadýysak)
-                // Örneðin 0'ý attýk, geride kimse yok. 1, 2, 3 diye bakar.
+                // Eðer býçak BULUNAMADIYSA, eski komþu mantýðýna geç
                 if (targetIndex == -1)
                 {
-                    for (int fwd = i + 1; fwd < inventoryItems.Length; fwd++)
+                    // A) Geriye Bak (Önceki en yakýn komþu)
+                    for (int back = i - 1; back >= 0; back--)
                     {
-                        if (inventoryItems[fwd] != null)
+                        if (inventoryItems[back] != null)
                         {
-                            targetIndex = fwd;
+                            targetIndex = back;
                             break;
+                        }
+                    }
+
+                    // B) Ýleriye Bak (Eðer geride bulamadýysak)
+                    if (targetIndex == -1)
+                    {
+                        for (int fwd = i + 1; fwd < inventoryItems.Length; fwd++)
+                        {
+                            if (inventoryItems[fwd] != null)
+                            {
+                                targetIndex = fwd;
+                                break;
+                            }
                         }
                     }
                 }
@@ -1700,8 +1791,7 @@ public class FirstPersonController : MonoBehaviour
                 // 3. Sonucu Uygula
                 if (targetIndex != -1)
                 {
-                    // Komþu bulduk! O slota geçiþ yap.
-                    // EquipSlot zaten animasyonlarý, rigleri ve currentGrabable'ý ayarlar.
+                    // Bulduðumuz slotu (Býçak veya Komþu) seç
                     EquipSlot(targetIndex);
                 }
                 else
