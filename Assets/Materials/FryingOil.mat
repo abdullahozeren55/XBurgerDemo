@@ -53,7 +53,7 @@ Material:
     - _Alpha: 0.19
     - _BoilAmount: 16
     - _BoilIntensity: 1.6
-    - _EffectWeight: 1
+    - _EffectWeight: 0.2
     - _FoamThickness: 0.04
     - _Height: 8
     - _MinVisibility: 0.8
