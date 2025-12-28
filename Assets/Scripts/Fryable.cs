@@ -35,8 +35,9 @@ public class Fryable : MonoBehaviour, IGrabable
 
     // References
     private Rigidbody rb;
-    private Collider col;
     private MeshRenderer meshRenderer;
+    private MeshFilter meshFilter;
+    private MeshCollider meshCollider;
 
     // Cache Layers
     private int grabableLayer;
@@ -52,8 +53,9 @@ public class Fryable : MonoBehaviour, IGrabable
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        col = GetComponent<Collider>();
         meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
+        meshCollider = GetComponent<MeshCollider>();
 
         // Layer ID'lerini al
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -102,24 +104,98 @@ public class Fryable : MonoBehaviour, IGrabable
 
     // --- BASKET LOGIC (Sepete Yerleþme) ---
 
-    public void PutOnBasket(Vector3 targetPos, Quaternion targetRot, Transform containerParent)
+    public void SetVisualState(int stackLevel, Transform container, float currentStackZ)
     {
-        // Kilidi aç, grablanamasýn
+        if (data.basketMeshes == null || data.basketMeshes.Length == 0) return;
+
+        // 1. Config'i çek
+        int index = Mathf.Clamp(stackLevel, 0, data.basketMeshes.Length - 1);
+        FryableData.MeshConfig config = data.basketMeshes[index];
+
+        // 2. Mesh'i güncelle
+        if (config.mesh != null)
+        {
+            meshFilter.mesh = config.mesh;
+            if (meshCollider != null)
+            {
+                meshCollider.sharedMesh = config.mesh;
+                meshCollider.convex = true;
+            }
+        }
+
+        // 3. TARGET LOCAL POZÝSYONU HESAPLA (Dünya koordinatýna hiç girmiyoruz)
+        // Sepetin tabanýna (0,0) göre ne kadar yukarýda (Z) ve offseti ne?
+        Vector3 targetLocalPos = new Vector3(0, 0, currentStackZ);
+        targetLocalPos += config.posOffset;
+
+        // 4. TARGET LOCAL ROTASYONU HESAPLA
+        // Container'ýn dönüþü bizi ilgilendirmiyor çünkü onun çocuðu (Child) olacaðýz.
+        // Sadece kendi içimizdeki düzeltme (Offset) ve varyasyon (Random) önemli.
+
+        // Önce Mesh düzeltmesi (fix), sonra rastgele döndürme (random)
+        Quaternion fixRot = Quaternion.Euler(config.rotOffset);
+        Quaternion randomRot = Quaternion.identity;
+
+        // Çarpma sýrasý önemli: Önce yamukluðu düzelt, sonra çevir.
+        Quaternion targetLocalRot = randomRot * fixRot;
+
+        // 5. Yerleþ (Direkt local deðerleri gönderiyoruz)
+        PutOnBasketLocal(targetLocalPos, targetLocalRot, container);
+    }
+
+    // YENÝ FONKSÝYON: Sadece Local çalýþýr
+    private void PutOnBasketLocal(Vector3 localPos, Quaternion localRot, Transform containerParent)
+    {
         isGettingPutOnBasket = true;
         PlayerManager.Instance.ResetPlayerGrab(this);
-
         ChangeLayer(onTrayLayer);
 
         rb.velocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        // Önce parent yap, böylece Local koordinatlar anlam kazanýr
+        transform.parent = containerParent;
+
+        Sequence seq = DOTween.Sequence();
+
+        // TransformPoint / InverseTransformPoint YOK! Direkt adrese teslim.
+        seq.Join(transform.DOLocalMove(localPos, 0.2f).SetEase(Ease.OutQuad));
+        seq.Join(transform.DOLocalRotateQuaternion(localRot, 0.2f).SetEase(Ease.OutCubic));
+
+        seq.OnComplete(() => {
+            isAddedToBasket = true;
+            isGettingPutOnBasket = false;
+            //if (data.dropSound) SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 0.9f, 1.1f);
+        });
+    }
+
+    // Elde tutulurken çaðrýlacak (Eski haline dön)
+    public void ResetToHandVisual()
+    {
+        if (data.handMesh == null) return;
+
+        meshFilter.mesh = data.handMesh.mesh;
+        if (meshCollider != null) meshCollider.sharedMesh = data.handMesh.mesh;
+
+        // Offsetleri sýfýrla (Elde tutma offsetleri IGrabable'dan geliyor zaten)
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+    }
+
+    // PutOnBasket'i biraz sadeleþtirdik, artýk hesap kitap yapmýyor sadece gidiyor
+    private void PutOnBasket(Vector3 targetPos, Quaternion targetRot, Transform containerParent)
+    {
+        isGettingPutOnBasket = true;
+        PlayerManager.Instance.ResetPlayerGrab(this);
+        ChangeLayer(onTrayLayer); // Layer deðiþimi
+
+        rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true; // Fiziði kapat
+        rb.isKinematic = true;
+        transform.parent = containerParent;
 
-        transform.parent = containerParent; // Sepetin containerýna child ol
-
-        // Yerel pozisyona çevir (Sepet hareket ederse sapýtmasýn)
         Vector3 targetLocalPos = containerParent.InverseTransformPoint(targetPos);
 
-        // DOTween ile yerine kay
         Sequence seq = DOTween.Sequence();
         seq.Join(transform.DOLocalMove(targetLocalPos, 0.2f).SetEase(Ease.OutQuad));
         seq.Join(transform.DORotateQuaternion(targetRot, 0.2f).SetEase(Ease.OutCubic));
@@ -127,12 +203,6 @@ public class Fryable : MonoBehaviour, IGrabable
         seq.OnComplete(() => {
             isAddedToBasket = true;
             isGettingPutOnBasket = false;
-
-            // Burasý önemli: Sadece en üsttekini Grabable yapacaðýz.
-            // Bu kararý Sepet (FryerBasket) verecek, o yüzden þimdilik OnBasketLayer'da kalýyor.
-            // Sepet scriptini yazýnca oradan "UpdateLayers" çaðýrýp en üsttekini açacaðýz.
-
-            // Yerleþme sesi
             //SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 0.9f, 1.1f);
         });
     }
@@ -143,6 +213,8 @@ public class Fryable : MonoBehaviour, IGrabable
     {
         ChangeLayer(grabbedLayer);
 
+        ResetToHandVisual();
+
         // Eðer bir sepetten alýyorsak, sepetten kaydýný sil
         if (currentBasket != null && isAddedToBasket)
         {
@@ -151,7 +223,7 @@ public class Fryable : MonoBehaviour, IGrabable
             isAddedToBasket = false;
         }
 
-        col.enabled = false;
+        meshCollider.enabled = false;
         rb.isKinematic = false; // Ele alýnca fizik açýlýr (ama gravity kapalý)
         rb.useGravity = false;
         rb.velocity = Vector3.zero;
@@ -179,7 +251,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     private void Release(Vector3 direction, float force)
     {
-        col.enabled = true;
+        meshCollider.enabled = true;
         IsGrabbed = false;
         transform.SetParent(null);
         rb.useGravity = true;
@@ -212,6 +284,16 @@ public class Fryable : MonoBehaviour, IGrabable
             ChangeLayer(interactableOutlinedRedLayer);
         else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
             ChangeLayer(grabableOutlinedLayer);
+    }
+
+    public float GetHeightForStackIndex(int stackIndex)
+    {
+        if (data.basketMeshes == null || data.basketMeshes.Length == 0) return 0.05f;
+
+        // Index sýnýrýný koru (Eðer 5. kat gelirse ve mesh yoksa sonuncuyu kullan)
+        int index = Mathf.Clamp(stackIndex, 0, data.basketMeshes.Length - 1);
+
+        return data.basketMeshes[index].height;
     }
 
     // --- COLLISION & SOUNDS ---

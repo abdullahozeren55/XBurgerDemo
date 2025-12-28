@@ -12,21 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 064a45c67f7539c41ad9e152101925d3, type: 3}
   m_Name: Fries
   m_EditorClassIdentifier: 
+  handMesh:
+    mesh: {fileID: 4136797301794320419, guid: d9cdff7fd728e16498f0ed31246a845c, type: 3}
+    posOffset: {x: 0, y: 0, z: 0}
+    rotOffset: {x: 0, y: 0, z: 0}
+    height: 0
+  basketMeshes:
+  - mesh: {fileID: 4096551827248307402, guid: d9cdff7fd728e16498f0ed31246a845c, type: 3}
+    posOffset: {x: 0.00032, y: -0.000178, z: -0.000754}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0.0006
+  - mesh: {fileID: -8124944137305977583, guid: d9cdff7fd728e16498f0ed31246a845c, type: 3}
+    posOffset: {x: -0.000349, y: 0.00007, z: -0.000829}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0.00091
+  - mesh: {fileID: -1017766418547586117, guid: d9cdff7fd728e16498f0ed31246a845c, type: 3}
+    posOffset: {x: -0.000717, y: 0.00047, z: -0.000946}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0
   type: 0
   icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
   focusTextKeys:
   - GRABABLE_PATTY_RAW
   - GRABABLE_PATTY_COOKED
   - GRABABLE_PATTY_BURNT
-  handGrabType: 6
-  stackHeight: 0.1
+  handGrabType: 4
+  stackHeight: 0.00112
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -270, y: -90, z: -70}
-  grabLocalPositionOffset: {x: 0.0061, y: 0.0498, z: 0.0568}
-  grabLocalRotationOffset: {x: 6.3910346, y: 53.18132, z: 341.5596}
+  grabLocalPositionOffset: {x: 0.0043475344, y: 0.05310817, z: 0.07184155}
+  grabLocalRotationOffset: {x: 358.28204, y: 191.03882, z: 185.04224}
   timeToCook: 10
   timeToBurn: 20
   rawMat: {fileID: 2100000, guid: dd3ee146c1ad9b6488d11361f43621cb, type: 2}

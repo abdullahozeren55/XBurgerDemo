@@ -11,6 +11,20 @@ public class FryableData : ScriptableObject
         Mozzarella  // Peynir Çubuðu vs.
     }
 
+    [System.Serializable]
+    public class MeshConfig
+    {
+        public Mesh mesh; // Görsel þekil
+        public Vector3 posOffset; // Blender hatasýný düzeltme payý
+        public Vector3 rotOffset; // Yan duruyorsa düzeltme payý
+        public float height;
+    }
+
+    [Header("Visual Configurations")]
+    [Tooltip("0: Sepet Dibi, 1: Orta, 2: Tepe")]
+    public MeshConfig handMesh; // Elde tutulan toplu hali
+    public MeshConfig[] basketMeshes; // Sepetteki yayýk halleri (3 tane eklersin)
+
     [Header("Identity")]
     public FryableType type;
     public Sprite icon;

@@ -42,7 +42,8 @@ public class FryerBasket : MonoBehaviour, IInteractable
     [SerializeField] private Ease moveEase = Ease.InOutSine;
     [Range(0f, 1f)]
     [SerializeField] private float directReturnThreshold = 0.35f; // %35'in altýndaysa direkt dön
-    
+    [Range(0f, 1f)][SerializeField] private float immersionThreshold = 0.85f; // %85'ten sonra piþmeye baþla, yað yükselmeye baþlasýn vs.
+
 
     [Header("Fryer Integration")]
     [SerializeField] private Fryer connectedFryer; // Yað efektini tetiklemek için
@@ -91,19 +92,19 @@ public class FryerBasket : MonoBehaviour, IInteractable
     private void Update()
     {
         // --- PÝÞÝRME DÖNGÜSÜ ---
-        // Sepet yaðdaysa ve içinde malzeme varsa piþir
-        if (isFrying && heldItems.Count > 0)
+        // Sadece FÝZÝKSEL OLARAK YAÐDAYSA piþir
+        // (Eskiden isFrying kontrol ediyorduk, o yüzden havada piþiyordu)
+        if (isPhysicallyInOil && heldItems.Count > 0)
         {
             foreach (var item in heldItems)
             {
-                // Her karede piþirme fonksiyonunu çaðýr
                 item.Cook(Time.deltaTime);
             }
         }
     }
 
     // --- TRIGGER LOGIC (YAKALAMA) ---
-    private void OnTriggerEnter(Collider other)
+    public void HandleCatch(Collider other)
     {
         // 1. Sepet Yaðda mý? (Yaðdayken içine malzeme düþemez, yaða düþer)
         if (isFrying) return;
@@ -128,44 +129,28 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
     private void AddItem(Fryable item)
     {
-        // Önceki malzemeyi kilitle (Artýk alýnamaz)
+        // 1. Önceki malzemeyi kilitle
         if (heldItems.Count > 0)
         {
             Fryable topItem = heldItems[heldItems.Count - 1];
-            topItem.ChangeLayer(onTrayLayer); // Grabable -> OnTray
-            topItem.currentBasket = null; // En üstteki olmadýðý için sepet referansýný silebiliriz veya tutabiliriz, null yapmak garanti.
+            topItem.ChangeLayer(onTrayLayer);
+            topItem.currentBasket = null;
         }
 
-        // --- STACKING MATEMATÝÐÝ ---
-        float targetY = 0f;
+        // Bu item þu an kaçýncý sýraya yerleþecek? (Mevcut sayý = Yeni index)
+        int targetIndex = heldItems.Count;
 
-        if (heldItems.Count == 0)
-        {
-            // Ýlk eleman: Zeminden kendi yarýsý kadar yukarý
-            targetY = item.data.stackHeight / 2f;
-            currentStackHeight = item.data.stackHeight;
-        }
-        else
-        {
-            // Sonraki elemanlar: Mevcut yükseklik + kendi yarýsý
-            targetY = currentStackHeight + (item.data.stackHeight / 2f);
-            currentStackHeight += item.data.stackHeight;
-        }
+        // O index'teki mesh'in boyu ne kadar olacak?
+        float thisItemHeight = item.GetHeightForStackIndex(targetIndex);
 
-        // Listeye ekle
+        // 2. Listeye ekle
         heldItems.Add(item);
-        item.currentBasket = this; // Sepeti taný
+        item.currentBasket = this;
 
-        // Pozisyonu ayarla (FoodContainer'ýn yerel koordinatýnda)
-        Vector3 localTargetPos = new Vector3(0, targetY, 0);
-        // Hafif rastgele rotasyon (Doðallýk için)
-        Quaternion localTargetRot = Quaternion.Euler(0, Random.Range(-15f, 15f), 0);
+        item.SetVisualState(targetIndex, foodContainer, currentStackHeight);
 
-        // Item'a "Yerleþ" emri ver (Container'ýn dünyadaki pozisyonunu hesaplayýp gönderiyoruz)
-        item.PutOnBasket(foodContainer.TransformPoint(localTargetPos), foodContainer.rotation * localTargetRot, foodContainer);
-
-        // Item layer'ý PutOnBasket içinde deðiþiyor, animasyon bitince Grabable olacak mý?
-        // Hayýr, animasyon bitince biz aþaðýda yönetiyoruz.
+        currentStackHeight += thisItemHeight;
+        
     }
 
     // Fryable.cs tarafýndan çaðrýlýr (OnGrab olduðunda)
@@ -265,18 +250,15 @@ public class FryerBasket : MonoBehaviour, IInteractable
         {
             if (isFrying)
             {
-                // SENARYO: AÞAÐI ÝNÝYORUZ (DALDIRMA)
-                // Tam suya gireceði zamaný hesapla (Yolun %85'i gibi)
-                // Eðer EarlyReturn ise yol kýsa olduðu için %70 gibi daha erken bir nokta olabilir
-                float hitWaterTime = duration * (isEarlyReturn ? 0.7f : 0.85f);
+                // Erken dönüþse %70, yoksa senin belirlediðin immersionThreshold (%85)
+                float threshold = isEarlyReturn ? 0.7f : immersionThreshold;
+                float hitWaterTime = duration * threshold;
 
-                // O saniyeye gelince "SyncFryerState" fonksiyonunu çalýþtýr
                 currentSeq.InsertCallback(hitWaterTime, () => SyncFryerState(true));
             }
             else
             {
-                // SENARYO: YUKARI ÇIKIYORUZ (KALDIRMA)
-                // Hareket baþladýðý an (0. saniye) yaðdan çýkmýþ sayýlýrýz
+                // Çýkarken hemen (0. saniye)
                 currentSeq.InsertCallback(0f, () => SyncFryerState(false));
             }
         }
