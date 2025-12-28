@@ -9,7 +9,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     [Header("Cooking State")]
     [SerializeField] private float currentCookingTime = 0f;
-    [SerializeField] private Cookable.CookAmount state = Cookable.CookAmount.RAW;
+    public Cookable.CookAmount CurrentCookingState = Cookable.CookAmount.RAW;
 
     // --- IGrabable Properties ---
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
@@ -27,11 +27,14 @@ public class Fryable : MonoBehaviour, IGrabable
 
     public Vector3 GrabPositionOffset { get => data.grabPositionOffset; set => data.grabPositionOffset = value; }
     public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
-    public string FocusTextKey { get => data.focusTextKeys[(int)state]; set => data.focusTextKeys[(int)state] = value; }
+    public string FocusTextKey { get => data.focusTextKeys[(int)CurrentCookingState]; set => data.focusTextKeys[(int)CurrentCookingState] = value; }
 
     // --- Logic Variables ---
     private bool isGettingPutOnBasket; // Yerleþme animasyonu kilidi
     private bool isAddedToBasket;      // Þu an sepetin içinde mi?
+
+    private float targetCookTime;
+    private float targetBurnTime;
 
     // References
     private Rigidbody rb;
@@ -65,36 +68,50 @@ public class Fryable : MonoBehaviour, IGrabable
         grabbedLayer = LayerMask.NameToLayer("Grabbed");
         onTrayLayer = LayerMask.NameToLayer("OnTray"); // Þimdilik OnTray kullanýyoruz, karýþýklýk olmasýn
 
+        // --- RANDOM PÝÞME SÜRESÝ HESABI ---
+        // 1. Rastgele bir çarpan belirle (Örn: 0.85 ile 1.15 arasý)
+        // cookingVariance 0.15 ise -> 0.85f ile 1.15f arasý sayý üretir
+        float varianceMultiplier = Random.Range(1f - data.cookingVariance, 1f + data.cookingVariance);
+
+        // 2. Data'daki base deðeri bu çarpanla çarpýp yerel deðiþkene ata
+        targetCookTime = data.timeToCook * varianceMultiplier;
+
+        // Yanma süresine de ayný çarpaný mý uygulayalým yoksa ona da mý random atalým?
+        // Bence AYNI ÇARPAN daha mantýklý. 
+        // Mantýk: "Bu patates ince kesilmiþ, o yüzden hem çabuk piþer hem çabuk yanar."
+        targetBurnTime = data.timeToBurn * varianceMultiplier;
+
         UpdateVisuals();
     }
 
     // --- COOKING LOGIC (Mevcut Kodun) ---
     public void Cook(float heatAmount)
     {
-        if (state == Cookable.CookAmount.BURNT) return;
+        if (CurrentCookingState == Cookable.CookAmount.BURNT) return;
         currentCookingTime += heatAmount;
         CheckState();
     }
 
     private void CheckState()
     {
-        Cookable.CookAmount oldState = state;
+        Cookable.CookAmount oldState = CurrentCookingState;
 
-        if (currentCookingTime >= data.timeToBurn) state = Cookable.CookAmount.BURNT;
-        else if (currentCookingTime >= data.timeToCook) state = Cookable.CookAmount.REGULAR;
-        else state = Cookable.CookAmount.RAW;
+        // ARTIK DATA YERÝNE YEREL DEÐÝÞKENLERÝ KULLANIYORUZ:
+        if (currentCookingTime >= targetBurnTime) CurrentCookingState = Cookable.CookAmount.BURNT;
+        else if (currentCookingTime >= targetCookTime) CurrentCookingState = Cookable.CookAmount.REGULAR;
+        else CurrentCookingState = Cookable.CookAmount.RAW;
 
-        if (state != oldState)
+        if (CurrentCookingState != oldState)
         {
             UpdateVisuals();
-            // Ýleride buraya ses/efekt eklenebilir
+            // Ses eklersek burada "Çýt" sesi çalabilir.
         }
     }
 
     private void UpdateVisuals()
     {
         if (meshRenderer == null || data == null) return;
-        switch (state)
+        switch (CurrentCookingState)
         {
             case Cookable.CookAmount.RAW: meshRenderer.material = data.rawMat; break;
             case Cookable.CookAmount.REGULAR: meshRenderer.material = data.cookedMat; break;
@@ -104,15 +121,15 @@ public class Fryable : MonoBehaviour, IGrabable
 
     // --- BASKET LOGIC (Sepete Yerleþme) ---
 
-    public void SetVisualState(int stackLevel, Transform container, float currentStackZ)
+    // Parametre olarak "Vector3 apexLocalPos" eklendi
+    public void SetVisualState(int stackLevel, Transform container, float currentStackZ, Vector3 apexLocalPos)
     {
         if (data.basketMeshes == null || data.basketMeshes.Length == 0) return;
 
-        // 1. Config'i çek
+        // 1. Config ve Mesh iþlemleri (Ayný)
         int index = Mathf.Clamp(stackLevel, 0, data.basketMeshes.Length - 1);
         FryableData.MeshConfig config = data.basketMeshes[index];
 
-        // 2. Mesh'i güncelle
         if (config.mesh != null)
         {
             meshFilter.mesh = config.mesh;
@@ -123,28 +140,21 @@ public class Fryable : MonoBehaviour, IGrabable
             }
         }
 
-        // 3. TARGET LOCAL POZÝSYONU HESAPLA (Dünya koordinatýna hiç girmiyoruz)
-        // Sepetin tabanýna (0,0) göre ne kadar yukarýda (Z) ve offseti ne?
+        // 2. Hedef Pozisyon (Ayný)
         Vector3 targetLocalPos = new Vector3(0, 0, currentStackZ);
         targetLocalPos += config.posOffset;
 
-        // 4. TARGET LOCAL ROTASYONU HESAPLA
-        // Container'ýn dönüþü bizi ilgilendirmiyor çünkü onun çocuðu (Child) olacaðýz.
-        // Sadece kendi içimizdeki düzeltme (Offset) ve varyasyon (Random) önemli.
-
-        // Önce Mesh düzeltmesi (fix), sonra rastgele döndürme (random)
+        // 3. Rotasyon (Ayný)
         Quaternion fixRot = Quaternion.Euler(config.rotOffset);
-        Quaternion randomRot = Quaternion.identity;
-
-        // Çarpma sýrasý önemli: Önce yamukluðu düzelt, sonra çevir.
+        Quaternion randomRot = Quaternion.identity; // Senin tercihin :)
         Quaternion targetLocalRot = randomRot * fixRot;
 
-        // 5. Yerleþ (Direkt local deðerleri gönderiyoruz)
-        PutOnBasketLocal(targetLocalPos, targetLocalRot, container);
+        // 4. Yerleþ (Artýk Apex'i de gönderiyoruz)
+        PutOnBasketLocal(targetLocalPos, targetLocalRot, container, apexLocalPos);
     }
 
-    // YENÝ FONKSÝYON: Sadece Local çalýþýr
-    private void PutOnBasketLocal(Vector3 localPos, Quaternion localRot, Transform containerParent)
+    // YENÝ DOPath MANTIÐI
+    private void PutOnBasketLocal(Vector3 targetLocalPos, Quaternion targetLocalRot, Transform containerParent, Vector3 apexLocalPos)
     {
         isGettingPutOnBasket = true;
         PlayerManager.Instance.ResetPlayerGrab(this);
@@ -153,19 +163,37 @@ public class Fryable : MonoBehaviour, IGrabable
         rb.velocity = Vector3.zero;
         rb.isKinematic = true;
 
-        // Önce parent yap, böylece Local koordinatlar anlam kazanýr
-        transform.parent = containerParent;
+        // KRÝTÝK NOKTA: "true" parametresi.
+        // Bu, objeyi parent yaparken "Dünya pozisyonunu koru" demek.
+        // Böylece patates olduðu yerde kalýr, ýþýnlanmaz. Sonra biz onu tween ile götürürüz.
+        transform.SetParent(containerParent, true);
 
         Sequence seq = DOTween.Sequence();
 
-        // TransformPoint / InverseTransformPoint YOK! Direkt adrese teslim.
-        seq.Join(transform.DOLocalMove(localPos, 0.2f).SetEase(Ease.OutQuad));
-        seq.Join(transform.DOLocalRotateQuaternion(localRot, 0.2f).SetEase(Ease.OutCubic));
+        // --- PATH OLUÞTURMA ---
+        // Yolumuz: Þu anki yerim -> Apex (Tepe) -> Hedef (Yýðýn)
+        // Not: DOPath zaten "þu anki yerimden baþla" mantýðýyla çalýþýr, o yüzden baþlangýcý vermiyoruz.
+        // Sadece gidilecek duraklarý veriyoruz.
+        Vector3[] pathPoints = new Vector3[] { apexLocalPos, targetLocalPos };
+
+        // Hareket (CatmullRom ile yumuþak kavis)
+        seq.Join(transform.DOLocalPath(pathPoints, data.putOnBasketDuration, PathType.CatmullRom)
+            .SetEase(Ease.OutSine)); // OutSine ile yavaþça baþlar, hýzla yerine oturur
+
+        // Dönüþ (Eþ zamanlý dönsün)
+        seq.Join(transform.DOLocalRotateQuaternion(targetLocalRot, data.putOnBasketDuration)
+            .SetEase(Ease.OutCubic));
 
         seq.OnComplete(() => {
             isAddedToBasket = true;
             isGettingPutOnBasket = false;
-            //if (data.dropSound) SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 0.9f, 1.1f);
+            // if (data.dropSound) SoundManager.Instance.PlaySoundFX...
+
+            // YENÝ: Animasyon bitti, sepete haber ver layer'ýmý ayarlasýn
+            if (currentBasket != null)
+            {
+                currentBasket.RefreshTopItemInteractability();
+            }
         });
     }
 
@@ -216,11 +244,12 @@ public class Fryable : MonoBehaviour, IGrabable
         ResetToHandVisual();
 
         // Eðer bir sepetten alýyorsak, sepetten kaydýný sil
-        if (currentBasket != null && isAddedToBasket)
+        if (currentBasket != null)
         {
-            //currentBasket.RemoveItem(this); // Sepet koduna bunu ekleyeceðiz
+            currentBasket.RemoveItem(this); // Sepet koduna bunu ekleyeceðiz
             currentBasket = null;
             isAddedToBasket = false;
+            isGettingPutOnBasket = false;
         }
 
         meshCollider.enabled = false;
@@ -237,6 +266,8 @@ public class Fryable : MonoBehaviour, IGrabable
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
 
         //SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 1f, 1.2f); // Tutma sesi (Drop sound kullandým geçici)
+
+        transform.localScale = data.localScaleWhenGrabbed;
     }
 
     public void OnThrow(Vector3 direction, float force)
@@ -263,14 +294,45 @@ public class Fryable : MonoBehaviour, IGrabable
 
     public void OnFocus()
     {
-        if (!isGettingPutOnBasket)
-            ChangeLayer(grabableOutlinedLayer);
+        if (isGettingPutOnBasket) return;
+
+        // --- YENÝ KONTROL ---
+        // Eðer sepetteysek, sadece "En Tepedeki" isek parlayabiliriz.
+        if (isAddedToBasket && currentBasket != null)
+        {
+            // Tepede deðilsem, focus olmayý reddet ve OnTray (Kilitli) kal.
+            if (!currentBasket.IsTopItem(this)) return;
+        }
+        // --------------------
+
+        ChangeLayer(grabableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        if (!isGettingPutOnBasket)
+        if (isGettingPutOnBasket) return;
+
+        // --- YENÝ KONTROL ---
+        // Sepetteysek, kafamýza göre "Grabable" olamayýz.
+        // Durumumuza uygun layer'a dönmemiz lazým.
+        if (isAddedToBasket && currentBasket != null)
+        {
+            if (currentBasket.IsTopItem(this))
+            {
+                // Tepedeysek -> Alýnabilir hale dön
+                ChangeLayer(grabableLayer);
+            }
+            else
+            {
+                // Altta kaldýysak -> Kilitli hale dön
+                ChangeLayer(onTrayLayer);
+            }
+        }
+        else
+        {
+            // Sepette deðilsek (Masadaysa vs.) normal davran
             ChangeLayer(grabableLayer);
+        }
     }
 
     public void ChangeLayer(int layer)

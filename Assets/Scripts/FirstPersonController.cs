@@ -2207,6 +2207,7 @@ public class FirstPersonController : MonoBehaviour
 
     public IInteractable GetCurrentInteractable() { return currentInteractable; }
     public IGrabable GetCurrentGrabable() { return currentGrabable; }
+    public bool ShouldIGoWithOutlineWhenTurningBackToGrabable (IGrabable grabable) {  return (currentGrabable == grabable && !currentGrabable.IsGrabbed) || otherGrabable == grabable; }
 
     public void SetFocusTextComplete(bool value) => focusTextComplete = value; //GETS TRUE IN TYPEWRITTER ACTIONS WHEN ITS COMPLETE. GETS FALSE WHENEVER TEXT GETS CHANGED ON DECIDEFOCUSTEXT()
 

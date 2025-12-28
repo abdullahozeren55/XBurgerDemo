@@ -30,6 +30,7 @@ MonoBehaviour:
     posOffset: {x: -0.000717, y: 0.00047, z: -0.000946}
     rotOffset: {x: 0, y: 0, z: 90}
     height: 0
+  putOnBasketDuration: 0.4
   type: 0
   icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
   focusTextKeys:
@@ -37,10 +38,10 @@ MonoBehaviour:
   - GRABABLE_PATTY_COOKED
   - GRABABLE_PATTY_BURNT
   handGrabType: 4
-  stackHeight: 0.00112
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1
+  localScaleWhenGrabbed: {x: 17.65112, y: 17.651125, z: 17.651123}
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -270, y: -90, z: -70}
   grabLocalPositionOffset: {x: 0.0043475344, y: 0.05310817, z: 0.07184155}

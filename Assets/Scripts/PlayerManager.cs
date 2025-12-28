@@ -70,6 +70,11 @@ public class PlayerManager : MonoBehaviour
         return firstPersonController?.GetCurrentGrabable();
     }
 
+    public bool ShouldIGoWithOutlineWhenTurningBackToGrabable(IGrabable grabable)
+    {
+        return firstPersonController.ShouldIGoWithOutlineWhenTurningBackToGrabable(grabable);
+    }
+
     public void ResetPlayerGrabAndInteract()
     {
         firstPersonController.ResetGrabAndInteract();

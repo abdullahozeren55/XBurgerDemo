@@ -25,6 +25,7 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
     [Header("Container Settings")] 
     [SerializeField] private Transform foodContainer; // Malzemelerin child olacaðý boþ obje (Sepet Tabaný)
+    [SerializeField] private Transform basketEntryApex; //Malzemeler girerken tepeden yay çizecekler iþte o tepe
     [SerializeField] private int capacity = 3; // Maksimum kaç yýðýn alýr?
     [SerializeField] private BoxCollider catchCollider; // Trigger olan collider
 
@@ -67,6 +68,7 @@ public class FryerBasket : MonoBehaviour, IInteractable
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int grabableLayer;
+    private int grabableOutlinedLayer;
     private int onTrayLayer; // Tray layer'ý ile ayný olabilir, karýþýklýk olmasýn diye ismini böyle tuttum
 
     private void Awake()
@@ -76,6 +78,7 @@ public class FryerBasket : MonoBehaviour, IInteractable
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         grabableLayer = LayerMask.NameToLayer("Grabable");
+        grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         onTrayLayer = LayerMask.NameToLayer("OnTray"); // "OnTray" layer'ýný kullanýyoruz
 
         isFrying = false;
@@ -123,6 +126,8 @@ public class FryerBasket : MonoBehaviour, IInteractable
         // Not: IGrabable interface'inden kontrol edebiliriz
         if (incomingItem.IsGrabbed) return;
 
+        if (incomingItem.CurrentCookingState != Cookable.CookAmount.RAW) return;
+
         // -- KABUL EDÝLDÝ --
         AddItem(incomingItem);
     }
@@ -134,7 +139,6 @@ public class FryerBasket : MonoBehaviour, IInteractable
         {
             Fryable topItem = heldItems[heldItems.Count - 1];
             topItem.ChangeLayer(onTrayLayer);
-            topItem.currentBasket = null;
         }
 
         // Bu item þu an kaçýncý sýraya yerleþecek? (Mevcut sayý = Yeni index)
@@ -147,7 +151,15 @@ public class FryerBasket : MonoBehaviour, IInteractable
         heldItems.Add(item);
         item.currentBasket = this;
 
-        item.SetVisualState(targetIndex, foodContainer, currentStackHeight);
+        Vector3 localApexPos = Vector3.zero;
+
+        if (basketEntryApex != null)
+        {
+            // Apex'in dünya pozisyonunu al -> Container'ýn içine yerel olarak çevir
+            localApexPos = foodContainer.InverseTransformPoint(basketEntryApex.position);
+        }
+
+        item.SetVisualState(targetIndex, foodContainer, currentStackHeight, localApexPos);
 
         currentStackHeight += thisItemHeight;
         
@@ -158,30 +170,32 @@ public class FryerBasket : MonoBehaviour, IInteractable
     {
         if (!heldItems.Contains(item)) return;
 
-        int index = heldItems.IndexOf(item);
-
         // Listeden çýkar
-        heldItems.RemoveAt(index);
-        item.currentBasket = null;
+        heldItems.Remove(item); // Index bulmaya gerek yok direkt objeyi silebiliriz
+        item.currentBasket = null; // Giden artýk bizden deðildir
 
         // Yüksekliði güncelle (Basitçe baþtan hesaplamak en temizi, aradan çekilme durumlarý için)
         RecalculateStackHeight();
 
-        // Eðer sepet boþalmadýysa, YENÝ EN ÜSTTEKÝ elemaný Grabable yap
-        if (heldItems.Count > 0)
-        {
-            Fryable newTopItem = heldItems[heldItems.Count - 1];
-            newTopItem.ChangeLayer(grabableLayer);
-            newTopItem.currentBasket = this; // Artýk muhattabý biziz
-        }
+        // --- KRÝTÝK DÜZELTME ---
+        // Manuel layer deðiþtirmek yerine akýllý fonksiyonu çaðýrýyoruz.
+        // Bu fonksiyon:
+        // 1. Yeni "En Üsttekini" bulacak.
+        // 2. Sepet yaðda mý diye bakacak.
+        // 3. Yaðdaysa KÝLÝTLÝ, askýdaysa GRABABLE yapacak.
+        RefreshTopItemInteractability();
     }
 
     private void RecalculateStackHeight()
     {
         currentStackHeight = 0f;
-        foreach (var item in heldItems)
+
+        // Foreach yerine for döngüsü kullanýyoruz ki index'e (kat numarasýna) eriþelim
+        for (int i = 0; i < heldItems.Count; i++)
         {
-            currentStackHeight += item.data.stackHeight;
+            // Her elemana soruyoruz: "Sen i. katta olsan boyun kaç olur?"
+            float heightAtIndex = heldItems[i].GetHeightForStackIndex(i);
+            currentStackHeight += heightAtIndex;
         }
     }
 
@@ -214,6 +228,10 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
         isFrying = !isFrying;
         basketStateNum = isFrying ? 1 : 0;
+
+        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
+
+        RefreshTopItemInteractability();
 
         //SoundManager.Instance.PlaySoundFX(isFrying ? dropSound : liftSound, transform, 1f, 1f, 1f, true, audioTag);
 
@@ -251,7 +269,7 @@ public class FryerBasket : MonoBehaviour, IInteractable
             if (isFrying)
             {
                 // Erken dönüþse %70, yoksa senin belirlediðin immersionThreshold (%85)
-                float threshold = isEarlyReturn ? 0.7f : immersionThreshold;
+                float threshold = isEarlyReturn ? immersionThreshold/2f : immersionThreshold;
                 float hitWaterTime = duration * threshold;
 
                 currentSeq.InsertCallback(hitWaterTime, () => SyncFryerState(true));
@@ -285,8 +303,6 @@ public class FryerBasket : MonoBehaviour, IInteractable
                 settleSeq.Append(transform.DOMove(cookingPoint.position + new Vector3(0, floatAmount, 0), floatDuration * 0.4f).SetEase(Ease.OutSine));
                 settleSeq.Append(transform.DOMove(cookingPoint.position, floatDuration * 0.6f).SetEase(Ease.InOutSine));
             }
-
-            PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
         });
     }
 
@@ -297,20 +313,20 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
         if (enteringOil)
         {
-            // Ýçeri giriyoruz, eðer zaten içeride deðilsek haber ver
             if (!isPhysicallyInOil)
             {
                 connectedFryer.OnBasketDown(IsHeavy);
                 isPhysicallyInOil = true;
+                RefreshTopItemInteractability(); // YENÝ: Girdik, kilitle!
             }
         }
         else
         {
-            // Dýþarý çýkýyoruz, eðer içerideysek haber ver
             if (isPhysicallyInOil)
             {
                 connectedFryer.OnBasketUp(IsHeavy);
                 isPhysicallyInOil = false;
+                RefreshTopItemInteractability(); // YENÝ: Çýktýk, kilidi aç!
             }
         }
     }
@@ -343,4 +359,48 @@ public class FryerBasket : MonoBehaviour, IInteractable
     }
 
     public void HandleFinishDialogue() { }
+
+    // Bu fonksiyonu her durum deðiþikliðinde çaðýracaðýz
+    public void RefreshTopItemInteractability()
+    {
+        // 1. Sepet boþsa yapacak bir þey yok
+        if (heldItems.Count == 0) return;
+
+        // 2. En tepedeki elemaný bul
+        Fryable topItem = heldItems[heldItems.Count - 1];
+
+        // 3. Durum Analizi:
+        // Eðer yaðdaysak (isFrying veya isPhysicallyInOil) -> KÝLÝTLE (OnTray)
+        // Eðer askýdaysak -> AÇ (Grabable)
+
+        // Not: isFrying kontrolünü de ekledim ki daha inerken bile almayý engelleyelim.
+        // Ýstersen sadece isPhysicallyInOil býrakabilirsin.
+        bool shouldBeLocked = isFrying || isPhysicallyInOil;
+
+        if (shouldBeLocked)
+        {
+            topItem.ChangeLayer(onTrayLayer);
+        }
+        else
+        {
+            // KÝLÝDÝ AÇ (AMA NASIL?)
+            // PlayerManager'a sor: "Þu an bu objeye mi bakýyorum?"
+            // Not: Metodun parametre olarak (MonoBehaviour/IGrabable) ne istediðine göre topItem veriyoruz.
+            if (PlayerManager.Instance.ShouldIGoWithOutlineWhenTurningBackToGrabable(topItem))
+            {
+                // Zaten buna bakýyormuþuz, Outline ile aç
+                topItem.ChangeLayer(grabableOutlinedLayer);
+            }
+            else
+            {
+                // Bakmýyoruz, düz aç
+                topItem.ChangeLayer(grabableLayer);
+            }
+        }
+    }
+
+    public bool IsTopItem(Fryable item)
+    {
+        return heldItems.Count > 0 && heldItems[heldItems.Count - 1] == item;
+    }
 }
