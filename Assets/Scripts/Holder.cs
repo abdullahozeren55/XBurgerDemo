@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic; // List için gerekli
 
 public class Holder : MonoBehaviour, IGrabable
 {
@@ -6,21 +7,32 @@ public class Holder : MonoBehaviour, IGrabable
     {
         Empty,
         Fries,
+        OnionRing,
+        // Ilerde buraya Nugget vs. eklersin
+    }
+
+    // YENÝ: Hangi enum hangi objeyi açacak?
+    [System.Serializable]
+    public struct VisualMapping
+    {
+        public HolderIngredient type;
+        public GameObject visualObject; // Child olarak koyduðun, scale'i ayarlanmýþ obje
     }
 
     [Header("Visual References")]
-    [SerializeField] private GameObject contentMeshObject; // Ýçindeki doluluk (Child obje)
+    // Tek bir obje yerine liste tutuyoruz
+    [SerializeField] private List<VisualMapping> visualMappings;
 
     [Header("Data & IGrabable")]
-    [SerializeField] private HolderData data; // Külahýn kendi datasý (Icon, tutuþ tipi vs.)
-    
+    [SerializeField] private HolderData data;
+
     // --- IGrabable Properties ---
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
     public Sprite Icon { get => data.icon; set => data.icon = value; }
     public PlayerManager.HandGrabTypes HandGrabType { get => data.handGrabType; set => data.handGrabType = value; }
-    
+
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
     public bool OutlineShouldBeGreen { get => outlineShouldBeGreen; set => outlineShouldBeGreen = value; }
@@ -29,10 +41,16 @@ public class Holder : MonoBehaviour, IGrabable
     public bool IsThrowable { get => data.isThrowable; set => data.isThrowable = value; }
     public float ThrowMultiplier { get => data.throwMultiplier; set => data.throwMultiplier = value; }
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
-    
+
     public Vector3 GrabPositionOffset { get => data.grabPositionOffset; set => data.grabPositionOffset = value; }
     public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
-    public string FocusTextKey { get => data.focusTextKeys[(int)currentIngredientType]; set => data.focusTextKeys[(int)currentIngredientType] = value; }
+
+    // Focus Text artýk içeriðe göre deðiþiyor
+    public string FocusTextKey
+    {
+        get => data.focusTextKeys[(int)currentIngredientType];
+        set => data.focusTextKeys[(int)currentIngredientType] = value;
+    }
 
     private HolderIngredient currentIngredientType = HolderIngredient.Empty;
 
@@ -40,6 +58,7 @@ public class Holder : MonoBehaviour, IGrabable
     private Rigidbody rb;
     private Collider col;
     private int grabableLayer;
+    private int grabableOutlinedGreenLayer;
     private int ungrabableLayer;
     private int grabbedLayer;
     private int grabableOutlinedLayer;
@@ -49,7 +68,7 @@ public class Holder : MonoBehaviour, IGrabable
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
-        
+
         // Content baþlarken kapalý olsun (veya editördeki duruma göre)
         UpdateVisuals();
 
@@ -57,6 +76,7 @@ public class Holder : MonoBehaviour, IGrabable
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
         grabbedLayer = LayerMask.NameToLayer("Grabbed");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
+        grabableOutlinedGreenLayer = LayerMask.NameToLayer("GrabableOutlinedGreen");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
     }
 
@@ -67,20 +87,24 @@ public class Holder : MonoBehaviour, IGrabable
         if (currentIngredientType != HolderIngredient.Empty) return false;
 
         // 2. Gelen þey bir "Fryable" (Kýzartmalýk) mý?
-        // (Cast iþlemi: Eðer otherItem Fryable deðilse 'item' null olur)
         Fryable item = otherItem as Fryable;
         if (item == null) return false;
 
-        //sadece REGULAR (Piþmiþ) kabul edelim.
-        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) 
+        // 3. Sadece REGULAR (Piþmiþ) kabul edelim.
+        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR)
         {
-            return false; // Çið ise alma
+            return false;
         }
 
         // 4. Türüne göre doldur
         if (item.data.type == FryableData.FryableType.Fries)
         {
             Fill(HolderIngredient.Fries, item);
+            return true;
+        }
+        else if (item.data.type == FryableData.FryableType.OnionRing)
+        {
+            Fill(HolderIngredient.OnionRing, item);
             return true;
         }
 
@@ -99,8 +123,9 @@ public class Holder : MonoBehaviour, IGrabable
         // 3. Piþmiþ mi?
         if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) return false;
 
-        // 4. Tür uyuyor mu? (Þimdilik sadece patates)
+        // 4. Tür uyuyor mu? (Patates veya Soðan Halkasý)
         if (item.data.type == FryableData.FryableType.Fries) return true;
+        if (item.data.type == FryableData.FryableType.OnionRing) return true;
 
         return false;
     }
@@ -108,40 +133,42 @@ public class Holder : MonoBehaviour, IGrabable
     private void Fill(HolderIngredient newIngedient, Fryable sourceItem)
     {
         currentIngredientType = newIngedient;
-        
+
         // Görseli aç
         UpdateVisuals();
 
         // Yerdeki malzemeyi yok et!
-        // Not: Controller bu objeyi referans tutuyor olabilir, dikkatli yok etmek lazým.
-        // Ama bool döndüðümüz için Controller onu "býrakacak".
         Destroy(sourceItem.gameObject);
-        
+
         // Ses efekti eklenebilir: "Hýþýrt"
     }
 
     private void UpdateVisuals()
     {
-        if (contentMeshObject != null)
+        // Listeyi dön, tipi tutaný aç, tutmayaný kapat
+        foreach (var mapping in visualMappings)
         {
-            contentMeshObject.SetActive(currentIngredientType != HolderIngredient.Empty);
+            if (mapping.visualObject != null)
+            {
+                bool isActive = (mapping.type == currentIngredientType);
+                mapping.visualObject.SetActive(isActive);
+            }
         }
     }
 
-    // --- IGrabable Standartlarý (Kopyala/Yapýþtýr) ---
-    // (Burayý kýsa tutuyorum, Fryable ile ayný mantýk)
-    
+    // --- IGrabable Standartlarý ---
+
     public void OnGrab(Transform grabPoint)
     {
         IsGrabbed = true;
         rb.isKinematic = true;
         rb.useGravity = false;
-        col.enabled = false; // Ele alýnca collider kapansýn
-        
+        col.enabled = false;
+
         transform.SetParent(grabPoint);
         transform.localPosition = data.grabLocalPositionOffset;
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
-        
+
         ChangeLayer(grabbedLayer);
     }
 
@@ -161,22 +188,57 @@ public class Holder : MonoBehaviour, IGrabable
 
     public void OnFocus() { ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer); }
     public void OnLoseFocus() { ChangeLayer(grabableLayer); }
-    
+
     public void OutlineChangeCheck()
     {
-        if (gameObject.layer == grabableOutlinedLayer && OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer);
-        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed) ChangeLayer(grabableOutlinedLayer);
+        // OutlineChangeCheck mantýðý aynen kalýyor, 
+        // ancak ChangeLayer çaðrýldýðýnda child objelerin de layer'ý deðiþmeli.
+
+        if (gameObject.layer == grabableOutlinedLayer)
+        {
+            if (OutlineShouldBeRed)
+                ChangeLayer(interactableOutlinedRedLayer);
+            else if (OutlineShouldBeGreen)
+                ChangeLayer(grabableOutlinedGreenLayer);
+        }
+        else if (gameObject.layer == grabableOutlinedGreenLayer)
+        {
+            if (OutlineShouldBeRed)
+                ChangeLayer(interactableOutlinedRedLayer);
+            else if (!OutlineShouldBeGreen)
+                ChangeLayer(grabableOutlinedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer)
+        {
+            if (!OutlineShouldBeRed)
+            {
+                if (OutlineShouldBeGreen)
+                    ChangeLayer(grabableOutlinedGreenLayer);
+                else
+                    ChangeLayer(grabableOutlinedLayer);
+            }
+        }
     }
-    
+
     public void ChangeLayer(int layer)
     {
         gameObject.layer = layer;
-        contentMeshObject.layer = layer;
+
+        // Sadece ana objenin deðil, içindeki child objelerin de layer'ýný deðiþtiriyoruz.
+        // Böylece outline shader'ý içindeki patatesi de parlatýr.
+        foreach (var mapping in visualMappings)
+        {
+            if (mapping.visualObject != null)
+            {
+                mapping.visualObject.layer = layer;
+            }
+        }
     }
+
     public void OnHolster() { gameObject.SetActive(false); }
     public void OnUseHold() { }
     public void OnUseRelease() { }
-    
+
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && gameObject.layer == ungrabableLayer) ChangeLayer(grabableLayer);

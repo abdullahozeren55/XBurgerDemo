@@ -42,7 +42,7 @@ public class Fryable : MonoBehaviour, IGrabable
     private Rigidbody rb;
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
-    private MeshCollider meshCollider;
+    private BoxCollider boxCollider;
 
     // Cache Layers
     private int grabableLayer;
@@ -61,7 +61,7 @@ public class Fryable : MonoBehaviour, IGrabable
         rb = GetComponent<Rigidbody>();
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
-        meshCollider = GetComponent<MeshCollider>();
+        boxCollider = GetComponent<BoxCollider>();
 
         // Layer ID'lerini al
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -137,10 +137,11 @@ public class Fryable : MonoBehaviour, IGrabable
         if (config.mesh != null)
         {
             meshFilter.mesh = config.mesh;
-            if (meshCollider != null)
+
+            if (boxCollider != null)
             {
-                meshCollider.sharedMesh = config.mesh;
-                meshCollider.convex = true;
+                boxCollider.center = config.colliderCenter;
+                boxCollider.size = config.colliderSize;
             }
         }
 
@@ -207,7 +208,12 @@ public class Fryable : MonoBehaviour, IGrabable
         if (data.handMesh == null) return;
 
         meshFilter.mesh = data.handMesh.mesh;
-        if (meshCollider != null) meshCollider.sharedMesh = data.handMesh.mesh;
+
+        if (boxCollider != null)
+        {
+            boxCollider.center = data.handMesh.colliderCenter;
+            boxCollider.size = data.handMesh.colliderSize;
+        }
 
         // Offsetleri sýfýrla (Elde tutma offsetleri IGrabable'dan geliyor zaten)
         transform.localPosition = Vector3.zero;
@@ -256,7 +262,7 @@ public class Fryable : MonoBehaviour, IGrabable
             isGettingPutOnBasket = false;
         }
 
-        meshCollider.enabled = false;
+        boxCollider.enabled = false;
         rb.isKinematic = false; // Ele alýnca fizik açýlýr (ama gravity kapalý)
         rb.useGravity = false;
         rb.velocity = Vector3.zero;
@@ -286,7 +292,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     private void Release(Vector3 direction, float force)
     {
-        meshCollider.enabled = true;
+        boxCollider.enabled = true;
         IsGrabbed = false;
         transform.SetParent(null);
         rb.useGravity = true;

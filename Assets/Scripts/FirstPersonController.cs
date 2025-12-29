@@ -726,8 +726,8 @@ public class FirstPersonController : MonoBehaviour
             // --- KRÝTÝK DEÐÝÞÝKLÝK BURADA ---
 
             // 1. Kombinasyon Kontrolü:
-            // "Elimdeki þey, baktýðým þeyle birleþebilir mi?"
-            bool canCombine = currentGrabable.CanCombine(otherGrabable);
+            // "Elimdeki yerdekini yer mi?" VEYA "Yerdeki elimdekini yer mi?"
+            bool canCombine = currentGrabable.CanCombine(otherGrabable) || otherGrabable.CanCombine(currentGrabable);
 
             if (canCombine)
             {
@@ -1495,28 +1495,43 @@ public class FirstPersonController : MonoBehaviour
                 IGrabable targetItem = hit.collider.gameObject.GetComponent<IGrabable>();
                 if (targetItem == null) return;
 
-                // --- YENÝ EKLENEN KISIM: COMBINE CHECK ---
+                /// --- KOMBÝNASYON KONTROLLERÝ ---
 
-                // Eðer elimde bir þey varsa (currentGrabable) VE baktýðým þey baþkaysa
+                // SENARYO A: Külah Elimde, Patates Yerde (Eski Kodun)
                 if (currentGrabable != null && currentGrabable.IsGrabbed && targetItem != currentGrabable)
                 {
-                    // Elimdeki eþyaya sor: "Yerdeki bu þeyi içine alabilir misin?"
                     if (currentGrabable.TryCombine(targetItem))
                     {
-                        // EÐER EVET ÝSE:
-                        // 1. Birleþtirme baþarýlý oldu (Külah doldu, Patates yok oldu).
-                        // 2. Yerdeki eþya artýk "otherGrabable" olmaktan çýktý çünkü yok oldu.
+                        if (otherGrabable == targetItem) otherGrabable = null;
+                        DecideOutlineAndCrosshair();
+                        return;
+                    }
 
-                        // Referansý temizle ki oyun "olmayan objeye" outline çizmeye çalýþmasýn
-                        if (otherGrabable == targetItem)
+                    // --- SENARYO B: Patates Elimde, Külah Yerde (YENÝ) ---
+                    // "Yerdeki þey (Külah), elimdeki þeyi (Patates) içine alabilir mi?"
+                    else if (targetItem.TryCombine(currentGrabable))
+                    {
+                        // 1. Holder.cs içindeki TryCombine çalýþtý:
+                        //    - Külah doldu.
+                        //    - Patates (currentGrabable) Destroy edildi.
+
+                        // 2. Elimizdeki patates yok olduðu için Envanter Slotunu temizlememiz lazým.
+                        //    Destroy frame sonunda çalýþýr, o yüzden referans hala duruyor, 
+                        //    onu manuel null yapýp baðlantýyý koparalým.
+                        if (currentSlotIndex != -1)
                         {
-                            otherGrabable = null;
+                            inventoryItems[currentSlotIndex] = null;
                         }
 
-                        // UI ve Outline'ý güncelle
-                        DecideOutlineAndCrosshair();
+                        // 3. Elimiz boþa çýktý. Yerdeki o dolu külahý (targetItem) kap!
+                        //    ChangeCurrentGrabable veya PickUpItem kullanabilirsin.
+                        //    PickUpItem zaten boþ slot bulup yerleþir.
+                        //    Biz az önce slotu null yaparak boþalttýðýmýz için, külah direkt o slota oturacak.
+                        PickUpItem(targetItem);
 
-                        // Fonksiyondan çýk (Yerden alma iþlemini yapma!)
+                        // 4. Temizlik
+                        otherGrabable = null; // Çünkü artýk onu aldýk
+                        DecideOutlineAndCrosshair();
                         return;
                     }
                 }

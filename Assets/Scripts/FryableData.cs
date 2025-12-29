@@ -18,6 +18,10 @@ public class FryableData : ScriptableObject
         public Vector3 posOffset; // Blender hatasýný düzeltme payý
         public Vector3 rotOffset; // Yan duruyorsa düzeltme payý
         public float height;
+
+        // --- YENÝ: Box Collider Ayarlarý ---
+        public Vector3 colliderCenter;
+        public Vector3 colliderSize = Vector3.one; // Varsayýlan 1 olsun ki kaybolmasýn
     }
 
     [Header("Visual Configurations")]
