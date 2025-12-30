@@ -9,7 +9,7 @@ public class Holder : MonoBehaviour, IGrabable
         Fries,
         OnionRing,
         SmileyFries,
-        // Ilerde buraya Nugget vs. eklersin
+        DinoNuggets,
     }
 
     // YENÝ: Hangi enum hangi objeyi açacak?

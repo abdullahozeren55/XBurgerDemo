@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064a45c67f7539c41ad9e152101925d3, type: 3}
+  m_Name: DinoNugget
+  m_EditorClassIdentifier: 
+  handMesh:
+    mesh: {fileID: 8320485423048819264, guid: e45d03832d596f24d9ea6fdf7ac76bed, type: 3}
+    posOffset: {x: 0, y: 0, z: 0}
+    rotOffset: {x: 0, y: 0, z: 0}
+    height: 0
+    colliderCenter: {x: -0.00005741435, y: -0.00013782522, z: 0.00011957011}
+    colliderSize: {x: 0.0026280484, y: 0.0029425183, z: 0.0013148941}
+  basketMeshes:
+  - mesh: {fileID: 5951916458113292211, guid: e45d03832d596f24d9ea6fdf7ac76bed, type: 3}
+    posOffset: {x: -0.000093, y: -0.00004, z: -0.000814}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0.0006
+    colliderCenter: {x: 0.000021325892, y: -0.00008053316, z: 0.00047852314}
+    colliderSize: {x: 0.0034513564, y: 0.0017669419, z: 0.0012012298}
+  - mesh: {fileID: -4589090067485023807, guid: e45d03832d596f24d9ea6fdf7ac76bed, type: 3}
+    posOffset: {x: -0.000308, y: 0.000433, z: -0.000912}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0.00064
+    colliderCenter: {x: -0.0004499256, y: -0.0003060503, z: 0.0004539332}
+    colliderSize: {x: 0.003554321, y: 0.0018783502, z: 0.0011834035}
+  - mesh: {fileID: -3936769562345784851, guid: e45d03832d596f24d9ea6fdf7ac76bed, type: 3}
+    posOffset: {x: -0.000064, y: 0.00033, z: -0.001264}
+    rotOffset: {x: 0, y: 0, z: 90}
+    height: 0
+    colliderCenter: {x: -0.0003248085, y: -0.00004367733, z: 0.0007679238}
+    colliderSize: {x: 0.003783112, y: 0.002013779, z: 0.0015820352}
+  putOnBasketDuration: 0.4
+  type: 4
+  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  focusTextKeys:
+  - GRABABLE_PATTY_RAW
+  - GRABABLE_PATTY_COOKED
+  - GRABABLE_PATTY_BURNT
+  handGrabType: 6
+  isUseable: 0
+  isThrowable: 1
+  throwMultiplier: 1
+  localScaleWhenGrabbed: {x: 111.1112, y: 111.1112, z: 111.1112}
+  grabPositionOffset: {x: 0.6, y: 1, z: 2}
+  grabRotationOffset: {x: -270, y: -90, z: -70}
+  grabLocalPositionOffset: {x: -0.040764168, y: 0.04942195, z: 0.0930503}
+  grabLocalRotationOffset: {x: 50.780922, y: 352.51718, z: 41.980732}
+  timeToCook: 20
+  timeToBurn: 30
+  cookingVariance: 0.15
+  rawMat: {fileID: 2100000, guid: 1278bcd435f814748942f424e448805b, type: 2}
+  cookedMat: {fileID: 2100000, guid: 75e0cce310c1e0a44942628d86451c50, type: 2}
+  burntMat: {fileID: 2100000, guid: 15e23f84279df6f478bc30acb0634ecf, type: 2}
