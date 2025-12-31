@@ -114,12 +114,10 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         ChangeLayer(grabableLayer);
     }
 
-    public void PutOnTray(Vector3 trayPos, Quaternion trayRot, Transform parentTray)
+    public void PutOnTray(Vector3 trayPos, Quaternion trayRot, Transform parentTray, Vector3 apexWorldPos)
     {
-        canAddToTray = false;
-        
+        canAddToTray = false;    
         SetOnTrayLayer();
-
         ChangeLayer(onTrayLayer);
 
         rb.velocity = Vector3.zero;
@@ -128,49 +126,43 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         transform.parent = parentTray;
 
-        // 1. Bize gelen Dünya Pozisyonunu (trayPos), yeni babamýzýn (parentTray) Yerel Pozisyonuna çeviriyoruz.
-        // Çünkü tepsi o sýrada hareket ediyor veya scale deðiþtiriyor olabilir.
+        // --- YENÝ PATH MANTIÐI ---
+
+        // 1. Hedef ve Apex noktalarýný parent'ýn yerel koordinatlarýna çevir
         Vector3 targetLocalPos = parentTray.InverseTransformPoint(trayPos);
+        Vector3 apexLocalPos = parentTray.InverseTransformPoint(apexWorldPos);
 
-        // 2. DOMove yerine DOLocalMove kullanýyoruz.
-        // Böylece tepsi Squash animasyonuyla ezilse bile malzeme ona yapýþýk kalýr,
-        // dünya koordinatlarýyla kavga etmez.
-        var moveTween = transform.DOLocalMove(targetLocalPos, data.timeToPutOnTray).SetEase(Ease.OutQuad);
+        // 2. Yol Dizisi: [Apex, Hedef]
+        // Not: DOTween path, "bulunduðum yerden baþla" mantýðýyla çalýþýr.
+        Vector3[] pathPoints = new Vector3[] { apexLocalPos, targetLocalPos };
 
-        // -------------------------
-
-        var rotateTween = transform.DORotateQuaternion(trayRot, data.timeToPutOnTray).SetEase(Ease.OutCubic);
-
+        // 3. Hareketi Baþlat (DOLocalPath)
+        // PathType.CatmullRom yumuþak bir kavis saðlar.
         Sequence seq = DOTween.Sequence();
-        seq.Join(moveTween);
-        seq.Join(rotateTween);
-        seq.OnComplete(() => {
 
+        seq.Join(transform.DOLocalPath(pathPoints, data.timeToPutOnTray, PathType.CatmullRom)
+            .SetEase(Ease.OutSine)); // Yavaþça baþla, hýzla otur
+
+        seq.Join(transform.DORotateQuaternion(trayRot, data.timeToPutOnTray)
+            .SetEase(Ease.OutCubic));
+
+        seq.OnComplete(() => {
             isAddedToBurger = true;
             isGettingPutOnTray = false;
             isJustDropped = false;
             isJustThrowed = false;
 
-            if (data.isSauce)
-                meshCol.convex = false;
+            if (data.isSauce) meshCol.convex = false;
 
             bool isLastItem = tray != null && tray.allBurgerIngredients.Count > 0 &&
                           tray.allBurgerIngredients[tray.allBurgerIngredients.Count - 1] == this;
 
-            // Eðer sonuncuyum AMA kutulama baþladýysa -> Grabable OLAMAM.
             if (isLastItem && !tray.isBoxingProcessStarted)
-            {
                 SetOnGrabableLayer();
-            }
             else
-            {
-                // Ya sonuncu deðilim, ya da kutulama baþladý -> Kilitlen.
                 SetOnTrayLayer();
-            }
-            // -----------------------
 
             SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.traySoundVolume, data.traySoundMinPitch, data.traySoundMaxPitch);
-
         });
     }
 

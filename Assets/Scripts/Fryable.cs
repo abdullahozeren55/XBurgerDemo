@@ -45,6 +45,7 @@ public class Fryable : MonoBehaviour, IGrabable
     private MeshRenderer meshRenderer;
     private MeshFilter meshFilter;
     private BoxCollider boxCollider;
+    private MeshCollider meshCollider;
 
     // Cache Layers
     private int grabableLayer;
@@ -64,6 +65,7 @@ public class Fryable : MonoBehaviour, IGrabable
         meshRenderer = GetComponent<MeshRenderer>();
         meshFilter = GetComponent<MeshFilter>();
         boxCollider = GetComponent<BoxCollider>();
+        meshCollider = GetComponent<MeshCollider>();
 
         // Layer ID'lerini al
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -267,6 +269,8 @@ public class Fryable : MonoBehaviour, IGrabable
             PlayerManager.Instance.ForceUpdatePlayerGrab(burgerIngredientScript);
         }
 
+        if (boxCollider != null) Destroy(boxCollider);
+
         Destroy(this);
     }
 
@@ -287,7 +291,8 @@ public class Fryable : MonoBehaviour, IGrabable
             isGettingPutOnBasket = false;
         }
 
-        boxCollider.enabled = false;
+        if (boxCollider != null) boxCollider.enabled = false;
+        if (meshCollider != null) meshCollider.enabled = false;
         rb.isKinematic = false; // Ele alýnca fizik açýlýr (ama gravity kapalý)
         rb.useGravity = false;
         rb.velocity = Vector3.zero;
@@ -325,7 +330,8 @@ public class Fryable : MonoBehaviour, IGrabable
 
     private void Release(Vector3 direction, float force)
     {
-        boxCollider.enabled = true;
+        if (boxCollider != null) boxCollider.enabled = true;
+        if (meshCollider != null) meshCollider.enabled = true;
         IsGrabbed = false;
         transform.SetParent(null);
         rb.useGravity = true;

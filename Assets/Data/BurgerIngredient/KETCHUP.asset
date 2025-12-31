@@ -23,7 +23,7 @@ MonoBehaviour:
   sauceType: 0
   handGrabType: 0
   icon: {fileID: 21300000, guid: f250e6eb449bfb549adafe33accc2646, type: 3}
-  yHeight: 0.003
+  yHeight: 0.002
   timeToPutOnTray: 0.2
   localScaleWhenGrabbed: {x: 22, y: 22, z: 4}
   stickableLayers:

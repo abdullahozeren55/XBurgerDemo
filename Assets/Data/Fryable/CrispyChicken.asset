@@ -17,27 +17,27 @@ MonoBehaviour:
     posOffset: {x: 0, y: 0, z: 0}
     rotOffset: {x: 0, y: 0, z: 0}
     height: 0
-    colliderCenter: {x: 0.0000000014260877, y: -6.984921e-10, z: -0.00000003531023}
-    colliderSize: {x: 0.0015014424, y: 0.0014879265, z: 0.00032216028}
+    colliderCenter: {x: 0.000000020954758, y: -0.0000005296897, z: 0.00000001071021}
+    colliderSize: {x: 0.022521637, y: 0.0048324037, z: 0.022318892}
   basketMeshes:
   - mesh: {fileID: 3070186605672834296, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
     posOffset: {x: -0.000057000085, y: 0.001213, z: -0.00051}
     rotOffset: {x: 30, y: 0, z: 0}
     height: 0.00042
-    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
-    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+    colliderCenter: {x: 0.0008002967, y: -0.00014267379, z: 0.00066525425}
+    colliderSize: {x: 0.03632786, y: 0.023304157, z: 0.040881082}
   - mesh: {fileID: -3068166526660607008, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
     posOffset: {x: -0.000057000085, y: 0.000729, z: -0.000885}
     rotOffset: {x: 30, y: 0, z: 0}
     height: 0.00042
-    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
-    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+    colliderCenter: {x: 0.0008002967, y: -0.00014267379, z: 0.00066525425}
+    colliderSize: {x: 0.03632786, y: 0.023304157, z: 0.040881082}
   - mesh: {fileID: -7201958362644950398, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
     posOffset: {x: -0.000057000085, y: 0.000245, z: -0.001303}
     rotOffset: {x: 30, y: 0, z: 0}
     height: 0
-    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
-    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+    colliderCenter: {x: 0.0008002967, y: -0.00014267379, z: 0.00066525425}
+    colliderSize: {x: 0.03632786, y: 0.023304157, z: 0.040881082}
   putOnBasketDuration: 0.4
   type: 7
   icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
@@ -49,11 +49,11 @@ MonoBehaviour:
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1
-  localScaleWhenGrabbed: {x: 111.1112, y: 111.1112, z: 111.1112}
+  localScaleWhenGrabbed: {x: 6.8, y: 6.6, z: 6.7}
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -20, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.0003, y: 0.0513, z: 0.0937}
-  grabLocalRotationOffset: {x: 36.27637, y: 189.215, z: 4.938634}
+  grabLocalRotationOffset: {x: 36.276638, y: 189.2149, z: 184.93849}
   timeToCook: 20
   timeToBurn: 30
   cookingVariance: 0.15

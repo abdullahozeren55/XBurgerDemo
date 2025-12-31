@@ -23,16 +23,16 @@ MonoBehaviour:
   sauceType: 0
   handGrabType: 5
   icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
-  yHeight: 0.018
+  yHeight: 0.015
   timeToPutOnTray: 0.2
-  localScaleWhenGrabbed: {x: 111.1112, y: 111.1112, z: 111.1112}
+  localScaleWhenGrabbed: {x: 6.8, y: 6.6, z: 6.7}
   stickableLayers:
     serializedVersion: 2
     m_Bits: 0
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -20, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.0003, y: 0.0513, z: 0.0937}
-  grabLocalRotationOffset: {x: 36.27637, y: 189.215, z: 4.938634}
+  grabLocalRotationOffset: {x: 36.276638, y: 189.2149, z: 184.93849}
   focusTextKeys:
   - GRABABLE_PATTY_RAW
   - GRABABLE_PATTY_COOKED

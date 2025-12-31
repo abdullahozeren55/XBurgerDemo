@@ -12,6 +12,12 @@ public class Tray : MonoBehaviour
     [SerializeField] private BoxCollider boxCollider;
     [SerializeField] private BoxCollider sauceCollider;
 
+    // --- YENÝ: Apex Noktasý ---
+    [Header("Movement Settings")]
+    [SerializeField] private Transform entryApex; // Malzemelerin ineceði tepe nokta
+    [SerializeField] private float topBunSnapDistance = 0.15f; // Üst ekmek bu kadar yaklaþmazsa yapýþmaz
+    private float startApexLocalZ; // Apex'in baþlangýç yüksekliðini saklamak için
+
     [Header("Sauces")]
     [SerializeField] private GameObject[] sauces; //0 ketchup, 1 mayo, 2 mustard, 3 bbq
     public AudioClip sauceOnTraySound;
@@ -52,6 +58,9 @@ public class Tray : MonoBehaviour
         sauceColliderStartZ = sauceCollider.size.z;
         sauceColliderStartCenterZ = sauceCollider.center.z;
 
+        // Apex'in baþlangýç Y deðerini kaydet
+        if (entryApex != null) startApexLocalZ = entryApex.localPosition.z;
+
         burgerIsDone = false;
 
         ResetPosition();
@@ -65,6 +74,16 @@ public class Tray : MonoBehaviour
     private void UpdateCurrentLocationToPutBurgerIngredient(float heightIncreaseAmount)
     {
         currentLocationToPutBurgerIngredient.y += heightIncreaseAmount;
+
+        // --- YENÝ: Apex'i de yukarý taþý ---
+        // Böylece burger büyüdükçe "giriþ kapýsý" da yükselir.
+        if (entryApex != null)
+        {
+            Vector3 newApexPos = entryApex.localPosition;
+            newApexPos.z += heightIncreaseAmount/12f;
+            entryApex.localPosition = newApexPos;
+        }
+        // ----------------------------------
 
         Vector3 newSize = boxCollider.size;
         newSize.z += heightIncreaseAmount/12;
@@ -88,7 +107,7 @@ public class Tray : MonoBehaviour
     {
         if (!allSauces.Contains(type) && !burgerIsDone)
         {
-            UpdateCurrentLocationToPutBurgerIngredient(0.003f); // Sos için sabit deðer
+            UpdateCurrentLocationToPutBurgerIngredient(0.002f); // Sos için sabit deðer
             // 1. Rotasyonu ve Pozisyonu BURADA hesaplýyoruz
             Quaternion targetRotation = Quaternion.Euler(90f, Random.Range(0f, 360f), 0f);
             Vector3 targetPosition = currentLocationToPutBurgerIngredient;
@@ -104,7 +123,7 @@ public class Tray : MonoBehaviour
                 ingredientsParent);
 
             // 3. Yüksekliði sosun kalýnlýðý kadar arttýr
-            UpdateCurrentLocationToPutBurgerIngredient(0.003f); // Sos için sabit deðer
+            UpdateCurrentLocationToPutBurgerIngredient(0.002f); // Sos için sabit deðer
 
             go.transform.parent = ingredientsParent;
 
@@ -121,7 +140,7 @@ public class Tray : MonoBehaviour
 
     public void RemoveSauce()
     {
-        UpdateCurrentLocationToPutBurgerIngredient(-2 * 0.003f);
+        UpdateCurrentLocationToPutBurgerIngredient(-2 * 0.002f);
         allBurgerIngredients.RemoveAt(allBurgerIngredients.Count - 1);
         allSauces.RemoveAt(allSauces.Count - 1);
         allGO.RemoveAt(allGO.Count - 1);
@@ -163,6 +182,15 @@ public class Tray : MonoBehaviour
     private void ResetPosition()
     {
         currentLocationToPutBurgerIngredient = transform.position;
+
+        // --- YENÝ: Apex'i baþlangýca döndür ---
+        if (entryApex != null)
+        {
+            Vector3 resetApexPos = entryApex.localPosition;
+            resetApexPos.z = startApexLocalZ;
+            entryApex.localPosition = resetApexPos;
+        }
+        // --------------------------------------
 
         Vector3 newSize = boxCollider.size;
         newSize.z = boxColliderStartZ;
@@ -299,8 +327,12 @@ public class Tray : MonoBehaviour
                 }
                 // --------------------------------------
 
-                // Artýk storedRotation deðil, taze hesapladýðýmýz targetRotation'ý veriyoruz.
-                ingredient.PutOnTray(currentLocationToPutBurgerIngredient, targetRotation, ingredientsParent);
+                // --- YENÝ: Apex Noktasýný Gönderiyoruz ---
+                // Eðer Apex atanmamýþsa kendi üstünü kullanýr (güvenlik)
+                Vector3 apexPos = (entryApex != null) ? entryApex.position : currentLocationToPutBurgerIngredient + Vector3.up * 0.2f;
+
+                ingredient.PutOnTray(currentLocationToPutBurgerIngredient, targetRotation, ingredientsParent, apexPos);
+                // -----------------------------------------
 
                 Invoke("Squash", ingredient.data.timeToPutOnTray / 1.2f);
                 UpdateCurrentLocationToPutBurgerIngredient(ingredient.data.yHeight);
@@ -346,9 +378,19 @@ public class Tray : MonoBehaviour
         // 2. Burger bitmiþse (burgerIsDone) -> Hiçbir þey kabul etme
         if (burgerIsDone) return false;
 
-        // 3. Sýradaki malzemeler
-        // Buradaki kurallar TurnOnHologram fonksiyonundaki kurallarla AYNI olmalý.
+
         BurgerIngredientData.IngredientType type = ingredient.data.ingredientType;
+
+        // --- YENÝ: Top Bun için Apex Mesafe Kontrolü (HASSAS BIRAKMA) ---
+        if (type == BurgerIngredientData.IngredientType.TOPBUN && entryApex != null)
+        {
+            float dist = Vector3.Distance(ingredient.transform.position, entryApex.position);
+            if (dist > topBunSnapDistance)
+            {
+                return false; // Uzaktan fýrlatýldý, kabul etme!
+            }
+        }
+        // ----------------------------------------------------------------
 
         switch (type)
         {
