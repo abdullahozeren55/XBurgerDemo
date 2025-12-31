@@ -21,7 +21,7 @@ MonoBehaviour:
   cookingSoundMaxPitch: 1.3
   materials:
   - {fileID: 2100000, guid: b167df5b10b2e7844abcfb20993fec98, type: 2}
-  - {fileID: 2100000, guid: ca1dfd91055e20240ab4c5f793c39cf9, type: 2}
+  - {fileID: 2100000, guid: cb7b93ce0d296dc46b28b8ae8c5d4ae4, type: 2}
   - {fileID: 2100000, guid: f0bbbdcf14c04ef4f9a5e0488dc91905, type: 2}
   cookTime:
   - 15

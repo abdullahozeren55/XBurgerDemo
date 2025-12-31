@@ -1,6 +1,5 @@
 using DG.Tweening;
 using UnityEngine;
-using static FryableData;
 
 public class Fryable : MonoBehaviour, IGrabable
 {
@@ -10,6 +9,9 @@ public class Fryable : MonoBehaviour, IGrabable
     [Header("Cooking State")]
     [SerializeField] private float currentCookingTime = 0f;
     public Cookable.CookAmount CurrentCookingState = Cookable.CookAmount.RAW;
+
+    [Header("Conversion Settings")]
+    [SerializeField] private BurgerIngredient burgerIngredientScript; // Inspector'dan atayacaðýn kapalý script
 
     // --- IGrabable Properties ---
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
@@ -245,6 +247,29 @@ public class Fryable : MonoBehaviour, IGrabable
         });
     }
 
+    private void TransformToBurgerIngredient()
+    {
+        if (burgerIngredientScript == null) return;
+
+        // 1. Tag deðiþtir
+        gameObject.tag = "BurgerIngredient";
+
+        // 2. Yeni scripti hazýrla
+        burgerIngredientScript.enabled = true;
+        burgerIngredientScript.IsGrabbed = true; // State senkronizasyonu
+
+        // Þuna dikkat: BurgerIngredient.Awake() veya OnEnable() içinde IsGrabbed = false yapýyor olabilir.
+        // O yüzden enabled yaptýktan hemen sonra IsGrabbed = true dediðimizden emin oluyoruz.
+
+        // 3. Controller'a "Artýk muhattabýn bu yeni script" de
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.ForceUpdatePlayerGrab(burgerIngredientScript);
+        }
+
+        Destroy(this);
+    }
+
     // --- IGRABABLE IMPLEMENTATION ---
 
     public void OnGrab(Transform grabPoint)
@@ -278,6 +303,14 @@ public class Fryable : MonoBehaviour, IGrabable
         //SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 1f, 1.2f); // Tutma sesi (Drop sound kullandým geçici)
 
         transform.localScale = data.localScaleWhenGrabbed;
+
+        // --- DÖNÜÞÜM BLOÐU (Hybrid Item) ---
+        // Eðer bu bir Çýtýr Tavuksa VE Piþmiþse
+        if (data.type == Holder.HolderIngredient.CrispyChicken &&
+            CurrentCookingState == Cookable.CookAmount.REGULAR)
+        {
+            TransformToBurgerIngredient();
+        }
     }
 
     public void OnThrow(Vector3 direction, float force)

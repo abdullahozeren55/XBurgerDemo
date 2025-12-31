@@ -27,10 +27,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
-    [Space]
-
-    [SerializeField] private Tray tray;
-
     public SauceBottleData data;
 
     public enum SauceType
@@ -96,8 +92,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
 
         col.enabled = false;
 
-        tray.TurnOnSauceHologram(sauceType);
-
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.useGravity = false;
@@ -126,8 +120,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
     {
         col.enabled = true;
 
-        tray.TurnOffAllHolograms();
-
         IsGrabbed = false;
 
         if (useCoroutine != null)
@@ -153,8 +145,6 @@ public class SauceBottle : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         col.enabled = true;
-
-        tray.TurnOffAllHolograms();
 
         IsGrabbed = false;
 

@@ -12,6 +12,7 @@ public class Holder : MonoBehaviour, IGrabable
         DinoNuggets,
         Nuggets,
         CheeseSticks,
+        CrispyChicken
     }
 
     // YENÝ: Hangi enum hangi objeyi açacak?
@@ -100,7 +101,7 @@ public class Holder : MonoBehaviour, IGrabable
         }
 
         // 4. Türüne göre doldur
-        if (item.data.type != HolderIngredient.Empty)
+        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken)
         {
             Fill(item.data.type, item);
             return true;
@@ -122,7 +123,7 @@ public class Holder : MonoBehaviour, IGrabable
         if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) return false;
 
         // 4. Tür uyuyor mu? (Patates veya Soðan Halkasý)
-        if (item.data.type != HolderIngredient.Empty) return true;
+        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken) return true;
 
         return false;
     }

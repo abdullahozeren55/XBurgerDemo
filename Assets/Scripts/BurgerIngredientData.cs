@@ -16,6 +16,7 @@ public class BurgerIngredientData : ScriptableObject
         ONION,
         PICKLE,
         TOPBUN,
+        CRISPYCHICKEN,
     }
 
     public bool isUseable = false;

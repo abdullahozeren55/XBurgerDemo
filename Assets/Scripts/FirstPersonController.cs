@@ -1699,6 +1699,25 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    public void ForceUpdateCurrentGrabableReference(IGrabable newReference)
+    {
+        // 1. Ana referansý güncelle
+        currentGrabable = newReference;
+
+        // 2. Envanter dizisini güncelle (Çok Kritik!)
+        // Bunu yapmazsak slot deðiþtirdiðinde veya tekrar baktýðýnda eski scripti bulur.
+        if (currentSlotIndex != -1 && currentSlotIndex < inventoryItems.Length)
+        {
+            inventoryItems[currentSlotIndex] = newReference;
+        }
+
+        // 3. UI'ý güncelle (Ýkon deðiþmiþ olabilir)
+        RefreshInventoryUI();
+
+        // 4. Outline rengini yeni scripte göre tekrar hesapla
+        DecideOutlineAndCrosshair();
+    }
+
     public void ChangeCurrentGrabable(IGrabable grabObject)
     {
         // SENARYO 1: TELEFON (Özel Durum)

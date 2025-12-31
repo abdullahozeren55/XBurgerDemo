@@ -58,8 +58,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     private float lastSoundTime = 0f;
     private bool isStuckAndCantPlayAudioUntilPickedAgain;
 
-    [HideInInspector] public Quaternion storedRotationForTray;
-
     private Quaternion collisionRotation;
 
     private void Awake()
@@ -96,6 +94,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
             SetOnGrabableLayer();
         }
+    }
+
+    private void Start()
+    {
+        //SIRF INSPECTORDA SCRIPT DISABLE EDÝLEBÝLSÝN DÝYE KOYDUM
     }
 
     public void SetOnTrayLayer()
@@ -173,20 +176,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public void OnHolster()
     {
-        // 1. Eðer bu malzeme tepsiyle iliþkilendirilmiþse (hologram vs.) temizle
-        if (tray != null)
-        {
-            tray.TurnOffAllHolograms();
-
-            // Eðer tepsinin "þu anki malzemesi" bendimsem, artýk yokum de.
-            if (tray.currentIngredient == this)
-            {
-                tray.currentIngredient = null;
-            }
-        }
-
-        // 2. Outline vs. temizliði (Gerekirse)
-        // OnLoseFocus(); // Ýstersen focus'u da burada kaybettirebilirsin ama þart deðil.
     }
 
     public void OnGrab(Transform grabPoint)
@@ -205,13 +194,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
             isAddedToBurger = false;
         }
-
-        tray.currentIngredient = this;
-
-        if (data.isSauce)
-            tray.TurnOnSauceHologram(data.sauceType);
-        else
-            tray.TurnOnHologram(data.ingredientType);
 
         col.enabled = false;
 
@@ -254,22 +236,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     {
         col.enabled = true;
 
-        if (tray != null)
-        {
-            // Fýrlatmadan hemen önce, o anki tepsi hologram açýsýný kopyalýyoruz.
-            // Böylece havada el deðiþtirsen bile bu açý deðiþmez.
-            storedRotationForTray = tray.currentRotationToPutBurgerIngredient;
-
-            tray.TurnOffAllHolograms();
-
-            if (tray.currentIngredient == this)
-                tray.currentIngredient = null;
-            // --------------------------------
-
-            tray.TurnOffAllHolograms();
-            if (tray.currentIngredient == this) tray.currentIngredient = null;
-        }
-
         IsGrabbed = false;
 
         transform.SetParent(null);
@@ -286,22 +252,6 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         col.enabled = true;
-
-        if (tray != null)
-        {
-            // Fýrlatmadan hemen önce, o anki tepsi hologram açýsýný kopyalýyoruz.
-            // Böylece havada el deðiþtirsen bile bu açý deðiþmez.
-            storedRotationForTray = tray.currentRotationToPutBurgerIngredient;
-
-            tray.TurnOffAllHolograms();
-
-            if (tray.currentIngredient == this)
-                tray.currentIngredient = null;
-            // --------------------------------
-
-            tray.TurnOffAllHolograms();
-            if (tray.currentIngredient == this) tray.currentIngredient = null;
-        }
 
         IsGrabbed = false;
 

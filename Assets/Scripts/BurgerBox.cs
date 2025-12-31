@@ -180,7 +180,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
         CanBeReceived = true;
 
         tray.currentBox = this;
-        tray.TurnOnBoxHologram();
 
         col.enabled = false;
 
@@ -215,8 +214,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
     {
         col.enabled = true;
 
-        tray.TurnOffAllHolograms();
-
         IsGrabbed = false;
 
         transform.SetParent(null);
@@ -233,8 +230,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         col.enabled = true;
-
-        tray.TurnOffAllHolograms();
 
         IsGrabbed = false;
 

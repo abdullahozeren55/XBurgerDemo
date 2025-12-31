@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064a45c67f7539c41ad9e152101925d3, type: 3}
+  m_Name: CrispyChicken
+  m_EditorClassIdentifier: 
+  handMesh:
+    mesh: {fileID: 3003076174818837970, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
+    posOffset: {x: 0, y: 0, z: 0}
+    rotOffset: {x: 0, y: 0, z: 0}
+    height: 0
+    colliderCenter: {x: 0.0000000014260877, y: -6.984921e-10, z: -0.00000003531023}
+    colliderSize: {x: 0.0015014424, y: 0.0014879265, z: 0.00032216028}
+  basketMeshes:
+  - mesh: {fileID: 3070186605672834296, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
+    posOffset: {x: -0.000057000085, y: 0.001213, z: -0.00051}
+    rotOffset: {x: 30, y: 0, z: 0}
+    height: 0.00042
+    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
+    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+  - mesh: {fileID: -3068166526660607008, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
+    posOffset: {x: -0.000057000085, y: 0.000729, z: -0.000885}
+    rotOffset: {x: 30, y: 0, z: 0}
+    height: 0.00042
+    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
+    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+  - mesh: {fileID: -7201958362644950398, guid: 1244ee3fa47cbf648a6934f7f49f191d, type: 3}
+    posOffset: {x: -0.000057000085, y: 0.000245, z: -0.001303}
+    rotOffset: {x: 30, y: 0, z: 0}
+    height: 0
+    colliderCenter: {x: 0.000025330612, y: 0.00003667729, z: 0.00017902459}
+    colliderSize: {x: 0.0016816035, y: 0.0016889886, z: 0.0006795509}
+  putOnBasketDuration: 0.4
+  type: 7
+  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  focusTextKeys:
+  - GRABABLE_PATTY_RAW
+  - GRABABLE_PATTY_COOKED
+  - GRABABLE_PATTY_BURNT
+  handGrabType: 5
+  isUseable: 0
+  isThrowable: 1
+  throwMultiplier: 1
+  localScaleWhenGrabbed: {x: 111.1112, y: 111.1112, z: 111.1112}
+  grabPositionOffset: {x: 0.6, y: 1, z: 2}
+  grabRotationOffset: {x: -20, y: -70, z: -70}
+  grabLocalPositionOffset: {x: 0.0003, y: 0.0513, z: 0.0937}
+  grabLocalRotationOffset: {x: 36.27637, y: 189.215, z: 4.938634}
+  timeToCook: 20
+  timeToBurn: 30
+  cookingVariance: 0.15
+  rawMat: {fileID: 2100000, guid: 12d540d63cffe4147a0a8c5bb5883d53, type: 2}
+  cookedMat: {fileID: 2100000, guid: 7fab0010851c1c64d96f677bd2b5f009, type: 2}
+  burntMat: {fileID: 2100000, guid: 5a0a7eca07a431e4085d4ae74b865336, type: 2}

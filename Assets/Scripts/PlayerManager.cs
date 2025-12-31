@@ -138,6 +138,12 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.CanUseHeadbob = can;
     }
 
+    public void ForceUpdatePlayerGrab(IGrabable newGrabable)
+    {
+        // FirstPersonController referansýna (playerController vs.) ulaþ
+        firstPersonController.ForceUpdateCurrentGrabableReference(newGrabable);
+    }
+
     public void ChangePlayerCurrentGrabable(IGrabable objectToGrab)
     {
         firstPersonController.ChangeCurrentGrabable(objectToGrab);
