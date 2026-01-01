@@ -8,18 +8,18 @@ public class BurgerBoxData : ScriptableObject
 {
     public bool isUseable = false;
     public bool isThrowable = true;
-    public PlayerManager.HandGrabTypes[] handGrabTypes; //0 for open, 1 for close
+    public PlayerManager.HandGrabTypes handGrabType;
     public Sprite[] icon;
     [Space]
     public float timeToPutOnTray = 0.3f;
     public float throwMultiplier = 1f;
     public Vector3 trayRotation = new Vector3(0, 0, -90);
     [Space]
-    public Vector3[] grabPositionOffset; //0 for open, 1 for close
-    public Vector3[] grabRotationOffset; //0 for open, 1 for close
+    public Vector3 grabPositionOffset;
+    public Vector3 grabRotationOffset;
     [Space]
-    public Vector3[] grabLocalPositionOffset; //0 for open, 1 for close
-    public Vector3[] grabLocalRotationOffset; //0 for open, 1 for close
+    public Vector3 grabLocalPositionOffset;
+    public Vector3 grabLocalRotationOffset;
     [Space]
     public string[] focusTextKeys;
 

@@ -1,227 +1,196 @@
-using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BurgerBox : MonoBehaviour, IGrabable
 {
+    public IGrabable Master => this;
+
+    [Header("Visuals")]
+    [SerializeField] private Transform boxInnerPoint; // Burgerin yerleþeceði iç nokta (Pivot)
+    public GameObject topPart; // Kapak
+
+    [Header("Data")]
+    public BurgerBoxData data;
+
+    [Header("Lid Settings (Adaptive)")]
+    [SerializeField] private float minLidAngle = 32f; // Küçük burgerlerdeki havalý duruþ
+    [SerializeField] private float maxLidAngle = 90f; // Dev burgerlerdeki zoraki duruþ
+
+    [Tooltip("Burger bu boydan kýsaysa Min Angle kullanýlýr.")]
+    [SerializeField] private float minBurgerHeightLimit = 0.15f; // Bu deðerin altý 32 derece
+
+    [Tooltip("Burger bu boya ulaþýrsa Max Angle (90) olur.")]
+    [SerializeField] private float maxBurgerHeightLimit = 0.4f; // Bu deðer ve üstü 90 derece
+
+    // State
+    private GameObject containedBurger;
+    private bool isBoxFull = false;
+
+    // --- IGrabable Props ---
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
-    public Sprite Icon { get => data.icon[boxSituation]; set => data.icon[boxSituation] = value; }
-
-    public PlayerManager.HandGrabTypes HandGrabType { get => data.handGrabTypes[boxSituation]; set => data.handGrabTypes[boxSituation] = value; }
-    public bool IsThrowable { get => data.isThrowable; set => data.isThrowable = value; }
-
-    public Transform LeftHandPoint { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
-    public float ThrowMultiplier { get => data.throwMultiplier; set => data.throwMultiplier = value; }
+    public Sprite Icon { get => data.icon[isBoxFull ? 1 : 0]; set { } }
+    public PlayerManager.HandGrabTypes HandGrabType { get => data.handGrabType; set => data.handGrabType = value; }
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
     public bool OutlineShouldBeGreen { get => outlineShouldBeGreen; set => outlineShouldBeGreen = value; }
     private bool outlineShouldBeGreen;
-    public Vector3 GrabPositionOffset { get => data.grabPositionOffset[boxSituation]; set => data.grabPositionOffset[boxSituation] = value; }
-    public Vector3 GrabRotationOffset { get => data.grabRotationOffset[boxSituation]; set => data.grabRotationOffset[boxSituation] = value; }
 
-    public Vector3 GrabLocalPositionOffset { get => data.grabLocalPositionOffset[boxSituation]; set => data.grabLocalPositionOffset[boxSituation] = value; }
-    public Vector3 GrabLocalRotationOffset { get => data.grabLocalRotationOffset[boxSituation]; set => data.grabLocalRotationOffset[boxSituation] = value; }
+    public bool IsThrowable { get => data.isThrowable; set => data.isThrowable = value; }
+    public float ThrowMultiplier { get => data.throwMultiplier; set => data.throwMultiplier = value; }
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
-    private bool isGettingPutOnTray;
+    public Vector3 GrabPositionOffset { get => data.grabPositionOffset; set => data.grabPositionOffset = value; }
+    public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
+    public Vector3 GrabLocalPositionOffset { get => data.grabLocalPositionOffset; set => data.grabLocalPositionOffset = value; }
+    public Vector3 GrabLocalRotationOffset { get => data.grabLocalRotationOffset; set => data.grabLocalRotationOffset = value; }
 
-    public BurgerBoxData data;
+    public string FocusTextKey
+    {
+        get
+        {
+            return data.focusTextKeys[0]; // "Burger Box"
+        }
+        set { }
+    }
 
-    [HideInInspector] public bool canAddToTray;
-
-    [SerializeField] private Tray tray;
-    public string FocusTextKey { get => data.focusTextKeys[burgerNo]; set => data.focusTextKeys[burgerNo] = value; }
-    [HideInInspector] public int burgerNo = 0; //0 for "Burger Box" text, rest is for menu names in order
-    private int boxSituation = 0; //0 for open, 1 for close
-    [Space]
-
-    public List<BurgerIngredientData.IngredientType> allBurgerIngredientTypes = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> allSauces = new List<SauceBottle.SauceType>();
-
-    public GameObject topPart;
-
-    [Header("Closing Animation Settings")]
-    [SerializeField] private float lidCloseDuration = 0.2f; // Kapak kapanma süresi
-
-    [Header("Closed Collider Settings")]
-    [SerializeField] private Vector3 closedColliderCenter; // Kapalýykenki Center
-    [SerializeField] private Vector3 closedColliderSize;   // Kapalýykenki Size
-
+    // References
     private Rigidbody rb;
-    private BoxCollider col;
+    private Collider[] allColliders;
+    private int grabableLayer, grabableOutlinedLayer, interactableOutlinedRedLayer, ungrabableLayer, grabbedLayer, grabableOutlinedGreenLayer;
 
-    private int grabableLayer;
-    private int grabableOutlinedLayer;
-    private int interactableOutlinedRedLayer;
-    private int ungrabableLayer;
-    private int grabbedLayer;
-    private int onTrayLayer;
-
-    [HideInInspector] public bool isJustThrowed;
-    [HideInInspector] public bool isJustDropped;
-    [HideInInspector] public bool CanBeReceived;
-
-    [HideInInspector] public GameManager.BurgerTypes burgerType;
-
+    // --- PHYSICS FLAGS (Geri Geldi!) ---
+    private bool isJustThrowed;
+    private bool isJustDropped;
     private float lastSoundTime = 0f;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        col = GetComponent<BoxCollider>();
+        allColliders = GetComponentsInChildren<Collider>();
+
+        // --- YENÝ: TopPart'a Proxy Script Atama ---
+        if (topPart != null)
+        {
+            // Eðer üzerinde BoxChild yoksa ekle ve ayarla
+            BoxChild childScript = topPart.GetComponent<BoxChild>();
+            if (childScript == null)
+            {
+                childScript = topPart.AddComponent<BoxChild>();
+            }
+            childScript.parentBox = this;
+
+            // Eðer TopPart'ýn tag'i "Untagged" ise, raycast'in bulmasý için
+            // Layer'ý parent ile ayný yapacaðýz ChangeLayer fonksiyonunda.
+        }
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
         grabbedLayer = LayerMask.NameToLayer("Grabbed");
-        onTrayLayer = LayerMask.NameToLayer("OnTray");
-
-        IsGrabbed = false;
-        isGettingPutOnTray = false;
+        grabableOutlinedGreenLayer = LayerMask.NameToLayer("GrabableOutlinedGreen");
 
         isJustThrowed = false;
         isJustDropped = false;
-        CanBeReceived = true;
+    }
 
-        canAddToTray = false;
+    // --- KOMBÝNASYON (FIXED) ---
+    public bool TryCombine(IGrabable otherItem)
+    {
+        if (isBoxFull) return false;
 
+        WholeBurger burger = null;
+
+        // 1. Direkt WholeBurger mi? (Nadiren olur)
+        if (otherItem is WholeBurger)
+        {
+            burger = (WholeBurger)otherItem;
+        }
+        // 2. ChildBurger mi? (Genelde bu olur çünkü raycast buna çarpar)
+        else if (otherItem is ChildBurger)
+        {
+            burger = ((ChildBurger)otherItem).parentBurger;
+        }
+
+        if (burger == null) return false;
+
+        FillBox(burger);
+        return true;
+    }
+
+    public bool CanCombine(IGrabable otherItem)
+    {
+        if (isBoxFull) return false;
+
+        // Hem WholeBurger hem ChildBurger kabul et
+        if (otherItem is WholeBurger || otherItem is ChildBurger) return true;
+
+        return false;
+    }
+
+    private void FillBox(WholeBurger burger)
+    {
+        isBoxFull = true;
+
+        // 1. Verileri yedekle (Çünkü script yok olacak)
+        containedBurger = burger.gameObject;
+        float burgerHeight = burger.TotalBurgerHeight;
+
+        // 2. Burgeri paketle (Bu iþlem scriptleri yok eder)
+        burger.PackIntoBox(this, boxInnerPoint);
+
+        // 3. Layer'larý MANUEL ayarla (Artýk script yok)
+        // Kutu þu an hangi layerdaysa (muhtemelen Grabbed veya Default), burgeri de ona eþitle.
+        SetLayerRecursively(containedBurger, grabbedLayer);
+
+        // 4. Kapaðý ayarla
         if (topPart != null)
         {
-            topPart.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+            float targetAngle = minLidAngle;
+            if (burgerHeight > minBurgerHeightLimit)
+            {
+                float t = Mathf.InverseLerp(minBurgerHeightLimit, maxBurgerHeightLimit, burgerHeight);
+                targetAngle = Mathf.Lerp(minLidAngle, maxLidAngle, t);
+            }
+            topPart.transform.localRotation = Quaternion.Euler(targetAngle, 0f, 0f);
         }
+
+        if (PlayerManager.Instance != null) PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.closeSoundVolume, data.closeSoundMinPitch, data.closeSoundMaxPitch);
     }
 
-    public void PutOnTray(Vector3 trayPos)
+    // --- IGrabable ---
+    public void OnGrab(Transform grabPoint)
     {
-        canAddToTray = false;
-        isGettingPutOnTray = true;
-        ChangeLayer(onTrayLayer);
-
+        IsGrabbed = true;
         isJustDropped = false;
         isJustThrowed = false;
 
-        rb.velocity = Vector3.zero;
         rb.isKinematic = true;
+        rb.useGravity = false;
+        ToggleColliders(false);
 
-        Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOMove(trayPos, data.timeToPutOnTray).SetEase(Ease.OutQuad));
-        seq.Join(transform.DORotateQuaternion(Quaternion.Euler(data.trayRotation), data.timeToPutOnTray).SetEase(Ease.OutCubic));
-
-        seq.OnComplete(() =>
-        {
-            SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.closeSoundVolume, data.closeSoundMinPitch, data.closeSoundMaxPitch);
-
-            tray.PrepareForSquash();
-
-            // --- COLLIDER BAÞLANGIÇ DEÐERLERÝNÝ KAYDET ---
-            // Animasyon baþlamadan önceki son halini (Açýk halini) alýyoruz.
-            Vector3 startColSize = Vector3.one;
-            Vector3 startColCenter = Vector3.zero;
-
-            if (col != null)
-            {
-                startColSize = col.size;
-                startColCenter = col.center;
-            }
-            // ---------------------------------------------
-
-            // Burger ne zaman ezilmeye baþlasýn? (0.5 = Yolun yarýsý/90 Derece)
-            float squashStartT = 0.5f;
-
-            // --- MASTER TWEEN ---
-            DOVirtual.Float(0f, 1f, lidCloseDuration, (t) =>
-            {
-                // A) KAPAK ROTASYONU (Her zaman döner)
-                // 180'den 0'a iner. t > 1 olunca negatife düþer (Juice).
-                float currentAngle = Mathf.LerpUnclamped(180f, 0f, t);
-                topPart.transform.localRotation = Quaternion.Euler(currentAngle, 0f, 0f);
-
-                // B) BURGER SQUASH (Sadece temas sonrasý)
-                float burgerProgress = 0f;
-                if (t >= squashStartT)
-                {
-                    // 0.5 ile 1.0 arasýný -> 0.0 ile 1.0 arasýna çevir (Remap)
-                    burgerProgress = (t - squashStartT) / (1f - squashStartT);
-                }
-                tray.UpdateSquash(burgerProgress);
-
-                // C) COLLIDER GÜNCELLEME (Her zaman deðiþir)
-                // Kutu kapanýrken collider da sürekli küçülmeli ki fiziksel olarak otursun.
-                // OutBack sayesinde kapanýnca hafifçe daha da küçülüp (sýkýþýp) geri yerine oturur.
-                if (col != null)
-                {
-                    col.size = Vector3.LerpUnclamped(startColSize, closedColliderSize, t);
-                    col.center = Vector3.LerpUnclamped(startColCenter, closedColliderCenter, t);
-                }
-
-            }).SetEase(Ease.OutQuad)
-              .OnComplete(FinishPutOnTray);
-        });
-    }
-
-    public void OnHolster()
-    {
-    }
-
-    public void OnGrab(Transform grabPoint)
-    {
-        ChangeLayer(grabbedLayer);
-        isGettingPutOnTray = false;
-
-        CanBeReceived = true;
-
-        tray.currentBox = this;
-
-        col.enabled = false;
+        transform.SetParent(grabPoint);
+        transform.localPosition = GrabLocalPositionOffset;
+        transform.localRotation = Quaternion.Euler(GrabLocalRotationOffset);
 
         SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
 
-        rb.isKinematic = false;
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.useGravity = false;
-
-        IsGrabbed = true;
-
-        transform.SetParent(grabPoint);
-        transform.position = grabPoint.position;
-
-        transform.localPosition = GrabLocalPositionOffset;
-        transform.localRotation = Quaternion.Euler(GrabLocalRotationOffset);
-    }
-    public void OnFocus()
-    {
-        if (!isJustDropped && !isJustThrowed)
-            ChangeLayer(grabableOutlinedLayer);
-    }
-    public void OnLoseFocus()
-    {
-        if (!isJustDropped && !isJustThrowed)
-            ChangeLayer(grabableLayer);
+        ChangeLayer(grabbedLayer);
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
-        col.enabled = true;
-
+        ToggleColliders(true);
         IsGrabbed = false;
-
         transform.SetParent(null);
-
+        rb.isKinematic = false;
         rb.useGravity = true;
-
         rb.AddForce(direction * force, ForceMode.Impulse);
 
+        // FLAGLER GERÝ GELDÝ
         isJustDropped = true;
 
         ChangeLayer(ungrabableLayer);
@@ -229,113 +198,87 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public void OnThrow(Vector3 direction, float force)
     {
-        col.enabled = true;
-
+        ToggleColliders(true);
         IsGrabbed = false;
-
         transform.SetParent(null);
-
+        rb.isKinematic = false;
         rb.useGravity = true;
-
         rb.AddForce(direction * force, ForceMode.Impulse);
 
+        // FLAGLER GERÝ GELDÝ
         isJustThrowed = true;
 
         ChangeLayer(ungrabableLayer);
     }
 
+    // --- FOCUS CONTROLS (Fizik durumuna göre) ---
+    public void OnFocus()
+    {
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
+    }
+
+    public void OnLoseFocus()
+    {
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(grabableLayer);
+    }
+
     public void OutlineChangeCheck()
     {
-        if (gameObject.layer == grabableOutlinedLayer && OutlineShouldBeRed)
+        if (gameObject.layer == grabableOutlinedLayer)
         {
-            ChangeLayer(interactableOutlinedRedLayer);
+            if (OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer);
+            else if (OutlineShouldBeGreen) ChangeLayer(grabableOutlinedGreenLayer);
         }
-        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        else if (gameObject.layer == grabableOutlinedGreenLayer)
         {
-            ChangeLayer(grabableOutlinedLayer);
+            if (OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer);
+            else if (!OutlineShouldBeGreen) ChangeLayer(grabableOutlinedLayer);
         }
-    }
-
-    private void FinishPutOnTray() //Gets called in oncomplete seq
-    {
-        tray.ResetTray();
-
-        GameManager.Instance.CheckBurgerType(allBurgerIngredientTypes, allSauces, this);
-
-        gameObject.tag = "BurgerBoxClosed";
-
-        boxSituation = 1;
-        
-        ChangeLayer(grabableLayer);
-    }
-
-    public void SetBurgerType(GameManager.BurgerTypes type)
-    {
-        burgerNo = (int) type + 1;
-        burgerType = type;
-
-        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
+        else if (gameObject.layer == interactableOutlinedRedLayer)
+        {
+            if (!OutlineShouldBeRed)
+            {
+                if (OutlineShouldBeGreen) ChangeLayer(grabableOutlinedGreenLayer);
+                else ChangeLayer(grabableOutlinedLayer);
+            }
+        }
     }
 
     public void ChangeLayer(int layer)
     {
         gameObject.layer = layer;
-        topPart.layer = layer;
-    }
-
-    private void OnDisable()
-    {
-        PlayerManager.Instance.ResetPlayerGrab(this);
-    }
-
-    private void OnDestroy()
-    {
-        PlayerManager.Instance.ResetPlayerGrab(this);
-    }
-
-    private void HandleSoundFX(Collision collision)
-    {
-        // --- 2. Hýz Hesaplama ---
-        // Çarpýþmanýn þiddetini alýyoruz
-        float impactForce = collision.relativeVelocity.magnitude;
-
-        // --- 3. Spam Korumasý ve Sessizlik ---
-        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
-        // son sesin üzerinden çok az zaman geçtiyse çýk.
-        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
-
-        // --- 4. Hýza Göre Ses Seçimi ---
-        if (impactForce >= data.throwThreshold)
+        if (topPart != null) topPart.layer = layer;
+        if (containedBurger != null)
         {
-            // === FIRLATMA SESÝ (Hýzlý) ===
-            SoundManager.Instance.PlaySoundFX(
-                data.audioClips[2],
-                transform,
-                data.throwSoundVolume,
-                data.throwSoundMinPitch,
-                data.throwSoundMaxPitch
-            );
+            SetLayerRecursively(containedBurger, layer);
         }
-        else
-        {
-            // === DÜÞME SESÝ (Yavaþ/Orta) ===
-            SoundManager.Instance.PlaySoundFX(
-                data.audioClips[1],
-                transform,
-                data.dropSoundVolume,
-                data.dropSoundMinPitch,
-                data.dropSoundMaxPitch
-            );
-        }
-
-        // Ses çaldýk, zamaný kaydet
-        lastSoundTime = Time.time;
     }
 
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null) return;
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (child == null) continue;
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
+
+    public void OnHolster() { gameObject.SetActive(false); }
+    public void OnUseHold() { }
+    public void OnUseRelease() { }
+
+    // --- COLLISION & SOUND (Geri Geldi) ---
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && !isGettingPutOnTray && !collision.gameObject.CompareTag("Player"))
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
+            // Havada süzülürken layer deðiþimi
             if (isJustThrowed)
             {
                 ChangeLayer(grabableLayer);
@@ -346,29 +289,50 @@ public class BurgerBox : MonoBehaviour, IGrabable
                 ChangeLayer(grabableLayer);
                 isJustDropped = false;
             }
+            else if (gameObject.layer == ungrabableLayer)
+            {
+                ChangeLayer(grabableLayer);
+            }
 
             HandleSoundFX(collision);
-
         }
     }
 
-    public void OnUseHold()
+    private void HandleSoundFX(Collision collision)
     {
+        float impactForce = collision.relativeVelocity.magnitude;
 
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        if (impactForce >= data.throwThreshold)
+        {
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch,
+                data.throwSoundMaxPitch
+            );
+        }
+        else
+        {
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch,
+                data.dropSoundMaxPitch
+            );
+        }
+
+        lastSoundTime = Time.time;
     }
 
-    public void OnUseRelease()
+    private void ToggleColliders(bool state)
     {
-
-    }
-
-    public bool TryCombine(IGrabable otherItem)
-    {
-        return false;
-    }
-
-    public bool CanCombine(IGrabable otherItem)
-    {
-        return false;
+        foreach (var c in allColliders)
+        {
+            if (c != null) c.enabled = state;
+        }
     }
 }

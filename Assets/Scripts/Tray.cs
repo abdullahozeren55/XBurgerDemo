@@ -6,8 +6,6 @@ using UnityEngine;
 public class Tray : MonoBehaviour
 {
     [SerializeField] private float startPointYHeight = 0.01f;
-    [SerializeField] private float boxClosingSquashMinLimit = 0.16f;
-    [SerializeField] private Transform burgerBoxTransform;
     [SerializeField] private Transform ingredientsParent;
     [SerializeField] private BoxCollider boxCollider;
     [SerializeField] private BoxCollider sauceCollider;
@@ -42,18 +40,12 @@ public class Tray : MonoBehaviour
 
     private bool burgerIsDone;
 
-    [HideInInspector] public BurgerBox currentBox;
     [HideInInspector] public bool isBoxingProcessStarted = false;
 
-    private Vector3 initialSquashScale;
-    private Vector3 targetSquashScale;
-
     private int onTrayLayer;
-    private int grabableLayer;
 
     private void Awake()
     {
-        currentBox = null;
 
         boxColliderStartZ = boxCollider.size.z;
         boxColliderStartCenterZ = boxCollider.center.z;
@@ -69,7 +61,6 @@ public class Tray : MonoBehaviour
         ResetPosition();
 
         onTrayLayer = LayerMask.NameToLayer("OnTray");
-        grabableLayer = LayerMask.NameToLayer("Grabable");
 
         GameManager.Instance.tray = this;
     }
@@ -110,7 +101,7 @@ public class Tray : MonoBehaviour
     {
         if (!allSauces.Contains(type) && !burgerIsDone)
         {
-            UpdateCurrentLocationToPutBurgerIngredient(0.002f); // Sos için sabit deðer
+            UpdateCurrentLocationToPutBurgerIngredient(0.0016f); // Sos için sabit deðer
             // 1. Rotasyonu ve Pozisyonu BURADA hesaplýyoruz
             Quaternion targetRotation = Quaternion.Euler(90f, Random.Range(0f, 360f), 0f);
             Vector3 targetPosition = currentLocationToPutBurgerIngredient;
@@ -126,7 +117,7 @@ public class Tray : MonoBehaviour
                 ingredientsParent);
 
             // 3. Yüksekliði sosun kalýnlýðý kadar arttýr
-            UpdateCurrentLocationToPutBurgerIngredient(0.002f); // Sos için sabit deðer
+            UpdateCurrentLocationToPutBurgerIngredient(0.0016f); // Sos için sabit deðer
 
             go.transform.parent = ingredientsParent;
 
@@ -143,7 +134,7 @@ public class Tray : MonoBehaviour
 
     public void RemoveSauce()
     {
-        UpdateCurrentLocationToPutBurgerIngredient(-2 * 0.002f);
+        UpdateCurrentLocationToPutBurgerIngredient(-2 * 0.0016f);
         allBurgerIngredients.RemoveAt(allBurgerIngredients.Count - 1);
         allSauces.RemoveAt(allSauces.Count - 1);
         allGO.RemoveAt(allGO.Count - 1);
@@ -161,23 +152,11 @@ public class Tray : MonoBehaviour
             Destroy(go);
         }
 
-        foreach (BurgerIngredient burgerIngredient in allBurgerIngredients)
-        {
-            if (!burgerIngredient.data.isSauce)
-                currentBox.allBurgerIngredientTypes.Add(burgerIngredient.data.ingredientType);
-        }
-
-        foreach(SauceBottle.SauceType sauceType in allSauces)
-        {
-            currentBox.allSauces.Add(sauceType);
-        }
-
         allBurgerIngredients.Clear();
         allSauces.Clear();
         allGO.Clear();
 
         burgerIsDone = false;
-        currentBox = null;
 
         ResetPosition();
     }
@@ -217,39 +196,6 @@ public class Tray : MonoBehaviour
         UpdateCurrentLocationToPutBurgerIngredient(startPointYHeight);
     }
 
-    public void PrepareForSquash()
-    {
-        // Baþlangýç scale'ini kaydet (Genelde 1,1,1)
-        initialSquashScale = ingredientsParent.localScale;
-
-        // --- HEDEF SCALE HESAPLAMA ---
-        // Eðer yükseklik limitin altýndaysa ezilme olmasýn (Target = Initial)
-        if (currentLocationToPutBurgerIngredient.y <= boxClosingSquashMinLimit)
-        {
-            targetSquashScale = initialSquashScale;
-            return;
-        }
-
-        // Ne kadar ezileceðini hesapla
-        float excessHeight = (currentLocationToPutBurgerIngredient.y - boxClosingSquashMinLimit) * 4.5f;
-        float squashFactor = Mathf.Clamp01(excessHeight);
-
-        // Sadece Z ekseninde hedefi belirle (Min 0.6f'ye kadar inebilir)
-        float targetZ = Mathf.Max(0.6f, 1f - squashFactor);
-
-        // X ve Y sabit kalacak (Yanlardan taþma ÝPTAL), sadece Z hedefi deðiþiyor
-        targetSquashScale = new Vector3(initialSquashScale.x, initialSquashScale.y, targetZ);
-    }
-
-    // Bu fonksiyonu BurgerBox her karede (Update) çaðýracak
-    // t: 0 (Açýk) ile 1 (Kapalý) arasý deðer (Ease.OutBack ile 1'i geçebilir)
-    public void UpdateSquash(float t)
-    {
-        // Unclamped kullanýyoruz ki OutBack overshoot yaptýðýnda (t > 1 olduðunda)
-        // Burger hedeften daha fazla ezilsin, sonra geri gelsin.
-        ingredientsParent.localScale = Vector3.LerpUnclamped(initialSquashScale, targetSquashScale, t);
-    }
-
     public void RemoveIngredient()
     {
         UpdateCurrentLocationToPutBurgerIngredient(-2 * allBurgerIngredients[allBurgerIngredients.Count - 1].data.yHeight);
@@ -278,7 +224,7 @@ public class Tray : MonoBehaviour
                 // Geri eski haline (1,1,1) dönerken standart elastiklik kullanýyoruz.
                 if (burgerIsDone)
                 {
-                    ingredientsParent.DOScale(new Vector3 (12f, 12f, 12f), 0.3f)
+                    ingredientsParent.DOScale(new Vector3 (11f, 11f, 11f), 0.3f)
                     .SetEase(Ease.OutElastic);
 
                     FinalizeBurger();
@@ -354,27 +300,6 @@ public class Tray : MonoBehaviour
                 // RefreshHologram SÝLÝNDÝ
             }
         }
-        else if (other.CompareTag("BurgerBox"))
-        {
-            BurgerBox boxComponent = other.GetComponent<BurgerBox>();
-            if (boxComponent != null && boxComponent == currentBox && boxComponent.canAddToTray)
-            {
-                if (!burgerIsDone) return;
-                if (allBurgerIngredients.Count == 0) return;
-
-                isBoxingProcessStarted = true;
-
-                if (allBurgerIngredients.Count > 0)
-                {
-                    BurgerIngredient lastIngredient = allBurgerIngredients[allBurgerIngredients.Count - 1];
-                    lastIngredient.SetOnTrayLayer();
-
-                    // TurnOffAllHolograms ve OnLoseFocus SÝLÝNDÝ/GEREKSÝZ
-                }
-
-                currentBox.PutOnTray(burgerBoxTransform.position);
-            }
-        }
     }
 
     // Bu fonksiyon, hologramýn yaptýðý iþi manuel yapar.
@@ -441,11 +366,7 @@ public class Tray : MonoBehaviour
         Transform finishedBurger = ingredientsParent;
         ingredientsParent = null; // Baðlantýyý kopar
         finishedBurger.SetParent(null); // Dünyaya sal
-
-        // --- GARANTÝ SÝGORTASI ---
-        // Tween devreye girene kadar 1 frame bile olsa cücük kalmasýn.
-        // Zaten Squash içinde tween baþlattýn ama buraya da koymak göz çýkarmaz.
-        finishedBurger.localScale = new Vector3(12f, 12f, 12f);
+        finishedBurger.localScale = new Vector3(11f, 11f, 11f);
         // -------------------------
 
         // 2. Yeni Tepsi Parent'ýný Oluþtur (Reset için)
@@ -468,13 +389,34 @@ public class Tray : MonoBehaviour
         // 5. Çocuklarý Dönüþtür (ChildBurger)
         List<GameObject> childrenList = new List<GameObject>();
 
+        // --- TARÝF KONTROLÜ ÝÇÝN LÝSTELER ---
+        List<BurgerIngredientData.IngredientType> currentIngredients = new List<BurgerIngredientData.IngredientType>();
+        List<SauceBottle.SauceType> currentSauces = new List<SauceBottle.SauceType>();
+
         foreach (GameObject go in allGO)
         {
             if (go == null) continue;
 
             // Eski scriptleri temizle
             BurgerIngredient oldScript = go.GetComponent<BurgerIngredient>();
-            if (oldScript != null) Destroy(oldScript);
+
+            // --- DÜZELTME BURADA ---
+            if (oldScript != null)
+            {
+                // ÖNCE VERÝYÝ ÇEKÝP LÝSTEYE ATIYORUZ
+                if (oldScript.data.isSauce)
+                {
+                    currentSauces.Add(oldScript.data.sauceType);
+                }
+                else
+                {
+                    currentIngredients.Add(oldScript.data.ingredientType);
+                }
+
+                // SONRA YOK EDÝYORUZ
+                Destroy(oldScript);
+            }
+            // -----------------------
 
             Cookable cook = go.GetComponent<Cookable>();
             if (cook != null) Destroy(cook);
@@ -492,17 +434,17 @@ public class Tray : MonoBehaviour
             childrenList.Add(go);
         }
 
-        // --- TARÝF HESAPLAMA (GELECEK PLAN) ---
-        // Þimdilik "Random Bullshit" (Son index) varsayalým.
-        // Daha sonra GameManager.Instance.CheckBurgerType(...) ile doðru indexi bulup buraya vereceðiz.
-        int burgerIndex = wholeBurgerData.focusTextKeys.Length - 1;
+        // --- TARÝF HESAPLAMA ---
+        // GameManager'a sor: Bu malzemelerle hangi burger olur?
+        int burgerIndex = GameManager.Instance.GetBurgerTypeIndex(currentIngredients, currentSauces);
 
-        // 6. INITIALIZE (GÜNCELLENDÝ)
-        // Data ve Index'i de veriyoruz.
-        wb.Initialize(childrenList, rb, wholeBurgerData, burgerIndex);
+        float totalHeight = currentLocationToPutBurgerIngredient.y - startPointYHeight;
+
+        // 6. INITIALIZE (Data ve ID ile)
+        wb.Initialize(childrenList, rb, wholeBurgerData, burgerIndex, totalHeight);
 
         // 8. Juice (Zýplatma)
-        rb.AddForce(Vector3.up * 2f, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * 0.5f, ForceMode.Impulse);
         rb.AddTorque(Random.insideUnitSphere * 0.5f, ForceMode.Impulse);
 
         // 9. Tepsiyi Temizle (Objeleri silmeden)

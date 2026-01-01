@@ -7,6 +7,7 @@ using static Cookable;
 
 public class WholeIngredient : MonoBehaviour, IGrabable
 {
+    public IGrabable Master => this;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 

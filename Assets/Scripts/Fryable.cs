@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Fryable : MonoBehaviour, IGrabable
 {
+    public IGrabable Master => this;
+
     [Header("Data")]
     public FryableData data;
 

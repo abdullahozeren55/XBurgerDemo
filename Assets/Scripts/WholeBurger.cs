@@ -5,11 +5,15 @@ public class WholeBurger : MonoBehaviour, IGrabable
 {
     [Header("Identity")]
     public WholeBurgerData data;
-    [HideInInspector] public int burgerTypeIndex = 0; //0 for "Burger Box" text, rest is for menu names in order
+    [HideInInspector] public int burgerTypeIndex = 0;
+
+    public float TotalBurgerHeight { get; private set; }
 
     private List<GameObject> childVisuals = new List<GameObject>();
 
     // --- IGrabable Props ---
+
+    public IGrabable Master => this;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
@@ -55,14 +59,17 @@ public class WholeBurger : MonoBehaviour, IGrabable
 
     // Tray tarafýndan kurulum yapýlýrken çaðrýlacak
     // Rigidbody'yi parametre olarak alýyoruz!
-    public void Initialize(List<GameObject> children, Rigidbody rigidBody, WholeBurgerData burgerData, int typeIndex)
+
+    // --- INITIALIZE (GÜNCELLENDÝ) ---
+    public void Initialize(List<GameObject> children, Rigidbody rigidBody, WholeBurgerData burgerData, int typeIndex, float height)
     {
         childVisuals = children;
         rb = rigidBody;
-        data = burgerData;        // Datayý al
-        burgerTypeIndex = typeIndex; // Kimliði al
+        data = burgerData;
+        burgerTypeIndex = typeIndex;
 
-        ChangeLayer(grabableLayer);
+        // Boyu kaydet
+        TotalBurgerHeight = height;
     }
 
     // --- IGrabable Implementation ---
@@ -184,5 +191,52 @@ public class WholeBurger : MonoBehaviour, IGrabable
             Collider c = child.GetComponent<Collider>();
             if (c != null) c.enabled = state;
         }
+    }
+
+    // --- GÜNCELLENEN FONKSÝYON ---
+    public void PackIntoBox(BurgerBox box, Transform containerPoint)
+    {
+        // 1. Pozisyonlama
+        transform.SetParent(containerPoint);
+
+        if (data != null)
+        {
+            transform.localPosition = data.boxPlacementPositionOffset;
+            transform.localRotation = Quaternion.Euler(data.boxPlacementRotationOffset);
+        }
+        else
+        {
+            transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
+        }
+
+        // 2. Temizlik ve Devir Teslim Operasyonu
+
+        // A) Rigidbody'yi yok et
+        if (rb != null) Destroy(rb);
+
+        // B) Çocuklardaki ChildBurger'i sil, yerine BoxChild ekle!
+        foreach (var child in childVisuals)
+        {
+            if (child != null)
+            {
+                // Eski kimliði sil
+                ChildBurger cb = child.GetComponent<ChildBurger>();
+                if (cb != null) Destroy(cb);
+
+                // --- YENÝ: BoxChild Ekle ve Baðla ---
+                // Böylece Raycast bu köfteye çarparsa kutuyu tutmuþ sayýlacak.
+                BoxChild boxChild = child.AddComponent<BoxChild>();
+                boxChild.parentBox = box;
+                // ------------------------------------
+
+                // Colliderlarý AÇIK býrakýyoruz.
+                // Tag'i temizle
+                child.tag = "Untagged";
+            }
+        }
+
+        // C) Kendi scriptimi yok et
+        Destroy(this);
     }
 }

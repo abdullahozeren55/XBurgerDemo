@@ -31,6 +31,8 @@ public class Holder : MonoBehaviour, IGrabable
     [SerializeField] private HolderData data;
 
     // --- IGrabable Properties ---
+
+    public IGrabable Master => this;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 

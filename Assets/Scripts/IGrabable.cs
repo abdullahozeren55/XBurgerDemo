@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public interface IGrabable
 {
+    // YENÝ: Herkes gerçek sahibini göstersin
+    IGrabable Master { get; }
     public void OnGrab(Transform grabPoint);
     public void OnThrow(Vector3 direction, float force);
     public void OnFocus();

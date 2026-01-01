@@ -98,9 +98,6 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
     public Transform CameraLookAt { get => cameraLookAt; set => cameraLookAt = value; }
     [SerializeField] private Transform cameraLookAt;
 
-    [Header("Other Settings")]
-    [SerializeField] private float giveOrderBackMultiplier = 1f;
-
     private int day;
     private Tween rotateTween;
     private Coroutine currentAnimCoroutine;
@@ -249,11 +246,6 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
     public void ReceiveBurger(BurgerBox burgerBox)
     {
         ChangeLayer(uninteractableLayer);
-
-        if (burgerBox.burgerType == BurgerType)
-            HandleBurgerTrue();
-        else
-            HandleBurgerFalse();
     }
 
     public void ReceiveDrink(Drink drink)
@@ -431,18 +423,6 @@ public class NpcCustomer : MonoBehaviour, ICustomer, IInteractable
 
     private void GiveOrderBack()
     {
-        if (ordersInRightHand[0].activeSelf)
-        {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * transform.forward * giveOrderBackMultiplier);
-            ordersInRightHand[0].SetActive(false);
-        }
-        else
-        {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * transform.forward * giveOrderBackMultiplier);
-            ordersInRightHand[1].SetActive(false);
-            ordersInRightHand[2].SetActive(false);
-            ordersInRightHand[3].SetActive(false);
-        }
 
     }
 

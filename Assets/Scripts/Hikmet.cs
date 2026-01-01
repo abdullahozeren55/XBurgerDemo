@@ -264,14 +264,7 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
     public void ReceiveBurger(BurgerBox burgerBox)
     {
-
-
         ChangeLayer(uninteractableLayer);
-
-        if (burgerBox.burgerType == BurgerType)
-            HandleBurgerTrue();
-        else
-            HandleBurgerFalse();
     }
 
     public void ReceiveDrink(Drink drink)
@@ -463,37 +456,10 @@ public class Hikmet : MonoBehaviour, ICustomer, IInteractable
 
     private void GiveOrderBack()
     {
-
-        if (ordersInRightHand[0].activeSelf)
-        {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * transform.forward);
-            ordersInRightHand[0].SetActive(false);
-        }
-        else
-        {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * transform.forward);
-            ordersInRightHand[1].SetActive(false);
-            ordersInRightHand[2].SetActive(false);
-            ordersInRightHand[3].SetActive(false);
-        }
-
     }
 
     private void GiveOtherOrderBack()
     {
-        if (ordersInLeftHand[0].activeSelf)
-        {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInLeftHand[0].transform, customerData.throwForce * transform.forward);
-            ordersInLeftHand[0].SetActive(false);
-        }
-        else
-        {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInLeftHand[1].transform, customerData.throwForce * transform.forward);
-            ordersInLeftHand[1].SetActive(false);
-            ordersInLeftHand[2].SetActive(false);
-            ordersInLeftHand[3].SetActive(false);
-        }
-
     }
 
     public void HandleDialogueAnim(ICustomer.DialogueAnim dialogueAnim, float delay)

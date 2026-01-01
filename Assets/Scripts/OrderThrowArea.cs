@@ -37,17 +37,6 @@ public class OrderThrowArea : MonoBehaviour
 
                     if (!drink.IsGrabbed && drink.CanBeReceived)
                     {
-                        GameManager.Instance.CustomerReceiveDrink(drink);
-                    }
-
-                }
-                else if (other.CompareTag("BurgerBoxClosed"))
-                {
-                    BurgerBox burgerBox = other.GetComponent<BurgerBox>();
-
-                    if (!burgerBox.IsGrabbed && burgerBox.CanBeReceived)
-                    {
-                        GameManager.Instance.CustomerReceiveBurger(burgerBox);
                     }
 
                 }

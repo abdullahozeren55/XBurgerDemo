@@ -380,18 +380,6 @@ public class Sukran : MonoBehaviour, ICustomer, IInteractable
 
     private void GiveOrderBack() //called in animator
     {
-        if (ordersInRightHand[0].activeSelf)
-        {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInRightHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInRightHand[0].SetActive(false);
-        }
-        else
-        {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInRightHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInRightHand[1].SetActive(false);
-            ordersInRightHand[2].SetActive(false);
-            ordersInRightHand[3].SetActive(false);
-        }
 
     }
 

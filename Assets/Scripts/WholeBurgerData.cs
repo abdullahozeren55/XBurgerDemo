@@ -12,11 +12,13 @@ public class WholeBurgerData : ScriptableObject
     public PlayerManager.HandGrabTypes handGrabType;
     public Sprite icon;
     [Space]
-    public Vector3 grabPositionOffset; //0 for open, 1 for close
-    public Vector3 grabRotationOffset; //0 for open, 1 for close
+    public Vector3 grabPositionOffset;
+    public Vector3 grabRotationOffset;
     [Space]
-    public Vector3 grabLocalPositionOffset; //0 for open, 1 for close
-    public Vector3 grabLocalRotationOffset; //0 for open, 1 for close
+    public Vector3 grabLocalPositionOffset;
+    public Vector3 grabLocalRotationOffset;
+    public Vector3 boxPlacementPositionOffset;
+    public Vector3 boxPlacementRotationOffset;
     [Space]
     public string[] focusTextKeys;
 }

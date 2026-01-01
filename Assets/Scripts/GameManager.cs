@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     {
         public CursorType type;
         public Sprite sprite; // İmleç resmi
-        public Vector2 hotspot;   // Tıklama noktası (Aşağıda açıklayacağım)
+        public Vector2 hotspot;   // Tıklama noktası
     }
 
     [Header("Cursor Settings")]
@@ -99,17 +99,9 @@ public class GameManager : MonoBehaviour
     public List<SauceBottle.SauceType> basicBurgerSauces = new List<SauceBottle.SauceType>();
 
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
-
-    private bool burgerMatched;
-
-    private BurgerBox lastThrowedBurgerBox;
-    private Drink lastThrowedDrink;
-    private MeshRenderer[] lastThrowedBurgerBoxMeshRenderers;
+    private List<List<SauceBottle.SauceType>> allBurgerSauces;
 
     public ICustomer CurrentCustomer;
-
-    private int customerLayer;
-    private int ungrabableLayer;
 
     [Header("Other Settings")]
     [Space]
@@ -153,8 +145,21 @@ public class GameManager : MonoBehaviour
             basicBurger,
         };
 
-        customerLayer = LayerMask.NameToLayer("Customer");
-        ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
+        allBurgerSauces = new List<List<SauceBottle.SauceType>>()
+        {
+            classicBurgerSauces,
+            cheeseBurgerSauces,
+            doubleCheeseBurgerSauces,
+            fullyLoadedBurgerSauces,
+            budgetBurgerSauces,
+            brokeAhhBurgerSauces,
+            goutBurgerSauces,
+            xBurgerSauces,
+            longAhhBurgerSauces,
+            tomatoLoverBurgerSauces,
+            bbqBurgerSauces,
+            basicBurgerSauces
+        };
 
         SetOrderThrowArea(false);
 
@@ -178,72 +183,6 @@ public class GameManager : MonoBehaviour
     {
         CurrentCustomer = customer;
         CameraManager.Instance.SetCustomerCamLookAt(CurrentCustomer.CameraLookAt);
-    }
-    public void CustomerReceiveDrink(Drink drink)
-    {
-        if (CurrentCustomer != null && !CurrentCustomer.TrueDrinkReceived)
-        {
-            CurrentCustomer.ReceiveDrink(drink);
-            lastThrowedDrink = drink;
-
-            lastThrowedDrink.GetComponent<MeshRenderer>().enabled = false;
-            lastThrowedDrink.GetComponent<MeshCollider>().enabled = false;
-            lastThrowedDrink.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        }
-            
-    }
-
-    public void CustomerReceiveBurger(BurgerBox burgerBox)
-    {
-        if (CurrentCustomer != null && !CurrentCustomer.TrueBurgerReceived)
-        {
-            CurrentCustomer.ReceiveBurger(burgerBox);
-            lastThrowedBurgerBox = burgerBox;
-
-            lastThrowedBurgerBoxMeshRenderers = lastThrowedBurgerBox.GetComponentsInChildren<MeshRenderer>();
-
-            foreach (MeshRenderer mr in lastThrowedBurgerBoxMeshRenderers)
-            {
-                mr.enabled = false;
-            }
-
-            lastThrowedBurgerBox.GetComponent<BoxCollider>().enabled = false;
-            lastThrowedBurgerBox.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        }
-            
-    }
-
-    public void CustomerGiveBackDrink(Transform throwPoint, Vector3 force)
-    {
-        CurrentCustomer.ChangeLayer(customerLayer);
-        lastThrowedDrink.transform.position = throwPoint.position;
-        lastThrowedDrink.transform.rotation = throwPoint.rotation;
-        lastThrowedDrink.isJustThrowed = false;
-        lastThrowedDrink.isJustDropped = true;
-        lastThrowedDrink.CanBeReceived = false;
-        lastThrowedDrink.ChangeLayer(ungrabableLayer);
-
-        lastThrowedDrink.GetComponent<MeshRenderer>().enabled = true;
-        lastThrowedDrink.GetComponent<MeshCollider>().enabled = true;
-        lastThrowedDrink.GetComponent<Rigidbody>().velocity = force; 
-    }
-
-    public void CustomerGiveBackBurger(Transform throwPoint, Vector3 force)
-    {
-        CurrentCustomer.ChangeLayer(customerLayer);
-        lastThrowedBurgerBox.transform.position = throwPoint.position;
-        lastThrowedBurgerBox.transform.rotation = throwPoint.rotation;
-        lastThrowedBurgerBox.isJustThrowed = false;
-        lastThrowedBurgerBox.isJustDropped = true;
-        lastThrowedBurgerBox.CanBeReceived = false;
-        lastThrowedBurgerBox.ChangeLayer(ungrabableLayer);
-
-        foreach (MeshRenderer mr in lastThrowedBurgerBoxMeshRenderers)
-        {
-            mr.enabled = true;
-        }
-        lastThrowedBurgerBox.GetComponent<BoxCollider>().enabled = true;
-        lastThrowedBurgerBox.GetComponent<Rigidbody>().velocity = force;
     }
 
     public void SetOrderThrowArea(bool shouldReceive) { if (orderThrowArea != null) orderThrowArea.ShouldReceive = shouldReceive; }
@@ -289,140 +228,28 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    public void CheckBurgerType(List<BurgerIngredientData.IngredientType> type, List<SauceBottle.SauceType> sauces, BurgerBox box)
+    // --- YENİ: OPTİMİZE EDİLMİŞ BURGER KONTROLÜ ---
+    // Artık BurgerBox referansı almıyor, direkt sonucu (int ID) döndürüyor.
+    public int GetBurgerTypeIndex(List<BurgerIngredientData.IngredientType> currentIngredients, List<SauceBottle.SauceType> currentSauces)
     {
-        BurgerTypes matchedType = BurgerTypes.RandomBullShitBurger;
-        burgerMatched = false;
-
-        foreach (var menu in allBurgerMenus)
+        // Menüdeki tüm burgerleri tara
+        for (int i = 0; i < allBurgerMenus.Count; i++)
         {
-            if (AreListsEqual(type, menu))
+            // 1. Malzemeler Tutuyor mu?
+            bool ingredientsMatch = AreListsEqual(currentIngredients, allBurgerMenus[i]);
+
+            // 2. Soslar Tutuyor mu?
+            bool saucesMatch = AreSaucesEqual(currentSauces, allBurgerSauces[i]);
+
+            // İkisi de tutuyorsa bingo!
+            if (ingredientsMatch && saucesMatch)
             {
-                burgerMatched = true;
-
-                box.SetBurgerType(BurgerTypes.ClassicBurger);
-                box.SetBurgerType(BurgerTypes.CheeseBurger);
-                box.SetBurgerType(BurgerTypes.DoubleCheeseBurger);
-                box.SetBurgerType(BurgerTypes.FullyLoadedBurger);
-                box.SetBurgerType(BurgerTypes.BudgetBurger);
-                box.SetBurgerType(BurgerTypes.BrokeAhhBurger);
-                box.SetBurgerType(BurgerTypes.GoutBurger);
-                box.SetBurgerType(BurgerTypes.XBurger);
-                box.SetBurgerType(BurgerTypes.LongAhhBurger);
-                box.SetBurgerType(BurgerTypes.TomatoLoverBurger);
-                box.SetBurgerType(BurgerTypes.BBQBurger);
-                box.SetBurgerType(BurgerTypes.BasicBurger);
-                box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
-
-                if (menu == classicBurger)
-                    matchedType = BurgerTypes.ClassicBurger;
-
-                else if (menu == cheeseBurger)
-                    matchedType = BurgerTypes.CheeseBurger;
-
-                else if (menu == doubleCheeseBurger)
-                    matchedType = BurgerTypes.DoubleCheeseBurger;
-
-                else if (menu == fullyLoadedBurger)
-                    matchedType = BurgerTypes.FullyLoadedBurger;
-
-                else if (menu == budgetBurger)
-                    matchedType = BurgerTypes.BudgetBurger;
-
-                else if (menu == brokeAhhBurger)
-                    matchedType = BurgerTypes.BrokeAhhBurger;
-
-                else if (menu == goutBurger)
-                    matchedType = BurgerTypes.GoutBurger;
-
-                else if (menu == xBurger)
-                    matchedType = BurgerTypes.XBurger;
-                else if (menu == longAhhBurger)
-                    matchedType = BurgerTypes.LongAhhBurger;
-                else if (menu == tomatoLoverBurger)
-                    matchedType = BurgerTypes.TomatoLoverBurger;
-                else if (menu == bbqBurger)
-                    matchedType = BurgerTypes.BBQBurger;
-                else if (menu == basicBurger)
-                    matchedType = BurgerTypes.BasicBurger;
-
-                break;
-
+                return i; // Enum'ın indexini döndür (Örn: Classic için 0)
             }
-                
         }
 
-        if (burgerMatched)
-        {
-            List<SauceBottle.SauceType> requiredSauces = new List<SauceBottle.SauceType>();
-            
-
-            if (matchedType == BurgerTypes.ClassicBurger)
-            {
-                requiredSauces = classicBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.CheeseBurger)
-            {
-                requiredSauces = cheeseBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.DoubleCheeseBurger)
-            {
-                requiredSauces = doubleCheeseBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.FullyLoadedBurger)
-            {
-                requiredSauces = fullyLoadedBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.BudgetBurger)
-            {
-                requiredSauces = budgetBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.BrokeAhhBurger)
-            {
-                requiredSauces = brokeAhhBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.GoutBurger)
-            {
-                requiredSauces = goutBurgerSauces;
-            }
-                
-            else if (matchedType == BurgerTypes.XBurger)
-            {
-                requiredSauces = xBurgerSauces;
-            }
-
-            else if (matchedType == BurgerTypes.LongAhhBurger)
-            {
-                requiredSauces = longAhhBurgerSauces;
-            }
-
-            else if (matchedType == BurgerTypes.TomatoLoverBurger)
-            {
-                requiredSauces = tomatoLoverBurgerSauces;
-            }
-            else if (matchedType == BurgerTypes.BBQBurger)
-            {
-                requiredSauces = bbqBurgerSauces;
-            }
-            else if (matchedType == BurgerTypes.BasicBurger)
-            {
-                requiredSauces = basicBurgerSauces;
-            }
-
-
-            if (AreSaucesEqual(sauces, requiredSauces))
-                box.SetBurgerType(matchedType);
-            else
-                box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
-        }
-        else
-            box.SetBurgerType(BurgerTypes.RandomBullShitBurger);
+        // Hiçbiri tutmadıysa -> Random Bullshit Burger (Enum'ın son elemanı)
+        return (int)BurgerTypes.RandomBullShitBurger;
     }
 
     private bool AreListsEqual(List<BurgerIngredientData.IngredientType> list1, List<BurgerIngredientData.IngredientType> list2)

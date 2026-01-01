@@ -4,6 +4,8 @@ public class ChildBurger : MonoBehaviour, IGrabable
 {
     [HideInInspector] public WholeBurger parentBurger;
 
+    public IGrabable Master => parentBurger;
+
     // --- Proxy Logic ---
     // Tüm emirleri Parent'a iletiyoruz.
 

@@ -250,11 +250,6 @@ public class Kemal : MonoBehaviour, ICustomer, IInteractable
     public void ReceiveBurger(BurgerBox burgerBox)
     {
         ChangeLayer(uninteractableLayer);
-
-        if (burgerBox.burgerType == BurgerType)
-            HandleBurgerTrue();
-        else
-            HandleBurgerFalse();
     }
 
     public void ReceiveDrink(Drink drink)
@@ -433,20 +428,7 @@ public class Kemal : MonoBehaviour, ICustomer, IInteractable
     }
 
     private void GiveOrderBack()
-    {
-        if (ordersInLeftHand[0].activeSelf)
-        {
-            GameManager.Instance.CustomerGiveBackBurger(ordersInLeftHand[0].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInLeftHand[0].SetActive(false);
-        }
-        else
-        {
-            GameManager.Instance.CustomerGiveBackDrink(ordersInLeftHand[1].transform, customerData.throwForce * (transform.forward + (transform.up * 2f)).normalized);
-            ordersInLeftHand[1].SetActive(false);
-            ordersInLeftHand[2].SetActive(false);
-            ordersInLeftHand[3].SetActive(false);
-        }
-        
+    {  
     }
 
     public void HandleDialogueAnim(ICustomer.DialogueAnim dialogueAnim, float delay)

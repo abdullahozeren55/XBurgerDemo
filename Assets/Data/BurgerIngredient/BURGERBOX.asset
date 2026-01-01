@@ -14,25 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isUseable: 0
   isThrowable: 1
-  handGrabTypes: 050000000a000000
+  handGrabType: 10
   icon:
   - {fileID: 21300000, guid: 58d16380fb4b21a4ab66a83ce4ac227a, type: 3}
   - {fileID: 21300000, guid: 174c27038ef842a4cae4b9e195949bcf, type: 3}
   timeToPutOnTray: 0.2
   throwMultiplier: 1
   trayRotation: {x: 0, y: 0, z: 0}
-  grabPositionOffset:
-  - {x: 0.6, y: 1, z: 2}
-  - {x: 0.6, y: 1, z: 2}
-  grabRotationOffset:
-  - {x: -5, y: -70, z: -70}
-  - {x: -30, y: -70, z: -90}
-  grabLocalPositionOffset:
-  - {x: 0.009468009, y: 0.070862085, z: -0.036727287}
-  - {x: -0.025524, y: -0.04391902, z: 0.09297123}
-  grabLocalRotationOffset:
-  - {x: 312.49033, y: 174.85678, z: 190.7005}
-  - {x: 347.81567, y: 1.997663, z: 166.97704}
+  grabPositionOffset: {x: 0.6, y: 0.5, z: 2}
+  grabRotationOffset: {x: -20, y: -90, z: -70}
+  grabLocalPositionOffset: {x: -0.0174, y: -0.0941, z: 0.1124}
+  grabLocalRotationOffset: {x: 303.81934, y: 257.121, z: 204.88878}
   focusTextKeys:
   - BURGER_BOX
   - BURGER_CLASSIC

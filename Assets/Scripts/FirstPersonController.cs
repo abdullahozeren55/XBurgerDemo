@@ -1,10 +1,8 @@
 using Febucci.UI.Core;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
-using static UnityEditor.Progress;
 
 [DefaultExecutionOrder(10000)]
 public class FirstPersonController : MonoBehaviour
@@ -1242,6 +1240,19 @@ public class FirstPersonController : MonoBehaviour
                     // Eþya bulduk, yavaþlat
                     InputManager.Instance.aimAssistSlowdown = InputManager.Instance.GetMagnetStrength();
 
+                    // --- DEÐÝÞÝKLÝK BURADA BAÞLIYOR ---
+
+                    // 1. Çarptýðýmýz þeyin üzerindeki scripti al
+                    IGrabable rawGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
+
+                    // 2. Onun PATRONUNU bul
+                    // (Eðer rawGrabable null ise null döner, deðilse Master'ý döner)
+                    IGrabable targetMaster = rawGrabable?.Master;
+
+                    if (targetMaster == null) return; // Güvenlik
+
+                    // --- MANTIK GÜNCELLEMESÝ ---
+
                     if (currentGrabable == null)
                     {
                         if (otherGrabable != null)
@@ -1251,16 +1262,18 @@ public class FirstPersonController : MonoBehaviour
                             DecideOutlineAndCrosshair();
                         }
 
-                        currentGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
+                        currentGrabable = targetMaster;
                         
                         if (currentGrabable != null)
                             currentGrabable.OnFocus();
 
                         DecideOutlineAndCrosshair();
                     }
+                    // B) Zaten elimde bir þey varsa (CurrentGrabable dolu)
                     else if (currentGrabable.IsGrabbed)
                     {
-                        if (otherGrabable != null && hit.collider.gameObject.GetComponent<IGrabable>() != otherGrabable)
+                        // Baktýðým þey (Master) zaten OtherGrabable deðilse güncelle
+                        if (otherGrabable != null && targetMaster != otherGrabable)
                         {
                             otherGrabable.OnLoseFocus();
                             otherGrabable = null;
@@ -1269,18 +1282,21 @@ public class FirstPersonController : MonoBehaviour
 
                         if (otherGrabable == null)
                         {
-                            otherGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
-
-                            if (otherGrabable != null)
+                            // Baktýðým þey elimdekiyle ayný deðilse (kendi tuttuðum þeye bakmýyorsam)
+                            if (targetMaster != currentGrabable)
                             {
-                                otherGrabable.OnFocus();
-                                DecideOutlineAndCrosshair();
+                                otherGrabable = targetMaster;
+                                if (otherGrabable != null)
+                                {
+                                    otherGrabable.OnFocus();
+                                    DecideOutlineAndCrosshair();
+                                }
                             }
                         }
-
-                        
                     }
-                    else if (currentGrabable != hit.collider.gameObject.GetComponent<IGrabable>())
+                    // C) Elim boþ ama baþka bir þeye bakmaya baþladým (Focus deðiþimi)
+                    // BURASI ÇOK ÖNEMLÝ: currentGrabable != hit... kontrolü yerine Master kontrolü
+                    else if (currentGrabable != targetMaster)
                     {
                         if (otherGrabable != null)
                         {
@@ -1291,10 +1307,13 @@ public class FirstPersonController : MonoBehaviour
 
                         currentGrabable.OnLoseFocus();
                         DecideOutlineAndCrosshair();
-                        currentGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
+
+                        currentGrabable = targetMaster; // Yeni Master'ý al
+
                         currentGrabable.OnFocus();
                         DecideOutlineAndCrosshair();
                     }
+                    // -----------------------------------
                 }
                 else
                 {
@@ -1377,7 +1396,6 @@ public class FirstPersonController : MonoBehaviour
 
                     phoneGrabable.OnDrop(Vector3.zero, 0f);
 
-                    // Telefonu býrakýnca eski slotu geri yükleme (Sonraki adýmda yapacaðýz, þimdilik null)
                     currentGrabable = null;
 
                     Invoke("DecideOutlineAndCrosshair", 0.16f);
@@ -1448,13 +1466,11 @@ public class FirstPersonController : MonoBehaviour
                     if (currentSlotIndex == -1)
                     {
                         currentGrabable = null;
-                        SetHandAnimBoolsOff(); // Animasyonlarý kapat
+                        SetHandAnimBoolsOff();
 
-                        // Rig'i sýfýrla (Bunu da garantiye alalým)
                         if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
                         rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(false, false));
                     }
-                    // Else: Zaten EquipSlot çaðrýldýysa o animasyonlarý ve rigleri ayarladý, elleþme.
 
                     DecideOutlineAndCrosshair();
                 }
@@ -1462,24 +1478,19 @@ public class FirstPersonController : MonoBehaviour
         }
 
         // --- BÖLÜM 2: YERDEN EÞYA ALMA (PICK UP) ---
-        // Artýk 'else if' deðil, ayrý bir 'if'. Böylece elimiz doluyken de çalýþýr.
-        // Ancak fýrlatma þarjý yaparken (throwChargeTimer) alamasýn diye ufak bir koruma koyuyoruz.
         bool attemptPickUp = false;
 
-        // SENARYO A: Elimde KULLANILABÝLÝR (Useable) bir eþya var
+        // SENARYO A: Elimde KULLANILABÝLÝR bir eþya var
         if (currentGrabable != null && currentGrabable.IsGrabbed && currentGrabable.IsUseable)
         {
-            // O zaman alma iþlemini "Basma" (Press) anýnda deðil, "Býrakma" (Release) anýnda yap.
-            // AYRICA: Eðer tuþu basýlý tutup eþyayý kullandýysak (isUsingGrabbedItem), býrakýnca yerden bir þey alma!
             if (InputManager.Instance.PlayerInteractRelease() && !isUsingGrabbedItem && !InteractKeyIsDone)
             {
                 attemptPickUp = true;
             }
         }
-        // SENARYO B: Elim boþ VEYA Elimdeki eþya kullanýlamaz (Sadece fýrlatmalýk süs eþyasý)
+        // SENARYO B: Elim boþ VEYA Elimdeki eþya kullanýlamaz
         else
         {
-            // Eskisi gibi "Basar basmaz" (Press) al.
             if (InputManager.Instance.PlayerInteract())
             {
                 attemptPickUp = true;
@@ -1492,12 +1503,17 @@ public class FirstPersonController : MonoBehaviour
             // Raycast kontrolü
             if (PerformInteractionCast(out RaycastHit hit, interactionDistance, grabableLayers))
             {
-                IGrabable targetItem = hit.collider.gameObject.GetComponent<IGrabable>();
+                // --- KRÝTÝK GÜNCELLEME BURADA ---
+                // Eskiden: hit.collider.gameObject.GetComponent<IGrabable>();
+                // Þimdi: .Master ekliyoruz!
+                // Böylece BoxChild'a týklasan bile targetItem "BurgerBox" oluyor.
+                IGrabable targetItem = hit.collider.gameObject.GetComponent<IGrabable>()?.Master;
+
                 if (targetItem == null) return;
 
                 /// --- KOMBÝNASYON KONTROLLERÝ ---
 
-                // SENARYO A: Külah Elimde, Patates Yerde (Eski Kodun)
+                // SENARYO A: Külah Elimde, Patates Yerde
                 if (currentGrabable != null && currentGrabable.IsGrabbed && targetItem != currentGrabable)
                 {
                     if (currentGrabable.TryCombine(targetItem))
@@ -1507,30 +1523,19 @@ public class FirstPersonController : MonoBehaviour
                         return;
                     }
 
-                    // --- SENARYO B: Patates Elimde, Külah Yerde (YENÝ) ---
-                    // "Yerdeki þey (Külah), elimdeki þeyi (Patates) içine alabilir mi?"
+                    // --- SENARYO B: Patates Elimde, Külah Yerde ---
                     else if (targetItem.TryCombine(currentGrabable))
                     {
-                        // 1. Holder.cs içindeki TryCombine çalýþtý:
-                        //    - Külah doldu.
-                        //    - Patates (currentGrabable) Destroy edildi.
-
-                        // 2. Elimizdeki patates yok olduðu için Envanter Slotunu temizlememiz lazým.
-                        //    Destroy frame sonunda çalýþýr, o yüzden referans hala duruyor, 
-                        //    onu manuel null yapýp baðlantýyý koparalým.
                         if (currentSlotIndex != -1)
                         {
                             inventoryItems[currentSlotIndex] = null;
                         }
 
-                        // 3. Elimiz boþa çýktý. Yerdeki o dolu külahý (targetItem) kap!
-                        //    ChangeCurrentGrabable veya PickUpItem kullanabilirsin.
-                        //    PickUpItem zaten boþ slot bulup yerleþir.
-                        //    Biz az önce slotu null yaparak boþalttýðýmýz için, külah direkt o slota oturacak.
+                        // targetItem artýk kesinlikle Master (BurgerBox veya Holder) olduðu için
+                        // PickUpItem doðru objeyi envantere ekleyecek.
                         PickUpItem(targetItem);
 
-                        // 4. Temizlik
-                        otherGrabable = null; // Çünkü artýk onu aldýk
+                        otherGrabable = null;
                         DecideOutlineAndCrosshair();
                         return;
                     }
@@ -1545,12 +1550,17 @@ public class FirstPersonController : MonoBehaviour
                 // DURUM B: Elim Dolu, yerdeki baþka bir þey (OtherGrabable) ve yerim var.
                 else if (targetItem == otherGrabable && !phoneGrabable.IsGrabbed)
                 {
-                    // Slot kontrolünü PickUpItem içinde zaten yapýyoruz ama burada da garanti olsun
                     if (HasEmptySlot())
                     {
                         PickUpItem(otherGrabable);
                         otherGrabable = null;
                     }
+                }
+                // DURUM C: (Ekstra Güvenlik) Master/Proxy deðiþimi yüzünden eþitlik tutmamýþ olabilir
+                // Ama yerdeyse ve boþ yerimiz varsa alalým.
+                else if (!targetItem.IsGrabbed && !phoneGrabable.IsGrabbed && HasEmptySlot())
+                {
+                    PickUpItem(targetItem);
                 }
             }
         }
