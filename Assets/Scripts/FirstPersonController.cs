@@ -1,5 +1,6 @@
 using Febucci.UI.Core;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -220,6 +221,8 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private int maxInventorySlots = 4;
     // Envanterdeki eþyalarýn listesi
     private IGrabable[] inventoryItems;
+    // YENÝ: Eþyalarýn alýnma sýrasýný tutacak liste
+    private List<IGrabable> itemPickupHistory = new List<IGrabable>();
 
     // Hangi slot seçili? -1 ise el boþ demek. 0, 1, 2, 3 slot numaralarý.
     private int currentSlotIndex = -1;
@@ -1810,6 +1813,12 @@ public class FirstPersonController : MonoBehaviour
         // 3. Yeni eþyayý bulduðumuz BOÞ slota yerleþtir
         inventoryItems[emptySlotIndex] = itemToPickUp;
 
+        // --- YENÝ EKLENEN KISIM: GEÇMÝÞE KAYDET ---
+        // Eðer listede varsa önce çýkar (yer deðiþtirme ihtimaline karþý), sonra en sona ekle.
+        if (itemPickupHistory.Contains(itemToPickUp)) itemPickupHistory.Remove(itemToPickUp);
+        itemPickupHistory.Add(itemToPickUp);
+        // ------------------------------------------
+
         // 4. O slotu seçili hale getir
         currentSlotIndex = emptySlotIndex;
         currentGrabable = itemToPickUp;
@@ -1850,64 +1859,48 @@ public class FirstPersonController : MonoBehaviour
                 // 1. Önce o slotu boþalt
                 inventoryItems[i] = null;
 
-                // 2. Eðer attýðýmýz eþya þu an elimizde deðilse (pasif bir slotu sildiysek)
-                // Hiçbir þey yapma, çýk.
-                if (currentSlotIndex != i) break;
-
-                // --- OTO SEÇÝM MANTIÐI (AUTO SWITCH) ---
-                int targetIndex = -1;
-
-                // --- YENÝ: BIÇAK ÖNCELÝÐÝ (KNIFE PRIORITY) ---
-                // Envanterde herhangi bir býçak var mý diye tara.
-                for (int k = 0; k < inventoryItems.Length; k++)
+                // --- YENÝ: GEÇMÝÞTEN SÝL ---
+                if (itemPickupHistory.Contains(itemToRemove))
                 {
-                    // Slot boþ deðilse VE Tipi Býçak Tutuþu ise
-                    if (inventoryItems[k] != null &&
-                        inventoryItems[k].HandGrabType == PlayerManager.HandGrabTypes.KnifeGrab)
-                    {
-                        targetIndex = k;
-                        break; // Býçaðý bulduk, hemen bunu seç!
-                    }
+                    itemPickupHistory.Remove(itemToRemove);
                 }
 
-                // Eðer býçak BULUNAMADIYSA, eski komþu mantýðýna geç
-                if (targetIndex == -1)
+                // 2. Eðer attýðýmýz eþya þu an elimizde deðilse (pasif bir slotu sildiysek) çýk.
+                if (currentSlotIndex != i) break;
+
+                // --- YENÝ: GEÇMÝÞE GÖRE SEÇÝM MANTIÐI ---
+                int targetIndex = -1;
+
+                // Geçmiþ listesini SONDAN BAÞA doðru tara (En son ekleneni bulmak için)
+                for (int h = itemPickupHistory.Count - 1; h >= 0; h--)
                 {
-                    // A) Geriye Bak (Önceki en yakýn komþu)
-                    for (int back = i - 1; back >= 0; back--)
+                    IGrabable candidateItem = itemPickupHistory[h];
+
+                    // Bu aday eþya þu an envanterde hangi slotta?
+                    // (Hala envanterde mi diye kontrol ediyoruz, belki baþka bir þekilde silinmiþtir)
+                    for (int k = 0; k < inventoryItems.Length; k++)
                     {
-                        if (inventoryItems[back] != null)
+                        if (inventoryItems[k] == candidateItem)
                         {
-                            targetIndex = back;
+                            targetIndex = k; // Slotu bulduk!
                             break;
                         }
                     }
 
-                    // B) Ýleriye Bak (Eðer geride bulamadýysak)
-                    if (targetIndex == -1)
-                    {
-                        for (int fwd = i + 1; fwd < inventoryItems.Length; fwd++)
-                        {
-                            if (inventoryItems[fwd] != null)
-                            {
-                                targetIndex = fwd;
-                                break;
-                            }
-                        }
-                    }
+                    // Eðer envanterde bulduysak döngüyü kýr, hedefimiz bu.
+                    if (targetIndex != -1) break;
                 }
 
                 // 3. Sonucu Uygula
                 if (targetIndex != -1)
                 {
-                    // Bulduðumuz slotu (Býçak veya Komþu) seç
+                    // Bulduðumuz (en son eklenen) slotu seç
                     EquipSlot(targetIndex);
                 }
                 else
                 {
-                    // Kimse yok, yapayalnýzýz. Eli boþa düþür.
+                    // Geçmiþte dönülecek bir eþya yoksa eli boþa düþür.
                     currentSlotIndex = -1;
-                    // currentGrabable = null iþlemini HandleGrabInput içinde yapacaðýz.
                 }
 
                 break; // Ýþim bitti, döngüden çýk

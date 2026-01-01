@@ -31,7 +31,7 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public BurgerIngredientData data;
 
-    [SerializeField] private Tray tray;
+    [SerializeField] private BurgerCombineArea burgerCombineArea;
     public string FocusTextKey { get => data.focusTextKeys[(int)cookAmount]; set => data.focusTextKeys[(int)cookAmount] = value; }
     [Space]
 
@@ -155,10 +155,10 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
             if (data.isSauce) meshCol.convex = false;
 
-            bool isLastItem = tray != null && tray.allBurgerIngredients.Count > 0 &&
-                          tray.allBurgerIngredients[tray.allBurgerIngredients.Count - 1] == this;
+            bool isLastItem = burgerCombineArea != null && burgerCombineArea.allBurgerIngredients.Count > 0 &&
+                          burgerCombineArea.allBurgerIngredients[burgerCombineArea.allBurgerIngredients.Count - 1] == this;
 
-            if (isLastItem && !tray.isBoxingProcessStarted)
+            if (isLastItem && !burgerCombineArea.isBoxingProcessStarted)
                 SetOnGrabableLayer();
             else
                 SetOnTrayLayer();
@@ -179,11 +179,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         {
             if (data.isSauce)
             {
-                tray.RemoveSauce();
+                burgerCombineArea.RemoveSauce();
                 meshCol.convex = true;
             }   
             else
-                tray.RemoveIngredient();
+                burgerCombineArea.RemoveIngredient();
 
             isAddedToBurger = false;
         }

@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Other Settings")]
     [Space]
-    public Tray tray;
+    public BurgerCombineArea burgerCombineArea;
     [Space]
     public OrderThrowArea orderThrowArea;
 
@@ -176,7 +176,7 @@ public class GameManager : MonoBehaviour
 
     public void AddSauceToTray(SauceBottle.SauceType type)
     {
-        tray.AddSauce(type);
+        burgerCombineArea.AddSauce(type);
     }
 
     public void SetCurrentCustomer(ICustomer customer)

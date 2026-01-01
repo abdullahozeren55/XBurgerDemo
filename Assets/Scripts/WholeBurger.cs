@@ -70,6 +70,8 @@ public class WholeBurger : MonoBehaviour, IGrabable
 
         // Boyu kaydet
         TotalBurgerHeight = height;
+
+        ChangeLayer(grabableLayer);
     }
 
     // --- IGrabable Implementation ---
