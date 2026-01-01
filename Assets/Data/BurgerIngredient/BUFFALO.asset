@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7283705b9a48eed4cafef7f670eb71e3, type: 3}
+  m_Name: BUFFALO
+  m_EditorClassIdentifier: 
+  isUseable: 0
+  isSauce: 1
+  isThrowable: 1
+  sauceDropAmount: 5
+  targetDropScale: 0.8
+  randomMultiplier: 1.3
+  throwMultiplier: 1
+  ingredientType: 3
+  sauceType: 4
+  handGrabType: 0
+  icon: {fileID: 21300000, guid: ca0e26d3206fcb841b02b87ecbaf1eb8, type: 3}
+  yHeight: 0.0016
+  timeToPutOnTray: 0.2
+  localScaleWhenGrabbed: {x: 22, y: 22, z: 4}
+  stickableLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  grabPositionOffset: {x: 0.6, y: 1, z: 2}
+  grabRotationOffset: {x: -20, y: -70, z: -70}
+  grabLocalPositionOffset: {x: 0.00045338421, y: 0.04404887, z: 0.067784056}
+  grabLocalRotationOffset: {x: 306.82947, y: 186.33774, z: 188.63446}
+  focusTextKeys:
+  - GRABABLE_BBQ
+  dropParticles:
+  - {fileID: 8670732574423207768, guid: b544ea461d4fd5b4bb8f1e7480e99c79, type: 3}
+  throwParticles:
+  - {fileID: 8670732574423207768, guid: 2ab807a8b48fb62479ff0888dc6f2667, type: 3}
+  audioClips:
+  - {fileID: 8300000, guid: 3135f1182e700394982a7ad627248bb7, type: 3}
+  - {fileID: 8300000, guid: f5047815751f6574c8ed48f45de1c865, type: 3}
+  - {fileID: 8300000, guid: 3c4f71e3513289d44a8cd2feb087bde9, type: 3}
+  - {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 1.1
+  grabSoundMaxPitch: 1.4
+  dropSoundVolume: 0.8
+  dropSoundMinPitch: 1
+  dropSoundMaxPitch: 1.3
+  throwSoundVolume: 1
+  throwSoundMinPitch: 1.2
+  throwSoundMaxPitch: 1.5
+  traySoundVolume: 1
+  traySoundMinPitch: 1
+  traySoundMaxPitch: 1.2
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1
+  cookedSoundMultiplier: 0.8
+  burntSoundMultiplier: 0.6

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a36c543d467ec6245ac010065e9af8fc, type: 3}
+  m_Name: BUFFALO
+  m_EditorClassIdentifier: 
+  isUseable: 1
+  isThrowable: 1
+  throwMultiplier: 1
+  handGrabType: 1
+  icon: {fileID: 21300000, guid: cde5ff9ea6741cd429b60e2c01df96c0, type: 3}
+  grabPositionOffset: {x: 0.7, y: 1, z: 3}
+  grabRotationOffset: {x: -5, y: -70, z: -70}
+  grabLocalPositionOffset: {x: 0.0012753477, y: -0.024081646, z: 0.06398927}
+  grabLocalRotationOffset: {x: 82.59776, y: 254.86421, z: 341.04123}
+  usePositionOffset: {x: 0.7, y: 2, z: 3}
+  useRotationOffset: {x: 180, y: -120, z: -150}
+  useLocalPositionOffset: {x: 0.0013, y: -0.0234, z: 0.0623}
+  useLocalRotationOffset: {x: 82.59771, y: 254.85889, z: 341.03546}
+  timeToUse: 0.3
+  usingFOV: 70
+  audioClips:
+  - {fileID: 8300000, guid: 802098a4a628b9441a8dd1ab6f99016f, type: 3}
+  - {fileID: 8300000, guid: 661b5a0ce5cbad3449ff0fb5b5e8d22d, type: 3}
+  - {fileID: 8300000, guid: ab1ae25769643ef4aa7ecd87e9b2aac4, type: 3}
+  grabSoundVolume: 0.3
+  grabSoundMinPitch: 1.1
+  grabSoundMaxPitch: 1.3
+  dropSoundVolume: 0.4
+  dropSoundMinPitch: 1.1
+  dropSoundMaxPitch: 1.3
+  throwSoundVolume: 0.4
+  throwSoundMinPitch: 1.1
+  throwSoundMaxPitch: 1.3
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

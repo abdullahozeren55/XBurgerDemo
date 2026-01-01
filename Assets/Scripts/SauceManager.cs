@@ -20,7 +20,7 @@ public class SauceManager : MonoBehaviour
     }
 
 
-    public GameObject[] sauceDrops = new GameObject[4]; //0 ketchup, 1 mayo, 2 mustard, 3 BBQ
+    public GameObject[] sauceDrops = new GameObject[5]; //0 ketchup, 1 mayo, 2 mustard, 3 BBQ, 4 Buffalo
     public float dropLifetime = 10f;
 
     private List<SauceDropData> activeOutsideDrops = new List<SauceDropData>();

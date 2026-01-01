@@ -111,7 +111,8 @@ public class BurgerCombineArea : MonoBehaviour
             GameObject go = Instantiate(
                 type == SauceBottle.SauceType.Ketchup ? sauces[0] :
                 type == SauceBottle.SauceType.Mayo ? sauces[1] :
-                type == SauceBottle.SauceType.Mustard ? sauces[2] : sauces[3],
+                type == SauceBottle.SauceType.Mustard ? sauces[2] :
+                type == SauceBottle.SauceType.BBQ ? sauces[3] : sauces[4],
                 targetPosition,
                 targetRotation,
                 ingredientsParent);
