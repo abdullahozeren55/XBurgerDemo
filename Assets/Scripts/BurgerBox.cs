@@ -11,16 +11,6 @@ public class BurgerBox : MonoBehaviour, IGrabable
     [Header("Data")]
     public BurgerBoxData data;
 
-    [Header("Lid Settings (Adaptive)")]
-    [SerializeField] private float minLidAngle = 32f; // Küçük burgerlerdeki havalý duruþ
-    [SerializeField] private float maxLidAngle = 90f; // Dev burgerlerdeki zoraki duruþ
-
-    [Tooltip("Burger bu boydan kýsaysa Min Angle kullanýlýr.")]
-    [SerializeField] private float minBurgerHeightLimit = 0.15f; // Bu deðerin altý 32 derece
-
-    [Tooltip("Burger bu boya ulaþýrsa Max Angle (90) olur.")]
-    [SerializeField] private float maxBurgerHeightLimit = 0.4f; // Bu deðer ve üstü 90 derece
-
     // State
     private GameObject containedBurger;
     private bool isBoxFull = false;
@@ -150,11 +140,11 @@ public class BurgerBox : MonoBehaviour, IGrabable
         // 4. Kapaðý ayarla
         if (topPart != null)
         {
-            float targetAngle = minLidAngle;
-            if (burgerHeight > minBurgerHeightLimit)
+            float targetAngle = data.minLidAngle;
+            if (burgerHeight > data.minBurgerHeightLimit)
             {
-                float t = Mathf.InverseLerp(minBurgerHeightLimit, maxBurgerHeightLimit, burgerHeight);
-                targetAngle = Mathf.Lerp(minLidAngle, maxLidAngle, t);
+                float t = Mathf.InverseLerp(data.minBurgerHeightLimit, data.maxBurgerHeightLimit, burgerHeight);
+                targetAngle = Mathf.Lerp(data.minLidAngle, data.maxLidAngle, t);
             }
             topPart.transform.localRotation = Quaternion.Euler(targetAngle, 0f, 0f);
         }

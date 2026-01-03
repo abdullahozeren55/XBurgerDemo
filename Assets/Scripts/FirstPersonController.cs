@@ -1806,7 +1806,7 @@ public class FirstPersonController : MonoBehaviour
         currentSlotIndex = emptySlotIndex;
         currentGrabable = itemToPickUp;
 
-        // 5. Fiziksel Alma Ýþlemi (Standart)
+        // 5. Fiziksel Alma Ýþlemi
         currentGrabable.OnGrab(grabPoint);
 
         // Diðer 'Other' temizlikleri
@@ -1819,12 +1819,11 @@ public class FirstPersonController : MonoBehaviour
 
         // 6. Rig ve Animasyon
         DecideGrabAnimBool();
-        if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
 
-        currentPositionOffsetForRightHand = currentGrabable.GrabPositionOffset;
-        currentRotationOffsetForRightHand = currentGrabable.GrabRotationOffset;
-        coyoteTimeForPhone = phoneCoyoteForGrab;
-        rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
+        // --- DEÐÝÞEN KISIM BURASI ---
+        // Eski 4-5 satýrlýk Rig kodunu sildik, yerine bunu yazdýk:
+        ApplyGrabHandRig();
+        // ----------------------------
 
         InteractKeyIsDone = true;
         DecideOutlineAndCrosshair();
@@ -1946,11 +1945,7 @@ public class FirstPersonController : MonoBehaviour
         currentGrabable.OnGrab(grabPoint);
         DecideGrabAnimBool();
 
-        if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
-        currentPositionOffsetForRightHand = currentGrabable.GrabPositionOffset;
-        currentRotationOffsetForRightHand = currentGrabable.GrabRotationOffset;
-        coyoteTimeForPhone = phoneCoyoteForGrab;
-        rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
+        ApplyGrabHandRig();
 
         InteractKeyIsDone = true;
         DecideOutlineAndCrosshair();
@@ -2631,6 +2626,38 @@ public class FirstPersonController : MonoBehaviour
         if (inventoryUI != null)
         {
             inventoryUI.UpdateDisplay(inventoryItems, currentSlotIndex);
+        }
+    }
+
+    private void ApplyGrabHandRig()
+    {
+        if (currentGrabable == null) return;
+
+        // 1. Önce eski sað el iþlemini durdur (Her ihtimale karþý)
+        if (rightHandRigLerpCoroutine != null)
+        {
+            StopCoroutine(rightHandRigLerpCoroutine);
+            rightHandRigLerpCoroutine = null;
+        }
+
+        // 2. Ortak Deðiþkenleri Ata
+        
+        // TELEFON KALDIRILACAK OYUNDAN: coyoteTimeForPhone = phoneCoyoteForGrab;
+
+        // 3. TÝP KONTROLÜ (Switch Case)
+        switch (currentGrabable.HandRigType)
+        {
+            case PlayerManager.HandRigTypes.SingleHandGrab:
+                // ESKÝ MANTIK: Sað eli kaldýr
+                currentPositionOffsetForRightHand = currentGrabable.GrabPositionOffset;
+                currentRotationOffsetForRightHand = currentGrabable.GrabRotationOffset;
+                rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
+                break;
+
+            case PlayerManager.HandRigTypes.HoldingTray:
+                // --- BURASI ÞÝMDÝLÝK BOÞ ---
+                // Tepsi tutma mantýðýný (Çift el IK vb.) buraya yazacaðýz.
+                break;
         }
     }
 

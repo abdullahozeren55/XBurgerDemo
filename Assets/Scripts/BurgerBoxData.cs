@@ -12,6 +12,12 @@ public class BurgerBoxData : ScriptableObject
     public PlayerManager.HandRigTypes handRigType = PlayerManager.HandRigTypes.SingleHandGrab;
     public Sprite[] icon;
     [Space]
+    [Header("Lid Settings (Adaptive)")]
+    public float minLidAngle = 32f; // Küçük burgerlerdeki havalý duruþ
+    public float maxLidAngle = 112f; // Dev burgerlerdeki zoraki duruþ
+    public float minBurgerHeightLimit = 1f; // Bu deðerin altý min derece
+    public float maxBurgerHeightLimit = 1.4f; // Bu deðer ve üstü max derece
+    [Space]
     public float timeToPutOnTray = 0.3f;
     public float throwMultiplier = 1f;
     public Vector3 trayRotation = new Vector3(0, 0, -90);
