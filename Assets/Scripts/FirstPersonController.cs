@@ -1232,146 +1232,126 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleGrabCheck()
     {
-
         if (PerformInteractionCast(out RaycastHit hit, interactionDistance, grabableLayers))
         {
             if (hit.collider)
             {
-                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Grabable") || hit.collider.gameObject.layer == LayerMask.NameToLayer("GrabableOutlined") || hit.collider.gameObject.layer == LayerMask.NameToLayer("GrabableOutlinedGreen") || hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlinedRed"))
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Grabable") ||
+                    hit.collider.gameObject.layer == LayerMask.NameToLayer("GrabableOutlined") ||
+                    hit.collider.gameObject.layer == LayerMask.NameToLayer("GrabableOutlinedGreen") ||
+                    hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlinedRed"))
                 {
                     // --- MAGNETISM ---
-                    // Eþya bulduk, yavaþlat
                     InputManager.Instance.aimAssistSlowdown = InputManager.Instance.GetMagnetStrength();
 
-                    // --- DEÐÝÞÝKLÝK BURADA BAÞLIYOR ---
-
-                    // 1. Çarptýðýmýz þeyin üzerindeki scripti al
+                    // 1. Hedefi Bul
                     IGrabable rawGrabable = hit.collider.gameObject.GetComponent<IGrabable>();
-
-                    // 2. Onun PATRONUNU bul
-                    // (Eðer rawGrabable null ise null döner, deðilse Master'ý döner)
                     IGrabable targetMaster = rawGrabable?.Master;
 
-                    if (targetMaster == null) return; // Güvenlik
+                    if (targetMaster == null) return;
 
-                    // --- MANTIK GÜNCELLEMESÝ ---
-
+                    // --- STATE A: ELÝM BOÞ, ÝLK DEFA BÝR ÞEYE BAKIYORUM ---
                     if (currentGrabable == null)
                     {
+                        // Temizlik (ne olur ne olmaz)
                         if (otherGrabable != null)
                         {
                             otherGrabable.OnLoseFocus();
                             otherGrabable = null;
-                            DecideOutlineAndCrosshair();
                         }
 
                         currentGrabable = targetMaster;
-                        
-                        if (currentGrabable != null)
-                            currentGrabable.OnFocus();
+                        currentGrabable.OnFocus();
 
+                        // ÝÞLEM BÝTTÝ, ÞÝMDÝ GÜNCELLE
                         DecideOutlineAndCrosshair();
                     }
-                    // B) Zaten elimde bir þey varsa (CurrentGrabable dolu)
+                    // --- STATE B: ZATEN ELÝMDE BÝR ÞEY VAR (HOLDING) ---
                     else if (currentGrabable.IsGrabbed)
                     {
-                        // Baktýðým þey (Master) zaten OtherGrabable deðilse güncelle
-                        if (otherGrabable != null && targetMaster != otherGrabable)
+                        // Baktýðým þey, þu an "Yerdeki Hedefim" (otherGrabable) ile ayný deðilse?
+                        if (otherGrabable != targetMaster)
                         {
-                            otherGrabable.OnLoseFocus();
-                            otherGrabable = null;
-                            DecideOutlineAndCrosshair();
-                        }
+                            // 1. Eskiyi temizle
+                            if (otherGrabable != null)
+                            {
+                                otherGrabable.OnLoseFocus();
+                                otherGrabable = null;
+                                // BURADA Decide ÇAÐIRMIYORUZ, ÇÜNKÜ HENÜZ ÝÞÝMÝZ BÝTMEDÝ
+                            }
 
-                        if (otherGrabable == null)
-                        {
-                            // Baktýðým þey elimdekiyle ayný deðilse (kendi tuttuðum þeye bakmýyorsam)
+                            // 2. Yeniyi ata (Eðer elimdekiyle ayný þeye bakmýyorsam)
                             if (targetMaster != currentGrabable)
                             {
                                 otherGrabable = targetMaster;
-                                if (otherGrabable != null)
-                                {
-                                    otherGrabable.OnFocus();
-                                    DecideOutlineAndCrosshair();
-                                }
+                                otherGrabable.OnFocus();
                             }
+
+                            // 3. HER ÞEY HAZIR, TEK SEFERDE GÜNCELLE
+                            DecideOutlineAndCrosshair();
                         }
                     }
-                    // C) Elim boþ ama baþka bir þeye bakmaya baþladým (Focus deðiþimi)
-                    // BURASI ÇOK ÖNEMLÝ: currentGrabable != hit... kontrolü yerine Master kontrolü
+                    // --- STATE C: ELÝM BOÞ AMA BAÞKA BÝR EÞYAYA GEÇÝÞ YAPIYORUM (SWITCHING) ---
+                    // Sorun buradaydý: Arada sürekli Decide çaðýrýp sistemi yoruyorduk.
                     else if (currentGrabable != targetMaster)
                     {
+                        // 1. Other Temizliði
                         if (otherGrabable != null)
                         {
                             otherGrabable.OnLoseFocus();
                             otherGrabable = null;
-                            DecideOutlineAndCrosshair();
                         }
 
+                        // 2. Eski Current'ý Býrak
                         currentGrabable.OnLoseFocus();
-                        DecideOutlineAndCrosshair();
 
-                        currentGrabable = targetMaster; // Yeni Master'ý al
-
+                        // 3. Yeni Current'ý Al
+                        currentGrabable = targetMaster;
                         currentGrabable.OnFocus();
+
+                        // 4. FLICKER OLMAMASI ÝÇÝN SADECE EN SONDA ÇAÐIR
                         DecideOutlineAndCrosshair();
                     }
-                    // -----------------------------------
                 }
+                // --- Hedef Layer deðilse (Ama Raycast çarptýysa) ---
                 else
                 {
-
-                    if (currentGrabable != null && !currentGrabable.IsGrabbed)
-                    {
-                        currentGrabable.OnLoseFocus();
-                        currentGrabable = null;
-                        DecideOutlineAndCrosshair();
-                    }
-
-                    if (otherGrabable != null)
-                    {
-                        otherGrabable.OnLoseFocus();
-                        otherGrabable = null;
-                        DecideOutlineAndCrosshair();
-                    }
+                    CleanUpFocus();
                 }
-
             }
+            // --- Collider yoksa ---
             else
             {
-
-                if (currentGrabable != null && !currentGrabable.IsGrabbed)
-                {
-                    currentGrabable.OnLoseFocus();
-                    currentGrabable = null;
-                    DecideOutlineAndCrosshair();
-                }
-
-                if (otherGrabable != null)
-                {
-                    otherGrabable.OnLoseFocus();
-                    otherGrabable = null;
-                    DecideOutlineAndCrosshair();
-                }
+                CleanUpFocus();
             }
         }
+        // --- Raycast boþa düþtüyse ---
         else
         {
-
-            if (currentGrabable != null && !currentGrabable.IsGrabbed)
-            {
-                currentGrabable.OnLoseFocus();
-                currentGrabable = null;
-                DecideOutlineAndCrosshair();
-            }
-
-            if (otherGrabable != null)
-            {
-                otherGrabable.OnLoseFocus();
-                otherGrabable = null;
-                DecideOutlineAndCrosshair();
-            }
+            CleanUpFocus();
         }
+    }
+
+    // Kod tekrarýný önlemek için temizlik fonksiyonu
+    private void CleanUpFocus()
+    {
+        bool changed = false;
+
+        if (currentGrabable != null && !currentGrabable.IsGrabbed)
+        {
+            currentGrabable.OnLoseFocus();
+            currentGrabable = null;
+            changed = true;
+        }
+
+        if (otherGrabable != null)
+        {
+            otherGrabable.OnLoseFocus();
+            otherGrabable = null;
+            changed = true;
+        }
+
+        if (changed) DecideOutlineAndCrosshair();
     }
 
     private void HandleGrabInput()
