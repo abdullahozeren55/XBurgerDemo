@@ -51,13 +51,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _Alpha: 4
-    - _AlphaMultiplier: 2
-    - _Noise: 16
+    - _AlphaMultiplier: 3
+    - _Noise: 8
     - _PixelDensity: 64
     - _QueueControl: 0
     - _QueueOffset: -2
     - _Speed: -0.96
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 0.2509804}
+    - _Color: {r: 1, g: 0.7529412, b: 0, a: 0.7058824}
     - _Tiling: {r: 8, g: 2, b: 0, a: 0}
   m_BuildTextureStacks: []

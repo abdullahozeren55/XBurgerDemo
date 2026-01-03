@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37adf64c92825a3408e4aaf73c1834dc, type: 3}
+  m_Name: DRINKCUPLID
+  m_EditorClassIdentifier: 
+  isUseable: 0
+  isThrowable: 1
+  throwMultiplier: 1
+  handGrabType: 4
+  icon: {fileID: 21300000, guid: 5b1c3d60abf220a488edb8a644f5d33f, type: 3}
+  grabPositionOffset: {x: 0.6, y: 1, z: 2}
+  grabRotationOffset: {x: 60, y: -70, z: -70}
+  grabLocalPositionOffset: {x: -0.0347, y: 0.0525, z: 0.0866}
+  grabLocalRotationOffset: {x: 24.15221, y: 121.007774, z: 321.6542}
+  focusTextKey: GRABABLE_TRASH
+  audioClips:
+  - {fileID: 8300000, guid: 6ba247c05ab01244d97d4f693e4f832e, type: 3}
+  - {fileID: 8300000, guid: b5c223266c9892747aafc530c31bb790, type: 3}
+  - {fileID: 8300000, guid: 7b272dd5318467c40abc0c82a05fdabd, type: 3}
+  grabSoundVolume: 0.7
+  grabSoundMinPitch: 1
+  grabSoundMaxPitch: 1.2
+  dropSoundVolume: 1
+  dropSoundMinPitch: 1
+  dropSoundMaxPitch: 1.2
+  throwSoundVolume: 1
+  throwSoundMinPitch: 1
+  throwSoundMaxPitch: 1.2
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

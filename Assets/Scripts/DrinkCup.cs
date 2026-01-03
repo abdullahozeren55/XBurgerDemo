@@ -19,8 +19,9 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
     // --- YENÝ EKLENENLER ---
     [HideInInspector] public SodaMachine currentMachine;
-    private bool isFull = false; // Bardak dolu mu?
-    public bool IsFull => isFull; // Dýþarýdan okumak için
+    public bool IsGettingFilled;
+    public bool IsFull;
+    public bool HasLid { get; private set; } = false; // Kapaðý var mý?
     // -----------------------
 
     // ... (Diðer deðiþkenler ayný) ...
@@ -39,8 +40,12 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
     private Rigidbody rb;
     private Collider col;
+    private Collider lidCol;
+    private Collider strawCol;
+
     private int grabableLayer;
     private int grabableOutlinedLayer;
+    private int grabableOutlinedGreenLayer;
     private int interactableOutlinedRedLayer;
     private int ungrabableLayer;
     private int grabbedLayer;
@@ -52,9 +57,12 @@ public class DrinkCup : MonoBehaviour, IGrabable
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
+        lidCol = lidGO.GetComponent<Collider>();
+        strawCol = strawGO.GetComponent<Collider>();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
         grabableOutlinedLayer = LayerMask.NameToLayer("GrabableOutlined");
+        grabableOutlinedGreenLayer = LayerMask.NameToLayer("GrabableOutlinedGreen");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
         grabbedLayer = LayerMask.NameToLayer("Grabbed");
@@ -67,11 +75,25 @@ public class DrinkCup : MonoBehaviour, IGrabable
         if (drinkGO != null) drinkGO.SetActive(false);
     }
 
+    public void AttachLidAndStraw()
+    {
+        if (HasLid) return; // Zaten varsa iþlem yapma
+
+        HasLid = true;
+
+        // Bardaðýn kendi parçalarýný aç
+        if (lidGO != null) lidGO.SetActive(true);
+        if (strawGO != null) strawGO.SetActive(true);
+
+        // Opsiyonel: Ses çal (Kapak 'çýt' sesi)
+        // SoundManager.Instance.PlaySoundFX(...) 
+    }
+
     // --- YENÝ FONKSÝYON: DOLUM ÝÞLEMÝ ---
     public void StartFilling(Color liquidColor, float duration)
     {
-        // 1. Zaten doluysa iþlem yapma (Renk deðiþtirme, tekrar doldurma vs.)
-        if (isFull) return;
+        // 1. Zaten doluysa veya kapak takýldýysa iþlem yapma (Renk deðiþtirme, tekrar doldurma vs.)
+        if (IsFull || HasLid) return;
 
         // 2. Ýçecek objesini aç
         if (drinkGO != null)
@@ -97,9 +119,8 @@ public class DrinkCup : MonoBehaviour, IGrabable
                 // DOTween ile sürece yayarak 100 yap
                 DOTween.To(() => meshRenderer.GetBlendShapeWeight(blendShapeIndex),
                            x => meshRenderer.SetBlendShapeWeight(blendShapeIndex, x),
-                           100f, duration)
-                           .SetEase(Ease.Linear) // Sabit hýzla dolsun
-                           .OnComplete(() => isFull = true); // Bitince "Dolu" iþaretle
+                           96f, duration)
+                           .SetEase(Ease.Linear);
             }
         }
     }
@@ -118,9 +139,14 @@ public class DrinkCup : MonoBehaviour, IGrabable
         }
 
         // DOTween kill: Eðer dolarken alýrsan dolmayý durdur.
-        if (drinkGO != null) drinkGO.GetComponent<SkinnedMeshRenderer>()?.DOKill();
+        if (drinkGO != null)
+        {
+            SkinnedMeshRenderer drinkSMR = drinkGO.GetComponent<SkinnedMeshRenderer>();
+            drinkSMR.DOKill();
+            drinkSMR.SetBlendShapeWeight(0, 96f);
+        }
 
-        col.enabled = false;
+        HandleColliders(false);
         SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -137,18 +163,18 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
     public void OnFocus()
     {
-        if (!isJustDropped && !isJustThrowed)
+        if (!isJustDropped && !isJustThrowed && !IsGettingFilled)
             ChangeLayer(grabableOutlinedLayer);
     }
     public void OnLoseFocus()
     {
-        if (!isJustDropped && !isJustThrowed)
+        if (!isJustDropped && !isJustThrowed && !IsGettingFilled)
             ChangeLayer(grabableLayer);
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
-        col.enabled = true;
+        HandleColliders(true);
         IsGrabbed = false;
         transform.SetParent(null);
         rb.useGravity = true;
@@ -159,7 +185,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
     public void OnThrow(Vector3 direction, float force)
     {
-        col.enabled = true;
+        HandleColliders(true);
         IsGrabbed = false;
         transform.SetParent(null);
         rb.useGravity = true;
@@ -178,13 +204,29 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
     public void OutlineChangeCheck()
     {
-        if (gameObject.layer == grabableOutlinedLayer && OutlineShouldBeRed)
+        if (gameObject.layer == grabableOutlinedLayer)
         {
-            ChangeLayer(interactableOutlinedRedLayer);
+            if (OutlineShouldBeRed)
+                ChangeLayer(interactableOutlinedRedLayer);
+            else if (OutlineShouldBeGreen)
+                ChangeLayer(grabableOutlinedGreenLayer);
         }
-        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
+        else if (gameObject.layer == grabableOutlinedGreenLayer)
         {
-            ChangeLayer(grabableOutlinedLayer);
+            if (OutlineShouldBeRed)
+                ChangeLayer(interactableOutlinedRedLayer);
+            else if (!OutlineShouldBeGreen)
+                ChangeLayer(grabableOutlinedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer)
+        {
+            if (!OutlineShouldBeRed)
+            {
+                if (OutlineShouldBeGreen)
+                    ChangeLayer(grabableOutlinedGreenLayer);
+                else
+                    ChangeLayer(grabableOutlinedLayer);
+            }
         }
     }
 
@@ -212,15 +254,75 @@ public class DrinkCup : MonoBehaviour, IGrabable
         }
     }
 
+    private void HandleColliders(bool state)
+    {
+        col.enabled = state;
+        lidCol.enabled = state;
+        strawCol.enabled = state;
+    }
+
     public void OnUseHold() { throw new System.NotImplementedException(); }
     public void OnUseRelease() { throw new System.NotImplementedException(); }
-    public bool TryCombine(IGrabable otherItem) { return false; }
-    public bool CanCombine(IGrabable otherItem) { return false; }
+    public bool CanCombine(IGrabable otherItem)
+    {
+        // 1. Bardaðým zaten kapalýysa kimseyle birleþmem.
+        if (HasLid) return false;
+
+        // 2. Bardaðým boþsa kapak takmam (Opsiyonel, istersen boþ da kapatabilirsin ama genelde dolu kapatýlýr)
+        if (!IsFull) return false;
+
+        // 3. Karþýdaki obje bir KAPAK mý?
+        if (otherItem is DrinkCupLid)
+        {
+            return true; // Yeþil ýþýk yak
+        }
+
+        return false;
+    }
+
+    // Combine tuþuna basýldý (Lid'i yiyeceðiz)
+    public bool TryCombine(IGrabable otherItem)
+    {
+        if (CanCombine(otherItem))
+        {
+            // Karþýdaki obje Kapak olduðu kesin (CanCombine true döndü)
+            DrinkCupLid targetLid = (DrinkCupLid)otherItem;
+
+            // 1. Kendi görselimi aç
+            AttachLidAndStraw();
+
+            // 2. Hedef kapaðý yok et
+            // Eðer kapak o an bir yerde takýlýysa veya fizikselse güvenli silme yapalým
+
+            // Eðer kapak (çok düþük ihtimal ama) baþkasýnýn elindeyse?
+            if (targetLid.IsGrabbed)
+            {
+                // Baþkasýnýn elinden alýp yok etmek gerekir ama 
+                // senin oyun singleplayer olduðu için buna gerek yok.
+                // Yine de PlayerManager kontrolü iyidir.
+                if (PlayerManager.Instance != null) PlayerManager.Instance.ResetPlayerGrab(targetLid);
+            }
+
+            Destroy(targetLid.gameObject);
+
+            // 3. Baþarýlý döndür
+            return true;
+        }
+
+        return false;
+    }
 
     public void FinishPuttingOnSodaMachine()
     {
         ChangeLayer(grabableLayer);
         isJustDropped = false;
         isJustThrowed = false;
+    }
+
+    public void FinishGettingFilled()
+    {
+        IsGettingFilled = false;
+        IsFull = true;
+        ChangeLayer(grabableLayer);
     }
 }

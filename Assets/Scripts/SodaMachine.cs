@@ -31,7 +31,10 @@ public class SodaMachine : MonoBehaviour
     private float currentStreamLength = 0f;
     private float currentStreamStart = 0f;
     private Material streamMat;
+
     private int interactableLayer;
+    private int ungrabableLayer;
+    private int grababaleLayer;
 
     private void Awake()
     {
@@ -42,7 +45,10 @@ public class SodaMachine : MonoBehaviour
             streamLine.useWorldSpace = false;
             streamMat = streamLine.material;
         }
+
         interactableLayer = LayerMask.NameToLayer("Interactable");
+        ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
+        grababaleLayer = LayerMask.NameToLayer("Grabable");
     }
 
     private void Update()
@@ -65,6 +71,13 @@ public class SodaMachine : MonoBehaviour
             if (PlayerManager.Instance != null) PlayerManager.Instance.ResetPlayerInteract(b, true);
         }
 
+        if (currentCup != null)
+        {
+            currentCup.IsGettingFilled = true;
+            currentCup.ChangeLayer(ungrabableLayer);
+            if (PlayerManager.Instance != null) PlayerManager.Instance.ResetPlayerGrab(currentCup);
+        }
+
         // 2. BUTONU ÝÇERÝ GÖM
         btn.transform.DOKill();
         btn.transform.DOLocalMove(btn.initialPos + (Vector3.up * buttonPressDepth), 0.2f).SetEase(Ease.OutQuad);
@@ -80,8 +93,8 @@ public class SodaMachine : MonoBehaviour
             if (btn.flavorIndex >= 0 && btn.flavorIndex < flavorColors.Length)
                 selectedColor = flavorColors[btn.flavorIndex];
 
-            // Toplam süre = Akýþ Süresi + Durma (Damlama) Süresi
-            float totalFillTime = pourDuration + stopDuration;
+            // Toplam süre = Akýþ Süresi + Durma (Damlama) - 0.1f (for juice) Süresi
+            float totalFillTime = pourDuration + stopDuration - 0.1f;
 
             // Bardaða "Baþla" de
             currentCup.StartFilling(selectedColor, totalFillTime);
@@ -90,6 +103,9 @@ public class SodaMachine : MonoBehaviour
 
         // 4. BEKLE
         yield return new WaitForSeconds(pourDuration);
+
+        if (currentCup != null)
+            currentCup.FinishGettingFilled();
 
         // 5. DURDURMA EVRESÝ
         BeginStopping();
@@ -172,6 +188,7 @@ public class SodaMachine : MonoBehaviour
         DrinkCup incomingCup = other.GetComponent<DrinkCup>();
         if (incomingCup == null) return;
         if (incomingCup.IsGrabbed) return;
+        if (incomingCup.IsFull) return;
 
         SnapCupToMachine(incomingCup);
     }
