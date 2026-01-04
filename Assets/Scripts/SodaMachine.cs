@@ -186,7 +186,7 @@ public class SodaMachine : MonoBehaviour
         streamLine.SetPosition(1, new Vector3(0, -currentStreamLength, 0));
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void HandleCatch(Collider other) //OnTrigger vazifesi görüyor, SodaMachineTriggerRelay çaðýrýyor.
     {
         if (currentCup != null) return;
         DrinkCup incomingCup = other.GetComponent<DrinkCup>();

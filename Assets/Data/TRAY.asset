@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d8bc7d3e537e164a98da597b6ea9421, type: 3}
+  m_Name: TRAY
+  m_EditorClassIdentifier: 
+  isUseable: 0
+  isThrowable: 0
+  throwMultiplier: 1
+  handGrabType: 0
+  handRigType: 3
+  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  grabPositionOffset: {x: 0, y: 0, z: 0}
+  grabRotationOffset: {x: 0, y: 0, z: 0}
+  focusTextKey: GRABABLE_KNIFE
+  audioClips:
+  - {fileID: 8300000, guid: 19e9594bc172813438457584b8a663b6, type: 3}
+  - {fileID: 8300000, guid: b92f567054a7252448d18d6f96600d12, type: 3}
+  - {fileID: 8300000, guid: 5ac87daf57e5ddb4ebcfb5967ee44707, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15
+  soundCooldown: 0.1
+  throwThreshold: 6
+  dropThreshold: 2

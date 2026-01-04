@@ -1,5 +1,6 @@
+using DG.Tweening;
+using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic; // List için gerekli
 
 public class Holder : MonoBehaviour, IGrabable
 {
@@ -15,24 +16,23 @@ public class Holder : MonoBehaviour, IGrabable
         CrispyChicken
     }
 
-    // YENÝ: Hangi enum hangi objeyi açacak?
     [System.Serializable]
     public struct VisualMapping
     {
         public HolderIngredient type;
-        public GameObject visualObject; // Child olarak koyduðun, scale'i ayarlanmýþ obje
+        public GameObject visualObject;
     }
 
     [Header("Visual References")]
-    // Tek bir obje yerine liste tutuyoruz
     [SerializeField] private List<VisualMapping> visualMappings;
 
     [Header("Data & IGrabable")]
     [SerializeField] private HolderData data;
 
     // --- IGrabable Properties ---
-
     public IGrabable Master => this;
+
+    public HolderIngredient CurrentIngredient => currentIngredientType;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
@@ -52,7 +52,6 @@ public class Holder : MonoBehaviour, IGrabable
     public Vector3 GrabPositionOffset { get => data.grabPositionOffset; set => data.grabPositionOffset = value; }
     public Vector3 GrabRotationOffset { get => data.grabRotationOffset; set => data.grabRotationOffset = value; }
 
-    // Focus Text artýk içeriðe göre deðiþiyor
     public string FocusTextKey
     {
         get => data.focusTextKeys[(int)currentIngredientType];
@@ -61,14 +60,24 @@ public class Holder : MonoBehaviour, IGrabable
 
     private HolderIngredient currentIngredientType = HolderIngredient.Empty;
 
+    // --- LOGIC VARIABLES ---
+    [HideInInspector] public Tray currentTray;
+    private bool isGettingPutOnTray;
+    // isOnTray silindi (Gerek yok)
+
+    private bool isJustDropped;
+    private bool isJustThrowed;
+
     // --- References ---
     private Rigidbody rb;
     private Collider col;
+
+    // Layers
     private int grabableLayer;
-    private int grabableOutlinedGreenLayer;
     private int ungrabableLayer;
     private int grabbedLayer;
     private int grabableOutlinedLayer;
+    private int grabableOutlinedGreenLayer;
     private int interactableOutlinedRedLayer;
 
     private void Awake()
@@ -76,7 +85,6 @@ public class Holder : MonoBehaviour, IGrabable
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
-        // Content baþlarken kapalý olsun (veya editördeki duruma göre)
         UpdateVisuals();
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -87,74 +95,89 @@ public class Holder : MonoBehaviour, IGrabable
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
     }
 
-    // --- ASIL OLAY: BÝRLEÞTÝRME MANTIÐI ---
-    public bool TryCombine(IGrabable otherItem)
+    // --- YENÝ YERLEÞME METODU (DRINKCUP MANTIÐI) ---
+    public void PlaceOnTray(Transform targetSlot, Transform apexTransform, Tray trayRef, int slotIndex)
     {
-        // 1. Zaten doluysak kimseyi alamayýz
-        if (currentIngredientType != HolderIngredient.Empty) return false;
+        // 1. State Ayarla
+        isGettingPutOnTray = true;
+        isJustDropped = false;
+        isJustThrowed = false;
+        currentTray = trayRef;
 
-        // 2. Gelen þey bir "Fryable" (Kýzartmalýk) mý?
-        Fryable item = otherItem as Fryable;
-        if (item == null) return false;
-
-        // 3. Sadece REGULAR (Piþmiþ) kabul edelim.
-        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR)
+        // Çarpýþmayý yoksay (Tepsiyle kavga etmesin)
+        if (currentTray != null && col != null)
         {
-            return false;
+            Physics.IgnoreCollision(col, currentTray.GetCollider, true);
         }
 
-        // 4. Türüne göre doldur
-        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken)
+        // Player elinden düþür
+        if (PlayerManager.Instance != null && IsGrabbed)
         {
-            Fill(item.data.type, item);
-            return true;
+            PlayerManager.Instance.ResetPlayerGrab(this);
         }
 
-        return false;
-    }
+        // 2. Fizik Kapat
+        rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.useGravity = false;
+        col.enabled = false; // Yerleþirken tamamen kapalý kalsýn
 
-    public bool CanCombine(IGrabable otherItem)
-    {
-        // 1. Doluysak olmaz
-        if (currentIngredientType != HolderIngredient.Empty) return false;
+        // 3. Parent Ata (Dünya pozisyonunu koru: true)
+        transform.SetParent(targetSlot, true);
 
-        // 2. Fryable mý?
-        Fryable item = otherItem as Fryable;
-        if (item == null) return false;
+        // 4. HEDEF OFFSET VE RANDOMÝZASYON
+        Vector3 baseLocalPos = Vector3.zero;
+        Vector3 baseLocalRot = Vector3.zero;
 
-        // 3. Piþmiþ mi?
-        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) return false;
-
-        // 4. Tür uyuyor mu? (Patates veya Soðan Halkasý)
-        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken) return true;
-
-        return false;
-    }
-
-    private void Fill(HolderIngredient newIngedient, Fryable sourceItem)
-    {
-        currentIngredientType = newIngedient;
-
-        // Görseli aç
-        UpdateVisuals();
-
-        // Yerdeki malzemeyi yok et!
-        Destroy(sourceItem.gameObject);
-
-        // Ses efekti eklenebilir: "Hýþýrt"
-    }
-
-    private void UpdateVisuals()
-    {
-        // Listeyi dön, tipi tutaný aç, tutmayaný kapat
-        foreach (var mapping in visualMappings)
+        // Data'dan veriyi çek
+        if (data.slotOffsets != null && slotIndex < data.slotOffsets.Length)
         {
-            if (mapping.visualObject != null)
-            {
-                bool isActive = (mapping.type == currentIngredientType);
-                mapping.visualObject.SetActive(isActive);
-            }
+            baseLocalPos = data.slotOffsets[slotIndex].localPosition;
+            baseLocalRot = data.slotOffsets[slotIndex].localRotation;
         }
+
+        Quaternion finalTargetRotation = Quaternion.Euler(baseLocalRot);
+        // -----------------------------
+
+        // 5. APEX Hesabý (Havadan gelme)
+        Vector3 localApexPos;
+        if (apexTransform != null)
+        {
+            localApexPos = targetSlot.InverseTransformPoint(apexTransform.position);
+        }
+        else
+        {
+            localApexPos = baseLocalPos + Vector3.up * 0.15f;
+        }
+
+        // 6. DOTween Sequence
+        Vector3[] pathPoints = new Vector3[] { localApexPos, baseLocalPos };
+        Sequence seq = DOTween.Sequence();
+
+        // Hareket (Kavisli)
+        seq.Join(transform.DOLocalPath(pathPoints, 0.2f, PathType.CatmullRom).SetEase(Ease.OutSine));
+
+        // Dönüþ (Quaternion - Kýsa Yol)
+        seq.Join(transform.DOLocalRotateQuaternion(finalTargetRotation, 0.2f).SetEase(Ease.OutBack));
+
+        // Scale (Garantiye al)
+        seq.Join(transform.DOScale(data.trayLocalScale, 0.2f));
+
+        seq.OnComplete(() =>
+        {
+            // Floating point hatalarýný temizle
+            transform.localPosition = baseLocalPos;
+            transform.localRotation = finalTargetRotation;
+
+            isGettingPutOnTray = false;
+
+            // Collider'ý aç (IgnoreCollision sayesinde tepsiyle çarpýþmaz, ama Raycast tutar)
+            col.enabled = true;
+
+            // Layer'ý tepsiye uydur
+            if (currentTray != null) ChangeLayer(currentTray.gameObject.layer);
+        });
     }
 
     // --- IGrabable Standartlarý ---
@@ -162,6 +185,22 @@ public class Holder : MonoBehaviour, IGrabable
     public void OnGrab(Transform grabPoint)
     {
         IsGrabbed = true;
+
+        ChangeLayer(grabbedLayer);
+
+        // --- TEPSÝDEN AYRILMA ---
+        if (currentTray != null)
+        {
+            // Çarpýþmayý Geri Aç
+            if (col != null) Physics.IgnoreCollision(col, currentTray.GetCollider, false);
+
+            currentTray.RemoveItem(this);
+            currentTray = null;
+        }
+
+        isGettingPutOnTray = false;
+        // ------------------------
+
         rb.isKinematic = true;
         rb.useGravity = false;
         col.enabled = false;
@@ -170,53 +209,89 @@ public class Holder : MonoBehaviour, IGrabable
         transform.localPosition = data.grabLocalPositionOffset;
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
 
-        ChangeLayer(grabbedLayer);
+        // SCALE RESET (Ýsteðin üzerine eklendi)
+        transform.localScale = data.grabbedLocalScale;
     }
 
-    public void OnDrop(Vector3 direction, float force) => Release(direction, force);
-    public void OnThrow(Vector3 direction, float force) => Release(direction, force);
+    public void OnDrop(Vector3 direction, float force)
+    {
+        Release(direction, force);
+        isJustDropped = true;
+    }
+
+    public void OnThrow(Vector3 direction, float force)
+    {
+        Release(direction, force);
+        isJustThrowed = true;
+    }
 
     private void Release(Vector3 direction, float force)
     {
         IsGrabbed = false;
         transform.SetParent(null);
-        rb.isKinematic = false;
+
+        rb.isKinematic = false; // Fizik geri gelir
         rb.useGravity = true;
         col.enabled = true;
+
         rb.AddForce(direction * force, ForceMode.Impulse);
         ChangeLayer(ungrabableLayer);
     }
 
-    public void OnFocus() { ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer); }
-    public void OnLoseFocus() { ChangeLayer(grabableLayer); }
-
-    public void OutlineChangeCheck()
+    public void OnFocus()
     {
-        // OutlineChangeCheck mantýðý aynen kalýyor, 
-        // ancak ChangeLayer çaðrýldýðýnda child objelerin de layer'ý deðiþmeli.
+        // Yerleþirken focus olmasýn (Titreþimi önler)
+        if (isJustDropped || isJustThrowed || isGettingPutOnTray) return;
 
-        if (gameObject.layer == grabableOutlinedLayer)
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
+    }
+
+    public void OnLoseFocus()
+    {
+        if (isJustDropped || isJustThrowed || isGettingPutOnTray) return;
+
+        ChangeLayer(grabableLayer);
+    }
+
+    // ... (TryCombine, CanCombine, Fill, UpdateVisuals, ChangeLayer vs. AYNEN KALSIN) ...
+    public bool TryCombine(IGrabable otherItem)
+    {
+        if (currentIngredientType != HolderIngredient.Empty) return false;
+        Fryable item = otherItem as Fryable;
+        if (item == null) return false;
+        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) return false;
+        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken)
         {
-            if (OutlineShouldBeRed)
-                ChangeLayer(interactableOutlinedRedLayer);
-            else if (OutlineShouldBeGreen)
-                ChangeLayer(grabableOutlinedGreenLayer);
+            Fill(item.data.type, item);
+            return true;
         }
-        else if (gameObject.layer == grabableOutlinedGreenLayer)
+        return false;
+    }
+
+    public bool CanCombine(IGrabable otherItem)
+    {
+        if (currentIngredientType != HolderIngredient.Empty) return false;
+        Fryable item = otherItem as Fryable;
+        if (item == null) return false;
+        if (item.CurrentCookingState != Cookable.CookAmount.REGULAR) return false;
+        if (item.data.type != HolderIngredient.Empty && item.data.type != HolderIngredient.CrispyChicken) return true;
+        return false;
+    }
+
+    private void Fill(HolderIngredient newIngedient, Fryable sourceItem)
+    {
+        currentIngredientType = newIngedient;
+        UpdateVisuals();
+        Destroy(sourceItem.gameObject);
+    }
+
+    private void UpdateVisuals()
+    {
+        foreach (var mapping in visualMappings)
         {
-            if (OutlineShouldBeRed)
-                ChangeLayer(interactableOutlinedRedLayer);
-            else if (!OutlineShouldBeGreen)
-                ChangeLayer(grabableOutlinedLayer);
-        }
-        else if (gameObject.layer == interactableOutlinedRedLayer)
-        {
-            if (!OutlineShouldBeRed)
+            if (mapping.visualObject != null)
             {
-                if (OutlineShouldBeGreen)
-                    ChangeLayer(grabableOutlinedGreenLayer);
-                else
-                    ChangeLayer(grabableOutlinedLayer);
+                mapping.visualObject.SetActive(mapping.type == currentIngredientType);
             }
         }
     }
@@ -224,14 +299,30 @@ public class Holder : MonoBehaviour, IGrabable
     public void ChangeLayer(int layer)
     {
         gameObject.layer = layer;
-
-        // Sadece ana objenin deðil, içindeki child objelerin de layer'ýný deðiþtiriyoruz.
-        // Böylece outline shader'ý içindeki patatesi de parlatýr.
         foreach (var mapping in visualMappings)
         {
-            if (mapping.visualObject != null)
+            if (mapping.visualObject != null) mapping.visualObject.layer = layer;
+        }
+    }
+
+    public void OutlineChangeCheck()
+    {
+        if (gameObject.layer == grabableOutlinedLayer)
+        {
+            if (OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer);
+            else if (OutlineShouldBeGreen) ChangeLayer(grabableOutlinedGreenLayer);
+        }
+        else if (gameObject.layer == grabableOutlinedGreenLayer)
+        {
+            if (OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer);
+            else if (!OutlineShouldBeGreen) ChangeLayer(grabableOutlinedLayer);
+        }
+        else if (gameObject.layer == interactableOutlinedRedLayer)
+        {
+            if (!OutlineShouldBeRed)
             {
-                mapping.visualObject.layer = layer;
+                if (OutlineShouldBeGreen) ChangeLayer(grabableOutlinedGreenLayer);
+                else ChangeLayer(grabableOutlinedLayer);
             }
         }
     }
@@ -243,5 +334,7 @@ public class Holder : MonoBehaviour, IGrabable
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && gameObject.layer == ungrabableLayer) ChangeLayer(grabableLayer);
+        isJustDropped = false;
+        isJustThrowed = false;
     }
 }

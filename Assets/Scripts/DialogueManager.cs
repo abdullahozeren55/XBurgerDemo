@@ -21,7 +21,6 @@ public class DialogueManager : MonoBehaviour
         TalkWithMascott,
         TalkWithYourselfInCutscene,
         TalkWithYourselfAfterInteraction,
-        TalkWithPhone
     }
 
     public enum TalkingPerson
@@ -139,8 +138,6 @@ public class DialogueManager : MonoBehaviour
                     {
                         if (talkType == TalkType.TalkWithCustomer)
                             EndCustomerDialogue();
-                        else if (talkType == TalkType.TalkWithPhone)
-                            EndPhoneDialogue();
                     }
                     else
                     {
@@ -346,37 +343,6 @@ public class DialogueManager : MonoBehaviour
         IsInSelfDialogue = false;
 
         sinanSelfTalkTextAnim.StartDisappearingText();
-    }
-
-    public void StartPhoneDialogue(DialogueData data)
-    {
-        currentDialogueData = data;
-
-        IsInDialogue = true;
-
-        talkType = TalkType.TalkWithPhone;
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        dialogueIndex = 0;
-
-        HandleDialogue();
-    }
-
-    private void EndPhoneDialogue()
-    {
-        IsSkipped = false;
-        IsDialogueComplete = false;
-
-        IsInDialogue = false;
-
-        currentTextAnim.StartDisappearingText();
-
-        PhoneManager.Instance.HandleFinishingTheCall();
-
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 
     public void StartSelfDialogueInCutscene(DialogueData data)

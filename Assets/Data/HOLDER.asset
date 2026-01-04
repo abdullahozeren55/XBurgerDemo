@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9aa91e82199efc4e8d838b956f55c7b, type: 3}
+  m_Name: HOLDER
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  focusTextKeys:
+  - GRABABLE_PATTY_RAW
+  - GRABABLE_PATTY_COOKED
+  - GRABABLE_PATTY_BURNT
+  handGrabType: 6
+  handRigType: 1
+  slotOffsets:
+  - slotName: Slot0
+    localPosition: {x: -0.0004, y: -0.0005, z: 0.00017}
+    localRotation: {x: 460, y: 90, z: -90}
+  - slotName: Slot1
+    localPosition: {x: 0, y: -0.0005, z: 0.00017}
+    localRotation: {x: 75, y: 90, z: -90}
+  - slotName: Slot2
+    localPosition: {x: 0.0004, y: -0.0005, z: 0.00017}
+    localRotation: {x: 460, y: 90, z: -90}
+  - slotName: Slot3
+    localPosition: {x: -0.0005, y: 0.0006, z: 0.00017}
+    localRotation: {x: 260, y: 90, z: -90}
+  - slotName: Slot4
+    localPosition: {x: 0, y: 0.0005, z: 0.00017}
+    localRotation: {x: -100, y: 90, z: -90}
+  - slotName: Slot5
+    localPosition: {x: 0.0005, y: 0.0006, z: 0.00017}
+    localRotation: {x: 260, y: 90, z: -90}
+  grabbedLocalScale: {x: 96.55544, y: 96.55542, z: 96.55542}
+  trayLocalScale: {x: 1.05, y: 1.0497532, z: 1.1559992}
+  isUseable: 0
+  isThrowable: 1
+  throwMultiplier: 1
+  grabPositionOffset: {x: 0.6, y: 0.5, z: 2}
+  grabRotationOffset: {x: -20, y: -90, z: -70}
+  grabLocalPositionOffset: {x: -0.0109, y: 0.0609, z: 0.0533}
+  grabLocalRotationOffset: {x: 3.6346002, y: 284.52606, z: 61.24388}

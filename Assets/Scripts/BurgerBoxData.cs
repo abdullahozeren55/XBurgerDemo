@@ -22,6 +22,14 @@ public class BurgerBoxData : ScriptableObject
     public float throwMultiplier = 1f;
     public Vector3 trayRotation = new Vector3(0, 0, -90);
     [Space]
+    [Header("Tray Settings")]
+    [Tooltip("Tepsideki 6 slot için ayrý ayrý ince ayarlar.")]
+    public TraySlotOffset[] slotOffsets;
+
+    [Tooltip("Eline aldýðýnda scale bozulmasýn diye resetlenecek deðer (Genelde 1,1,1)")]
+    public Vector3 grabbedLocalScale = Vector3.one;
+    public Vector3 trayLocalScale = Vector3.one;
+    [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]

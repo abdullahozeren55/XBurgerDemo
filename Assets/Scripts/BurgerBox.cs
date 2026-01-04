@@ -1,12 +1,14 @@
+using DG.Tweening;
 using UnityEngine;
+using System.Collections.Generic; // List için gerekli
 
 public class BurgerBox : MonoBehaviour, IGrabable
 {
     public IGrabable Master => this;
 
     [Header("Visuals")]
-    [SerializeField] private Transform boxInnerPoint; // Burgerin yerleþeceði iç nokta (Pivot)
-    public GameObject topPart; // Kapak
+    [SerializeField] private Transform boxInnerPoint;
+    public GameObject topPart;
 
     [Header("Data")]
     public BurgerBoxData data;
@@ -38,21 +40,26 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public string FocusTextKey
     {
-        get
-        {
-            return data.focusTextKeys[0]; // "Burger Box"
-        }
+        get { return data.focusTextKeys[0]; }
         set { }
     }
 
     public PlayerManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
 
+    // --- LOGIC VARIABLES ---
+    [HideInInspector] public Tray currentTray;
+    private bool isGettingPutOnTray;
+
     // References
     private Rigidbody rb;
-    private Collider[] allColliders;
+
+    // --- DEÐÝÞÝKLÝK 1: Array yerine List kullanýyoruz ---
+    private List<Collider> allColliders = new List<Collider>();
+    // ----------------------------------------------------
+
+    // Layers
     private int grabableLayer, grabableOutlinedLayer, interactableOutlinedRedLayer, ungrabableLayer, grabbedLayer, grabableOutlinedGreenLayer;
 
-    // --- PHYSICS FLAGS (Geri Geldi!) ---
     private bool isJustThrowed;
     private bool isJustDropped;
     private float lastSoundTime = 0f;
@@ -60,21 +67,15 @@ public class BurgerBox : MonoBehaviour, IGrabable
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        allColliders = GetComponentsInChildren<Collider>();
 
-        // --- YENÝ: TopPart'a Proxy Script Atama ---
+        // Baþlangýçta sadece kutunun kendi colliderlarýný ekle
+        allColliders.AddRange(GetComponentsInChildren<Collider>());
+
         if (topPart != null)
         {
-            // Eðer üzerinde BoxChild yoksa ekle ve ayarla
             BoxChild childScript = topPart.GetComponent<BoxChild>();
-            if (childScript == null)
-            {
-                childScript = topPart.AddComponent<BoxChild>();
-            }
+            if (childScript == null) childScript = topPart.AddComponent<BoxChild>();
             childScript.parentBox = this;
-
-            // Eðer TopPart'ýn tag'i "Untagged" ise, raycast'in bulmasý için
-            // Layer'ý parent ile ayný yapacaðýz ChangeLayer fonksiyonunda.
         }
 
         grabableLayer = LayerMask.NameToLayer("Grabable");
@@ -88,26 +89,140 @@ public class BurgerBox : MonoBehaviour, IGrabable
         isJustDropped = false;
     }
 
-    // --- KOMBÝNASYON (FIXED) ---
+    // --- YERLEÞME METODU ---
+    public void PlaceOnTray(Transform targetSlot, Transform apexTransform, Tray trayRef, int slotIndex)
+    {
+        isGettingPutOnTray = true;
+        isJustDropped = false;
+        isJustThrowed = false;
+        currentTray = trayRef;
+
+        // Çarpýþmayý Yoksay (Listeye sonradan eklenen burger parçalarý dahil)
+        if (currentTray != null)
+        {
+            ToggleCollisionWithTray(currentTray.GetCollider, true);
+        }
+
+        if (PlayerManager.Instance != null && IsGrabbed)
+        {
+            PlayerManager.Instance.ResetPlayerGrab(this);
+        }
+
+        rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.useGravity = false;
+
+        // Tüm colliderlarý kapat (Burger dahil)
+        ToggleColliders(false);
+
+        transform.SetParent(targetSlot, true);
+
+        // Hedef Hesaplama
+        Vector3 baseLocalPos = Vector3.zero;
+        Vector3 baseLocalRot = Vector3.zero;
+
+        if (data.slotOffsets != null && slotIndex < data.slotOffsets.Length)
+        {
+            baseLocalPos = data.slotOffsets[slotIndex].localPosition;
+            baseLocalRot = data.slotOffsets[slotIndex].localRotation;
+        }
+
+        Quaternion finalTargetRotation = Quaternion.Euler(baseLocalRot);
+
+        // APEX
+        Vector3 localApexPos;
+        if (apexTransform != null)
+        {
+            localApexPos = targetSlot.InverseTransformPoint(apexTransform.position);
+        }
+        else
+        {
+            localApexPos = baseLocalPos + Vector3.up * 0.15f;
+        }
+
+        // DOTween
+        Vector3[] pathPoints = new Vector3[] { localApexPos, baseLocalPos };
+        Sequence seq = DOTween.Sequence();
+
+        seq.Join(transform.DOLocalPath(pathPoints, 0.2f, PathType.CatmullRom).SetEase(Ease.OutSine));
+        seq.Join(transform.DOLocalRotateQuaternion(finalTargetRotation, 0.2f).SetEase(Ease.OutBack));
+        seq.Join(transform.DOScale(data.trayLocalScale, 0.2f));
+
+        seq.OnComplete(() =>
+        {
+            transform.localPosition = baseLocalPos;
+            transform.localRotation = finalTargetRotation;
+
+            isGettingPutOnTray = false;
+
+            // Tüm colliderlarý aç
+            ToggleColliders(true);
+
+            if (currentTray != null) ChangeLayer(currentTray.gameObject.layer);
+        });
+    }
+
+    // --- GRAB ---
+    public void OnGrab(Transform grabPoint)
+    {
+        IsGrabbed = true;
+        isJustDropped = false;
+        isJustThrowed = false;
+
+        if (currentTray != null)
+        {
+            // Çarpýþmayý Geri Aç
+            ToggleCollisionWithTray(currentTray.GetCollider, false);
+
+            currentTray.RemoveItem(this);
+            currentTray = null;
+        }
+        isGettingPutOnTray = false;
+
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        ToggleColliders(false);
+
+        transform.SetParent(grabPoint);
+        transform.localPosition = GrabLocalPositionOffset;
+        transform.localRotation = Quaternion.Euler(GrabLocalRotationOffset);
+        transform.localScale = data.grabbedLocalScale;
+
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
+
+        ChangeLayer(grabbedLayer);
+    }
+
+    // --- YARDIMCI FONKSÝYONLAR ---
+    private void ToggleCollisionWithTray(Collider trayCollider, bool ignore)
+    {
+        if (trayCollider == null || allColliders == null) return;
+
+        // Listeyi döner, artýk burger parçalarý da burada
+        foreach (var c in allColliders)
+        {
+            if (c != null) Physics.IgnoreCollision(c, trayCollider, ignore);
+        }
+    }
+
+    private void ToggleColliders(bool state)
+    {
+        foreach (var c in allColliders)
+        {
+            if (c != null) c.enabled = state;
+        }
+    }
+
+    // --- KOMBÝNASYON VE FILLBOX ---
     public bool TryCombine(IGrabable otherItem)
     {
         if (isBoxFull) return false;
-
         WholeBurger burger = null;
-
-        // 1. Direkt WholeBurger mi? (Nadiren olur)
-        if (otherItem is WholeBurger)
-        {
-            burger = (WholeBurger)otherItem;
-        }
-        // 2. ChildBurger mi? (Genelde bu olur çünkü raycast buna çarpar)
-        else if (otherItem is ChildBurger)
-        {
-            burger = ((ChildBurger)otherItem).parentBurger;
-        }
+        if (otherItem is WholeBurger) burger = (WholeBurger)otherItem;
+        else if (otherItem is ChildBurger) burger = ((ChildBurger)otherItem).parentBurger;
 
         if (burger == null) return false;
-
         FillBox(burger);
         return true;
     }
@@ -115,29 +230,28 @@ public class BurgerBox : MonoBehaviour, IGrabable
     public bool CanCombine(IGrabable otherItem)
     {
         if (isBoxFull) return false;
-
-        // Hem WholeBurger hem ChildBurger kabul et
         if (otherItem is WholeBurger || otherItem is ChildBurger) return true;
-
         return false;
     }
 
     private void FillBox(WholeBurger burger)
     {
         isBoxFull = true;
-
-        // 1. Verileri yedekle (Çünkü script yok olacak)
         containedBurger = burger.gameObject;
         float burgerHeight = burger.TotalBurgerHeight;
 
-        // 2. Burgeri paketle (Bu iþlem scriptleri yok eder)
         burger.PackIntoBox(this, boxInnerPoint);
 
-        // 3. Layer'larý MANUEL ayarla (Artýk script yok)
-        // Kutu þu an hangi layerdaysa (muhtemelen Grabbed veya Default), burgeri de ona eþitle.
+        // --- DEÐÝÞÝKLÝK 2: Burger parçalarýnýn colliderlarýný listeye ekle ---
+        Collider[] burgerColliders = containedBurger.GetComponentsInChildren<Collider>();
+        if (burgerColliders != null)
+        {
+            allColliders.AddRange(burgerColliders);
+        }
+        // ---------------------------------------------------------------------
+
         SetLayerRecursively(containedBurger, grabbedLayer);
 
-        // 4. Kapaðý ayarla
         if (topPart != null)
         {
             float targetAngle = data.minLidAngle;
@@ -153,25 +267,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.closeSoundVolume, data.closeSoundMinPitch, data.closeSoundMaxPitch);
     }
 
-    // --- IGrabable ---
-    public void OnGrab(Transform grabPoint)
-    {
-        IsGrabbed = true;
-        isJustDropped = false;
-        isJustThrowed = false;
-
-        rb.isKinematic = true;
-        rb.useGravity = false;
-        ToggleColliders(false);
-
-        transform.SetParent(grabPoint);
-        transform.localPosition = GrabLocalPositionOffset;
-        transform.localRotation = Quaternion.Euler(GrabLocalRotationOffset);
-
-        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
-
-        ChangeLayer(grabbedLayer);
-    }
+    // ... (Kalan OnDrop, OnThrow, Focus, ChangeLayer vs. ayný) ...
 
     public void OnDrop(Vector3 direction, float force)
     {
@@ -181,10 +277,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.AddForce(direction * force, ForceMode.Impulse);
-
-        // FLAGLER GERÝ GELDÝ
         isJustDropped = true;
-
         ChangeLayer(ungrabableLayer);
     }
 
@@ -196,24 +289,20 @@ public class BurgerBox : MonoBehaviour, IGrabable
         rb.isKinematic = false;
         rb.useGravity = true;
         rb.AddForce(direction * force, ForceMode.Impulse);
-
-        // FLAGLER GERÝ GELDÝ
         isJustThrowed = true;
-
         ChangeLayer(ungrabableLayer);
     }
 
-    // --- FOCUS CONTROLS (Fizik durumuna göre) ---
     public void OnFocus()
     {
-        if (!isJustDropped && !isJustThrowed)
-            ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
+        if (isJustDropped || isJustThrowed || isGettingPutOnTray) return;
+        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        if (!isJustDropped && !isJustThrowed)
-            ChangeLayer(grabableLayer);
+        if (isJustDropped || isJustThrowed || isGettingPutOnTray) return;
+        ChangeLayer(grabableLayer);
     }
 
     public void OutlineChangeCheck()
@@ -242,18 +331,13 @@ public class BurgerBox : MonoBehaviour, IGrabable
     {
         gameObject.layer = layer;
         if (topPart != null) topPart.layer = layer;
-        if (containedBurger != null)
-        {
-            SetLayerRecursively(containedBurger, layer);
-        }
+        if (containedBurger != null) SetLayerRecursively(containedBurger, layer);
     }
 
     private void SetLayerRecursively(GameObject obj, int newLayer)
     {
         if (obj == null) return;
-
         obj.layer = newLayer;
-
         foreach (Transform child in obj.transform)
         {
             if (child == null) continue;
@@ -265,26 +349,13 @@ public class BurgerBox : MonoBehaviour, IGrabable
     public void OnUseHold() { }
     public void OnUseRelease() { }
 
-    // --- COLLISION & SOUND (Geri Geldi) ---
     private void OnCollisionEnter(Collision collision)
     {
         if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
         {
-            // Havada süzülürken layer deðiþimi
-            if (isJustThrowed)
-            {
-                ChangeLayer(grabableLayer);
-                isJustThrowed = false;
-            }
-            else if (isJustDropped)
-            {
-                ChangeLayer(grabableLayer);
-                isJustDropped = false;
-            }
-            else if (gameObject.layer == ungrabableLayer)
-            {
-                ChangeLayer(grabableLayer);
-            }
+            if (isJustThrowed) { ChangeLayer(grabableLayer); isJustThrowed = false; }
+            else if (isJustDropped) { ChangeLayer(grabableLayer); isJustDropped = false; }
+            else if (gameObject.layer == ungrabableLayer) ChangeLayer(grabableLayer);
 
             HandleSoundFX(collision);
         }
@@ -293,38 +364,12 @@ public class BurgerBox : MonoBehaviour, IGrabable
     private void HandleSoundFX(Collision collision)
     {
         float impactForce = collision.relativeVelocity.magnitude;
-
         if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
 
         if (impactForce >= data.throwThreshold)
-        {
-            SoundManager.Instance.PlaySoundFX(
-                data.audioClips[2],
-                transform,
-                data.throwSoundVolume,
-                data.throwSoundMinPitch,
-                data.throwSoundMaxPitch
-            );
-        }
+            SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
         else
-        {
-            SoundManager.Instance.PlaySoundFX(
-                data.audioClips[1],
-                transform,
-                data.dropSoundVolume,
-                data.dropSoundMinPitch,
-                data.dropSoundMaxPitch
-            );
-        }
-
+            SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
         lastSoundTime = Time.time;
-    }
-
-    private void ToggleColliders(bool state)
-    {
-        foreach (var c in allColliders)
-        {
-            if (c != null) c.enabled = state;
-        }
     }
 }

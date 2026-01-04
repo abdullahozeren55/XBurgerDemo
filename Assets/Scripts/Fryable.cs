@@ -50,6 +50,9 @@ public class Fryable : MonoBehaviour, IGrabable
     private BoxCollider boxCollider;
     private MeshCollider meshCollider;
 
+    private bool isJustDropped;
+    private bool isJustThrowed;
+
     // Cache Layers
     private int grabableLayer;
     private int grabableOutlinedLayer;
@@ -170,10 +173,13 @@ public class Fryable : MonoBehaviour, IGrabable
     {
         isGettingPutOnBasket = true;
         PlayerManager.Instance.ResetPlayerGrab(this);
-        //ChangeLayer(onTrayLayer); Baskete girerken bana çarpýyo bazen o yüzden kapatýyorum
 
-        rb.velocity = Vector3.zero;
+        isJustDropped = false;
+        isJustThrowed = false;
+
         rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
 
         // KRÝTÝK NOKTA: "true" parametresi.
         // Bu, objeyi parent yaparken "Dünya pozisyonunu koru" demek.
@@ -233,31 +239,6 @@ public class Fryable : MonoBehaviour, IGrabable
         // Offsetleri sýfýrla (Elde tutma offsetleri IGrabable'dan geliyor zaten)
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
-    }
-
-    // PutOnBasket'i biraz sadeleþtirdik, artýk hesap kitap yapmýyor sadece gidiyor
-    private void PutOnBasket(Vector3 targetPos, Quaternion targetRot, Transform containerParent)
-    {
-        isGettingPutOnBasket = true;
-        PlayerManager.Instance.ResetPlayerGrab(this);
-        ChangeLayer(onTrayLayer); // Layer deðiþimi
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
-        transform.parent = containerParent;
-
-        Vector3 targetLocalPos = containerParent.InverseTransformPoint(targetPos);
-
-        Sequence seq = DOTween.Sequence();
-        seq.Join(transform.DOLocalMove(targetLocalPos, 0.2f).SetEase(Ease.OutQuad));
-        seq.Join(transform.DORotateQuaternion(targetRot, 0.2f).SetEase(Ease.OutCubic));
-
-        seq.OnComplete(() => {
-            isAddedToBasket = true;
-            isGettingPutOnBasket = false;
-            //SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 1f, 0.9f, 1.1f);
-        });
     }
 
     private void TransformToBurgerIngredient()
@@ -332,11 +313,13 @@ public class Fryable : MonoBehaviour, IGrabable
     public void OnThrow(Vector3 direction, float force)
     {
         Release(direction, force);
+        isJustThrowed = true;
     }
 
     public void OnDrop(Vector3 direction, float force)
     {
         Release(direction, force);
+        isJustDropped = true;
     }
 
     private void Release(Vector3 direction, float force)
@@ -354,7 +337,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     public void OnFocus()
     {
-        if (isGettingPutOnBasket) return;
+        if (isGettingPutOnBasket || isJustDropped || isJustThrowed) return;
 
         // --- YENÝ KONTROL ---
         // Eðer sepetteysek, sadece "En Tepedeki" isek parlayabiliriz.
@@ -370,7 +353,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     public void OnLoseFocus()
     {
-        if (isGettingPutOnBasket) return;
+        if (isGettingPutOnBasket || isJustDropped || isJustThrowed) return;
 
         // --- YENÝ KONTROL ---
         // Sepetteysek, kafamýza göre "Grabable" olamayýz.
@@ -450,6 +433,9 @@ public class Fryable : MonoBehaviour, IGrabable
         {
             ChangeLayer(grabableLayer);
         }
+
+        isJustDropped = false;
+        isJustThrowed = false;
 
         HandleSoundFX(collision);
     }

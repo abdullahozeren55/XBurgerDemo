@@ -21,10 +21,31 @@ MonoBehaviour:
   isThrowable: 1
   throwMultiplier: 1
   fillDuration: 2
+  grabbedLocalScale: {x: 7.2222214, y: 6.1111083, z: 7.222221}
+  trayLocalScale: {x: 0.085, y: 0.078926824, z: 0.085137025}
   grabPositionOffset: {x: 0.6, y: 0.4, z: 2}
   grabRotationOffset: {x: -15, y: -60, z: -50}
   grabLocalPositionOffset: {x: 0.16710238, y: -0.023765879, z: 0.047093596}
   grabLocalRotationOffset: {x: 0.8010835, y: 8.651253, z: 84.74857}
+  slotOffsets:
+  - slotName: Slot0
+    localPosition: {x: -0.00045, y: -0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot1
+    localPosition: {x: 0, y: -0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot2
+    localPosition: {x: 0.00045, y: -0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot3
+    localPosition: {x: -0.00045, y: 0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot4
+    localPosition: {x: 0, y: 0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot5
+    localPosition: {x: 0.00045, y: 0.00055, z: 0.00015}
+    localRotation: {x: 0, y: -90, z: -90}
   audioClips:
   - {fileID: 8300000, guid: ae7df4ee2fc19fd4a89c3bfb6446b5b1, type: 3}
   - {fileID: 8300000, guid: 5a5f45b1083b46441aa9b227335ba150, type: 3}

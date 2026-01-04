@@ -15,12 +15,18 @@ public class DrinkCupData : ScriptableObject
     public bool isThrowable = true;
     public float throwMultiplier = 1f;
     public float fillDuration = 3.0f;
+    public Vector3 grabbedLocalScale;
+    public Vector3 trayLocalScale = Vector3.one;
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]
     public Vector3 grabLocalPositionOffset;
     public Vector3 grabLocalRotationOffset;
+    [Space]
+    [Header("Tray Slot Settings")]
+    [Tooltip("Tepsideki 6 slot için ayrý ayrý ince ayarlar. Sýrasýyla 0'dan 5'e.")]
+    public TraySlotOffset[] slotOffsets; // Buraya Inspector'dan 6 eleman ekle
     [Space]
     public AudioClip[] audioClips;
     [Space]
