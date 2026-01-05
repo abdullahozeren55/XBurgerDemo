@@ -15,14 +15,36 @@ MonoBehaviour:
   focusTextKey: GRABABLE_KETCHUP
   sauceType: 1
   handGrabType: 13
+  handRigType: 1
   icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1
+  slotOffsets:
+  - slotName: Slot0
+    localPosition: {x: -0.0005, y: -0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot1
+    localPosition: {x: 0, y: -0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot2
+    localPosition: {x: 0.0005, y: -0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot3
+    localPosition: {x: -0.0005, y: 0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot4
+    localPosition: {x: 0, y: 0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  - slotName: Slot5
+    localPosition: {x: 0.0005, y: 0.0005, z: 0.0005}
+    localRotation: {x: 0, y: -90, z: -90}
+  grabbedLocalScale: {x: 22.222225, y: 17.77778, z: 22.222223}
+  trayLocalScale: {x: 0.24999999, y: 0.18528475, z: 0.22960493}
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -20, y: -70, z: -70}
-  grabLocalPositionOffset: {x: 0.00037028565, y: 0.04741072, z: 0.03591471}
-  grabLocalRotationOffset: {x: 67.11544, y: 258.32233, z: 271.73547}
+  grabLocalPositionOffset: {x: 0.01, y: 0.0673, z: 0.0372}
+  grabLocalRotationOffset: {x: 83.94502, y: 263.01144, z: 276.32394}
   audioClips:
   - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
   - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}

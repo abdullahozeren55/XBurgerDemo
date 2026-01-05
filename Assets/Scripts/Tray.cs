@@ -91,92 +91,253 @@ public class Tray : MonoBehaviour, IGrabable
     {
         IGrabable item = other.GetComponent<IGrabable>()?.Master;
         if (item == null) return;
-
-        // Zaten tepsideyse iþlem yapma
         if (itemsOnTray.Contains(item)) return;
 
-        // --- BOÞ SLOT BULMA MANTIÐI (RANDOM) ---
+        // --- DEÐÝÞEN YERLEÞTÝRME MANTIÐI ---
 
-        // 1. Boþ olan slotlarýn indekslerini listele
-        List<int> emptySlots = new List<int>();
-        for (int i = 0; i < isSlotOccupied.Length; i++)
+        int targetSlotIndex = -1;
+        int stackIndex = 0; // 0 = Zemin, 1 = Üstü
+
+        // A. EÐER GELEN BÝR SOS ÝSE (Özel Ýstifleme Mantýðý)
+        if (item is SauceCapsule sauce)
         {
-            if (!isSlotOccupied[i]) emptySlots.Add(i);
+            // 1. Önce "Yarým Dolu" sos slotu var mý bak?
+            for (int i = 0; i < slotPoints.Length; i++)
+            {
+                int count = GetSauceCountInSlot(i);
+
+                // Eðer slotta sos varsa AMA limit dolmamýþsa
+                if (count > 0 && count < data.maxSaucePerSlot)
+                {
+                    // Ayrýca o slotta BAÞKA bir tür eþya (Burger vs) olmadýðýndan emin olmalýyýz
+                    // (Gerçi GetSauceCount > 0 ise orada sos vardýr ama garanti olsun)
+                    targetSlotIndex = i;
+                    stackIndex = count; // 1 tane varsa index 1 olur (üste gelir)
+
+                    // --- FIX: O SLOTTAKÝ TÜM ESKÝ SOSLARI KÝLÝTLE ---
+                    // Sadece "birini" deðil, hepsini bulup "Stacked" yapýyoruz.
+                    List<SauceCapsule> existingSauces = GetAllSaucesInSlot(i);
+                    foreach (var s in existingSauces)
+                    {
+                        s.SetStacked(true);
+                    }
+                    // ------------------------------------------------
+
+                    break;
+                }
+            }
+
+            // 2. Eðer yarým slot bulamadýysak, tamamen BOÞ slot ara
+            if (targetSlotIndex == -1)
+            {
+                targetSlotIndex = FindEmptySlotIndex();
+                stackIndex = 0; // Zemine oturacak
+            }
+
+            // Yer bulundu mu?
+            if (targetSlotIndex != -1)
+            {
+                // PlaceOnTray artýk stackIndex de alýyor
+                sauce.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex, stackIndex);
+                RegisterItem(item, targetSlotIndex);
+            }
+            return;
         }
 
-        // 2. Eðer hiç boþ yer yoksa çýk
-        if (emptySlots.Count == 0) return;
+        // B. DÝÐER EÞYALAR (Standart Mantýk - Sadece Boþ Slot)
+        targetSlotIndex = FindEmptySlotIndex();
+        if (targetSlotIndex == -1) return; // Yer yok
 
-        // 3. Rastgele bir slot seç
-        int randomIndex = emptySlots[Random.Range(0, emptySlots.Count)];
-        Transform targetPoint = slotPoints[randomIndex];
-        Transform targetApex = slotApexes[randomIndex];
-
-        // --- TÝP KONTROLÜ VE YERLEÞTÝRME ---
-
-        bool placed = false;
-
-        // A. DRINK CUP
         if (item is DrinkCup drinkCup)
         {
             if (drinkCup.IsFull && drinkCup.HasLid)
             {
-                // Index numarasýný da gönderiyoruz!
-                drinkCup.PlaceOnTray(targetPoint, targetApex, this, randomIndex);
-                placed = true;
+                drinkCup.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
+                RegisterItem(item, targetSlotIndex);
             }
         }
-        // B. HOLDER
         else if (item is Holder holder)
         {
             if (holder.CurrentIngredient != Holder.HolderIngredient.Empty)
             {
-                // Index numarasýný da gönderiyoruz!
-                holder.PlaceOnTray(targetPoint, targetApex, this, randomIndex);
-                placed = true;
+                holder.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
+                RegisterItem(item, targetSlotIndex);
             }
         }
         else if (item is BurgerBox burgerBox)
         {
-            // Kutu dolu mu? (Opsiyonel: Boþ kutu tepsiye konmasýn dersen)
-            // if (!burgerBox.IsBoxFull) return; // Þimdilik kapalý, boþ da koyabil
+            burgerBox.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
+            RegisterItem(item, targetSlotIndex);
+        }
+    }
 
-            // Yerleþtir
-            burgerBox.PlaceOnTray(targetPoint, targetApex, this, randomIndex);
-            placed = true;
+    // --- YENÝ YARDIMCI FONKSÝYONLAR ---
+
+    // Bir slotta kaç tane sos olduðunu sayar
+    private int GetSauceCountInSlot(int slotIndex)
+    {
+        int count = 0;
+        foreach (var storedItem in itemsOnTray)
+        {
+            // Eðer bu eþya o slottaysa VE o eþya bir Sos ise
+            if (itemToSlotMap.ContainsKey(storedItem) && itemToSlotMap[storedItem] == slotIndex)
+            {
+                if (storedItem is SauceCapsule)
+                {
+                    count++;
+                }
+                else
+                {
+                    // Slotta sos dýþýnda biþey varsa (örn: Burger), bu slot sos için "kirli"dir.
+                    // -1 döndürerek burayý pas geçilmesini saðlayabiliriz veya logic kurarýz.
+                    // Þimdilik sadece sos sayýsýný dönelim.
+                    return -1; // -1: Sos stacking'e uygun deðil
+                }
+            }
+        }
+        return count;
+    }
+
+    // Boþ slot bulucu
+    private int FindEmptySlotIndex()
+    {
+        List<int> emptySlots = new List<int>();
+        for (int i = 0; i < isSlotOccupied.Length; i++)
+        {
+            // isSlotOccupied[i] true ise orasý doludur (ya burger vardýr ya da sos limiti dolmuþtur)
+            if (!isSlotOccupied[i]) emptySlots.Add(i);
         }
 
-        // --- KAYIT ÝÞLEMLERÝ ---
-        if (placed)
-        {
-            // Slotu kilitle
-            isSlotOccupied[randomIndex] = true;
+        if (emptySlots.Count == 0) return -1;
+        return emptySlots[Random.Range(0, emptySlots.Count)];
+    }
 
-            // Haritaya iþle
-            itemToSlotMap.Add(item, randomIndex);
-            itemsOnTray.Add(item);
+    // Eþyayý kaydetme ve slotu kilitleme
+    private void RegisterItem(IGrabable item, int slotIndex)
+    {
+        itemToSlotMap.Add(item, slotIndex);
+        itemsOnTray.Add(item);
+
+        // Slot Doluluk Kontrolü:
+        // Eðer bu bir sos ise, ve limit dolmadýysa slotu HALA BOÞ GÖSTER (ki baþkasý gelebilsin)
+        if (item is SauceCapsule)
+        {
+            int count = GetSauceCountInSlot(slotIndex);
+            if (count >= data.maxSaucePerSlot)
+            {
+                isSlotOccupied[slotIndex] = true; // Limit doldu, artýk dolu iþaretle
+            }
+            else
+            {
+                // Limit dolmadý, isSlotOccupied false kalmaya devam etsin
+                // (Ama FindEmptySlotIndex orayý bulursa ne olacak? Oraya burger koymaya çalýþabilir!)
+                // FIX: FindEmptySlotIndex sadece "Hiçbir þey olmayan" yerleri mi bulmalý?
+                // HAYIR. isSlotOccupied dizisini "Baþka TÜR eþya giremez" olarak kullanalým.
+
+                // Þöyle yapalým:
+                // Sos koyduðumuz an orayý "Dolu" iþaretleyelim.
+                // Ama sos yerleþtirme mantýðý (TryPlaceItem baþýndaki döngü) isSlotOccupied'a bakmýyor,
+                // direkt içeriðe bakýyor. O yüzden burayý true yapmamýzda sakýnca yok.
+                // Tek risk: FindEmptySlotIndex dolu slotu vermemeli.
+
+                isSlotOccupied[slotIndex] = true;
+
+                // FAKAT: Eðer isSlotOccupied true olursa, 2. sos oraya nasýl girecek?
+                // TryPlaceItem'ýn baþýndaki A mantýðý (Sos Stackleme) isSlotOccupied'a bakmadan çalýþýyor.
+                // O yüzden sorun yok.
+            }
+        }
+        else
+        {
+            // Sos deðilse direkt kapat
+            isSlotOccupied[slotIndex] = true;
         }
     }
 
     public void RemoveItem(IGrabable item)
     {
-        // Önce listelerden sil
         if (itemsOnTray.Contains(item)) itemsOnTray.Remove(item);
 
-        // Hangi slotta oturuyordu?
         if (itemToSlotMap.ContainsKey(item))
         {
             int slotIndex = itemToSlotMap[item];
+            itemToSlotMap.Remove(item);
 
-            // Slotu boþa çýkar
+            // --- SOS ÇIKINCA NE OLACAK? (FIXED) ---
+            if (item is SauceCapsule)
+            {
+                // O slotta kalan tüm soslarý bul
+                List<SauceCapsule> remainingSauces = GetAllSaucesInSlot(slotIndex);
+
+                if (remainingSauces.Count > 0)
+                {
+                    // En tepedekini bul (Yüksekliðine göre karar veriyoruz)
+                    // Z ekseni yüksekliði belirlediði için localPosition.z'si en büyük olan tepededir.
+                    // Veya Y ekseniyse Y. (Senin sistemde Z offset ekliyorduk)
+
+                    SauceCapsule topSauce = null;
+                    float maxH = -999f;
+
+                    foreach (var s in remainingSauces)
+                    {
+                        // Stacked olsun olmasýn hepsini tara
+                        // Hangi ekseni yükseklik yaptýysak ona bak (SauceCapsuleData.stackHeightOffset mantýðý)
+                        // Genelde Z offset vermiþtik.
+                        float h = s.transform.localPosition.z;
+                        if (h > maxH)
+                        {
+                            maxH = h;
+                            topSauce = s;
+                        }
+                    }
+
+                    // En tepedekini özgür býrak, diðerlerini kilitle
+                    if (topSauce != null)
+                    {
+                        topSauce.SetStacked(false);
+                    }
+
+                    // (Opsiyonel) Garanti olsun diye diðerleri hala kilitli mi emin olabilirsin
+                    // ama zaten kilitliydiler, dokunmaya gerek yok.
+                }
+            }
+            // --------------------------------------
+
+            // Slotu ne zaman "Boþ" (false) yapacaðýz?
+            // O slotta hiç eþya kalmadýðýnda.
             if (slotIndex >= 0 && slotIndex < isSlotOccupied.Length)
             {
-                isSlotOccupied[slotIndex] = false;
-            }
+                // Slotun içinde baþka eþya kaldý mý kontrol et
+                bool isStillOccupied = false;
+                foreach (var kvp in itemToSlotMap)
+                {
+                    if (kvp.Value == slotIndex)
+                    {
+                        isStillOccupied = true;
+                        break;
+                    }
+                }
 
-            // Haritadan sil
-            itemToSlotMap.Remove(item);
+                isSlotOccupied[slotIndex] = isStillOccupied;
+            }
         }
+    }
+
+    // --- YENÝ YARDIMCI: Hepsini Getir ---
+    private List<SauceCapsule> GetAllSaucesInSlot(int slotIndex)
+    {
+        List<SauceCapsule> sauces = new List<SauceCapsule>();
+        foreach (var storedItem in itemsOnTray)
+        {
+            if (itemToSlotMap.ContainsKey(storedItem) && itemToSlotMap[storedItem] == slotIndex)
+            {
+                if (storedItem is SauceCapsule s)
+                {
+                    sauces.Add(s);
+                }
+            }
+        }
+        return sauces;
     }
 
     public void ChangeLayer(int layer)

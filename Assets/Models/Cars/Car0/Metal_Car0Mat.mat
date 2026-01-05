@@ -69,8 +69,8 @@ Material:
     - _ZWriteControl: 0
     m_Colors:
     - _CarColor: {r: 1, g: 0, b: 0, a: 1}
-    - _EmissionColor: {r: 9.189588, g: 9.189588, b: 9.189588, a: 1}
-    - _MaskColor: {r: 1, g: 1, b: 1, a: 0}
+    - _EmissionColor: {r: 1.1486982, g: 1.1486982, b: 1.1486982, a: 1}
+    - _MaskColor: {r: 1, g: 0.8713282, b: 0.7783019, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &8265276446566089460
 MonoBehaviour:

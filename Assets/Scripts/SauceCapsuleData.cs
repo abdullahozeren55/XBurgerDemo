@@ -15,6 +15,15 @@ public class SauceCapsuleData : ScriptableObject
     public bool isThrowable = true;
     public float throwMultiplier = 1f;
     [Space]
+    [Header("Tray Settings")]
+    [Tooltip("Tepsideki 6 slot için ayrý ayrý ince ayarlar.")]
+    public TraySlotOffset[] slotOffsets;
+
+    [Tooltip("Eline aldýðýnda scale bozulmasýn diye resetlenecek deðer (Genelde 1,1,1)")]
+    public Vector3 grabbedLocalScale = Vector3.one;
+    public Vector3 trayLocalScale = Vector3.one;
+    public float zHeightIncreasePerSauce = 0.0005f; //soslarý tepside ayný slota koyup üst üste dizmek için.
+    [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]

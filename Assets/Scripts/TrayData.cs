@@ -15,6 +15,7 @@ public class TrayData : ScriptableObject
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;
     [Space]
+    public int maxSaucePerSlot = 2; // Bir slotta üst üste kaç sos durabilir?
     public string focusTextKey;
     public AudioClip[] audioClips;
     [Space]
