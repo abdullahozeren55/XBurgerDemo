@@ -27,6 +27,11 @@ public class DrinkCup : MonoBehaviour, IGrabable
     public bool IsGettingFilled;
     public bool IsFull;
     public bool HasLid { get; private set; } = false; // Kapaðý var mý?
+
+    // --- STACK (BARDAKLIK) LOGIC ---
+    [HideInInspector] public SodaMachine SodaMachineSC; // Bizi tutan makine
+    public bool IsInCupHolder = false; // Rafta mýyýz?
+    // -------------------------------
     // -----------------------
 
     // ... (Diðer deðiþkenler ayný) ...
@@ -87,10 +92,6 @@ public class DrinkCup : MonoBehaviour, IGrabable
         // Baþlangýçta içecek kapalý olsun
         if (drinkGO != null) drinkGO.SetActive(false);
     }
-
-    // ARTIK APEX TRANSFORM ALIYORUZ
-    // Parametreye 'int slotIndex' eklendi
-    // ... (Üst kýsýmlar ayný) ...
 
     public void PlaceOnTray(Transform targetSlot, Transform apexTransform, Tray trayRef, int slotIndex)
     {
@@ -259,6 +260,15 @@ public class DrinkCup : MonoBehaviour, IGrabable
         }
 
         isGettingPutOnTray = false;
+
+        // Eðer bu bardak raftan alýnýyorsa, makineye haber ver ki alttakini açsýn.
+        if (IsInCupHolder && SodaMachineSC != null)
+        {
+            SodaMachineSC.OnCupRemovedFromStack(this);
+            IsInCupHolder = false; // Artýk özgürüz
+            SodaMachineSC = null;   // Baðlantýyý koparabiliriz
+        }
+        // -----------------------------------
 
         if (currentMachine != null)
         {

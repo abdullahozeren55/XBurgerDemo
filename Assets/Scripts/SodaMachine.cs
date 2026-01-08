@@ -9,6 +9,12 @@ public class SodaMachine : MonoBehaviour
     [SerializeField] private SodaButton[] buttons;
     [SerializeField] private LineRenderer streamLine;
 
+    [Header("Cup Stacks")]
+    // Inspector'da doldururken DÝKKAT: Element 0 = En Üstteki Bardak
+    [SerializeField] private System.Collections.Generic.List<DrinkCup> smallCups;
+    [SerializeField] private System.Collections.Generic.List<DrinkCup> mediumCups;
+    [SerializeField] private System.Collections.Generic.List<DrinkCup> largeCups;
+
     [Header("Configuration")]
     [SerializeField] private Color[] flavorColors;
     [SerializeField] private float targetLength = 0.2f;
@@ -49,6 +55,14 @@ public class SodaMachine : MonoBehaviour
         interactableLayer = LayerMask.NameToLayer("Interactable");
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
         grababaleLayer = LayerMask.NameToLayer("Grabable");
+    }
+
+    private void Start()
+    {
+        // Oyun baþlayýnca yýðýnlarý ayarla
+        InitializeStack(smallCups);
+        InitializeStack(mediumCups);
+        InitializeStack(largeCups);
     }
 
     private void Update()
@@ -233,5 +247,56 @@ public class SodaMachine : MonoBehaviour
     public void ReleaseCup()
     {
         currentCup = null;
+    }
+
+    private void InitializeStack(System.Collections.Generic.List<DrinkCup> stack)
+    {
+        if (stack == null || stack.Count == 0) return;
+
+        for (int i = 0; i < stack.Count; i++)
+        {
+            DrinkCup cup = stack[i];
+            if (cup == null) continue;
+
+            // Bardaða referans ver
+            cup.SodaMachineSC = this;
+            cup.IsInCupHolder = true;
+
+            // Eðer listenin baþýndaysa (0) alýnabilir olsun, deðilse kilitli olsun.
+            if (i == 0)
+            {
+                cup.ChangeLayer(grababaleLayer); // En üstteki
+            }
+            else
+            {
+                cup.ChangeLayer(ungrabableLayer); // Alttakiler
+            }
+        }
+    }
+
+    // Bardak tarafýndan çaðrýlan fonksiyon
+    public void OnCupRemovedFromStack(DrinkCup cup)
+    {
+        // Hangi listede olduðunu bul ve iþlemi yap
+        if (TryRemoveFromStack(smallCups, cup)) return;
+        if (TryRemoveFromStack(mediumCups, cup)) return;
+        if (TryRemoveFromStack(largeCups, cup)) return;
+    }
+
+    private bool TryRemoveFromStack(System.Collections.Generic.List<DrinkCup> stack, DrinkCup cupToRemove)
+    {
+        if (stack.Contains(cupToRemove))
+        {
+            // 1. Bardaðý listeden düþ
+            stack.Remove(cupToRemove);
+
+            // 2. Eðer listede hala bardak varsa, yeni en üsttekini (0. index) aktif et
+            if (stack.Count > 0 && stack[0] != null)
+            {
+                stack[0].ChangeLayer(grababaleLayer);
+            }
+            return true; // Bulduk ve sildik
+        }
+        return false; // Bu listede deðilmiþ
     }
 }
