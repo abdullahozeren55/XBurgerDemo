@@ -221,9 +221,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startColor:
       serializedVersion: 2
-      minMaxState: 2
+      minMaxState: 0
       minColor: {r: 0.49234155, g: 0.5660378, b: 0.20558918, a: 1}
-      maxColor: {r: 0.59607846, g: 0.85882354, b: 0.76862746, a: 1}
+      maxColor: {r: 0.67058825, g: 0.7882353, b: 0.81960785, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
