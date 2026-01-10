@@ -27,6 +27,7 @@ public class SodaMachine : MonoBehaviour
 
     [Header("Cup Placement")]
     [SerializeField] private Transform cupSnapPoint;
+    [SerializeField] private Transform cupPlacementApex;
     private DrinkCup currentCup;
 
     [Header("Audio")]
@@ -236,12 +237,35 @@ public class SodaMachine : MonoBehaviour
             rb.isKinematic = true;
             rb.velocity = Vector3.zero;
         }
+
+        // 1. Önce parent yapýyoruz
         cup.transform.SetParent(cupSnapPoint);
-        cup.transform.DOLocalMove(Vector3.zero, 0.2f).SetEase(Ease.OutBack).OnComplete(() =>
+
+        // 2. Apex noktasýnýn Local pozisyonunu hesapla
+        // (Apex transformu null ise güvenlik için dümdüz yukarýda bir nokta seçer)
+        Vector3 localApexPos = Vector3.up * 0.2f;
+        if (cupPlacementApex != null)
         {
-            cup.FinishPuttingOnSodaMachine();
-        });
-        cup.transform.DOLocalRotate(Vector3.zero, 0.2f).SetEase(Ease.OutBack);
+            // "Apex'in dünya pozisyonunu, SnapPoint'in yerel koordinatýna çevir"
+            localApexPos = cupSnapPoint.InverseTransformPoint(cupPlacementApex.position);
+        }
+
+        // 3. Yol haritasýný oluþtur: [Tepe Noktasý, Hedef Nokta(0,0,0)]
+        Vector3[] pathPoints = new Vector3[] { localApexPos, Vector3.zero };
+
+        // 4. Hareketi baþlat (CatmullRom yumuþak bir yay çizer)
+        // Süreyi 0.2'den 0.35'e çýkardým ki yay hareketi gözle görülsün.
+        cup.transform.DOLocalPath(pathPoints, 0.2f, PathType.CatmullRom)
+            .SetEase(Ease.OutSine)
+            .OnComplete(() =>
+            {
+                // Garanti olsun diye tam 0 noktasýna oturt
+                cup.transform.localPosition = Vector3.zero;
+                cup.FinishPuttingOnSodaMachine();
+            });
+
+        // Rotasyonu da ayný sürede düzelt
+        cup.transform.DOLocalRotate(Vector3.zero, 0.35f).SetEase(Ease.OutBack);
     }
 
     public void ReleaseCup()

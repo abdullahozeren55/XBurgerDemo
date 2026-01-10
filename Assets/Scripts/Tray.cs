@@ -93,60 +93,60 @@ public class Tray : MonoBehaviour, IGrabable
         if (item == null) return;
         if (itemsOnTray.Contains(item)) return;
 
-        // --- DEÐÝÞEN YERLEÞTÝRME MANTIÐI ---
+        // --- ÖNEMLÝ EKLEME: IS GRABBED KONTROLÜ ---
+        // Eðer oyuncu hala elinde tutuyorsa tepsi onu çekip almasýn.
+        // (Normalde layerlar bunu engeller ama fizik bazen kaçýrabilir, sigorta olsun)
+        if (item.IsGrabbed) return;
+
+        // --- 1. GENEL KONTROL: Eþya zaten baþka bir tepside mi? ---
+        // Her bir tipi ayrý ayrý cast edip kontrol etmek yerine, 
+        // eþyayý tanýyýp "zaten yerleþmiþ mi" diye bakýyoruz.
+        if (IsItemAlreadyOnAnotherTray(item)) return;
+
 
         int targetSlotIndex = -1;
-        int stackIndex = 0; // 0 = Zemin, 1 = Üstü
+        int stackIndex = 0;
 
-        // A. EÐER GELEN BÝR SOS ÝSE (Özel Ýstifleme Mantýðý)
+        // A. SOS KAPSÜLÜ ÝSE
         if (item is SauceCapsule sauce)
         {
-            // 1. Önce "Yarým Dolu" sos slotu var mý bak?
+            // (Buradaki currentTray kontrolünü yukarýdaki fonksiyona taþýdýk)
+
             for (int i = 0; i < slotPoints.Length; i++)
             {
                 int count = GetSauceCountInSlot(i);
-
-                // Eðer slotta sos varsa AMA limit dolmamýþsa
                 if (count > 0 && count < data.maxSaucePerSlot)
                 {
-                    // Ayrýca o slotta BAÞKA bir tür eþya (Burger vs) olmadýðýndan emin olmalýyýz
-                    // (Gerçi GetSauceCount > 0 ise orada sos vardýr ama garanti olsun)
                     targetSlotIndex = i;
-                    stackIndex = count; // 1 tane varsa index 1 olur (üste gelir)
+                    stackIndex = count;
 
-                    // --- FIX: O SLOTTAKÝ TÜM ESKÝ SOSLARI KÝLÝTLE ---
-                    // Sadece "birini" deðil, hepsini bulup "Stacked" yapýyoruz.
                     List<SauceCapsule> existingSauces = GetAllSaucesInSlot(i);
-                    foreach (var s in existingSauces)
-                    {
-                        s.SetStacked(true);
-                    }
-                    // ------------------------------------------------
+                    foreach (var s in existingSauces) s.SetStacked(true);
 
                     break;
                 }
             }
 
-            // 2. Eðer yarým slot bulamadýysak, tamamen BOÞ slot ara
             if (targetSlotIndex == -1)
             {
                 targetSlotIndex = FindEmptySlotIndex();
-                stackIndex = 0; // Zemine oturacak
+                stackIndex = 0;
             }
 
-            // Yer bulundu mu?
             if (targetSlotIndex != -1)
             {
-                // PlaceOnTray artýk stackIndex de alýyor
                 sauce.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex, stackIndex);
                 RegisterItem(item, targetSlotIndex);
             }
             return;
         }
 
-        // B. DÝÐER EÞYALAR (Standart Mantýk - Sadece Boþ Slot)
+        // B. DÝÐER EÞYALAR
         targetSlotIndex = FindEmptySlotIndex();
-        if (targetSlotIndex == -1) return; // Yer yok
+        if (targetSlotIndex == -1) return;
+
+        // Aþaðýdaki bloklarda artýk "currentTray != null" kontrolüne gerek yok,
+        // en baþta "IsItemAlreadyOnAnotherTray" ile hallettik.
 
         if (item is DrinkCup drinkCup)
         {
@@ -166,8 +166,6 @@ public class Tray : MonoBehaviour, IGrabable
         }
         else if (item is Drink drink)
         {
-            // Direkt yerleþtir (Herhangi bir doluluk þartý var mý? Kapaklý olmak zorunda mý?)
-            // Þimdilik direkt kabul ediyoruz.
             drink.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
             RegisterItem(item, targetSlotIndex);
         }
@@ -178,12 +176,27 @@ public class Tray : MonoBehaviour, IGrabable
                 burgerBox.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
                 RegisterItem(item, targetSlotIndex);
             }
-            
         }
         else if (item is Toy toy)
         {
             toy.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
             RegisterItem(item, targetSlotIndex);
+        }
+    }
+
+    // --- YARDIMCI METOT (Kod Tekrarýný Önler) ---
+    private bool IsItemAlreadyOnAnotherTray(IGrabable item)
+    {
+        // C# 7.0 Pattern Matching kullanarak temiz kontrol
+        switch (item)
+        {
+            case SauceCapsule s: return s.currentTray != null;
+            case DrinkCup dc: return dc.currentTray != null;
+            case Holder h: return h.currentTray != null;
+            case Drink d: return d.currentTray != null;
+            case BurgerBox b: return b.currentTray != null;
+            case Toy t: return t.currentTray != null;
+            default: return false;
         }
     }
 

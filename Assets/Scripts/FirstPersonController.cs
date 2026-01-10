@@ -330,6 +330,8 @@ public class FirstPersonController : MonoBehaviour
 
             HandleGravityAndLanding();
 
+            anim.SetFloat("speedY", moveDirection.y);
+
 
             if (CanCrouch)
                 HandleCrouch();
@@ -592,58 +594,56 @@ public class FirstPersonController : MonoBehaviour
         if (ShouldJump)
         {
             anim.SetBool("isGrounded", false);
-            anim.SetTrigger("jump");
+
+            // ESKÝSÝ: anim.SetTrigger("jump");
+            // YENÝSÝ: Bool yapýyoruz. Yere deðene kadar true kalacak.
+            anim.SetBool("jump", true);
 
             CheckSurfaceAndPlaySound(1.9f, true, true);
 
             moveDirection.y = jumpForce;
-
         }
-            
     }
 
     private void HandleGravityAndLanding()
     {
-
         // --- LANDING MANTIÐI (YERE ÝNÝÞ) ---
-        // Eðer geçen kare havadaysak (wasGrounded == false) VE þimdi yerdeysek (isCurrentlyGrounded == true)
-        // Demek ki tam bu karede yere bastýk!
         if (!wasGrounded && characterController.isGrounded)
         {
-            // Yere inince yapýlacaklar:
+            // Yere indik!
             anim.SetBool("isGrounded", true);
 
-            // Düþme hýzý kontrolü (Merdiven inerken zýrt pýrt ses çýkmasýn diye)
-            // moveDirection.y negatifse düþüyoruzdur.
-            // -0.5f gibi bir eþik deðeri, yürürkenki minik zýplamalarý filtreler.
+            // YENÝ: Yere indiðimiz için zýplama durumunu (veya düþme durumunu) bitir.
+            anim.SetBool("jump", false);
+
+            // Düþme hýzý kontrolü
             if (moveDirection.y < landVelocityThreshold)
             {
-                // O çok sevdiðimiz yeni yüzey fonksiyonunu çaðýrýyoruz
-                // Mesafe: 2f (Ayak altý), Jump/Land: True, Jumping: False (yani Landing)
                 CheckSurfaceAndPlaySound(2f, true, false);
             }
             else
             {
                 CheckSurfaceAndPlaySound(2f, false, false);
             }
-            
-            moveDirection.y = -2f; // Karakteri yere yapýþtýrmak için minik bir negatif kuvvet (Standarttýr)
+
+            moveDirection.y = -2f;
         }
         // --- FALLING MANTIÐI (HAVADA OLMA) ---
         else if (!characterController.isGrounded)
         {
-            // Havadaysak yerçekimini uygula
             moveDirection.y -= gravity * Time.deltaTime;
 
-            // Animasyonu güncelle (Eðer grounded false ise düþüyor animasyonu devreye girer)
-            if (wasGrounded) // Yerden yeni kesildiysek
+            if (wasGrounded)
             {
+                // Yerden kesildik (Zýplayarak veya yürüyerek düþerek)
                 anim.SetBool("isGrounded", false);
+
+                // NOT: Eðer buraya 'ShouldJump' olmadan geldiysek (yürüyerek düþtüysek),
+                // 'jump' bool'u zaten false kalacak.
+                // Animatörde: isGrounded == false ve jump == false ise -> FALL animasyonu oynat.
             }
         }
 
-        // --- DURUMU KAYDET ---
-        // Bu karenin durumu, bir sonraki karenin "geçmiþi" olacak.
         wasGrounded = characterController.isGrounded;
     }
 
@@ -1575,8 +1575,6 @@ public class FirstPersonController : MonoBehaviour
     {
         if (currentGrabable != null && currentGrabable.IsGrabbed)
         {
-            anim.SetTrigger("endThrowInstantly");
-
             switch (currentGrabable.HandGrabType)
             {
                 case PlayerManager.HandGrabTypes.RegularGrab:
