@@ -167,6 +167,12 @@ public class BurgerBox : MonoBehaviour, IGrabable
     // --- GRAB ---
     public void OnGrab(Transform grabPoint)
     {
+        // 1. GÜVENLÝK VE TEMÝZLÝK (EKLENEN KISIM)
+        // Eðer bu kutu üzerinde çalýþan bir hareket animasyonu (düþme vs.) varsa, 
+        // oyuncu tuttuðu an bunu öldürüyoruz. Böylece elde kayma yapmaz.
+        transform.DOKill();
+        // ----------------------------------------
+
         IsGrabbed = true;
         isJustDropped = false;
         isJustThrowed = false;
@@ -180,6 +186,14 @@ public class BurgerBox : MonoBehaviour, IGrabable
             currentTray = null;
         }
         isGettingPutOnTray = false;
+
+        // --- YENÝ EKLENEN: YIÐIN KONTROLÜ ---
+        // Eðer bu kutu bir yýðýnýn parçasýysa, combine area bunu halletsin.
+        if (GameManager.Instance != null && GameManager.Instance.burgerCombineArea != null)
+        {
+            GameManager.Instance.burgerCombineArea.OnBoxGrabbed(this);
+        }
+        // ------------------------------------
 
         rb.isKinematic = true;
         rb.useGravity = false;

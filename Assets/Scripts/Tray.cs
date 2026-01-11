@@ -17,6 +17,8 @@ public class Tray : MonoBehaviour, IGrabable
 
     public Collider GetCollider => col;
 
+    public bool IsInHolder = false;
+
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
     public Sprite Icon { get => data.icon; set => data.icon = value; }
@@ -89,6 +91,8 @@ public class Tray : MonoBehaviour, IGrabable
     // ... (TryPlaceItem, RemoveItem, ChangeLayer AYNEN KALSIN) ...
     public void TryPlaceItem(Collider other)
     {
+        if (IsInHolder) return;
+
         IGrabable item = other.GetComponent<IGrabable>()?.Master;
         if (item == null) return;
         if (itemsOnTray.Contains(item)) return;

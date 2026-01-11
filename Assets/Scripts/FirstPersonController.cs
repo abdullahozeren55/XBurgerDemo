@@ -593,6 +593,21 @@ public class FirstPersonController : MonoBehaviour
     {
         if (ShouldJump)
         {
+            // --- EKLENEN KISIM BAÞLANGIÇ ---
+            // Eðer þu an çömeliyorsak (isCrouching), zýplamadan önce tavaný kontrol etmeliyiz.
+            // HandleCrouch fonksiyonunda kullandýðýnýz Raycast mantýðýnýn aynýsýný kullanýyoruz.
+            if (isCrouching)
+            {
+                // Raycast yukarý doðru (Vector3.up) bakýyor. 
+                // Mesafe olarak 'standingHeight/1.7f' kullanýyoruz (mevcut kodunuzdaki tolerans ile ayný).
+                // Eðer bir þeye çarparsa, tepemizde engel var demektir; zýplamayý iptal et.
+                if (Physics.Raycast(mainCamera.transform.position, Vector3.up, standingHeight / 1.7f))
+                {
+                    return;
+                }
+            }
+            // --- EKLENEN KISIM BÝTÝÞ ---
+
             anim.SetBool("isGrounded", false);
 
             // ESKÝSÝ: anim.SetTrigger("jump");

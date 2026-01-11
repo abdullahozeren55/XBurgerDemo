@@ -3,6 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class BoxPile
+{
+    public string pileName = "Stack 1";
+    // Kutularý ALTTAN ÜSTE doðru bu listeye eklemelisin. 
+    // Element 0 = En alttaki kutu.
+    public List<BurgerBox> boxes = new List<BurgerBox>();
+}
 public class BurgerCombineArea : MonoBehaviour
 {
     [SerializeField] private float startPointYHeight = 0.01f;
@@ -12,6 +20,17 @@ public class BurgerCombineArea : MonoBehaviour
 
     [Header("Whole Burger Settings")]
     [SerializeField] private WholeBurgerData wholeBurgerData;
+
+    // --- YENÝ EKLENEN: KUTU YIÐINI AYARLARI ---
+    [Header("Burger Box Pile Settings")]
+    [SerializeField] private float boxDropDistance = 0.1f; // Bir kutu gidince ne kadar insinler? (Kutu yüksekliði kadar olmalý)
+    [SerializeField] private float boxDropDuration = 0.2f; // Ne kadar sürede insin?
+    [SerializeField] private float boxDropDelay = 0.05f;   // Ne kadar bekleyip insin?
+    [SerializeField] private Ease boxDropEase = Ease.OutQuad;
+
+    // Buraya inspector'dan kuleleri tanýmlayacaksýn
+    public List<BoxPile> burgerBoxPiles = new List<BoxPile>();
+    // ------------------------------------------
 
     // --- YENÝ: Apex Noktasý ---
     [Header("Movement Settings")]
@@ -457,4 +476,38 @@ public class BurgerCombineArea : MonoBehaviour
 
         ResetPosition();
     }
+
+    // --- YENÝ FONKSÝYON: KUTU YIÐINI YÖNETÝMÝ ---
+    public void OnBoxGrabbed(BurgerBox grabbedBox)
+    {
+        // 1. Bu kutu hangi yýðýnda?
+        foreach (var pile in burgerBoxPiles)
+        {
+            if (pile.boxes.Contains(grabbedBox))
+            {
+                int grabbedIndex = pile.boxes.IndexOf(grabbedBox);
+
+                // 2. Kutuyu listeden çýkar (Artýk özgür)
+                pile.boxes.RemoveAt(grabbedIndex);
+
+                // 3. Bu index ve sonrasýndaki (yani fiziksel olarak üstündeki) kutularý aþaðý indir
+                // Not: Listeden sildiðimiz için, eskiden üstte olanlar þimdi 'grabbedIndex'ten itibaren baþlýyor.
+                for (int i = grabbedIndex; i < pile.boxes.Count; i++)
+                {
+                    BurgerBox boxAbove = pile.boxes[i];
+                    if (boxAbove != null)
+                    {
+                        // Mevcut pozisyonundan aþaðý doðru tween baþlat
+                        boxAbove.transform.DOMoveY(boxAbove.transform.position.y - boxDropDistance, boxDropDuration)
+                            .SetDelay(boxDropDelay)
+                            .SetEase(boxDropEase);
+                    }
+                }
+
+                // Kutu bulundu ve iþlem yapýldý, diðer yýðýnlara bakmaya gerek yok.
+                break;
+            }
+        }
+    }
+    // --------------------------------------------
 }
