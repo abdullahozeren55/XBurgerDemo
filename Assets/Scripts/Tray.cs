@@ -91,7 +91,7 @@ public class Tray : MonoBehaviour, IGrabable
     // ... (TryPlaceItem, RemoveItem, ChangeLayer AYNEN KALSIN) ...
     public void TryPlaceItem(Collider other)
     {
-        if (IsInHolder) return;
+        if (IsInHolder || IsGrabbed) return;
 
         IGrabable item = other.GetComponent<IGrabable>()?.Master;
         if (item == null) return;
@@ -404,6 +404,7 @@ public class Tray : MonoBehaviour, IGrabable
         rb.isKinematic = true; // <-- BÖYLECE DOTWEEN ÝLE FÝZÝK ÇATIÞMAZ
 
         IsGrabbed = true;
+        IsInHolder = false;
 
         transform.SetParent(grabPoint);
         transform.DOLocalMove(Vector3.zero, 0.2f).SetEase(Ease.OutQuad);

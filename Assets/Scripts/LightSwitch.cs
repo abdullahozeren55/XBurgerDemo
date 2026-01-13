@@ -11,38 +11,24 @@ public class LightSwitch : MonoBehaviour, IInteractable
         NormalAmpul
     }
 
-    // --- CONFIG: Tür Bazlý Genel Ayarlar ---
     [System.Serializable]
     public class LightTypeConfig
     {
         public string label = "Ayarlar";
         public Material sourceMaterial;
-
-        [Tooltip("Maksimum ýþýk þiddeti")]
         public float maxBaseIntensity = 2f;
-
-        [Tooltip("Volumetric Light Beam kullanýlsýn mý?")]
         public bool useVLB = false;
-
-        [Tooltip("VLB Maksimum Opacity/Intensity")]
-        [Range(0f, 5f)]
-        public float maxVLBIntensity = 1f;
+        [Range(0f, 5f)] public float maxVLBIntensity = 1f;
 
         [Header("Explosion Settings")]
-        [Tooltip("Patlama sesi (Opsiyonel)")]
         public AudioClip explosionSound;
-
-        [Tooltip("Her iki tür için de ortak kývýlcým efekti")]
         public GameObject sparksParticlePrefab;
-
-        [Tooltip("Sadece FLORESAN için: Cam kýrýklarý efekti")]
         public GameObject shardsParticlePrefab;
-
-        [Tooltip("Sadece FLORESAN için: Patlayýnca deðiþecek kýrýk mesh")]
         public Mesh brokenMesh;
+        [Tooltip("Ampul düþerken uygulanacak itme kuvveti")]
+        public float bulbExplosionForce = 0.5f;
     }
 
-    // --- INSTANCE: Sahnedeki her bir ýþýðýn ayarý ---
     [System.Serializable]
     public class LightInstanceSettings
     {
@@ -63,11 +49,11 @@ public class LightSwitch : MonoBehaviour, IInteractable
         [HideInInspector] public Color baseEmissionColor;
         [HideInInspector] public Light lightComponent;
         [HideInInspector] public VolumetricLightBeamSD vlbComponent;
-
         [HideInInspector] public MeshFilter meshFilterComponent;
         [HideInInspector] public Rigidbody rigidBodyComponent;
-
         [HideInInspector] public bool isBroken = false;
+
+        [HideInInspector] public Coroutine activeLifecycleCoroutine;
     }
 
     // --- DEÐÝÞKENLER ---
@@ -97,8 +83,14 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
     private Quaternion offRotation;
     private Quaternion onRotation;
-    private Coroutine rotateCoroutine;
+    private Coroutine switchRotateCoroutine;
     private bool isOn;
+
+    [Header("Continuous Flicker Settings")]
+    [Tooltip("Iþýk yandýktan sonra tekrar titremeyi denemek için bekleyeceði min süre")]
+    [SerializeField] private float minFlickerCheckDelay = 5f;
+    [Tooltip("Iþýk yandýktan sonra tekrar titremeyi denemek için bekleyeceði max süre")]
+    [SerializeField] private float maxFlickerCheckDelay = 15f;
 
     [Header("Flicker Settings")]
     [SerializeField] private AudioClip[] flickClips;
@@ -143,7 +135,6 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
             setting.isBroken = false;
 
-            // Component Cache
             setting.lightComponent = setting.lightGO.GetComponentInChildren<Light>();
             setting.vlbComponent = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
             setting.meshFilterComponent = setting.lightGO.GetComponentInChildren<MeshFilter>();
@@ -189,8 +180,8 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
         HandleLights();
 
-        if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
-        rotateCoroutine = StartCoroutine(ToogleRotate(isOn));
+        if (switchRotateCoroutine != null) StopCoroutine(switchRotateCoroutine);
+        switchRotateCoroutine = StartCoroutine(ToogleRotate(isOn));
     }
 
     private IEnumerator ToogleRotate(bool shouldOn)
@@ -216,51 +207,22 @@ public class LightSwitch : MonoBehaviour, IInteractable
                 if (setting.isBroken) continue;
                 if (setting.lightComponent == null || setting.runtimeMaterial == null) continue;
 
-                LightTypeConfig config = (setting.lightType == LightSourceType.Floresan) ? fluorescentConfig : bulbConfig;
-
-                float randomMultiplier = Random.Range(setting.minGlowMultiplier, setting.maxGlowMultiplier);
-                float targetIntensity = config.maxBaseIntensity * randomMultiplier;
-                float targetVLBIntensity = config.maxVLBIntensity * randomMultiplier;
-                Color targetEmissionColor = setting.baseEmissionColor * randomMultiplier;
-
-                setting.runtimeMaterial.EnableKeyword("_EMISSION");
-                setting.lightComponent.enabled = true;
-
-                if (setting.vlbComponent != null && config.useVLB)
-                {
-                    setting.vlbComponent.enabled = true;
-                    setting.vlbComponent.intensityGlobal = targetVLBIntensity;
-                }
-                else if (setting.vlbComponent != null)
-                {
-                    setting.vlbComponent.enabled = false;
-                }
-
-                bool willFlicker = Random.Range(0, 100) < setting.flickerPossibility;
-
-                if (willFlicker)
-                {
-                    int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
-                    StartCoroutine(FlickerLightRoutine(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, flickerCount, config));
-                }
-                else
-                {
-                    setting.lightComponent.intensity = targetIntensity;
-                    setting.runtimeMaterial.SetColor(EmissionColorID, targetEmissionColor);
-                    buzzSoundSource.volume += buzzSoundIncreasePerLight;
-                }
+                if (setting.activeLifecycleCoroutine != null) StopCoroutine(setting.activeLifecycleCoroutine);
+                setting.activeLifecycleCoroutine = StartCoroutine(LightLifecycle(setting));
             }
         }
         else
         {
-            StopAllCoroutines();
-            if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
-            rotateCoroutine = StartCoroutine(ToogleRotate(isOn));
-
             buzzSoundSource.volume = 0f;
 
             foreach (var setting in lightsToEffect)
             {
+                if (setting.activeLifecycleCoroutine != null)
+                {
+                    StopCoroutine(setting.activeLifecycleCoroutine);
+                    setting.activeLifecycleCoroutine = null;
+                }
+
                 if (setting.isBroken) continue;
 
                 if (setting.lightComponent != null) setting.lightComponent.enabled = false;
@@ -270,37 +232,121 @@ public class LightSwitch : MonoBehaviour, IInteractable
         }
     }
 
-    // --- BURASI GÜNCELLENDÝ ---
+    // --- YARDIMCI METOT: Iþýðý Stabil Hale Getir ---
+    // Bu metot, ýþýðý zorla olmasý gereken parlaklýða ve renge sabitler.
+    // Flicker bittiðinde veya direkt açýlýþta kullanýlýr.
+    private void SetLightStable(LightInstanceSettings setting, float intensity, Color emission, float vlbIntensity, bool useVLB)
+    {
+        if (!isOn || setting.isBroken) return; // Güvenlik kontrolü
+
+        // 1. Emission'u kesinlikle aç
+        setting.runtimeMaterial.EnableKeyword("_EMISSION");
+
+        // 2. Iþýðý aç ve deðerleri ata
+        setting.lightComponent.enabled = true;
+        setting.lightComponent.intensity = intensity;
+        setting.runtimeMaterial.SetColor(EmissionColorID, emission);
+
+        // 3. VLB ayarla
+        if (setting.vlbComponent != null && useVLB)
+        {
+            setting.vlbComponent.enabled = true;
+            setting.vlbComponent.intensityGlobal = vlbIntensity;
+        }
+        else if (setting.vlbComponent != null)
+        {
+            setting.vlbComponent.enabled = false;
+        }
+    }
+
+    private IEnumerator LightLifecycle(LightInstanceSettings setting)
+    {
+        LightTypeConfig config = (setting.lightType == LightSourceType.Floresan) ? fluorescentConfig : bulbConfig;
+
+        float randomMultiplier = Random.Range(setting.minGlowMultiplier, setting.maxGlowMultiplier);
+        float targetIntensity = config.maxBaseIntensity * randomMultiplier;
+        float targetVLBIntensity = config.maxVLBIntensity * randomMultiplier;
+        Color targetEmissionColor = setting.baseEmissionColor * randomMultiplier;
+
+        // --- ÝLK AÇILIÞ ---
+        bool initialFlicker = Random.Range(0, 100) < setting.flickerPossibility;
+
+        // Flicker path'ine girse bile Emission keyword'ü aktif olsun!
+        setting.runtimeMaterial.EnableKeyword("_EMISSION");
+        setting.lightComponent.enabled = true;
+
+        if (initialFlicker)
+        {
+            int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
+            yield return StartCoroutine(FlickerLightRoutine(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, flickerCount, config));
+
+            // BUG FIX: Flicker bittiðinde ýþýk kýsýk kalmasýn, orijinal gücüne dönsün.
+            SetLightStable(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, config.useVLB);
+        }
+        else
+        {
+            // Flicker yoksa direkt stabil hale getir
+            SetLightStable(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, config.useVLB);
+        }
+
+        if (setting.isBroken || !isOn) yield break;
+
+        // Buzz Sesi Ekle (Sadece Floresan)
+        if (setting.lightType == LightSourceType.Floresan)
+        {
+            buzzSoundSource.volume += buzzSoundIncreasePerLight;
+        }
+
+        // --- SONSUZ DÖNGÜ (Periyodik Kontrol) ---
+        while (isOn && !setting.isBroken)
+        {
+            float waitTime = Random.Range(minFlickerCheckDelay, maxFlickerCheckDelay);
+            yield return new WaitForSeconds(waitTime);
+
+            if (!isOn || setting.isBroken) yield break;
+
+            bool periodicFlicker = Random.Range(0, 100) < setting.flickerPossibility;
+
+            if (periodicFlicker)
+            {
+                int pFlickerCount = Random.Range(minFlickerCount, maxFlickerCount);
+                yield return StartCoroutine(FlickerLightRoutine(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, pFlickerCount, config));
+
+                // BUG FIX: Periyodik flicker bittiðinde de ýþýðý eski gücüne getir
+                SetLightStable(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, config.useVLB);
+            }
+        }
+    }
+
     private IEnumerator FlickerLightRoutine(LightInstanceSettings setting, float maxIntensity, Color maxEmission, float maxVLB, int flickerCount, LightTypeConfig config)
     {
         Light light = setting.lightComponent;
         Material mat = setting.runtimeMaterial;
         VolumetricLightBeamSD vlb = setting.vlbComponent;
 
-        // 1. Önce bu turda patlayýp patlamayacaðýna karar ver
+        // Garanti olsun diye burada da açýyoruz
+        mat.EnableKeyword("_EMISSION");
+
         bool isDestinedToExplode = Random.Range(0, 100) < setting.explosionPossibility;
         int explosionIndex = -1;
 
         if (isDestinedToExplode)
         {
-            // 2. Patlayacaksa, HANGÝ flicker turunda patlayacaðýný seç.
-            //    Mantýk: Toplam flicker sayýsýnýn yarýsý ile tamamý arasýnda bir yerde patlasýn.
-            //    Böylece ýþýk en az birkaç kere yanýp söner, oyuncu tam alýþýrken patlar.
-
-            int minIndex = Mathf.Max(1, flickerCount / 2); // En az 1. tur olsun ki hemen gümlemesin
+            int minIndex = Mathf.Max(1, flickerCount / 2);
             explosionIndex = Random.Range(minIndex, flickerCount);
         }
 
         for (int i = 0; i < flickerCount; i++)
         {
-            // 3. Sýra geldi mi kontrol et
+            if (!isOn) yield break;
+
             if (isDestinedToExplode && i == explosionIndex)
             {
                 ExplodeLight(setting, config);
-                yield break; // Döngüyü kýr ve çýk
+                yield break;
             }
 
-            // --- SÖNME ANI ---
+            // --- SÖNME ---
             float randomDimIntensity = Random.Range(0.01f, maxIntensity * 0.3f);
             float ratio = randomDimIntensity / maxIntensity;
             Color flickerEmission = maxEmission * ratio;
@@ -312,7 +358,9 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
 
-            // --- YANMA ANI ---
+            // --- YANMA ---
+            if (!isOn) yield break;
+
             light.intensity = maxIntensity;
             mat.SetColor(EmissionColorID, maxEmission);
 
@@ -322,21 +370,13 @@ public class LightSwitch : MonoBehaviour, IInteractable
                 vlb.intensityGlobal = maxVLB;
             }
 
-            SoundManager.Instance.PlayRandomSoundFX(flickClips, light.transform, flickVolume, flickMinPitch, flickMaxPitch);
+            if (setting.lightType == LightSourceType.Floresan)
+            {
+                SoundManager.Instance.PlayRandomSoundFX(flickClips, light.transform, flickVolume, flickMinPitch, flickMaxPitch);
+            }
 
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
         }
-
-        // Bitiþ (Eðer patlamadýysa)
-        light.intensity = maxIntensity;
-        mat.SetColor(EmissionColorID, maxEmission);
-        if (vlb != null && config.useVLB)
-        {
-            vlb.enabled = true;
-            vlb.intensityGlobal = maxVLB;
-        }
-
-        buzzSoundSource.volume += buzzSoundIncreasePerLight;
     }
 
     private void ExplodeLight(LightInstanceSettings setting, LightTypeConfig config)
@@ -347,7 +387,13 @@ public class LightSwitch : MonoBehaviour, IInteractable
         if (setting.vlbComponent != null) setting.vlbComponent.enabled = false;
         if (setting.runtimeMaterial != null) setting.runtimeMaterial.DisableKeyword("_EMISSION");
 
-        if (buzzSoundSource.volume > 0) buzzSoundSource.volume -= buzzSoundIncreasePerLight;
+        if (setting.lightType == LightSourceType.Floresan && isOn)
+        {
+            if (buzzSoundSource.volume > 0)
+            {
+                buzzSoundSource.volume -= buzzSoundIncreasePerLight;
+            }
+        }
 
         if (config.explosionSound != null)
         {
@@ -371,10 +417,24 @@ public class LightSwitch : MonoBehaviour, IInteractable
         }
         else
         {
+            if (setting.meshFilterComponent != null && config.brokenMesh != null)
+            {
+                setting.meshFilterComponent.mesh = config.brokenMesh;
+            }
+
             if (setting.rigidBodyComponent != null)
             {
                 setting.rigidBodyComponent.isKinematic = false;
                 setting.rigidBodyComponent.AddTorque(Random.insideUnitSphere * 2f, ForceMode.Impulse);
+
+                Vector3 randomDirection = Random.insideUnitSphere;
+                randomDirection.y = -1f;
+                float forcePower = config.bulbExplosionForce;
+                setting.rigidBodyComponent.AddForce(randomDirection * forcePower, ForceMode.Impulse);
+            }
+            if (config.shardsParticlePrefab != null)
+            {
+                Instantiate(config.shardsParticlePrefab, setting.lightGO.transform.position, setting.lightGO.transform.rotation);
             }
             if (config.sparksParticlePrefab != null)
             {
