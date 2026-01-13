@@ -1,36 +1,95 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VLB; // <--- 1. VLB KÜTÜPHANESÝ EKLENDÝ
+using VLB;
 
 public class LightSwitch : MonoBehaviour, IInteractable
 {
-    // --- STANDART DEÐÝÞKENLER ---
+    public enum LightSourceType
+    {
+        Floresan,
+        NormalAmpul
+    }
+
+    // --- CONFIG: Tür Bazlý Genel Ayarlar ---
+    [System.Serializable]
+    public class LightTypeConfig
+    {
+        public string label = "Ayarlar";
+        public Material sourceMaterial;
+
+        [Tooltip("Maksimum ýþýk þiddeti")]
+        public float maxBaseIntensity = 2f;
+
+        [Tooltip("Volumetric Light Beam kullanýlsýn mý?")]
+        public bool useVLB = false;
+
+        [Tooltip("VLB Maksimum Opacity/Intensity")]
+        [Range(0f, 5f)]
+        public float maxVLBIntensity = 1f;
+
+        [Header("Explosion Settings")]
+        [Tooltip("Patlama sesi (Opsiyonel)")]
+        public AudioClip explosionSound;
+
+        [Tooltip("Her iki tür için de ortak kývýlcým efekti")]
+        public GameObject sparksParticlePrefab;
+
+        [Tooltip("Sadece FLORESAN için: Cam kýrýklarý efekti")]
+        public GameObject shardsParticlePrefab;
+
+        [Tooltip("Sadece FLORESAN için: Patlayýnca deðiþecek kýrýk mesh")]
+        public Mesh brokenMesh;
+    }
+
+    // --- INSTANCE: Sahnedeki her bir ýþýðýn ayarý ---
+    [System.Serializable]
+    public class LightInstanceSettings
+    {
+        public string name = "Light Name";
+        public GameObject lightGO;
+        public LightSourceType lightType;
+
+        [Header("Brightness Settings")]
+        [Range(0f, 1f)] public float minGlowMultiplier = 0.5f;
+        [Range(0f, 1f)] public float maxGlowMultiplier = 1f;
+
+        [Header("Flicker & Explosion")]
+        [Range(0, 100)] public int flickerPossibility;
+        [Range(0, 100)] public int explosionPossibility;
+
+        // --- CACHE & STATE ---
+        [HideInInspector] public Material runtimeMaterial;
+        [HideInInspector] public Color baseEmissionColor;
+        [HideInInspector] public Light lightComponent;
+        [HideInInspector] public VolumetricLightBeamSD vlbComponent;
+
+        [HideInInspector] public MeshFilter meshFilterComponent;
+        [HideInInspector] public Rigidbody rigidBodyComponent;
+
+        [HideInInspector] public bool isBroken = false;
+    }
+
+    // --- DEÐÝÞKENLER ---
     public bool CanInteract { get => canInteract; set => canInteract = value; }
     [SerializeField] private bool canInteract = true;
-
     public PlayerManager.HandRigTypes HandRigType { get => handRigType; set => handRigType = value; }
     [SerializeField] private PlayerManager.HandRigTypes handRigType;
-
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     [SerializeField] private bool outlineShouldBeRed;
-
     public string FocusTextKey { get => focusTextKeys[switchStateNum]; set => focusTextKeys[switchStateNum] = value; }
     [SerializeField] private string[] focusTextKeys;
     private int switchStateNum = 0;
 
-    [System.Serializable]
-    public class LightSettings
-    {
-        public GameObject lightGO;
-        [Range(0, 100)] public int flickerPossibility;
-    }
+    [Header("Global Type Configurations")]
+    [SerializeField] private LightTypeConfig fluorescentConfig;
+    [SerializeField] private LightTypeConfig bulbConfig;
 
-    [Header("On Off Settings")]
+    [Header("Light Instances")]
+    [SerializeField] private List<LightInstanceSettings> lightsToEffect;
+
+    [Header("Switch Settings")]
     [SerializeField] private AudioSource buzzSoundSource;
-    [SerializeField] private LightSettings[] lightsToEffect;
-    [SerializeField] private Material lightMatToCopy;
-    [Space]
     [SerializeField] private GameObject switchPart;
     [SerializeField] private float timeToSwitchRotate = 0.2f;
     [SerializeField] private float onSwitchXRotation = 20f;
@@ -46,13 +105,10 @@ public class LightSwitch : MonoBehaviour, IInteractable
     [SerializeField] private float flickVolume = 1f;
     [SerializeField] private float flickMinPitch = 0.85f;
     [SerializeField] private float flickMaxPitch = 1.15f;
-    [SerializeField] private float baseIntensity = 20f;
     [SerializeField] private float flickerMinDelay = 0.1f;
     [SerializeField] private float flickerMaxDelay = 0.3f;
     [SerializeField] private int minFlickerCount = 3;
     [SerializeField] private int maxFlickerCount = 12;
-
-    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
 
     [Header("Audio Settings")]
     public AudioClip lightSwitchSound;
@@ -61,7 +117,7 @@ public class LightSwitch : MonoBehaviour, IInteractable
     public float minPitchForOff = 0.7f;
     public float maxPitchForOff = 0.9f;
 
-    [Header("Layer Settings")]
+    private static readonly int EmissionColorID = Shader.PropertyToID("_EmissionColor");
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
@@ -76,19 +132,43 @@ public class LightSwitch : MonoBehaviour, IInteractable
         offRotation = switchPart.transform.localRotation;
         onRotation = Quaternion.Euler(onSwitchXRotation, offRotation.y, offRotation.z);
 
-        // Materyalleri kopyala
-        foreach (LightSettings settings in lightsToEffect)
+        InitializeLights();
+    }
+
+    private void InitializeLights()
+    {
+        foreach (var setting in lightsToEffect)
         {
-            Renderer rend = settings.lightGO.GetComponentInChildren<Renderer>();
-            if (rend != null)
+            if (setting.lightGO == null) continue;
+
+            setting.isBroken = false;
+
+            // Component Cache
+            setting.lightComponent = setting.lightGO.GetComponentInChildren<Light>();
+            setting.vlbComponent = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+            setting.meshFilterComponent = setting.lightGO.GetComponentInChildren<MeshFilter>();
+            setting.rigidBodyComponent = setting.lightGO.GetComponent<Rigidbody>();
+
+            LightTypeConfig activeConfig = (setting.lightType == LightSourceType.Floresan) ? fluorescentConfig : bulbConfig;
+            Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+
+            if (rend != null && activeConfig.sourceMaterial != null)
             {
-                rend.material = new Material(lightMatToCopy);
-                rend.material.SetColor("_EmissionColor", Color.black);
+                if (activeConfig.sourceMaterial.HasProperty(EmissionColorID))
+                    setting.baseEmissionColor = activeConfig.sourceMaterial.GetColor(EmissionColorID);
+                else
+                    setting.baseEmissionColor = Color.white;
+
+                setting.runtimeMaterial = new Material(activeConfig.sourceMaterial);
+                setting.runtimeMaterial.SetColor(EmissionColorID, Color.black);
+                rend.material = setting.runtimeMaterial;
             }
+
+            if (setting.vlbComponent != null) setting.vlbComponent.enabled = false;
+            if (setting.lightComponent != null) setting.lightComponent.enabled = false;
         }
     }
 
-    // --- INTERFACE METOTLARI ---
     public void ChangeLayer(int layerIndex) { gameObject.layer = layerIndex; switchPart.layer = layerIndex; }
     public void HandleFinishDialogue() { }
     public void OnFocus() { if (!CanInteract) return; ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer); }
@@ -103,7 +183,6 @@ public class LightSwitch : MonoBehaviour, IInteractable
     public void HandleRotation()
     {
         isOn = !isOn;
-
         SoundManager.Instance.PlaySoundFX(lightSwitchSound, transform, 1f, isOn ? minPitchForOn : minPitchForOff, isOn ? maxPitchForOn : maxPitchForOff);
         switchStateNum = isOn ? 1 : 0;
         PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
@@ -119,7 +198,6 @@ public class LightSwitch : MonoBehaviour, IInteractable
         Quaternion targetRotation = shouldOn ? onRotation : offRotation;
         Quaternion startingRotation = switchPart.transform.localRotation;
         float timeElapsed = 0f;
-
         while (timeElapsed < timeToSwitchRotate)
         {
             switchPart.transform.localRotation = Quaternion.Slerp(startingRotation, targetRotation, timeElapsed / timeToSwitchRotate);
@@ -131,123 +209,177 @@ public class LightSwitch : MonoBehaviour, IInteractable
 
     private void HandleLights()
     {
-        Color currentBaseEmission = Color.white;
-        if (DayManager.Instance != null)
-        {
-            currentBaseEmission = DayManager.Instance.GetOriginalEmissionColor(lightMatToCopy);
-        }
-
         if (isOn)
         {
-            // IÞIKLARI AÇIYORUZ
             foreach (var setting in lightsToEffect)
             {
-                Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
-                Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+                if (setting.isBroken) continue;
+                if (setting.lightComponent == null || setting.runtimeMaterial == null) continue;
 
-                // 2. VLB'yi BUL
-                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
+                LightTypeConfig config = (setting.lightType == LightSourceType.Floresan) ? fluorescentConfig : bulbConfig;
 
-                if (lightComp == null || rend == null) continue;
+                float randomMultiplier = Random.Range(setting.minGlowMultiplier, setting.maxGlowMultiplier);
+                float targetIntensity = config.maxBaseIntensity * randomMultiplier;
+                float targetVLBIntensity = config.maxVLBIntensity * randomMultiplier;
+                Color targetEmissionColor = setting.baseEmissionColor * randomMultiplier;
 
-                Material matInstance = rend.material;
-                matInstance.EnableKeyword("_EMISSION");
-                lightComp.enabled = true;
+                setting.runtimeMaterial.EnableKeyword("_EMISSION");
+                setting.lightComponent.enabled = true;
 
-                // 3. VLB'yi AÇ (Varsayýlan olarak)
-                if (vlb != null) vlb.enabled = true;
+                if (setting.vlbComponent != null && config.useVLB)
+                {
+                    setting.vlbComponent.enabled = true;
+                    setting.vlbComponent.intensityGlobal = targetVLBIntensity;
+                }
+                else if (setting.vlbComponent != null)
+                {
+                    setting.vlbComponent.enabled = false;
+                }
 
-                // Flicker olacak mý?
                 bool willFlicker = Random.Range(0, 100) < setting.flickerPossibility;
 
                 if (willFlicker)
                 {
-                    // FLICKER VARSA: VLB'yi parametre olarak gönder
                     int flickerCount = Random.Range(minFlickerCount, maxFlickerCount);
-                    StartCoroutine(FlickerLightRoutine(lightComp, vlb, matInstance, currentBaseEmission, flickerCount));
+                    StartCoroutine(FlickerLightRoutine(setting, targetIntensity, targetEmissionColor, targetVLBIntensity, flickerCount, config));
                 }
                 else
                 {
-                    // FLICKER YOKSA: Direkt aç
-                    lightComp.intensity = baseIntensity;
-                    matInstance.SetColor("_EmissionColor", currentBaseEmission);
-                    // VLB zaten yukarýda açýldý
-
+                    setting.lightComponent.intensity = targetIntensity;
+                    setting.runtimeMaterial.SetColor(EmissionColorID, targetEmissionColor);
                     buzzSoundSource.volume += buzzSoundIncreasePerLight;
                 }
             }
         }
         else
         {
-            // IÞIKLARI KAPATIYORUZ
             StopAllCoroutines();
             if (rotateCoroutine != null) StopCoroutine(rotateCoroutine);
             rotateCoroutine = StartCoroutine(ToogleRotate(isOn));
 
+            buzzSoundSource.volume = 0f;
+
             foreach (var setting in lightsToEffect)
             {
-                Light lightComp = setting.lightGO.GetComponentInChildren<Light>();
-                Renderer rend = setting.lightGO.GetComponentInChildren<Renderer>();
+                if (setting.isBroken) continue;
 
-                // 4. VLB'yi BUL
-                VolumetricLightBeamSD vlb = setting.lightGO.GetComponentInChildren<VolumetricLightBeamSD>();
-
-                // Eðer ýþýk zaten açýksa, BuzzManager'dan düþ
-                if (lightComp != null && lightComp.enabled)
-                {
-                    buzzSoundSource.volume = 0f;
-                    lightComp.enabled = false;
-                }
-
-                // 5. VLB'yi KAPAT
-                if (vlb != null) vlb.enabled = false;
-
-                if (rend != null)
-                {
-                    rend.material.DisableKeyword("_EMISSION");
-                }
+                if (setting.lightComponent != null) setting.lightComponent.enabled = false;
+                if (setting.vlbComponent != null) setting.vlbComponent.enabled = false;
+                if (setting.runtimeMaterial != null) setting.runtimeMaterial.DisableKeyword("_EMISSION");
             }
         }
     }
 
-    // 6. Parametreyi GÜNCELLE
-    private IEnumerator FlickerLightRoutine(Light light, VolumetricLightBeamSD vlb, Material mat, Color targetEmission, int flickerCount)
+    // --- BURASI GÜNCELLENDÝ ---
+    private IEnumerator FlickerLightRoutine(LightInstanceSettings setting, float maxIntensity, Color maxEmission, float maxVLB, int flickerCount, LightTypeConfig config)
     {
-        // Flicker sýrasýnda ýþýk bir yanýp bir sönecek
+        Light light = setting.lightComponent;
+        Material mat = setting.runtimeMaterial;
+        VolumetricLightBeamSD vlb = setting.vlbComponent;
+
+        // 1. Önce bu turda patlayýp patlamayacaðýna karar ver
+        bool isDestinedToExplode = Random.Range(0, 100) < setting.explosionPossibility;
+        int explosionIndex = -1;
+
+        if (isDestinedToExplode)
+        {
+            // 2. Patlayacaksa, HANGÝ flicker turunda patlayacaðýný seç.
+            //    Mantýk: Toplam flicker sayýsýnýn yarýsý ile tamamý arasýnda bir yerde patlasýn.
+            //    Böylece ýþýk en az birkaç kere yanýp söner, oyuncu tam alýþýrken patlar.
+
+            int minIndex = Mathf.Max(1, flickerCount / 2); // En az 1. tur olsun ki hemen gümlemesin
+            explosionIndex = Random.Range(minIndex, flickerCount);
+        }
+
         for (int i = 0; i < flickerCount; i++)
         {
-            // Rastgele kýsýk yan (SÖNME ANI)
-            float randomIntensity = Random.Range(0.01f, baseIntensity * 0.3f);
-            float emissionMultiplier = randomIntensity / (baseIntensity * 2);
-            Color flickerEmission = targetEmission * Mathf.LinearToGammaSpace(emissionMultiplier);
+            // 3. Sýra geldi mi kontrol et
+            if (isDestinedToExplode && i == explosionIndex)
+            {
+                ExplodeLight(setting, config);
+                yield break; // Döngüyü kýr ve çýk
+            }
 
-            light.intensity = randomIntensity;
-            mat.SetColor("_EmissionColor", flickerEmission);
+            // --- SÖNME ANI ---
+            float randomDimIntensity = Random.Range(0.01f, maxIntensity * 0.3f);
+            float ratio = randomDimIntensity / maxIntensity;
+            Color flickerEmission = maxEmission * ratio;
 
-            // 7. VLB'yi KAPAT
-            if (vlb != null) vlb.enabled = false;
+            light.intensity = randomDimIntensity;
+            mat.SetColor(EmissionColorID, flickerEmission);
+
+            if (vlb != null && config.useVLB) vlb.enabled = false;
 
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
 
-            // Normale dön (Kýsa süreliðine - YANMA ANI)
-            light.intensity = baseIntensity;
-            mat.SetColor("_EmissionColor", targetEmission);
+            // --- YANMA ANI ---
+            light.intensity = maxIntensity;
+            mat.SetColor(EmissionColorID, maxEmission);
 
-            // 8. VLB'yi AÇ
-            if (vlb != null) vlb.enabled = true;
+            if (vlb != null && config.useVLB)
+            {
+                vlb.enabled = true;
+                vlb.intensityGlobal = maxVLB;
+            }
 
             SoundManager.Instance.PlayRandomSoundFX(flickClips, light.transform, flickVolume, flickMinPitch, flickMaxPitch);
 
             yield return new WaitForSeconds(Random.Range(flickerMinDelay, flickerMaxDelay));
         }
 
-        // --- FLICKER BÝTTÝ, SON HALÝNÝ VER ---
-        light.intensity = baseIntensity;
-        mat.SetColor("_EmissionColor", targetEmission);
-
-        // 9. VLB'yi AÇIK BIRAK
-        if (vlb != null) vlb.enabled = true;
+        // Bitiþ (Eðer patlamadýysa)
+        light.intensity = maxIntensity;
+        mat.SetColor(EmissionColorID, maxEmission);
+        if (vlb != null && config.useVLB)
+        {
+            vlb.enabled = true;
+            vlb.intensityGlobal = maxVLB;
+        }
 
         buzzSoundSource.volume += buzzSoundIncreasePerLight;
+    }
+
+    private void ExplodeLight(LightInstanceSettings setting, LightTypeConfig config)
+    {
+        setting.isBroken = true;
+
+        if (setting.lightComponent != null) setting.lightComponent.enabled = false;
+        if (setting.vlbComponent != null) setting.vlbComponent.enabled = false;
+        if (setting.runtimeMaterial != null) setting.runtimeMaterial.DisableKeyword("_EMISSION");
+
+        if (buzzSoundSource.volume > 0) buzzSoundSource.volume -= buzzSoundIncreasePerLight;
+
+        if (config.explosionSound != null)
+        {
+            SoundManager.Instance.PlaySoundFX(config.explosionSound, setting.lightGO.transform, 1f, 0.9f, 1.1f);
+        }
+
+        if (setting.lightType == LightSourceType.Floresan)
+        {
+            if (setting.meshFilterComponent != null && config.brokenMesh != null)
+            {
+                setting.meshFilterComponent.mesh = config.brokenMesh;
+            }
+            if (config.shardsParticlePrefab != null)
+            {
+                Instantiate(config.shardsParticlePrefab, setting.lightGO.transform.position, setting.lightGO.transform.rotation);
+            }
+            if (config.sparksParticlePrefab != null)
+            {
+                Instantiate(config.sparksParticlePrefab, setting.lightGO.transform.position, setting.lightGO.transform.rotation);
+            }
+        }
+        else
+        {
+            if (setting.rigidBodyComponent != null)
+            {
+                setting.rigidBodyComponent.isKinematic = false;
+                setting.rigidBodyComponent.AddTorque(Random.insideUnitSphere * 2f, ForceMode.Impulse);
+            }
+            if (config.sparksParticlePrefab != null)
+            {
+                Instantiate(config.sparksParticlePrefab, setting.lightGO.transform.position, setting.lightGO.transform.rotation);
+            }
+        }
     }
 }
