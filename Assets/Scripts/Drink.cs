@@ -55,6 +55,7 @@ public class Drink : MonoBehaviour, IGrabable
     // --- LOGIC VARIABLES ---
     [HideInInspector] public Tray currentTray;
     private bool isGettingPutOnTray;
+    private bool isBeingDestroyed;
     // -----------------------
 
     private float lastSoundTime = 0f;
@@ -306,23 +307,55 @@ public class Drink : MonoBehaviour, IGrabable
 
     private void BreakBottle(Collision collision)
     {
+        if (isBeingDestroyed) return;
+
+        isBeingDestroyed = true;
+
+        // Varsayýlan deðerler
         Vector3 hitPoint = transform.position;
         Quaternion finalRotation = Quaternion.identity;
+
+        // AYAR: Yüzeyden ne kadar uzaklaþýlacaðý (Metre cinsinden).
+        // 0.05f (5cm) genellikle decal ve partiküllerin "clip" olmamasý için ideal bir mesafedir.
+        float surfaceOffset = 0.05f;
 
         if (collision.contacts.Length > 0)
         {
             ContactPoint contact = collision.contacts[0];
-            hitPoint = contact.point;
+
+            // --- KRÝTÝK DÜZELTME ---
+            // Contact Point: Çarpýþmanýn olduðu nokta.
+            // Contact Normal: Çarpýlan yüzeyin dýþa bakan dik vektörü.
+            // Formül: Yeni Pozisyon = Çarpýþma Noktasý + (Yön * Mesafe)
+            hitPoint = contact.point + (contact.normal * surfaceOffset);
+
+            // Rotasyonu yüzeyin normaline göre ayarlýyoruz.
+            // Böylece partikül efekti yüzeye dik (veya belirlenen offset ile) patlar.
             Quaternion surfaceRotation = Quaternion.LookRotation(contact.normal);
             finalRotation = surfaceRotation * Quaternion.Euler(data.effectRotationOffset);
         }
         else
         {
+            // Eðer fizik motoru contact point veremezse (çok nadir, ama mümkün),
+            // objenin kendi pozisyonunu kullanýrýz.
+            // Ancak decal'in gömülmemesi için hýzý tersine kullanarak geriye alabiliriz 
+            // veya olduðu gibi býrakabiliriz. Güvenlik için hafif yukarý alýyoruz.
+            hitPoint = transform.position + Vector3.up * surfaceOffset;
             finalRotation = Quaternion.Euler(data.effectRotationOffset);
         }
 
-        if (data.glassShatterPrefab != null) Instantiate(data.glassShatterPrefab, hitPoint, finalRotation);
-        if (data.liquidSplashPrefab != null) Instantiate(data.liquidSplashPrefab, hitPoint, finalRotation);
+        // Cam kýrýklarý (Shatter)
+        if (data.glassShatterPrefab != null)
+        {
+            Instantiate(data.glassShatterPrefab, hitPoint, finalRotation);
+        }
+
+        // Sývý efekti (Splash)
+        // Sývý efektleri genellikle decal projector içerir, bu yüzden offset hayatidir.
+        if (data.liquidSplashPrefab != null)
+        {
+            Instantiate(data.liquidSplashPrefab, hitPoint, finalRotation);
+        }
 
         if (PlayerManager.Instance != null) PlayerManager.Instance.ResetPlayerGrab(this);
         Destroy(gameObject);

@@ -34,7 +34,7 @@ public class DayManager : MonoBehaviour
         public float skyboxExposure;
         public float skyboxRotate;
         public Color skyboxColor;
-        public Color environmentColor;
+        [ColorUsage(true, true)] public Color environmentColor;
 
         // --- 2. ESKÝ FOG AYARLARI GÝTTÝ, YENÝLERÝ GELDÝ ---
         [Header("Atmospheric Fog Settings")]

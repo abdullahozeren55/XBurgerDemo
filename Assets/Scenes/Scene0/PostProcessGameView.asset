@@ -205,16 +205,16 @@ MonoBehaviour:
     m_Value: 0
   radius:
     m_OverrideState: 1
-    m_Value: 0.64
+    m_Value: 1
   maxRadiusPixels:
     m_OverrideState: 1
-    m_Value: 64
+    m_Value: 96
   bias:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.32
   intensity:
     m_OverrideState: 1
-    m_Value: 0.64
+    m_Value: 0.96
   useMultiBounce:
     m_OverrideState: 0
     m_Value: 0
@@ -226,7 +226,7 @@ MonoBehaviour:
     m_Value: 0.25
   offscreenSamplesContribution:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: 0.32
   maxDistance:
     m_OverrideState: 1
     m_Value: 64
@@ -238,7 +238,7 @@ MonoBehaviour:
     m_Value: 2
   baseColor:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
+    m_Value: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
   temporalFilterEnabled:
     m_OverrideState: 0
     m_Value: 1
@@ -262,6 +262,6 @@ MonoBehaviour:
     m_Value: 1
   brightnessMaskRange:
     m_OverrideState: 1
-    m_Value: {x: 0, y: 0.5000001}
+    m_Value: {x: 0, y: 0.21034917}
     min: 0
     max: 2
