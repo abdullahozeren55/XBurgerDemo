@@ -3,7 +3,10 @@ using TMPro;
 
 public class LocalizedText : MonoBehaviour
 {
-    public string localizationKey; // JSON'daki Key'i buraya yazacaksýn (Örn: "UI_START_GAME")
+    public string localizationKey;
+
+    // YENÝ: Bu metin hangi türde? (Inspector'dan seç: Header mý? Dialogue mi?)
+    public FontType fontType = FontType.PixelOutlined;
 
     private TMP_Text _textComp;
 
@@ -14,38 +17,40 @@ public class LocalizedText : MonoBehaviour
 
     private void Start()
     {
-        // Baþlangýçta metni ayarla
-        UpdateText();
+        UpdateContent();
     }
 
     private void OnEnable()
     {
         if (LocalizationManager.Instance != null)
         {
-            // 1. Abone ol (Gelecekteki deðiþiklikler için)
-            LocalizationManager.Instance.OnLanguageChanged += UpdateText;
-
-            // 2. HEMEN GÜNCELLE (Kaçýrdýðým deðiþiklikler için)
-            // Bu satýrý eklemezsen, pasifken yapýlan deðiþiklikleri algýlamaz.
-            UpdateText();
+            LocalizationManager.Instance.OnLanguageChanged += UpdateContent;
+            UpdateContent();
         }
     }
 
     private void OnDisable()
     {
-        // Abonelikten çýk (Hata vermemesi için þart)
         if (LocalizationManager.Instance != null)
-            LocalizationManager.Instance.OnLanguageChanged -= UpdateText;
+            LocalizationManager.Instance.OnLanguageChanged -= UpdateContent;
     }
 
-    // Bu fonksiyon dil deðiþince otomatik çalýþacak
-    public void UpdateText()
+    // Ýsmini UpdateText'ten UpdateContent'e çevirdim çünkü artýk hem Text hem Font deðiþiyor
+    public void UpdateContent()
     {
         if (_textComp != null && LocalizationManager.Instance != null)
         {
-            string newValue = LocalizationManager.Instance.GetText(localizationKey);
+            // 1. Metni Güncelle
+            _textComp.text = LocalizationManager.Instance.GetText(localizationKey);
 
-            _textComp.text = newValue;
+            // 2. Fontu Güncelle
+            TMP_FontAsset newFont = LocalizationManager.Instance.GetFontForCurrentLanguage(fontType);
+
+            // Gereksiz atamadan kaçýn (Performans)
+            if (newFont != null && _textComp.font != newFont)
+            {
+                _textComp.font = newFont;
+            }
         }
     }
 }

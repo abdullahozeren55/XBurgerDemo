@@ -72,11 +72,25 @@ public class Settings : MonoBehaviour
     public TMP_Text typewriterText;
     public TMP_Text uiText;
 
-    // Dropdown sýrasýna göre dil kodlarý. 
-    // Inspector'da Dropdown'a: 
-    // Option 0: "Türkçe" yazdýysan buradaki 0. eleman "tr" olmalý.
-    // Option 1: "English" yazdýysan buradaki 1. eleman "en" olmalý.
-    private readonly List<string> languageCodes = new List<string> { "en", "tr" };
+    // DÝKKAT: Bu listenin sýrasý, Unity Inspector'daki Dropdown Options sýrasýyla AYNI olmalý!
+    // Option 0: English -> "en"
+    // Option 1: Türkçe -> "tr"
+    // Option 2: Chinese -> "zh"
+    // Option 3: Japanese -> "ja"
+    // Option 4: Spanish -> "es"
+    // Option 5: Russian -> "ru"
+    // Option 6: Portuguese -> "pt"
+
+    private readonly List<string> languageCodes = new List<string>
+    {
+        "en", // 0
+        "tr", // 1
+        "zh", // 2
+        "ja", // 3
+        "es", // 4
+        "ru", // 5
+        "pt"  // 6
+    };
 
     private readonly int[] fpsValues = { 30, 60, 75, 120, 144, 165, 240, 300, 360, -1 };
 
