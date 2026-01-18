@@ -7,32 +7,39 @@ public class UIGlowController : MonoBehaviour
 {
     public enum GlowMode { Click, Hold }
 
-    [Header("Ayarlar")]
+    [Header("Mod Ayarý")]
     public GlowMode mode = GlowMode.Click;
-    public float clickSpeed = 8f;
-    public float chargeDuration = 0.5f;
-    public float breathSpeed = 2f;
-    public Vector2 breathRange = new Vector2(0.6f, 1.0f);
+
+    [Header("Parlaklýk Sýnýrlarý (0.0 - 1.0)")]
+    [Range(0f, 2f)] public float minBrightness = 0.3f; // En sönük hali (Yazý kaybolmasýn diye 0.3 iyi)
+    [Range(0f, 2f)] public float maxBrightness = 1.0f; // En parlak hali
+
+    [Header("Hýz Ayarlarý")]
+    public float clickSpeed = 8f; // Hýzlý yanýp sönme hýzý
+    public float holdSpeed = 2f;  // Yavaþ nefes alma hýzý (Eski breathSpeed)
 
     [Header("Hedefler")]
-    public Image targetImage;       // Child 1
-    public GameObject keyboardParent; // Child 2
-    public TMP_Text targetText;     // Child 2_Child
+    public Image targetImage;
+    public GameObject keyboardParent;
+    public TMP_Text targetText;
 
-    // --- DEÐÝÞEN KISIM: ORÝJÝNAL MATERYALLERÝ SAKLA ---
-    private Material _baseImageMat; // Image'in orijinal materyali
-    private Material _baseTextMat;  // Text'in orijinal materyali
+    // --- MATERYALLER ---
+    private Material _baseImageMat;
+    private Material _baseTextMat;
+    private Material _imageMatInstance;
+    private Material _textMatInstance;
 
-    private Material _imageMatInstance; // Anlýk kullanýlan kopya
-    private Material _textMatInstance;  // Anlýk kullanýlan kopya
-
+    // --- SHADER ID'LERÝ ---
     private int _glowAmountID;
     private int _emissionMapID;
     private int _glowColorID;
-    private int _faceColorID; // Bitmap font için
+    private int _faceColorID;
 
     private bool _isUsingImage = false;
     private Color _currentTextGlowColor;
+
+    // Titreþimi önleyen yerel zamanlayýcý
+    private float _localTimer = 0f;
 
     private void Awake()
     {
@@ -41,8 +48,6 @@ public class UIGlowController : MonoBehaviour
         _glowColorID = Shader.PropertyToID("_GlowColor");
         _faceColorID = Shader.PropertyToID("_FaceColor");
 
-        // --- YEDEKLEME ÝÞLEMÝ ---
-        // Oyun baþlarken editörde ne atadýysan onlarý "Referans" olarak saklýyoruz.
         if (targetImage != null) _baseImageMat = targetImage.material;
         if (targetText != null) _baseTextMat = targetText.fontSharedMaterial;
     }
@@ -54,9 +59,10 @@ public class UIGlowController : MonoBehaviour
 
         StopAllCoroutines();
 
-        // Eski kopyalarý temizle
         if (_imageMatInstance) Destroy(_imageMatInstance);
         if (_textMatInstance) Destroy(_textMatInstance);
+
+        _localTimer = 0f;
 
         if (useImage && targetImage != null)
         {
@@ -64,7 +70,6 @@ public class UIGlowController : MonoBehaviour
             targetImage.gameObject.SetActive(true);
             if (keyboardParent) keyboardParent.SetActive(false);
 
-            // DÝKKAT: Artýk targetImage.material'den deðil, _baseImageMat'ten kopya alýyoruz!
             if (_baseImageMat != null)
             {
                 _imageMatInstance = Instantiate(_baseImageMat);
@@ -83,16 +88,16 @@ public class UIGlowController : MonoBehaviour
             if (keyboardParent) keyboardParent.SetActive(true);
             targetText.gameObject.SetActive(true);
 
-            // DÝKKAT: _baseTextMat'ten kopya alýyoruz!
             if (_baseTextMat != null)
             {
                 _textMatInstance = Instantiate(_baseTextMat);
                 targetText.fontSharedMaterial = _textMatInstance;
 
-                // Bitmap Font Ayarlarý
                 targetText.fontSharedMaterial.EnableKeyword("GLOW_ON");
                 targetText.UpdateMeshPadding();
-                targetText.fontSharedMaterial.SetColor(ShaderUtilities.ID_GlowColor, glowColor);
+
+                // Baþlangýçta minBrightness deðerine set et (Patlamayý önler)
+                ApplyGlow(0f);
             }
         }
 
@@ -101,57 +106,47 @@ public class UIGlowController : MonoBehaviour
 
     private IEnumerator AnimateGlow()
     {
-        float timer = 0f;
-
         while (true)
         {
-            float glowValue = 0f;
+            _localTimer += Time.unscaledDeltaTime;
+
+            float waveValue = 0f;
 
             if (mode == GlowMode.Click)
             {
-                glowValue = Mathf.PingPong(Time.unscaledTime * clickSpeed, 1f);
+                // Click: Sinüs dalgasý (0'dan baþlar, yukarý çýkar)
+                waveValue = (Mathf.Sin(_localTimer * clickSpeed) + 1f) / 2f;
             }
             else
             {
-                if (timer < chargeDuration)
-                {
-                    timer += Time.unscaledDeltaTime;
-                    float progress = timer / chargeDuration;
-                    glowValue = Mathf.SmoothStep(0.2f, 1f, progress);
-                }
-                else
-                {
-                    float breathBase = breathRange.x;
-                    float breathDiff = breathRange.y - breathRange.x;
-                    float wave = (Mathf.Sin(Time.unscaledTime * breathSpeed) + 1f) / 2f;
-                    glowValue = breathBase + (wave * breathDiff);
-                }
+                // Hold: Cosinüs dalgasý (1'den baþlar, aþaðý iner - Nefes alma efekti)
+                waveValue = (Mathf.Cos(_localTimer * holdSpeed) + 1f) / 2f;
             }
 
-            ApplyGlow(glowValue);
+            // Hesaplanan 0-1 arasý dalgayý ApplyGlow'a gönderiyoruz
+            ApplyGlow(waveValue);
             yield return null;
         }
     }
 
-    private void ApplyGlow(float value)
+    private void ApplyGlow(float normalizedValue)
     {
+        // Gelen deðer her zaman 0 ile 1 arasýndadýr.
+        // Bunu Inspector'dan girdiðin Min ve Max deðerlerine dönüþtürüyoruz.
+        // Örn: normalizedValue 0 ise -> 0.3 (Min), 1 ise -> 1.0 (Max) olur.
+        float finalIntensity = Mathf.Lerp(minBrightness, maxBrightness, normalizedValue);
+
         if (_isUsingImage && _imageMatInstance != null)
         {
-            // Image için 0-1 arasý iyidir, çünkü alttaki resim zaten görünüyor.
-            _imageMatInstance.SetFloat(_glowAmountID, value);
+            _imageMatInstance.SetFloat(_glowAmountID, finalIntensity);
         }
         else if (!_isUsingImage && _textMatInstance != null)
         {
-            // --- TEXT FIX (KAYBOLMAYI ÖNLEME) ---
-            // Gelen 'value' deðiþkeni 0 (sönük) ile 1 (parlak) arasýnda gidip geliyor.
-            // Biz bunu Text için "En az 0.3 olsun" diye sýkýþtýrýyoruz (Lerp).
-
-            float minVisibility = 0.3f; // %30'un altýna düþmesin (Bunu istersen 0.5 yap)
-            float adjustedValue = Mathf.Lerp(minVisibility, 1f, value);
-
-            // Artýk adjustedValue 0.3 ile 1.0 arasýnda.
-            // HDR Rengi bu yeni deðerle çarpýyoruz.
-            Color finalColor = _currentTextGlowColor * adjustedValue;
+            // Sadece Parlaklýðý (RGB) deðiþtir, Alpha'yý (A) elleme.
+            Color finalColor = _currentTextGlowColor;
+            finalColor.r *= finalIntensity;
+            finalColor.g *= finalIntensity;
+            finalColor.b *= finalIntensity;
 
             _textMatInstance.SetColor(_faceColorID, finalColor);
         }
