@@ -44,8 +44,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
         Ayran
     }
 
-    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
-    [SerializeField] private string focusTextKey;
+    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
     [Space]
     [SerializeField] private ParticleSystem pourParticle;
     [Space]

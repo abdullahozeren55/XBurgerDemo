@@ -14,7 +14,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
     [HideInInspector] public Tray currentTray;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
-    public Sprite Icon { get => data.icon; set => data.icon = value; }
+    public Sprite Icon { get => data.icons[currentIconStateIndex]; set => data.icons[currentIconStateIndex] = value; }
 
     public float GetFillDuration => data.fillDuration;
 
@@ -64,6 +64,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
     }
 
     private int currentTextStateIndex = 0;
+    private int currentIconStateIndex = 0;
 
     public GameManager.DrinkTypes DrinkType = GameManager.DrinkTypes.Null; //Soda Makinesi tarafýndan doldurulurken atanacak
 
@@ -198,6 +199,10 @@ public class DrinkCup : MonoBehaviour, IGrabable
         if (HasLid) return; // Zaten varsa iþlem yapma
 
         HasLid = true;
+
+        currentIconStateIndex = 1;
+
+        PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, Icon);
 
         UpdateFocusTextState();
 

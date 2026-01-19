@@ -16,7 +16,7 @@ MonoBehaviour:
   drinkType: 6
   handGrabType: 1
   handRigType: 1
-  icon: {fileID: 21300000, guid: 13839bb85c9a4df4c8fc98c1057ec9be, type: 3}
+  icon: {fileID: 21300000, guid: 4eb7061c28bf4f944be3b41ad01ab531, type: 3}
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1

@@ -21,7 +21,7 @@ MonoBehaviour:
   grabPositionOffset: {x: 0, y: 0, z: 0}
   grabRotationOffset: {x: 0, y: 0, z: 0}
   maxSaucePerSlot: 5
-  focusTextKey: GRABABLE_KNIFE
+  focusTextKey: GRABABLE_TRAY
   audioClips:
   - {fileID: 8300000, guid: 19e9594bc172813438457584b8a663b6, type: 3}
   - {fileID: 8300000, guid: b92f567054a7252448d18d6f96600d12, type: 3}

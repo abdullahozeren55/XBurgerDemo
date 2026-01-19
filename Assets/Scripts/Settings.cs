@@ -134,7 +134,7 @@ public class Settings : MonoBehaviour
 
     private readonly List<string> stickLayoutKeys = new List<string>
     {
-        "UI_DEFAULT", // 0: Normal
+        "UI_NORMAL", // 0: Normal
         "UI_SWAPPED"  // 1: Ters (Solak)
     };
 

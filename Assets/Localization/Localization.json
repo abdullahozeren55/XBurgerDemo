@@ -141,6 +141,26 @@
     "pt": "Baixar Tampa"
   },
   {
+    "key": "INTERACTABLE_FRYER_LOWER_BASKET",
+    "tr": "Sepeti İndir",
+    "en": "Lower Basket",
+    "zh": "放下炸篮",
+    "ja": "バスケットを下げる",
+    "es": "Bajar Canasta",
+    "ru": "Опустить Корзину",
+    "pt": "Baixar Cesta"
+  },
+  {
+    "key": "INTERACTABLE_FRYER_LIFT_BASKET",
+    "tr": "Sepeti Kaldır",
+    "en": "Lift Basket",
+    "zh": "提起炸篮",
+    "ja": "バスケットを上げる",
+    "es": "Levantar Canasta",
+    "ru": "Поднять Корзину",
+    "pt": "Levantar Cesta"
+  },
+  {
     "key": "INTERACTABLE_KNIFE_HOLDER",
     "tr": "Bıçak Al",
     "en": "Take Knife",
@@ -149,16 +169,6 @@
     "es": "Tomar Cuchillo",
     "ru": "Взять Нож",
     "pt": "Pegar Faca"
-  },
-  {
-    "key": "INTERACTABLE_BURGER_BOX_BOX",
-    "tr": "Burger Kutusu Al",
-    "en": "Take Burger Box",
-    "zh": "拿汉堡盒",
-    "ja": "バーガーの箱を取る",
-    "es": "Tomar Caja De Hamburguesa",
-    "ru": "Взять Коробку Для Бургера",
-    "pt": "Pegar Caixa De Hambúrguer"
   },
   {
     "key": "INTERACTABLE_BUN_BOX",
@@ -332,7 +342,7 @@
   },
   {
     "key": "INTERACTABLE_BBQ_SAUCE_BOX",
-    "tr": "Barbekü Sosu Şişesi Al",
+    "tr": "Barbekü Sos Şişesi Al",
     "en": "Take BBQ Sauce Bottle",
     "zh": "拿烧烤酱瓶",
     "ja": "BBQソースボトルを取る",
@@ -342,7 +352,7 @@
   },
   {
     "key": "INTERACTABLE_BUFFALO_SAUCE_BOX",
-    "tr": "Buffalo Sosu Şişesi Al",
+    "tr": "Buffalo Sos Şişesi Al",
     "en": "Take Buffalo Sauce Bottle",
     "zh": "拿水牛城辣酱瓶",
     "ja": "バッファローソースボトルを取る",
@@ -439,6 +449,106 @@
     "es": "Tomar Ayran",
     "ru": "Взять Айран",
     "pt": "Pegar Ayran"
+  },
+  {
+    "key": "INTERACTABLE_TRAY_STACK",
+    "tr": "Tepsi Al",
+    "en": "Take Tray",
+    "zh": "拿托盘",
+    "ja": "トレーを取る",
+    "es": "Tomar Bandeja",
+    "ru": "Взять Поднос",
+    "pt": "Pegar Bandeja"
+  },
+  {
+    "key": "INTERACTABLE_TOY_BALL_BOX",
+    "tr": "Oyuncak Top Al",
+    "en": "Take Toy Ball",
+    "zh": "拿玩具球",
+    "ja": "おもちゃのボールを取る",
+    "es": "Tomar Pelota De Juguete",
+    "ru": "Взять Игрушечный Мяч",
+    "pt": "Pegar Bola De Brinquedo"
+  },
+  {
+    "key": "INTERACTABLE_TOY_CAR_BOX",
+    "tr": "Oyuncak Araba Al",
+    "en": "Take Toy Car",
+    "zh": "拿玩具车",
+    "ja": "おもちゃの車を取る",
+    "es": "Tomar Auto De Juguete",
+    "ru": "Взять Игрушечную Машинку",
+    "pt": "Pegar Carrinho De Brinquedo"
+  },
+  {
+    "key": "INTERACTABLE_TOY_CLOWN_BOX",
+    "tr": "Oyuncak Palyaço Al",
+    "en": "Take Toy Clown",
+    "zh": "拿玩具小丑",
+    "ja": "おもちゃのピエロを取る",
+    "es": "Tomar Payaso De Juguete",
+    "ru": "Взять Игрушечного Клоуна",
+    "pt": "Pegar Palhaço De Brinquedo"
+  },
+  {
+    "key": "INTERACTABLE_BURGER_BOX_BOX",
+    "tr": "Burger Kutusu Al",
+    "en": "Take Burger Box",
+    "zh": "拿汉堡盒",
+    "ja": "バーガーの箱を取る",
+    "es": "Tomar Caja De Hamburguesa",
+    "ru": "Взять Коробку Для Бургера",
+    "pt": "Pegar Caixa De Hambúrguer"
+  },
+  {
+    "key": "INTERACTABLE_SODA_CUP_SMALL_BOX",
+    "tr": "Küçük Bardak Al",
+    "en": "Take Small Soda Cup",
+    "zh": "拿小号汽水杯",
+    "ja": "Sサイズカップを取る",
+    "es": "Tomar Vaso Pequeño",
+    "ru": "Взять Маленький Стакан",
+    "pt": "Pegar Copo Pequeno"
+  },
+  {
+    "key": "INTERACTABLE_SODA_CUP_MEDIUM_BOX",
+    "tr": "Orta Bardak Al",
+    "en": "Take Medium Soda Cup",
+    "zh": "拿中号汽水杯",
+    "ja": "Mサイズカップを取る",
+    "es": "Tomar Vaso Mediano",
+    "ru": "Взять Средний Стакан",
+    "pt": "Pegar Copo Médio"
+  },
+  {
+    "key": "INTERACTABLE_SODA_CUP_LARGE_BOX",
+    "tr": "Büyük Bardak Al",
+    "en": "Take Large Soda Cup",
+    "zh": "拿大号汽水杯",
+    "ja": "Lサイズカップを取る",
+    "es": "Tomar Vaso Grande",
+    "ru": "Взять Большой Стакан",
+    "pt": "Pegar Copo Grande"
+  },
+  {
+    "key": "INTERACTABLE_LID_AND_STRAW_BOX",
+    "tr": "Kapak & Pipet Al",
+    "en": "Take Lid & Straw",
+    "zh": "拿杯盖与吸管",
+    "ja": "フタとストローを取る",
+    "es": "Tomar Tapa Y Popote",
+    "ru": "Взять Крышку И Трубочку",
+    "pt": "Pegar Tampa E Canudo"
+  },
+  {
+    "key": "INTERACTABLE_FRY_BOX_BOX",
+    "tr": "Kızartma Kutusu Al",
+    "en": "Take Fry Box",
+    "zh": "拿炸物盒",
+    "ja": "揚げ物の箱を取る",
+    "es": "Tomar Caja De Frituras",
+    "ru": "Взять Коробку Для Закусок",
+    "pt": "Pegar Caixa De Frituras"
   },
   {
     "key": "INTERACTABLE_TURN_ON_LIGHT",
@@ -882,7 +992,7 @@
   },
   {
     "key": "GRABABLE_BBQ_SAUCE_BOTTLE",
-    "tr": "Barbekü Sosu Şişesi",
+    "tr": "Barbekü Sos Şişesi",
     "en": "BBQ Sauce Bottle",
     "zh": "烧烤酱瓶",
     "ja": "BBQソースボトル",
@@ -892,7 +1002,7 @@
   },
   {
     "key": "GRABABLE_BUFFALO_SAUCE_BOTTLE",
-    "tr": "Buffalo Sosu Şişesi",
+    "tr": "Buffalo Sos Şişesi",
     "en": "Buffalo Sauce Bottle",
     "zh": "水牛城辣酱瓶",
     "ja": "バッファローソースボトル",
@@ -932,7 +1042,7 @@
   },
   {
     "key": "GRABABLE_BBQ",
-    "tr": "Barbekü Sosu",
+    "tr": "Barbekü Sos",
     "en": "BBQ Sauce",
     "zh": "烧烤酱",
     "ja": "BBQソース",
@@ -942,7 +1052,7 @@
   },
   {
     "key": "GRABABLE_BUFFALO",
-    "tr": "Buffalo Sosu",
+    "tr": "Buffalo Sos",
     "en": "Buffalo Sauce",
     "zh": "水牛城辣酱",
     "ja": "バッファローソース",
@@ -999,6 +1109,16 @@
     "es": "Tarrina De Salsa Buffalo",
     "ru": "Баночка Соуса Баффало",
     "pt": "Pote De Molho Buffalo"
+  },
+  {
+    "key": "GRABABLE_TRAY",
+    "tr": "Tepsi",
+    "en": "Tray",
+    "zh": "托盘",
+    "ja": "トレー",
+    "es": "Bandeja",
+    "ru": "Поднос",
+    "pt": "Bandeja"
   },
   {
     "key": "GRABABLE_TRASH",
@@ -1943,162 +2063,322 @@
   {
     "key": "UI_TRACK",
     "tr": "Parça",
-    "en": "Track"
+    "en": "Track",
+    "zh": "曲目",
+    "ja": "トラック",
+    "es": "Pista",
+    "ru": "Трек",
+    "pt": "Faixa"
   },
   {
     "key": "UI_MAIN_MENU_CONTINUE",
     "tr": "Devam Et",
-    "en": "Continue"
+    "en": "Continue",
+    "zh": "继续",
+    "ja": "コンティニュー",
+    "es": "Continuar",
+    "ru": "Продолжить",
+    "pt": "Continuar"
   },
   {
     "key": "UI_MAIN_MENU_NEW_GAME",
     "tr": "Yeni Oyun",
-    "en": "New Game"
+    "en": "New Game",
+    "zh": "新游戏",
+    "ja": "ニューゲーム",
+    "es": "Nueva Partida",
+    "ru": "Новая Игра",
+    "pt": "Novo Jogo"
   },
   {
     "key": "UI_MAIN_MENU_SETTINGS",
     "tr": "Ayarlar",
-    "en": "Settings"
+    "en": "Settings",
+    "zh": "设置",
+    "ja": "設定",
+    "es": "Ajustes",
+    "ru": "Настройки",
+    "pt": "Configurações"
   },
   {
     "key": "UI_MAIN_MENU_QUIT",
     "tr": "Çıkış",
-    "en": "Quit"
+    "en": "Quit",
+    "zh": "退出",
+    "ja": "終了",
+    "es": "Salir",
+    "ru": "Выход",
+    "pt": "Sair"
   },
   {
     "key": "UI_MAIN_MENU_GENERAL_SETTINGS",
     "tr": "Genel Ayarlar",
-    "en": "General Settings"
+    "en": "General Settings",
+    "zh": "通用设置",
+    "ja": "一般設定",
+    "es": "Ajustes Generales",
+    "ru": "Общие Настройки",
+    "pt": "Configurações Gerais"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_SETTINGS",
     "tr": "Ses Ayarları",
-    "en": "Audio Settings"
+    "en": "Audio Settings",
+    "zh": "音频设置",
+    "ja": "オーディオ設定",
+    "es": "Ajustes De Audio",
+    "ru": "Настройки Аудио",
+    "pt": "Configurações De Áudio"
   },
   {
     "key": "UI_MAIN_MENU_RESOLUTION",
     "tr": "Çözünürlük",
-    "en": "Resolution"
+    "en": "Resolution",
+    "zh": "分辨率",
+    "ja": "解像度",
+    "es": "Resolución",
+    "ru": "Разрешение",
+    "pt": "Resolução"
   },
   {
     "key": "UI_MAIN_MENU_QUALITY",
     "tr": "Kalite",
-    "en": "Quality"
+    "en": "Quality",
+    "zh": "质量",
+    "ja": "クオリティ",
+    "es": "Calidad",
+    "ru": "Качество",
+    "pt": "Qualidade"
   },
   {
     "key": "UI_MAIN_MENU_LANGUAGE",
     "tr": "Dil",
-    "en": "Language"
+    "en": "Language",
+    "zh": "语言",
+    "ja": "言語",
+    "es": "Idioma",
+    "ru": "Язык",
+    "pt": "Idioma"
   },
   {
     "key": "UI_MAIN_MENU_PIXELATION",
     "tr": "Pikselleşme",
-    "en": "Pixelation"
+    "en": "Pixelation",
+    "zh": "像素化",
+    "ja": "ピクセル化",
+    "es": "Pixelación",
+    "ru": "Пикселизация",
+    "pt": "Pixelização"
   },
   {
     "key": "UI_MAIN_MENU_UI_SCALE",
     "tr": "Arayüz Boyutu",
-    "en": "Interface Scale"
+    "en": "Interface Scale",
+    "zh": "界面缩放",
+    "ja": "UIスケール",
+    "es": "Escala De Interfaz",
+    "ru": "Масштаб Интерфейса",
+    "pt": "Escala Da Interface"
   },
   {
     "key": "UI_TOAST_MACHINE",
     "tr": "Tost Makinesi",
-    "en": "Toast Machine"
+    "en": "Toast Machine",
+    "zh": "面包机",
+    "ja": "トースター",
+    "es": "Tostadora",
+    "ru": "Тостер",
+    "pt": "Torradeira"
   },
   {
     "key": "UI_LOW",
     "tr": "Düşük",
-    "en": "Low"
+    "en": "Low",
+    "zh": "低",
+    "ja": "低",
+    "es": "Baja",
+    "ru": "Низкое",
+    "pt": "Baixa"
   },
   {
     "key": "UI_MEDIUM",
     "tr": "Orta",
-    "en": "Medium"
+    "en": "Medium",
+    "zh": "中",
+    "ja": "中",
+    "es": "Media",
+    "ru": "Среднее",
+    "pt": "Média"
   },
   {
     "key": "UI_HIGH",
     "tr": "Yüksek",
-    "en": "High"
+    "en": "High",
+    "zh": "高",
+    "ja": "高",
+    "es": "Alta",
+    "ru": "Высокое",
+    "pt": "Alta"
   },
   {
     "key": "UI_ULTRA",
     "tr": "Ultra",
-    "en": "Ultra"
+    "en": "Ultra",
+    "zh": "极致",
+    "ja": "ウルトラ",
+    "es": "Ultra",
+    "ru": "Ультра",
+    "pt": "Ultra"
   },
   {
     "key": "UI_MAIN_MENU_PIXELATION_0",
     "tr": "Pikselden Nefret Ederim (Yok)",
-    "en": "I Hate Pixels (None)"
+    "en": "I Hate Pixels (None)",
+    "zh": "我讨厌像素 (无)",
+    "ja": "ドット絵は嫌いだ (なし)",
+    "es": "Odio Los Píxeles (Nada)",
+    "ru": "Ненавижу Пиксели (Нет)",
+    "pt": "Odeio Pixels (Nada)"
   },
   {
     "key": "UI_MAIN_MENU_PIXELATION_1",
     "tr": "Siz Koyun Ben Dur Derim (Az)",
-    "en": "Just A Sprinkle (Low)"
+    "en": "Just A Sprinkle (Low)",
+    "zh": "撒一点点 (低)",
+    "ja": "隠し味程度に (低)",
+    "es": "Una Pizca (Baja)",
+    "ru": "Щепотку (Низкая)",
+    "pt": "Só Uma Pitada (Baixa)"
   },
   {
     "key": "UI_MAIN_MENU_PIXELATION_2",
     "tr": "Piksel Piksel Anadolu (Çok)",
-    "en": "I'm Legally Blind (High)"
+    "en": "I'm Legally Blind (High)",
+    "zh": "我要瞎了 (高)",
+    "ja": "メガネ忘れた (高)",
+    "es": "Estoy Ciego (Alta)",
+    "ru": "Мои Глаза! (Высокая)",
+    "pt": "Estou Legalmente Cego (Alta)"
   },
   {
     "key": "UI_MAIN_MENU_CONTROL_HINTS",
     "tr": "Kontrol İpuçları",
-    "en": "Control Hints"
+    "en": "Control Hints",
+    "zh": "操作提示",
+    "ja": "操作ヒント",
+    "es": "Consejos De Control",
+    "ru": "Подсказки Управления",
+    "pt": "Dicas De Controle"
   },
   {
     "key": "UI_MAIN_MENU_INTERACTION_TEXT",
     "tr": "Etkileşim Metni",
-    "en": "Interaction Text"
+    "en": "Interaction Text",
+    "zh": "交互文字",
+    "ja": "インタラクションテキスト",
+    "es": "Texto De Interacción",
+    "ru": "Текст Взаимодействия",
+    "pt": "Texto De Interação"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_MASTER",
     "tr": "Ana Ses",
-    "en": "Master Volume"
+    "en": "Master Volume",
+    "zh": "主音量",
+    "ja": "マスター音量",
+    "es": "Volumen Principal",
+    "ru": "Общая Громкость",
+    "pt": "Volume Principal"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_SOUND_FX",
     "tr": "Ses Efektleri",
-    "en": "Sound FX"
+    "en": "Sound FX",
+    "zh": "音效",
+    "ja": "効果音",
+    "es": "Efectos De Sonido",
+    "ru": "Звуковые Эффекты",
+    "pt": "Efeitos Sonoros"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_MUSIC",
     "tr": "Müzik",
-    "en": "Music"
+    "en": "Music",
+    "zh": "音乐",
+    "ja": "音楽",
+    "es": "Música",
+    "ru": "Музыка",
+    "pt": "Música"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_AMBIANCE",
     "tr": "Atmosfer",
-    "en": "Ambience"
+    "en": "Ambience",
+    "zh": "环境音",
+    "ja": "環境音",
+    "es": "Ambiente",
+    "ru": "Окружение",
+    "pt": "Ambiente"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_TYPEWRITER",
     "tr": "Yazı Sesi",
-    "en": "Text Sound"
+    "en": "Text Sound",
+    "zh": "文字音效",
+    "ja": "テキスト音",
+    "es": "Sonido De Texto",
+    "ru": "Звук Текста",
+    "pt": "Som Do Texto"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_UI",
     "tr": "Arayüz",
-    "en": "Interface"
+    "en": "Interface",
+    "zh": "界面",
+    "ja": "UI",
+    "es": "Interfaz",
+    "ru": "Интерфейс",
+    "pt": "Interface"
   },
   {
     "key": "UI_OKAY",
     "tr": "Tamam",
-    "en": "Okay"
+    "en": "Okay",
+    "zh": "确定",
+    "ja": "OK",
+    "es": "OK",
+    "ru": "ОК",
+    "pt": "OK"
   },
   {
     "key": "UI_DEFAULT",
     "tr": "Varsayılan",
-    "en": "Default"
+    "en": "Default",
+    "zh": "默认",
+    "ja": "デフォルト",
+    "es": "Predeterminado",
+    "ru": "По умолчанию",
+    "pt": "Padrão"
   },
   {
     "key": "UI_ON",
     "tr": "Açık",
-    "en": "On"
+    "en": "On",
+    "zh": "开启",
+    "ja": "オン",
+    "es": "Activado",
+    "ru": "Вкл.",
+    "pt": "Ativado"
   },
   {
     "key": "UI_OFF",
     "tr": "Kapalı",
-    "en": "Off"
+    "en": "Off",
+    "zh": "关闭",
+    "ja": "オフ",
+    "es": "Desactivado",
+    "ru": "Выкл.",
+    "pt": "Desativado"
   },
   {
     "key": "UI_MONITOR_BURGER_LIST",
@@ -2124,11 +2404,6 @@
     "key": "UI_START",
     "tr": "Başlat",
     "en": "Start"
-  },
-  {
-    "key": "UI_SHUT_DOWN",
-    "tr": "Kapat",
-    "en": "Shut Down"
   },
   {
     "key": "UI_MONITOR_HOW_TO_PREPARE_BURGER",
@@ -2158,222 +2433,442 @@
   {
     "key": "UI_VOLUME",
     "tr": "Ses",
-    "en": "Volume"
+    "en": "Volume",
+    "zh": "音量",
+    "ja": "音量",
+    "es": "Volumen",
+    "ru": "Громкость",
+    "pt": "Volume"
   },
   {
     "key": "UI_INTERACT",
     "tr": "Etkileşim",
-    "en": "Interact"
+    "en": "Interact",
+    "zh": "交互",
+    "ja": "インタラクト",
+    "es": "Interactuar",
+    "ru": "Взаимодействие",
+    "pt": "Interagir"
   },
   {
     "key": "UI_TAKE",
     "tr": "Al",
-    "en": "Take"
+    "en": "Take",
+    "zh": "拾取",
+    "ja": "取る",
+    "es": "Tomar",
+    "ru": "Взять",
+    "pt": "Pegar"
   },
   {
     "key": "UI_USE",
     "tr": "Kullan",
-    "en": "Use"
+    "en": "Use",
+    "zh": "使用",
+    "ja": "使用",
+    "es": "Usar",
+    "ru": "Использовать",
+    "pt": "Usar"
   },
   {
     "key": "UI_DROP",
     "tr": "Bırak",
-    "en": "Drop"
+    "en": "Drop",
+    "zh": "丢弃",
+    "ja": "ドロップ",
+    "es": "Soltar",
+    "ru": "Выбросить",
+    "pt": "Largar"
   },
   {
     "key": "UI_THROW",
     "tr": "Fırlat",
-    "en": "Throw"
+    "en": "Throw",
+    "zh": "投掷",
+    "ja": "投げる",
+    "es": "Lanzar",
+    "ru": "Бросить",
+    "pt": "Lançar"
   },
   {
     "key": "UI_HOLD",
     "tr": "Basılı Tut",
-    "en": "Hold"
+    "en": "Hold",
+    "zh": "长按",
+    "ja": "長押し",
+    "es": "Mantener",
+    "ru": "Удерживать",
+    "pt": "Segurar"
   },
   {
     "key": "UI_TOGGLE",
     "tr": "Bas-Çek",
-    "en": "Toggle"
+    "en": "Toggle",
+    "zh": "切换",
+    "ja": "切り替え",
+    "es": "Alternar",
+    "ru": "Переключение",
+    "pt": "Alternar"
   },
   {
     "key": "UI_MAIN_MENU_CONTROL_SETTINGS",
     "tr": "Kontrol Ayarları",
-    "en": "Control Settings"
+    "en": "Control Settings",
+    "zh": "控制设置",
+    "ja": "操作設定",
+    "es": "Ajustes De Control",
+    "ru": "Настройки Управления",
+    "pt": "Configurações De Controle"
   },
   {
     "key": "UI_MAIN_MENU_MOUSE_SENSITIVITY",
     "tr": "Fare Hassasiyeti",
-    "en": "Mouse Sensitivity"
+    "en": "Mouse Sensitivity",
+    "zh": "鼠标灵敏度",
+    "ja": "マウス感度",
+    "es": "Sensibilidad Del Ratón",
+    "ru": "Чувствительность Мыши",
+    "pt": "Sensibilidade Do Mouse"
   },
   {
     "key": "UI_MAIN_MENU_GAMEPAD_SENSITIVITY",
     "tr": "Oyun Kolu Hassasiyeti",
-    "en": "Gamepad Sensitivity"
+    "en": "Gamepad Sensitivity",
+    "zh": "手柄灵敏度",
+    "ja": "ゲームパッド感度",
+    "es": "Sensibilidad Del Mando",
+    "ru": "Чувствительность Геймпада",
+    "pt": "Sensibilidade Do Controle"
   },
   {
     "key": "UI_MAIN_MENU_INVERT_Y",
     "tr": "Y Eksenini Ters Çevir",
-    "en": "Invert Y"
+    "en": "Invert Y",
+    "zh": "反转Y轴",
+    "ja": "Y軸反転",
+    "es": "Invertir Eje Y",
+    "ru": "Инвертировать Ось Y",
+    "pt": "Inverter Eixo Y"
   },
   {
     "key": "UI_MAIN_MENU_SPRINT_MODE",
     "tr": "Koşma Modu",
-    "en": "Sprint Mode"
+    "en": "Sprint Mode",
+    "zh": "冲刺模式",
+    "ja": "ダッシュモード",
+    "es": "Modo Esprintar",
+    "ru": "Режим Бега",
+    "pt": "Modo De Corrida"
   },
   {
     "key": "UI_MAIN_MENU_CROUCH_MODE",
     "tr": "Eğilme Modu",
-    "en": "Crouch Mode"
+    "en": "Crouch Mode",
+    "zh": "蹲伏模式",
+    "ja": "しゃがみモード",
+    "es": "Modo Agacharse",
+    "ru": "Режим Приседания",
+    "pt": "Modo De Agachamento"
   },
   {
     "key": "UI_MAIN_MENU_KEYBOARD_AND_MOUSE_BINDINGS",
     "tr": "Klavye & Fare Atamaları",
-    "en": "Keyboard & Mouse Bindings"
+    "en": "Keyboard & Mouse Bindings",
+    "zh": "键鼠绑定",
+    "ja": "キーボード＆マウスのキー割り当て",
+    "es": "Asignación De Teclado Y Ratón",
+    "ru": "Назначение Клавиш (Клав. и Мышь)",
+    "pt": "Mapeamento De Teclado E Mouse"
   },
   {
     "key": "UI_MAIN_MENU_GAMEPAD_BINDINGS",
     "tr": "Oyun Kolu Atamaları",
-    "en": "Gamepad Bindings"
+    "en": "Gamepad Bindings",
+    "zh": "手柄绑定",
+    "ja": "ゲームパッドのボタン割り当て",
+    "es": "Asignación Del Mando",
+    "ru": "Назначение Кнопок Геймпада",
+    "pt": "Mapeamento Do Controle"
   },
   {
     "key": "UI_MOVE_FORWARD",
     "tr": "İleri Git:",
-    "en": "Move Forward:"
+    "en": "Move Forward:",
+    "zh": "向前移动:",
+    "ja": "前進:",
+    "es": "Moverse Adelante:",
+    "ru": "Движение Вперед:",
+    "pt": "Mover Para Frente:"
   },
   {
     "key": "UI_MOVE_BACKWARD",
     "tr": "Geri Git:",
-    "en": "Move Backward:"
+    "en": "Move Backward:",
+    "zh": "向后移动:",
+    "ja": "後退:",
+    "es": "Moverse Atrás:",
+    "ru": "Движение Назад:",
+    "pt": "Mover Para Trás:"
   },
   {
     "key": "UI_MOVE_LEFT",
     "tr": "Sola Git:",
-    "en": "Move Left:"
+    "en": "Move Left:",
+    "zh": "向左移动:",
+    "ja": "左移動:",
+    "es": "Moverse Izquierda:",
+    "ru": "Движение Влево:",
+    "pt": "Mover Para Esquerda:"
   },
   {
     "key": "UI_MOVE_RIGHT",
     "tr": "Sağa Git:",
-    "en": "Move Right:"
+    "en": "Move Right:",
+    "zh": "向右移动:",
+    "ja": "右移動:",
+    "es": "Moverse Derecha:",
+    "ru": "Движение Вправо:",
+    "pt": "Mover Para Direita:"
   },
   {
     "key": "UI_JUMP",
     "tr": "Zıpla:",
-    "en": "Jump:"
+    "en": "Jump:",
+    "zh": "跳跃:",
+    "ja": "ジャンプ:",
+    "es": "Saltar:",
+    "ru": "Прыжок:",
+    "pt": "Pular:"
   },
   {
     "key": "UI_SPRINT",
     "tr": "Koş:",
-    "en": "Sprint:"
+    "en": "Sprint:",
+    "zh": "冲刺:",
+    "ja": "ダッシュ:",
+    "es": "Esprintar:",
+    "ru": "Бег:",
+    "pt": "Correr:"
   },
   {
     "key": "UI_CROUCH",
     "tr": "Eğil:",
-    "en": "Crouch:"
+    "en": "Crouch:",
+    "zh": "蹲伏:",
+    "ja": "しゃがむ:",
+    "es": "Agacharse:",
+    "ru": "Присесть:",
+    "pt": "Agachar:"
   },
   {
     "key": "UI_PHONE",
     "tr": "Telefon:",
-    "en": "Phone:"
+    "en": "Phone:",
+    "zh": "手机:",
+    "ja": "スマホ:",
+    "es": "Teléfono:",
+    "ru": "Телефон:",
+    "pt": "Celular:"
   },
   {
     "key": "UI_PRESS_ANY_KEY",
     "tr": "BİR TUŞA BASIN",
-    "en": "PRESS ANY KEY"
+    "en": "PRESS ANY KEY",
+    "zh": "按任意键",
+    "ja": "なにかキーを押してください",
+    "es": "PRESIONA CUALQUIER TECLA",
+    "ru": "НАЖМИТЕ ЛЮБУЮ КЛАВИШУ",
+    "pt": "PRESSIONE QUALQUER TECLA"
   },
   {
     "key": "UI_STICK_LAYOUT",
     "tr": "Analog Düzeni",
-    "en": "Stick Layout"
+    "en": "Stick Layout",
+    "zh": "摇杆布局",
+    "ja": "スティック配置",
+    "es": "Disposición De Sticks",
+    "ru": "Раскладка Стиков",
+    "pt": "Esquema Dos Analógicos"
   },
   {
-    "key": "UI_DEFAULT",
+    "key": "UI_NORMAL",
     "tr": "Normal",
-    "en": "Default"
+    "en": "Normal",
+    "zh": "标准",
+    "ja": "ノーマル",
+    "es": "Normal",
+    "ru": "Обычная",
+    "pt": "Normal"
   },
   {
     "key": "UI_SWAPPED",
     "tr": "Ters",
-    "en": "Swapped"
+    "en": "Swapped",
+    "zh": "交换",
+    "ja": "入れ替え",
+    "es": "Intercambiado",
+    "ru": "Поменяны",
+    "pt": "Trocado"
   },
   {
     "key": "UI_CANCEL",
     "tr": "İPTAL",
-    "en": "CANCEL"
+    "en": "CANCEL",
+    "zh": "取消",
+    "ja": "キャンセル",
+    "es": "CANCELAR",
+    "ru": "ОТМЕНА",
+    "pt": "CANCELAR"
   },
   {
     "key": "UI_FIXED",
     "tr": "SABİT",
-    "en": "FIXED"
+    "en": "FIXED",
+    "zh": "固定",
+    "ja": "固定",
+    "es": "FIJO",
+    "ru": "ФИКСИРОВАНО",
+    "pt": "FIXO"
   },
   {
     "key": "UI_LOOK",
     "tr": "Bak:",
-    "en": "Look:"
+    "en": "Look:",
+    "zh": "视角:",
+    "ja": "視点:",
+    "es": "Mirar:",
+    "ru": "Обзор:",
+    "pt": "Olhar:"
   },
   {
     "key": "UI_PAUSE",
     "tr": "Duraklat:",
-    "en": "Pause:"
+    "en": "Pause:",
+    "zh": "暂停:",
+    "ja": "ポーズ:",
+    "es": "Pausa:",
+    "ru": "Пауза:",
+    "pt": "Pausa:"
   },
   {
     "key": "UI_XBOX",
     "tr": "Xbox",
-    "en": "Xbox"
+    "en": "Xbox",
+    "zh": "Xbox",
+    "ja": "Xbox",
+    "es": "Xbox",
+    "ru": "Xbox",
+    "pt": "Xbox"
   },
   {
     "key": "UI_PS",
     "tr": "PlayStation",
-    "en": "PlayStation"
+    "en": "PlayStation",
+    "zh": "PlayStation",
+    "ja": "PlayStation",
+    "es": "PlayStation",
+    "ru": "PlayStation",
+    "pt": "PlayStation"
   },
   {
     "key": "UI_RESET_TO_DEFAULTS",
     "tr": "Varsayılanlara Sıfırla",
-    "en": "Reset To Defaults"
+    "en": "Reset To Defaults",
+    "zh": "恢复默认设置",
+    "ja": "デフォルトに戻す",
+    "es": "Restaurar Predeterminados",
+    "ru": "Сброс Настроек",
+    "pt": "Restaurar Padrões"
   },
   {
     "key": "UI_GAMEPAD_ICONS",
     "tr": "Oyun Kolu İkonları",
-    "en": "Gamepad Icons"
+    "en": "Gamepad Icons",
+    "zh": "手柄图标",
+    "ja": "ゲームパッドアイコン",
+    "es": "Iconos Del Mando",
+    "ru": "Значки Геймпада",
+    "pt": "Ícones Do Controle"
   },
   {
     "key": "UI_MOVE",
     "tr": "Yürü:",
-    "en": "Move:"
+    "en": "Move:",
+    "zh": "移动:",
+    "ja": "移動:",
+    "es": "Moverse:",
+    "ru": "Перемещение:",
+    "pt": "Mover:"
   },
   {
     "key": "UI_CAN_BE_SWAPPED",
     "tr": "SABİT AMA TERS ÇEVRİLEBİLİR",
-    "en": "FIXED BUT CAN BE SWAPPED"
+    "en": "FIXED BUT CAN BE SWAPPED",
+    "zh": "固定但可交换",
+    "ja": "固定（入れ替え可能）",
+    "es": "FIJO PERO INTERCAMBIABLE",
+    "ru": "ФИКС., НО МОЖНО ПОМЕНЯТЬ",
+    "pt": "FIXO MAS PODE SER TROCADO"
   },
   {
     "key": "UI_AIM_ASSIST",
     "tr": "Nişan Yardımı",
-    "en": "Aim Assist"
+    "en": "Aim Assist",
+    "zh": "瞄准辅助",
+    "ja": "エイムアシスト",
+    "es": "Asistencia De Apuntado",
+    "ru": "Помощь В Прицеливании",
+    "pt": "Assistência De Mira"
   },
   {
     "key": "UI_MAIN_MENU_RESUME",
     "tr": "Oyuna Dön",
-    "en": "Resume"
+    "en": "Resume",
+    "zh": "回到游戏",
+    "ja": "再開",
+    "es": "Reanudar",
+    "ru": "Продолжить",
+    "pt": "Retomar"
   },
   {
     "key": "UI_MAIN_MENU",
     "tr": "Ana Menü",
-    "en": "Main Menu"
+    "en": "Main Menu",
+    "zh": "主菜单",
+    "ja": "メインメニュー",
+    "es": "Menú Principal",
+    "ru": "Главное Меню",
+    "pt": "Menu Principal"
   },
   {
     "key": "UI_UNLIMITED",
     "tr": "Sınırsız",
-    "en": "Unlimited"
+    "en": "Unlimited",
+    "zh": "无限制",
+    "ja": "無制限",
+    "es": "Ilimitado",
+    "ru": "Без ограничений",
+    "pt": "Ilimitado"
   },
   {
     "key": "UI_FPS_LIMIT",
     "tr": "FPS Sınırı",
-    "en": "FPS Limit"
+    "en": "FPS Limit",
+    "zh": "帧率限制",
+    "ja": "FPS制限",
+    "es": "Límite De FPS",
+    "ru": "Ограничение FPS",
+    "pt": "Limite De FPS"
   },
   {
     "key": "UI_VSYNC",
     "tr": "VSync",
-    "en": "VSync"
+    "en": "VSync",
+    "zh": "垂直同步",
+    "ja": "垂直同期",
+    "es": "VSync",
+    "ru": "VSync",
+    "pt": "VSync"
   }
 ]
 

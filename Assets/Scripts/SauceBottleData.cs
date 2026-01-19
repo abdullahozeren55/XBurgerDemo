@@ -12,6 +12,7 @@ public class SauceBottleData : ScriptableObject
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
     public Sprite icon;
+    public string focusTextKey;
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;

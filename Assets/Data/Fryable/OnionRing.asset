@@ -40,7 +40,7 @@ MonoBehaviour:
     colliderSize: {x: 0.0036931476, y: 0.0021010784, z: 0.0012782791}
   putOnBasketDuration: 0.3
   type: 2
-  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  icon: {fileID: 21300000, guid: 724445ae9d256ed469e0c580608238e5, type: 3}
   focusTextKeys:
   - GRABABLE_ONION_RINGS_FROZEN
   - GRABABLE_ONION_RINGS_FRIED

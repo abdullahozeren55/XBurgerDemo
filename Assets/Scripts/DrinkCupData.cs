@@ -10,7 +10,7 @@ public class DrinkCupData : ScriptableObject
     public GameManager.CupSize cupSize;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
-    public Sprite icon;
+    public Sprite[] icons;
     [Space]
     public bool isUseable = false;
     public bool isThrowable = true;

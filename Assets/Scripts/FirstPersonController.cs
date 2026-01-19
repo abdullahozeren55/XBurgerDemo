@@ -1823,6 +1823,34 @@ public class FirstPersonController : MonoBehaviour
         DecideOutlineAndCrosshair();
     }
 
+    public void ForceUpdateSlotIcon(IGrabable targetGrabable, Sprite newIcon)
+    {
+        if (targetGrabable == null || newIcon == null) return;
+
+        bool found = false;
+
+        // Envanteri tara
+        for (int i = 0; i < inventoryItems.Length; i++)
+        {
+            // Aradýðýmýz obje bu slotta mý?
+            if (inventoryItems[i] == targetGrabable)
+            {
+                // 1. Objenin kendi data verisini güncelle
+                // (Senin IGrabable yapýnda Icon set edildiðinde data.icon'u güncelliyor, yani kalýcý olur)
+                inventoryItems[i].Icon = newIcon;
+
+                found = true;
+                break; // Bulduk, iþimiz bitti.
+            }
+        }
+
+        // 2. Eðer objeyi bulup deðiþtirdiysek UI'ý tazele ki oyuncu yeni ikonu görsün
+        if (found)
+        {
+            RefreshInventoryUI();
+        }
+    }
+
     public void ChangeCurrentGrabable(IGrabable grabObject)
     {
         PickUpItem(grabObject);
