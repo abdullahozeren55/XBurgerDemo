@@ -62,7 +62,7 @@ public class SauceManager : MonoBehaviour
                                         sauceType == SauceBottle.SauceType.BBQ ? sauceDrops[3] :
                                         sauceType == SauceBottle.SauceType.Buffalo ? sauceDrops[4] :
                                         sauceType == SauceBottle.SauceType.OrangeJuice ? sauceDrops[5] :
-                                        sauceType == SauceBottle.SauceType.AppleJuice ? sauceDrops[6] :
+                                        sauceType == SauceBottle.SauceType.Lemonade ? sauceDrops[6] :
                                         sauceType == SauceBottle.SauceType.CherryJuice ? sauceDrops[7] : sauceDrops[8], position, rotation, null);
 
         newDrop.transform.localScale = scale;

@@ -7,11 +7,12 @@ public class LocalizedText : MonoBehaviour
     public FontType fontType = FontType.DialogueOutlined;
 
     private TMP_Text _textComp;
-    private RectTransform _rectTransform;
 
-    // --- ORÝJÝNAL (INSPECTOR) DEÐERLERÝ HAFIZASI ---
+    // ARTIK RECT TRANSFORM'A ÝHTÝYACIMIZ YOK
+    // private RectTransform _rectTransform; <-- Sildik
+
+    // Hafýza Deðerleri
     private float _initialFontSize;
-    private Vector2 _initialAnchoredPosition;
     private float _initialCharSpacing;
     private float _initialWordSpacing;
     private float _initialLineSpacing;
@@ -19,20 +20,14 @@ public class LocalizedText : MonoBehaviour
     private void Awake()
     {
         _textComp = GetComponent<TMP_Text>();
-        _rectTransform = GetComponent<RectTransform>();
+        // RectTransform atamasýný sildik.
 
-        // 1. Oyun baþladýðý an, Inspector'da senin elle girdiðin deðerleri "Referans" olarak kaydet.
         if (_textComp != null)
         {
             _initialFontSize = _textComp.fontSize;
             _initialCharSpacing = _textComp.characterSpacing;
             _initialWordSpacing = _textComp.wordSpacing;
             _initialLineSpacing = _textComp.lineSpacing;
-        }
-
-        if (_rectTransform != null)
-        {
-            _initialAnchoredPosition = _rectTransform.anchoredPosition;
         }
     }
 
@@ -46,7 +41,6 @@ public class LocalizedText : MonoBehaviour
         if (LocalizationManager.Instance != null)
         {
             LocalizationManager.Instance.OnLanguageChanged += UpdateContent;
-            // Enable olduðunda hemen güncelle ki UI açýlýr açýlmaz doðru görünsün
             UpdateContent();
         }
     }
@@ -61,47 +55,42 @@ public class LocalizedText : MonoBehaviour
     {
         if (_textComp == null || LocalizationManager.Instance == null) return;
 
-        // A. Metni Güncelle
-        _textComp.text = LocalizationManager.Instance.GetText(localizationKey);
-
-        // B. Font Verilerini Çek
-        // 1. Hedef Dilin Verisi (Örn: Japonca)
+        // 1. Verileri Çek
         var targetData = LocalizationManager.Instance.GetFontDataForCurrentLanguage(fontType);
-
-        // 2. Referans Dilin Verisi (Örn: Ýngilizce/Latin) - Oran hesabý için þart!
         var defaultData = LocalizationManager.Instance.GetDefaultFontData(fontType);
 
-        // C. Fontu Ata
+        // 2. Font Ata
         if (targetData.font != null && _textComp.font != targetData.font)
         {
             _textComp.font = targetData.font;
         }
 
-        // --- MATEMATÝK KISMI ---
-
-        // 1. BOYUT HESAPLAMA (Relative Scaling)
-        // Soru: Inspector'da boyutu kaç katýna çýkarmýþým?
-        // Formül: (InspectorBoyutu / LatinBaseBoyutu)
-        float defaultBaseSize = Mathf.Max(defaultData.basePixelSize, 0.1f); // 0'a bölünme hatasý önlemi
+        // 3. BOYUT HESABI (Ayný Kalýyor)
+        float defaultBaseSize = Mathf.Max(defaultData.basePixelSize, 0.1f);
         float scaleRatio = _initialFontSize / defaultBaseSize;
 
-        // Cevap: Yeni fontun base boyutunu ayný oranda büyüt.
         _textComp.fontSize = targetData.basePixelSize * scaleRatio;
 
+        // 4. OFFSET HESABI (<voffset> için)
+        // Hedef dilin offseti ile Default dilin offseti arasýndaki farký bul ve scale ile çarp.
+        float rawOffsetDiff = targetData.verticalOffset - defaultData.verticalOffset;
+        float finalVOffset = rawOffsetDiff * scaleRatio;
 
-        // 2. KONUM HESAPLAMA (Delta Offset)
-        // Eðer bu obje bir LayoutGroup altýndaysa pozisyonu deðiþtirmek çalýþmayabilir ama denemekten zarar gelmez.
-        if (_rectTransform != null)
+        // 5. METNÝ OLUÞTUR VE YAZ (BÜYÜ BURADA)
+        string rawText = LocalizationManager.Instance.GetText(localizationKey);
+
+        // Eðer offset 0.1'den küçükse tag ekleyip string'i kirletmeyelim, gerek yok.
+        if (Mathf.Abs(finalVOffset) > 0.1f)
         {
-            // Fark: (Hedef Dilin Kaymasý - Latin Dilin Kaymasý)
-            Vector2 offsetDelta = targetData.positionOffset - defaultData.positionOffset;
-
-            // Sonuç: Orijinal konum + Fark
-            _rectTransform.anchoredPosition = _initialAnchoredPosition + offsetDelta;
+            // Metni <voffset=XX>...</voffset> içine alýyoruz.
+            _textComp.text = $"<voffset={finalVOffset:F2}>{rawText}</voffset>";
+        }
+        else
+        {
+            _textComp.text = rawText;
         }
 
-
-        // 3. SPACING HESAPLAMA (Additive)
+        // 6. SPACING HESABI (Ayný Kalýyor)
         _textComp.characterSpacing = _initialCharSpacing + (targetData.characterSpacingOffset - defaultData.characterSpacingOffset);
         _textComp.wordSpacing = _initialWordSpacing + (targetData.wordSpacingOffset - defaultData.wordSpacingOffset);
         _textComp.lineSpacing = _initialLineSpacing + (targetData.lineSpacingOffset - defaultData.lineSpacingOffset);

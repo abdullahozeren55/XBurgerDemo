@@ -22,7 +22,7 @@ MonoBehaviour:
   grabRotationOffset: {x: 60, y: -70, z: -70}
   grabLocalPositionOffset: {x: -0.0347, y: 0.0525, z: 0.0866}
   grabLocalRotationOffset: {x: 24.15221, y: 121.007774, z: 321.6542}
-  focusTextKey: GRABABLE_TRASH
+  focusTextKey: GRABABLE_LID_AND_STRAW
   audioClips:
   - {fileID: 8300000, guid: 6ba247c05ab01244d97d4f693e4f832e, type: 3}
   - {fileID: 8300000, guid: b5c223266c9892747aafc530c31bb790, type: 3}

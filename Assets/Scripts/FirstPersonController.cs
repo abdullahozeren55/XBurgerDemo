@@ -186,14 +186,20 @@ public class FirstPersonController : MonoBehaviour
     private bool focusTextComplete;
     private Coroutine grabbedUseCoroutine;
 
-    // Orijinal deðerleri saklamak için (Hafýza)
+    // Orijinal deðerler (Hafýza)
     private float _initFocusFontSize;
     private float _initFocusCharSpacing;
     private float _initFocusWordSpacing;
     private float _initFocusLineSpacing;
-    private Vector2 _initFocusAnchoredPos;
-    private RectTransform _focusTextRect;
-    // --- YENÝ EKLENENLER BÝTÝÞ ---
+
+    // --- OPTÝMÝZASYON ÝÇÝN HAFIZA ---
+    private IInteractable _cachedInteractable;
+    private IGrabable _cachedGrabable; // (Hem current hem other için tek deðiþken yeterli, çünkü ayný anda ikisine odaklanamayýz)
+    private Color _cachedColor;
+    private string _cachedRawText; // Ham metni de tutalým ki dil deðiþirse anlayalým
+
+    // YENÝ: Anlýk olarak kullanacaðýmýz hesaplanmýþ offset deðeri
+    private float _currentFocusVOffset = 0f;
 
     [Header("HandControlSettings")]
     [SerializeField, Range(0, 10)] private float handControlSpeedX = 0.2f;
@@ -245,8 +251,6 @@ public class FirstPersonController : MonoBehaviour
     private float defaultLowerLookLimit;
     private bool defaultCanJump;
     private bool defaultCanCrouch;
-    private bool defaultCanGrab;
-    private bool defaultCanInteract;
 
     private float rightHandArmLength;
     private float leftHandArmLength;
@@ -260,6 +264,7 @@ public class FirstPersonController : MonoBehaviour
     private Vector3 moveDirection;
 
     private int uninteractableLayer;
+    private int ungrabableLayer;
 
     private float rotationX = 0f;
 
@@ -274,6 +279,7 @@ public class FirstPersonController : MonoBehaviour
         defaultCrosshairColor = crosshair.color;
 
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
+        ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
 
         InteractKeyIsDone = false;
 
@@ -283,16 +289,11 @@ public class FirstPersonController : MonoBehaviour
 
         if (focusText != null)
         {
-            _focusTextRect = focusText.GetComponent<RectTransform>();
-
             // Orijinal deðerleri "Referans" olarak kaydet
             _initFocusFontSize = focusText.fontSize;
             _initFocusCharSpacing = focusText.characterSpacing;
             _initFocusWordSpacing = focusText.wordSpacing;
             _initFocusLineSpacing = focusText.lineSpacing;
-
-            if (_focusTextRect != null)
-                _initFocusAnchoredPos = _focusTextRect.anchoredPosition;
         }
 
         defaultWalkSpeed = walkSpeed;
@@ -303,8 +304,6 @@ public class FirstPersonController : MonoBehaviour
         defaultLowerLookLimit = lowerLookLimit;
         defaultCanJump = CanJump;
         defaultCanCrouch = CanCrouch;
-        defaultCanGrab = CanGrab; // Bunu kapatacaðýz ki tepsi varken baþka þey alamasýn
-        defaultCanInteract = CanInteract;
     }
 
     void Start()
@@ -932,71 +931,82 @@ public class FirstPersonController : MonoBehaviour
 
     private void DecideFocusText()
     {
-        if (!showInteractText)
+        if (!showInteractText) return;
+
+        // 1. ÞU ANKÝ DURUMU BELÝRLE (Henüz string oluþturma!)
+        IInteractable targetInteractable = null;
+        IGrabable targetGrabable = null;
+        bool hasTarget = false;
+
+        // Durum analizi (String üretmeden sadece referans buluyoruz)
+        if (currentInteractable != null)
+        {
+            targetInteractable = currentInteractable;
+            hasTarget = true;
+        }
+        else if (currentGrabable != null && !currentGrabable.IsGrabbed)
+        {
+            targetGrabable = currentGrabable;
+            hasTarget = true;
+        }
+        else if (otherGrabable != null)
+        {
+            targetGrabable = otherGrabable;
+            hasTarget = true;
+        }
+
+        // 2. DEÐÝÞÝKLÝK KONTROLÜ (Dirty Check)
+        // Baktýðýmýz obje ayný mý? Rengimiz ayný mý?
+        // Not: Dil deðiþimi zaten Event ile yönetildiði için burada kontrol etmeye gerek yok.
+
+        bool isSameObject = (targetInteractable == _cachedInteractable) && (targetGrabable == _cachedGrabable);
+        bool isSameColor = (crosshair.color == _cachedColor);
+
+        // EÐER HÝÇBÝR ÞEY DEÐÝÞMEDÝYSE VE HEDEF VARSA -> HÝÇBÝR ÞEY YAPMA (PERFORMANS KURTARICISI)
+        if (hasTarget && isSameObject && isSameColor && focusTextAnim.isShowingText) // IsShowing kontrolü önemli, belki animasyon bitmemiþtir.
         {
             return;
         }
 
-        // 1 — ÝNTERACTABLE
-        if (currentInteractable != null)
-        {
-            string localizedText = LocalizationManager.Instance.GetText(currentInteractable.FocusTextKey);
+        // 3. EÐER BURAYA GELDÝYSEK BÝR ÞEYLER DEÐÝÞMÝÞ DEMEKTÝR. ÝÞLEM YAPALIM.
 
-            focusText.color = crosshair.color;
+        // Hafýzayý güncelle
+        _cachedInteractable = targetInteractable;
+        _cachedGrabable = targetGrabable;
+        _cachedColor = crosshair.color;
+
+        if (hasTarget)
+        {
+            string keyToUse = "";
+            if (targetInteractable != null) keyToUse = targetInteractable.FocusTextKey;
+            else if (targetGrabable != null) keyToUse = targetGrabable.FocusTextKey;
+
+            // Metni çek ve formatla (Sadece deðiþiklik olduðunda burasý çalýþýr)
+            string rawText = LocalizationManager.Instance.GetText(keyToUse);
+            string finalText = GetFormattedText(rawText, _cachedColor);
+
             focusTextAnim.StopDisappearingText();
 
-            if (focusText.text != localizedText)
+            if (focusText.text != finalText)
             {
                 SetFocusTextComplete(false);
-                focusTextAnim.ShowText(localizedText);
+                focusTextAnim.ShowText(finalText);
             }
             else if (!focusTextComplete)
             {
                 focusTextAnim.StartShowingText();
             }
         }
-        // 2 — GRABABLE (elde olmayan)
-        else if (currentGrabable != null && !currentGrabable.IsGrabbed)
-        {
-            string localizedText = LocalizationManager.Instance.GetText(currentGrabable.FocusTextKey);
-
-            focusText.color = crosshair.color;
-            focusTextAnim.StopDisappearingText();
-
-            if (focusText.text != localizedText)
-            {
-                SetFocusTextComplete(false);
-                focusTextAnim.ShowText(localizedText);
-            }
-            else if (!focusTextComplete)
-            {
-                focusTextAnim.StartShowingText();
-            }
-        }
-        // 3 — OTHER GRABABLE
-        else if (otherGrabable != null)
-        {
-            string localizedText = LocalizationManager.Instance.GetText(otherGrabable.FocusTextKey);
-
-            focusText.color = crosshair.color;
-            focusTextAnim.StopDisappearingText();
-
-            if (focusText.text != localizedText)
-            {
-                SetFocusTextComplete(false);
-                focusTextAnim.ShowText(localizedText);
-            }
-            else if (!focusTextComplete)
-            {
-                focusTextAnim.StartShowingText();
-            }
-        }
-        // 4 — NULL / TEMÝZLEME
         else
         {
+            // Hedef yoksa temizle
             SetFocusTextComplete(false);
             focusTextAnim.StopShowingText();
             focusTextAnim.StartDisappearingText();
+
+            // Cache'i sýfýrla ki tekrar baktýðýmýzda algýlasýn
+            _cachedInteractable = null;
+            _cachedGrabable = null;
         }
     }
 
@@ -1568,22 +1578,47 @@ public class FirstPersonController : MonoBehaviour
                 // --- KOMBÝNASYON KONTROLLERÝ ---
                 if (currentGrabable != null && currentGrabable.IsGrabbed && targetItem != currentGrabable)
                 {
+                    // Ýhtimal 1: A elimde, B yerde (Zaten çözdüðün kýsým)
                     if (currentGrabable.TryCombine(targetItem))
                     {
+                        targetItem.ChangeLayer(ungrabableLayer);
                         if (otherGrabable == targetItem) otherGrabable = null;
                         DecideOutlineAndCrosshair();
                         return;
                     }
-                    else if (targetItem.TryCombine(currentGrabable))
+                    // Ýhtimal 2: B elimde, A yerde (Sorunlu Kýsým)
+                    else
                     {
-                        if (currentSlotIndex != -1)
+                        // --- CÝLA BURADA ---
+                        // TryCombine çalýþýrken obje disable olursa ResetGrab tetiklenir.
+                        // O sýrada otherGrabable doluysa kod yanlýþlýkla "Yerdekini Al" moduna girer.
+                        // Bunu önlemek için FPC'nin yerdeki objeyi görmesini GEÇÝCÝ olarak engelliyoruz.
+
+                        IGrabable tempOther = otherGrabable; // Yedeðini al
+                        otherGrabable = null; // FPC'yi kör et
+
+                        if (targetItem.TryCombine(currentGrabable))
                         {
-                            inventoryItems[currentSlotIndex] = null;
+                            // Baþarýlý! Zaten otherGrabable null kalmalý, çünkü A'yý elimize alacaðýz.
+
+                            targetItem.ChangeLayer(ungrabableLayer); // A'yý raycastlerden sakla (PickUpItem zaten hallediyor ama garanti olsun)
+
+                            if (currentSlotIndex != -1)
+                            {
+                                inventoryItems[currentSlotIndex] = null;
+                            }
+
+                            PickUpItem(targetItem);
+                            // otherGrabable = null; // Buraya yazmana gerek yok, yukarýda zaten nulladýk.
+
+                            DecideOutlineAndCrosshair();
+                            return;
                         }
-                        PickUpItem(targetItem);
-                        otherGrabable = null;
-                        DecideOutlineAndCrosshair();
-                        return;
+                        else
+                        {
+                            // Kombinasyon baþarýsýz olduysa körlüðü kaldýr, eski haline döndür.
+                            otherGrabable = tempOther;
+                        }
                     }
                 }
                 // -----------------------------------------
@@ -2214,16 +2249,18 @@ public class FirstPersonController : MonoBehaviour
 
     public void TryChangingFocusText(IInteractable interactable, string textKey)
     {
-        if (!showInteractText)
-        {
-            return;
-        }
+        if (!showInteractText) return;
 
-        string localizedText = LocalizationManager.Instance.GetText(textKey);
+        string rawText = LocalizationManager.Instance.GetText(textKey);
 
-        if (currentInteractable != null && currentInteractable == interactable && focusText.text != localizedText)
+        // YENÝ: Hem metni hem rengi formatla
+        string finalText = GetFormattedText(rawText, crosshair.color);
+
+        if (currentInteractable != null &&
+            currentInteractable == interactable &&
+            focusText.text != finalText)
         {
-            focusTextAnim.ShowText(localizedText);
+            focusTextAnim.ShowText(finalText);
             focusTextAnim.SkipTypewriter();
             SetFocusTextComplete(true);
         }
@@ -2231,22 +2268,19 @@ public class FirstPersonController : MonoBehaviour
 
     public void TryChangingFocusText(IGrabable grabable, string textKey)
     {
-        if (!showInteractText)
-        {
-            return;
-        }
+        if (!showInteractText) return;
 
-        string localizedText = LocalizationManager.Instance.GetText(textKey);
+        string rawText = LocalizationManager.Instance.GetText(textKey);
 
-        if (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable && focusText.text != localizedText)
+        // YENÝ: Formatla
+        string finalText = GetFormattedText(rawText, crosshair.color);
+
+        bool isRelevant = (currentGrabable != null && !currentGrabable.IsGrabbed && currentGrabable == grabable) ||
+                          (otherGrabable != null && otherGrabable == grabable);
+
+        if (isRelevant && focusText.text != finalText)
         {
-            focusTextAnim.ShowText(localizedText);
-            focusTextAnim.SkipTypewriter();
-            SetFocusTextComplete(true);
-        }
-        else if (otherGrabable != null && otherGrabable == grabable && focusText.text != localizedText)
-        {
-            focusTextAnim.ShowText(localizedText);
+            focusTextAnim.ShowText(finalText);
             focusTextAnim.SkipTypewriter();
             SetFocusTextComplete(true);
         }
@@ -2623,35 +2657,31 @@ public class FirstPersonController : MonoBehaviour
 
     private void ForceUpdateFocusText()
     {
-        // 1. ÖNCE FONTU GÜNCELLE (Bu satýr eksikti!)
+        // Dil deðiþti, cache'i patlat ki metin zorla güncellensin.
+        _cachedInteractable = null;
+        _cachedGrabable = null;
+
+        // 1. Görünüm ayarlarýný (ve offset deðerini) güncelle
         UpdateFocusTextAppearance();
 
-        // 2. SONRA METNÝ GÜNCELLE (Mevcut kodun)
-        // Hangi objeye baktýðýmýzý bulalým
+        // 2. Metni bul
         string keyToUse = "";
+        // ... (Key bulma mantýðý aynen kalýyor) ...
 
-        if (CanInteract && currentInteractable != null)
-        {
-            keyToUse = currentInteractable.FocusTextKey;
-        }
-        else if (CanGrab && currentGrabable != null && !currentGrabable.IsGrabbed)
-        {
-            keyToUse = currentGrabable.FocusTextKey;
-        }
-        else if (CanGrab && otherGrabable != null)
-        {
-            keyToUse = otherGrabable.FocusTextKey;
-        }
-        else
-            return;
-
-        // Eðer geçerli bir key bulduysak ve metin görünüyorsa
         if (!string.IsNullOrEmpty(keyToUse) && showInteractText)
         {
-            string newText = LocalizationManager.Instance.GetText(keyToUse);
+            string rawText = LocalizationManager.Instance.GetText(keyToUse);
 
-            // Metni daktilo efektiyle veya direkt göster
-            focusTextAnim.ShowText(newText);
+            // YENÝ: Tag ekleme iþlemi
+            string finalString = rawText;
+
+            if (Mathf.Abs(_currentFocusVOffset) > 0.1f)
+            {
+                // Typewriter efektine göndermeden önce offset tag'ini ekle
+                finalString = $"<voffset={_currentFocusVOffset:F2}>{rawText}</voffset>";
+            }
+
+            focusTextAnim.ShowText(finalString);
             focusTextAnim.SkipTypewriter();
             SetFocusTextComplete(true);
         }
@@ -2723,40 +2753,52 @@ public class FirstPersonController : MonoBehaviour
     {
         if (LocalizationManager.Instance == null || focusText == null) return;
 
-        // 1. Gerekli Datalarý Çek
-        // Hedef dil (Örn: Japonca)
         var targetData = LocalizationManager.Instance.GetFontDataForCurrentLanguage(focusTextFontType);
-        // Referans dil (Latin) - Oran hesabý için
         var defaultData = LocalizationManager.Instance.GetDefaultFontData(focusTextFontType);
 
-        // 2. Font Assetini Deðiþtir
+        // Font
         if (targetData.font != null && focusText.font != targetData.font)
-        {
             focusText.font = targetData.font;
-        }
 
-        // --- MATEMATÝKSEL HESAPLAMALAR ---
-
-        // 3. BOYUT (Ratio Scaling)
-        // Senin Inspector'da verdiðin boyut, Latin Base boyutunun kaç katý?
-        float defaultBaseSize = Mathf.Max(defaultData.basePixelSize, 0.1f); // 0 hatasý önlemi
+        // Boyut
+        float defaultBaseSize = Mathf.Max(defaultData.basePixelSize, 0.1f);
         float scaleRatio = _initFocusFontSize / defaultBaseSize;
-
-        // Yeni fontu da ayný oranda büyüt
         focusText.fontSize = targetData.basePixelSize * scaleRatio;
 
-        // 4. SPACING (Additive Offset)
-        // Farklarý ekle
+        // Spacing
         focusText.characterSpacing = _initFocusCharSpacing + (targetData.characterSpacingOffset - defaultData.characterSpacingOffset);
         focusText.wordSpacing = _initFocusWordSpacing + (targetData.wordSpacingOffset - defaultData.wordSpacingOffset);
         focusText.lineSpacing = _initFocusLineSpacing + (targetData.lineSpacingOffset - defaultData.lineSpacingOffset);
 
-        // 5. KONUM (Delta Offset)
-        if (_focusTextRect != null)
+        // --- YENÝ: OFFSET HESABI (Sadece deðeri hesapla ve sakla) ---
+        float rawOffsetDiff = targetData.verticalOffset - defaultData.verticalOffset;
+
+        // Bu deðeri global deðiþkene atýyoruz ki metin deðiþince kullanalým
+        _currentFocusVOffset = rawOffsetDiff * scaleRatio;
+    }
+
+    // Yardýmcý Fonksiyon: Ham metni alýr, gerekiyorsa <voffset> ekleyip geri döndürür.
+    private string GetFormattedText(string rawText, Color targetColor)
+    {
+        string processedText = rawText;
+
+        // 1. Önce Offset Tag'i (Varsa)
+        if (Mathf.Abs(_currentFocusVOffset) > 0.1f)
         {
-            Vector2 offsetDelta = targetData.positionOffset - defaultData.positionOffset;
-            _focusTextRect.anchoredPosition = _initFocusAnchoredPos + offsetDelta;
+            processedText = $"<voffset={_currentFocusVOffset:F2}>{processedText}</voffset>";
         }
+
+        // 2. Sonra Renk Tag'i (Kesinlikle ekliyoruz)
+        // Bu sayede metin disappear olurken rengini kaybetmez.
+        string hexColor = ColorToHex(targetColor);
+        processedText = $"<color=#{hexColor}>{processedText}</color>";
+
+        return processedText;
+    }
+
+    private string ColorToHex(Color color)
+    {
+        return ColorUtility.ToHtmlStringRGB(color);
     }
 
     private void OnDrawGizmos()

@@ -30,11 +30,11 @@ public class GameManager : MonoBehaviour
 
     public enum DrinkTypes
     {
-        BlackKula,
-        YellowKula,
-        WhiteKula,
+        Cola,
+        OrangeSoda,
+        LemonLime,
         OrangeJuice,
-        AppleJuice,
+        Lemonade,
         CherryJuice,
         Ayran,
         Null

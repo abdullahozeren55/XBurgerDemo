@@ -5,7 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewDrinkCupData", menuName = "Data/DrinkCup")]
 public class DrinkCupData : ScriptableObject
 {
-    public string focusTextKey;
+    [Tooltip("0:Empty, 1:Cola, 2:Cola+Lid, 3:Orange, 4:Orange+Lid, 5:Lemon, 6:Lemon+Lid")]
+    public string[] focusTextKeys; // Array'e çevirdik
     public GameManager.CupSize cupSize;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;

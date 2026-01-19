@@ -39,7 +39,7 @@ public class SauceBottle : MonoBehaviour, IGrabable
         BBQ,
         Buffalo,
         OrangeJuice,
-        AppleJuice,
+        Lemonade,
         CherryJuice,
         Ayran
     }

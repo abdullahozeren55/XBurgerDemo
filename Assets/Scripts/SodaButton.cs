@@ -8,11 +8,15 @@ public class SodaButton : MonoBehaviour, IInteractable
     [Tooltip("0: Cola, 1: Fanta, 2: Sprite...")]
     public int flavorIndex;
 
+    [Tooltip("Bardaða atanacak mantýksal içecek türü")]
+    public GameManager.DrinkTypes drinkType; // <-- YENÝ: Enum ekledik
+
     // --- IInteractable ---
     public bool CanInteract { get => canInteract; set => canInteract = value; }
     [SerializeField] private bool canInteract = true;
 
-    public string FocusTextKey { get => "SodaButton"; set { } }
+    public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
+    [SerializeField] private string focusTextKey;
     public PlayerManager.HandRigTypes HandRigType { get => PlayerManager.HandRigTypes.Interaction; set { } }
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;

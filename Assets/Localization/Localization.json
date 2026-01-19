@@ -371,6 +371,36 @@
     "pt": "Sair Do Computador"
   },
   {
+    "key": "INTERACTABLE_POUR_COLA",
+    "tr": "Kola Doldur",
+    "en": "Pour Cola",
+    "zh": "倒可乐",
+    "ja": "コーラを注ぐ",
+    "es": "Servir Cola",
+    "ru": "Налить Колу",
+    "pt": "Servir Cola"
+  },
+  {
+    "key": "INTERACTABLE_POUR_ORANGE_SODA",
+    "tr": "Portakallı Gazoz Doldur",
+    "en": "Pour Orange Soda",
+    "zh": "倒橙味汽水",
+    "ja": "オレンジソーダを注ぐ",
+    "es": "Servir Soda De Naranja",
+    "ru": "Налить Апельсиновую Газировку",
+    "pt": "Servir Refrigerante De Laranja"
+  },
+  {
+    "key": "INTERACTABLE_POUR_LEMON_LIME_SODA",
+    "tr": "Sade Gazoz Doldur",
+    "en": "Pour Lemon-Lime Soda",
+    "zh": "倒柠檬酸橙汽水",
+    "ja": "レモンライムソーダを注ぐ",
+    "es": "Servir Soda Lima-Limón",
+    "ru": "Налить Лимонную Газировку",
+    "pt": "Servir Refrigerante De Limão"
+  },
+  {
     "key": "GRABABLE_BUN",
     "tr": "Ekmek",
     "en": "Bun",
@@ -801,6 +831,576 @@
     "pt": "Lixo"
   },
   {
+    "key": "GRABABLE_TOY_BALL",
+    "tr": "Oyuncak Top",
+    "en": "Toy Ball",
+    "zh": "玩具球",
+    "ja": "おもちゃのボール",
+    "es": "Pelota De Juguete",
+    "ru": "Игрушечный Мяч",
+    "pt": "Bola De Brinquedo"
+  },
+  {
+    "key": "GRABABLE_TOY_CAR",
+    "tr": "Oyuncak Araba",
+    "en": "Toy Car",
+    "zh": "玩具车",
+    "ja": "おもちゃの車",
+    "es": "Auto De Juguete",
+    "ru": "Игрушечная Машинка",
+    "pt": "Carrinho De Brinquedo"
+  },
+  {
+    "key": "GRABABLE_TOY_CLOWN",
+    "tr": "Oyuncak Palyaço",
+    "en": "Toy Clown",
+    "zh": "玩具小丑",
+    "ja": "おもちゃのピエロ",
+    "es": "Payaso De Juguete",
+    "ru": "Игрушечный Клоун",
+    "pt": "Palhaço De Brinquedo"
+  },
+  {
+    "key": "GRABABLE_FRY_BOX",
+    "tr": "Kızartma Kutusu",
+    "en": "Fry Box",
+    "zh": "炸物盒",
+    "ja": "揚げ物の箱",
+    "es": "Caja De Frituras",
+    "ru": "Коробка Для Закусок",
+    "pt": "Caixa De Frituras"
+  },
+  {
+    "key": "GRABABLE_FRIES_FROZEN",
+    "tr": "Patates (Donuk)",
+    "en": "Fries (Frozen)",
+    "zh": "薯条 (冷冻)",
+    "ja": "ポテト (冷凍)",
+    "es": "Papas (Congeladas)",
+    "ru": "Картофель Фри (Замороженный)",
+    "pt": "Batatas (Congeladas)"
+  },
+  {
+    "key": "GRABABLE_FRIES_FRIED",
+    "tr": "Patates (Kızarmış)",
+    "en": "Fries (Fried)",
+    "zh": "薯条 (炸过)",
+    "ja": "ポテト (揚げた)",
+    "es": "Papas (Fritas)",
+    "ru": "Картофель Фри (Пожаренный)",
+    "pt": "Batatas (Fritas)"
+  },
+  {
+    "key": "GRABABLE_FRIES_BURNT",
+    "tr": "Patates (Yanmış)",
+    "en": "Fries (Burnt)",
+    "zh": "薯条 (焦)",
+    "ja": "ポテト (焦げた)",
+    "es": "Papas (Quemadas)",
+    "ru": "Картофель Фри (Сгоревший)",
+    "pt": "Batatas (Queimadas)"
+  },
+  {
+    "key": "GRABABLE_FRIES_IN_BOX",
+    "tr": "Patates Kızartması",
+    "en": "French Fries",
+    "zh": "炸薯条",
+    "ja": "フライドポテト",
+    "es": "Papas Fritas",
+    "ru": "Картофель Фри",
+    "pt": "Batatas Fritas"
+  },
+  {
+    "key": "GRABABLE_ONION_RINGS_FROZEN",
+    "tr": "Soğan Halkası (Donuk)",
+    "en": "Onion Rings (Frozen)",
+    "zh": "洋葱圈 (冷冻)",
+    "ja": "オニオンリング (冷凍)",
+    "es": "Aros De Cebolla (Congelados)",
+    "ru": "Луковые Кольца (Замороженные)",
+    "pt": "Anéis De Cebola (Congelados)"
+  },
+  {
+    "key": "GRABABLE_ONION_RINGS_FRIED",
+    "tr": "Soğan Halkası (Kızarmış)",
+    "en": "Onion Rings (Fried)",
+    "zh": "洋葱圈 (炸过)",
+    "ja": "オニオンリング (揚げた)",
+    "es": "Aros De Cebolla (Fritos)",
+    "ru": "Луковые Кольца (Пожаренные)",
+    "pt": "Anéis De Cebola (Fritos)"
+  },
+  {
+    "key": "GRABABLE_ONION_RINGS_BURNT",
+    "tr": "Soğan Halkası (Yanmış)",
+    "en": "Onion Rings (Burnt)",
+    "zh": "洋葱圈 (焦)",
+    "ja": "オニオンリング (焦げた)",
+    "es": "Aros De Cebolla (Quemados)",
+    "ru": "Луковые Кольца (Сгоревшие)",
+    "pt": "Anéis De Cebola (Queimados)"
+  },
+  {
+    "key": "GRABABLE_ONION_RINGS_IN_BOX",
+    "tr": "Soğan Halkası",
+    "en": "Onion Rings",
+    "zh": "洋葱圈",
+    "ja": "オニオンリング",
+    "es": "Aros De Cebolla",
+    "ru": "Луковые Кольца",
+    "pt": "Anéis De Cebola"
+  },
+  {
+    "key": "GRABABLE_NUGGETS_FROZEN",
+    "tr": "Nugget (Donuk)",
+    "en": "Nuggets (Frozen)",
+    "zh": "鸡块 (冷冻)",
+    "ja": "ナゲット (冷凍)",
+    "es": "Nuggets (Congelados)",
+    "ru": "Наггетсы (Замороженные)",
+    "pt": "Nuggets (Congelados)"
+  },
+  {
+    "key": "GRABABLE_NUGGETS_FRIED",
+    "tr": "Nugget (Kızarmış)",
+    "en": "Nuggets (Fried)",
+    "zh": "鸡块 (炸过)",
+    "ja": "ナゲット (揚げた)",
+    "es": "Nuggets (Fritos)",
+    "ru": "Наггетсы (Пожаренные)",
+    "pt": "Nuggets (Fritos)"
+  },
+  {
+    "key": "GRABABLE_NUGGETS_BURNT",
+    "tr": "Nugget (Yanmış)",
+    "en": "Nuggets (Burnt)",
+    "zh": "鸡块 (焦)",
+    "ja": "ナゲット (焦げた)",
+    "es": "Nuggets (Quemados)",
+    "ru": "Наггетсы (Сгоревшие)",
+    "pt": "Nuggets (Queimados)"
+  },
+  {
+    "key": "GRABABLE_NUGGETS_IN_BOX",
+    "tr": "Nugget",
+    "en": "Chicken Nuggets",
+    "zh": "炸鸡块",
+    "ja": "チキンナゲット",
+    "es": "Nuggets De Pollo",
+    "ru": "Куриные Наггетсы",
+    "pt": "Nuggets De Frango"
+  },
+  {
+    "key": "GRABABLE_MOZZARELLA_STICKS_FROZEN",
+    "tr": "Mozzarella Çubuğu (Donuk)",
+    "en": "Mozzarella Sticks (Frozen)",
+    "zh": "马苏里拉芝士条 (冷冻)",
+    "ja": "モッツァレラスティック (冷凍)",
+    "es": "Palitos De Mozzarella (Congelados)",
+    "ru": "Палочки Моцареллы (Замороженные)",
+    "pt": "Palitos De Mussarela (Congelados)"
+  },
+  {
+    "key": "GRABABLE_MOZZARELLA_STICKS_FRIED",
+    "tr": "Mozzarella Çubuğu (Kızarmış)",
+    "en": "Mozzarella Sticks (Fried)",
+    "zh": "马苏里拉芝士条 (炸过)",
+    "ja": "モッツァレラスティック (揚げた)",
+    "es": "Palitos De Mozzarella (Fritos)",
+    "ru": "Палочки Моцареллы (Пожаренные)",
+    "pt": "Palitos De Mussarela (Fritos)"
+  },
+  {
+    "key": "GRABABLE_MOZZARELLA_STICKS_BURNT",
+    "tr": "Mozzarella Çubuğu (Yanmış)",
+    "en": "Mozzarella Sticks (Burnt)",
+    "zh": "马苏里拉芝士条 (焦)",
+    "ja": "モッツァレラスティック (焦げた)",
+    "es": "Palitos De Mozzarella (Quemados)",
+    "ru": "Палочки Моцареллы (Сгоревшие)",
+    "pt": "Palitos De Mussarela (Queimados)"
+  },
+  {
+    "key": "GRABABLE_MOZZARELLA_STICKS_IN_BOX",
+    "tr": "Mozzarella Çubuğu",
+    "en": "Mozzarella Sticks",
+    "zh": "马苏里拉芝士条",
+    "ja": "モッツァレラスティック",
+    "es": "Palitos De Mozzarella",
+    "ru": "Палочки Моцареллы",
+    "pt": "Palitos De Mussarela"
+  },
+  {
+    "key": "GRABABLE_DINO_NUGGETS_FROZEN",
+    "tr": "Dinogget™ (Donuk)",
+    "en": "Dinoggets™ (Frozen)",
+    "zh": "迪诺块™ (冷冻)",
+    "ja": "ダイナゲット™ (冷凍)",
+    "es": "Dinoggets™ (Congelados)",
+    "ru": "Диноггеты™ (Замороженные)",
+    "pt": "Dinoggets™ (Congelados)"
+  },
+  {
+    "key": "GRABABLE_DINO_NUGGETS_FRIED",
+    "tr": "Dinogget™ (Kızarmış)",
+    "en": "Dinoggets™ (Fried)",
+    "zh": "迪诺块™ (炸过)",
+    "ja": "ダイナゲット™ (揚げた)",
+    "es": "Dinoggets™ (Fritos)",
+    "ru": "Диноггеты™ (Пожаренные)",
+    "pt": "Dinoggets™ (Fritos)"
+  },
+  {
+    "key": "GRABABLE_DINO_NUGGETS_BURNT",
+    "tr": "Dinogget™ (Yanmış)",
+    "en": "Dinoggets™ (Burnt)",
+    "zh": "迪诺块™ (焦)",
+    "ja": "ダイナゲット™ (焦げた)",
+    "es": "Dinoggets™ (Quemados)",
+    "ru": "Диноггеты™ (Сгоревшие)",
+    "pt": "Dinoggets™ (Queimados)"
+  },
+  {
+    "key": "GRABABLE_DINO_NUGGETS_IN_BOX",
+    "tr": "Dinogget™",
+    "en": "Dinoggets™",
+    "zh": "迪诺块™",
+    "ja": "ダイナゲット™",
+    "es": "Dinoggets™",
+    "ru": "Диноггеты™",
+    "pt": "Dinoggets™"
+  },
+  {
+    "key": "GRABABLE_SMILEY_FRIES_FROZEN",
+    "tr": "Mutlu Patatesler™ (Donuk)",
+    "en": "Happy Fries™ (Frozen)",
+    "zh": "开心薯条™ (冷冻)",
+    "ja": "ハッピーポテト™ (冷凍)",
+    "es": "Papas Felices™ (Congeladas)",
+    "ru": "Веселая Картошка™ (Замороженная)",
+    "pt": "Batatas Felizes™ (Congeladas)"
+  },
+  {
+    "key": "GRABABLE_SMILEY_FRIES_FRIED",
+    "tr": "Mutlu Patatesler™ (Kızarmış)",
+    "en": "Happy Fries™ (Fried)",
+    "zh": "开心薯条™ (炸过)",
+    "ja": "ハッピーポテト™ (揚げた)",
+    "es": "Papas Felices™ (Fritas)",
+    "ru": "Веселая Картошка™ (Пожаренная)",
+    "pt": "Batatas Felizes™ (Fritas)"
+  },
+  {
+    "key": "GRABABLE_SMILEY_FRIES_BURNT",
+    "tr": "Mutlu Patatesler™ (Yanmış)",
+    "en": "Happy Fries™ (Burnt)",
+    "zh": "开心薯条™ (焦)",
+    "ja": "ハッピーポテト™ (焦げた)",
+    "es": "Papas Felices™ (Quemadas)",
+    "ru": "Веселая Картошка™ (Сгоревшая)",
+    "pt": "Batatas Felizes™ (Queimadas)"
+  },
+  {
+    "key": "GRABABLE_SMILEY_FRIES_IN_BOX",
+    "tr": "Mutlu Patatesler™",
+    "en": "Happy Fries™",
+    "zh": "开心薯条™",
+    "ja": "ハッピーポテト™",
+    "es": "Papas Felices™",
+    "ru": "Веселая Картошка™",
+    "pt": "Batatas Felizes™"
+  },
+  {
+    "key": "GRABABLE_CRISPY_CHICKEN_FROZEN",
+    "tr": "Çıtır Tavuk (Donuk)",
+    "en": "Crispy Chicken (Frozen)",
+    "zh": "香脆鸡肉 (冷冻)",
+    "ja": "クリスピーチキン (冷凍)",
+    "es": "Pollo Crujiente (Congelado)",
+    "ru": "Хрустящая Курица (Замороженная)",
+    "pt": "Frango Crocante (Congelado)"
+  },
+  {
+    "key": "GRABABLE_CRISPY_CHICKEN_FRIED",
+    "tr": "Çıtır Tavuk (Kızarmış)",
+    "en": "Crispy Chicken (Fried)",
+    "zh": "香脆鸡肉 (炸过)",
+    "ja": "クリスピーチキン (揚げた)",
+    "es": "Pollo Crujiente (Frito)",
+    "ru": "Хрустящая Курица (Пожаренная)",
+    "pt": "Frango Crocante (Frito)"
+  },
+  {
+    "key": "GRABABLE_CRISPY_CHICKEN_BURNT",
+    "tr": "Çıtır Tavuk (Yanmış)",
+    "en": "Crispy Chicken (Burnt)",
+    "zh": "香脆鸡肉 (焦)",
+    "ja": "クリスピーチキン (焦げた)",
+    "es": "Pollo Crujiente (Quemado)",
+    "ru": "Хрустящая Курица (Сгоревшая)",
+    "pt": "Frango Crocante (Queimado)"
+  },
+  {
+    "key": "GRABABLE_SODA_CUP_SMALL",
+    "tr": "Küçük Bardak",
+    "en": "Small Soda Cup",
+    "zh": "小号汽水杯",
+    "ja": "Sサイズカップ",
+    "es": "Vaso Pequeño",
+    "ru": "Маленький Стакан",
+    "pt": "Copo Pequeno"
+  },
+  {
+    "key": "GRABABLE_SODA_CUP_MEDIUM",
+    "tr": "Orta Bardak",
+    "en": "Medium Soda Cup",
+    "zh": "中号汽水杯",
+    "ja": "Mサイズカップ",
+    "es": "Vaso Mediano",
+    "ru": "Средний Стакан",
+    "pt": "Copo Médio"
+  },
+  {
+    "key": "GRABABLE_SODA_CUP_LARGE",
+    "tr": "Büyük Bardak",
+    "en": "Large Soda Cup",
+    "zh": "大号汽水杯",
+    "ja": "Lサイズカップ",
+    "es": "Vaso Grande",
+    "ru": "Большой Стакан",
+    "pt": "Copo Grande"
+  },
+  {
+    "key": "GRABABLE_LID_AND_STRAW",
+    "tr": "Kapak & Pipet",
+    "en": "Lid & Straw",
+    "zh": "杯盖与吸管",
+    "ja": "フタとストロー",
+    "es": "Tapa Y Popote",
+    "ru": "Крышка И Трубочка",
+    "pt": "Tampa E Canudo"
+  },
+  {
+    "key": "GRABABLE_COLA_SMALL_UNCAPPED",
+    "tr": "Küçük Kola (Kapaksız)",
+    "en": "Small Cola (Uncapped)",
+    "zh": "小号可乐 (无盖)",
+    "ja": "Sサイズコーラ (フタなし)",
+    "es": "Cola Pequeña (Sin Tapa)",
+    "ru": "Маленькая Кола (Без Крышки)",
+    "pt": "Cola Pequena (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_COLA_SMALL",
+    "tr": "Küçük Kola",
+    "en": "Small Cola",
+    "zh": "小号可乐",
+    "ja": "Sサイズコーラ",
+    "es": "Cola Pequeña",
+    "ru": "Маленькая Кола",
+    "pt": "Cola Pequena"
+  },
+  {
+    "key": "GRABABLE_COLA_MEDIUM_UNCAPPED",
+    "tr": "Orta Kola (Kapaksız)",
+    "en": "Medium Cola (Uncapped)",
+    "zh": "中号可乐 (无盖)",
+    "ja": "Mサイズコーラ (フタなし)",
+    "es": "Cola Mediana (Sin Tapa)",
+    "ru": "Средняя Кола (Без Крышки)",
+    "pt": "Cola Média (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_COLA_MEDIUM",
+    "tr": "Orta Kola",
+    "en": "Medium Cola",
+    "zh": "中号可乐",
+    "ja": "Mサイズコーラ",
+    "es": "Cola Mediana",
+    "ru": "Средняя Кола",
+    "pt": "Cola Média"
+  },
+  {
+    "key": "GRABABLE_COLA_LARGE_UNCAPPED",
+    "tr": "Büyük Kola (Kapaksız)",
+    "en": "Large Cola (Uncapped)",
+    "zh": "大号可乐 (无盖)",
+    "ja": "Lサイズコーラ (フタなし)",
+    "es": "Cola Grande (Sin Tapa)",
+    "ru": "Большая Кола (Без Крышки)",
+    "pt": "Cola Grande (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_COLA_LARGE",
+    "tr": "Büyük Kola",
+    "en": "Large Cola",
+    "zh": "大号可乐",
+    "ja": "Lサイズコーラ",
+    "es": "Cola Grande",
+    "ru": "Большая Кола",
+    "pt": "Cola Grande"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_SMALL_UNCAPPED",
+    "tr": "Küçük Portakallı Gazoz (Kapaksız)",
+    "en": "Small Orange Soda (Uncapped)",
+    "zh": "小号橙味汽水 (无盖)",
+    "ja": "Sサイズオレンジソーダ (フタなし)",
+    "es": "Soda De Naranja Pequeña (Sin Tapa)",
+    "ru": "Маленькая Апельсиновая Газировка (Без Крышки)",
+    "pt": "Refrigerante De Laranja Pequeno (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_SMALL",
+    "tr": "Küçük Portakallı Gazoz",
+    "en": "Small Orange Soda",
+    "zh": "小号橙味汽水",
+    "ja": "Sサイズオレンジソーダ",
+    "es": "Soda De Naranja Pequeña",
+    "ru": "Маленькая Апельсиновая Газировка",
+    "pt": "Refrigerante De Laranja Pequeno"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_MEDIUM_UNCAPPED",
+    "tr": "Orta Portakallı Gazoz (Kapaksız)",
+    "en": "Medium Orange Soda (Uncapped)",
+    "zh": "中号橙味汽水 (无盖)",
+    "ja": "Mサイズオレンジソーダ (フタなし)",
+    "es": "Soda De Naranja Mediana (Sin Tapa)",
+    "ru": "Средняя Апельсиновая Газировка (Без Крышки)",
+    "pt": "Refrigerante De Laranja Médio (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_MEDIUM",
+    "tr": "Orta Portakallı Gazoz",
+    "en": "Medium Orange Soda",
+    "zh": "中号橙味汽水",
+    "ja": "Mサイズオレンジソーダ",
+    "es": "Soda De Naranja Mediana",
+    "ru": "Средняя Апельсиновая Газировка",
+    "pt": "Refrigerante De Laranja Médio"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_LARGE_UNCAPPED",
+    "tr": "Büyük Portakallı Gazoz (Kapaksız)",
+    "en": "Large Orange Soda (Uncapped)",
+    "zh": "大号橙味汽水 (无盖)",
+    "ja": "Lサイズオレンジソーダ (フタなし)",
+    "es": "Soda De Naranja Grande (Sin Tapa)",
+    "ru": "Большая Апельсиновая Газировка (Без Крышки)",
+    "pt": "Refrigerante De Laranja Grande (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_ORANGE_SODA_LARGE",
+    "tr": "Büyük Portakallı Gazoz",
+    "en": "Large Orange Soda",
+    "zh": "大号橙味汽水",
+    "ja": "Lサイズオレンジソーダ",
+    "es": "Soda De Naranja Grande",
+    "ru": "Большая Апельсиновая Газировка",
+    "pt": "Refrigerante De Laranja Grande"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_SMALL_UNCAPPED",
+    "tr": "Küçük Sade Gazoz (Kapaksız)",
+    "en": "Small Lemon-Lime Soda (Uncapped)",
+    "zh": "小号柠檬酸橙汽水 (无盖)",
+    "ja": "Sサイズレモンライムソーダ (フタなし)",
+    "es": "Soda Lima-Limón Pequeña (Sin Tapa)",
+    "ru": "Маленькая Лимонная Газировка (Без Крышки)",
+    "pt": "Refrigerante De Limão Pequeno (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_SMALL",
+    "tr": "Küçük Sade Gazoz",
+    "en": "Small Lemon-Lime Soda",
+    "zh": "小号柠檬酸橙汽水",
+    "ja": "Sサイズレモンライムソーダ",
+    "es": "Soda Lima-Limón Pequeña",
+    "ru": "Маленькая Лимонная Газировка",
+    "pt": "Refrigerante De Limão Pequeno"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_MEDIUM_UNCAPPED",
+    "tr": "Orta Sade Gazoz (Kapaksız)",
+    "en": "Medium Lemon-Lime Soda (Uncapped)",
+    "zh": "中号柠檬酸橙汽水 (无盖)",
+    "ja": "Mサイズレモンライムソーダ (フタなし)",
+    "es": "Soda Lima-Limón Mediana (Sin Tapa)",
+    "ru": "Средняя Лимонная Газировка (Без Крышки)",
+    "pt": "Refrigerante De Limão Médio (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_MEDIUM",
+    "tr": "Orta Sade Gazoz",
+    "en": "Medium Lemon-Lime Soda",
+    "zh": "中号柠檬酸橙汽水",
+    "ja": "Mサイズレモンライムソーダ",
+    "es": "Soda Lima-Limón Mediana",
+    "ru": "Средняя Лимонная Газировка",
+    "pt": "Refrigerante De Limão Médio"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_LARGE_UNCAPPED",
+    "tr": "Büyük Sade Gazoz (Kapaksız)",
+    "en": "Large Lemon-Lime Soda (Uncapped)",
+    "zh": "大号柠檬酸橙汽水 (无盖)",
+    "ja": "Lサイズレモンライムソーダ (フタなし)",
+    "es": "Soda Lima-Limón Grande (Sin Tapa)",
+    "ru": "Большая Лимонная Газировка (Без Крышки)",
+    "pt": "Refrigerante De Limão Grande (Sem Tampa)"
+  },
+  {
+    "key": "GRABABLE_LEMON_LIME_SODA_LARGE",
+    "tr": "Büyük Sade Gazoz",
+    "en": "Large Lemon-Lime Soda",
+    "zh": "大号柠檬酸橙汽水",
+    "ja": "Lサイズレモンライムソーダ",
+    "es": "Soda Lima-Limón Grande",
+    "ru": "Большая Лимонная Газировка",
+    "pt": "Refrigerante De Limão Grande"
+  },
+  {
+    "key": "GRABABLE_ORANGE_JUICE",
+    "tr": "Portakal Suyu",
+    "en": "Orange Juice",
+    "zh": "橙汁",
+    "ja": "オレンジジュース",
+    "es": "Jugo De Naranja",
+    "ru": "Апельсиновый Сок",
+    "pt": "Suco De Laranja"
+  },
+  {
+    "key": "GRABABLE_CHERRY_JUICE",
+    "tr": "Vişne Suyu",
+    "en": "Cherry Juice",
+    "zh": "樱桃汁",
+    "ja": "チェリージュース",
+    "es": "Jugo De Cereza",
+    "ru": "Вишневый Сок",
+    "pt": "Suco De Cereja"
+  },
+  {
+    "key": "GRABABLE_LEMONADE",
+    "tr": "Limonata",
+    "en": "Lemonade",
+    "zh": "柠檬水",
+    "ja": "レモネード",
+    "es": "Limonada",
+    "ru": "Лимонад",
+    "pt": "Limonada"
+  },
+  {
+    "key": "GRABABLE_AYRAN",
+    "tr": "Ayran",
+    "en": "Ayran",
+    "zh": "爱兰",
+    "ja": "アイラン",
+    "es": "Ayran",
+    "ru": "Айран",
+    "pt": "Ayran"
+  },
+  {
     "key": "BURGER_BOX",
     "tr": "Burger Kutusu",
     "en": "Burger Box",
@@ -965,7 +1565,7 @@
     "tr": "Şefin Sürprizi",
     "en": "Chef's Surprise",
     "zh": "厨师的惊喜",
-    "ja": "シェフのサプライズ",
+    "ja": "シェフの気まぐれ",
     "es": "Sorpresa Del Chef",
     "ru": "Сюрприз Шефа",
     "pt": "Surpresa Do Chef"
@@ -974,7 +1574,7 @@
     "key": "BURGER_FALLBACK_1",
     "tr": "Şefin Dalgınlığı",
     "en": "Chef's Distraction",
-    "zh": "厨师的走神",
+    "zh": "厨师的疏忽",
     "ja": "シェフのうっかり",
     "es": "Despiste Del Chef",
     "ru": "Рассеянность Шефа",
@@ -985,7 +1585,7 @@
     "tr": "Şefin Hatası",
     "en": "Chef's Mistake",
     "zh": "厨师的失误",
-    "ja": "シェフの間違い",
+    "ja": "シェフのミス",
     "es": "Error Del Chef",
     "ru": "Ошибка Шефа",
     "pt": "Erro Do Chef"

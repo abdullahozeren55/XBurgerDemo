@@ -11,25 +11,21 @@ public class LanguageFontProfile : ScriptableObject
     [Serializable]
     public struct FontData
     {
-        public FontType type;       // Hangi tür? (Header, Dialogue vs.)
-        public TMP_FontAsset font;  // Font dosyasý
+        public FontType type;
+        public TMP_FontAsset font;
 
         [Header("Pixel Perfect Settings")]
-        [Tooltip("Bu fontun '1x' boyutu nedir? (Örn: Latin için 16, Japonca için 24)")]
+        [Tooltip("Bu fontun '1x' boyutu nedir? (Örn: Latin 16, Japonca 24)")]
         public float basePixelSize;
 
-        [Header("Offsets (Delta)")]
-        [Tooltip("Bu dil seçildiðinde metin ne kadar kaysýn? (X, Y)")]
-        public Vector2 positionOffset; // Inspector'daki konuma EKLENECEK deðer
+        // DEÐÝÞÝKLÝK BURADA: Vector2 yerine sadece float
+        [Header("Vertical Adjustment")]
+        [Tooltip("Metni satýr içinde ne kadar yukarý/aþaðý kaydýralým? (Pozitif: Yukarý, Negatif: Aþaðý)")]
+        public float verticalOffset;
 
         [Header("Spacing Adjustments")]
-        [Tooltip("Karakter aralýðýna eklenecek fark")]
         public float characterSpacingOffset;
-
-        [Tooltip("Kelime aralýðýna eklenecek fark")]
         public float wordSpacingOffset;
-
-        [Tooltip("Satýr aralýðýna eklenecek fark")]
         public float lineSpacingOffset;
     }
 

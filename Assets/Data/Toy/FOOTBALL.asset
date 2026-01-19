@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0984139850d29f4488ad93ededc697b, type: 3}
   m_Name: FOOTBALL
   m_EditorClassIdentifier: 
-  focusTextKey: GRABABLE_KETCHUP
+  focusTextKey: GRABABLE_TOY_BALL
   toyType: 2
   handGrabType: 10
   handRigType: 1

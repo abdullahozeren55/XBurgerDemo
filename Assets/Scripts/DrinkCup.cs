@@ -48,7 +48,22 @@ public class DrinkCup : MonoBehaviour, IGrabable
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
 
     public DrinkCupData data;
-    public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
+    public string FocusTextKey
+    {
+        get
+        {
+            // Eðer array boþsa veya index dýþýndaysa hata vermesin
+            if (data.focusTextKeys == null || data.focusTextKeys.Length == 0) return "";
+
+            // Güvenlik kontrolü
+            if (currentTextStateIndex >= data.focusTextKeys.Length) return data.focusTextKeys[0];
+
+            return data.focusTextKeys[currentTextStateIndex];
+        }
+        set { } // Set edilmesine gerek yok, içeriden yönetiliyor
+    }
+
+    private int currentTextStateIndex = 0;
 
     public GameManager.DrinkTypes DrinkType = GameManager.DrinkTypes.Null; //Soda Makinesi tarafýndan doldurulurken atanacak
 
@@ -184,6 +199,8 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
         HasLid = true;
 
+        UpdateFocusTextState();
+
         // Bardaðýn kendi parçalarýný aç
         if (lidGO != null) lidGO.SetActive(true);
         if (strawGO != null) strawGO.SetActive(true);
@@ -193,41 +210,35 @@ public class DrinkCup : MonoBehaviour, IGrabable
     }
 
     // --- YENÝ FONKSÝYON: DOLUM ÝÞLEMÝ ---
-    public void StartFilling(Color liquidColor, float duration)
+    // --- StartFilling Güncellendi ---
+    // Artýk DrinkType parametresi alýyor
+    public void StartFilling(Color liquidColor, float duration, GameManager.DrinkTypes typeToFill)
     {
-        // 1. Zaten doluysa veya kapak takýldýysa iþlem yapma (Renk deðiþtirme, tekrar doldurma vs.)
         if (IsFull || HasLid) return;
 
-        // 2. Ýçecek objesini aç
+        // Tipi ata
+        DrinkType = typeToFill;
+
         if (drinkGO != null)
         {
             drinkGO.SetActive(true);
-
-            // 3. Rengi Ayarla
             SkinnedMeshRenderer meshRenderer = drinkGO.GetComponent<SkinnedMeshRenderer>();
             if (meshRenderer != null)
             {
-                // Material rengini deðiþtir
                 meshRenderer.material.color = liquidColor;
-                // Eðer shader graph veya özel shader kullanýyorsan:
-                // meshRenderer.material.SetColor("_BaseColor", liquidColor);
-
-                // 4. BlendShape Animasyonu (0 -> 100)
-                // "Key 1" genelde Index 0'dýr. Eðer Blender'da sýralamada 2. sýradaysa Index 1 yap.
                 int blendShapeIndex = 0;
-
-                // Önce sýfýrla
                 meshRenderer.SetBlendShapeWeight(blendShapeIndex, 0f);
 
-                // DOTween ile sürece yayarak 100 yap
                 DOTween.To(() => meshRenderer.GetBlendShapeWeight(blendShapeIndex),
                            x => meshRenderer.SetBlendShapeWeight(blendShapeIndex, x),
                            96f, duration)
                            .SetEase(Ease.Linear);
             }
         }
+
+        // Dolum baþlarken henüz tam dolmadýðý için text güncellemiyoruz 
+        // ya da "Doluyor" gibi bir state istersen buraya ekleyebilirsin.
     }
-    // -------------------------------------
 
     public void OnHolster() { }
 
@@ -480,6 +491,49 @@ public class DrinkCup : MonoBehaviour, IGrabable
     {
         IsGettingFilled = false;
         IsFull = true;
+
+        UpdateFocusTextState();
+
         ChangeLayer(grabableLayer);
+        
+    }
+
+    // --- YENÝ METOD: State Hesaplayýcý ---
+    private void UpdateFocusTextState()
+    {
+        // 1. Eðer boþsa -> Index 0
+        if (!IsFull && !IsGettingFilled) // Dolarken de boþ sayabiliriz veya doluyor diyebiliriz, þimdilik boþ sayalým.
+        {
+            currentTextStateIndex = 0;
+            return;
+        }
+
+        // 2. Ýçecek tipine göre Baz Index belirle
+        // Array Yapýsý: 0:Empty, 1:Cola, 2:ColaLid, 3:Orange, 4:OrangeLid, 5:Lemon, 6:LemonLid
+        int baseIndex = 0;
+
+        switch (DrinkType)
+        {
+            case GameManager.DrinkTypes.Cola:
+                baseIndex = 1;
+                break;
+            case GameManager.DrinkTypes.OrangeSoda:
+                baseIndex = 3;
+                break;
+            case GameManager.DrinkTypes.LemonLime:
+                baseIndex = 5;
+                break;
+            default:
+                baseIndex = 0; // Tanýmsýzsa boþ göster
+                break;
+        }
+
+        // 3. Kapak varsa +1 ekle
+        if (HasLid)
+        {
+            baseIndex += 1;
+        }
+
+        currentTextStateIndex = baseIndex;
     }
 }

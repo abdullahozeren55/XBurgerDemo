@@ -117,7 +117,7 @@ public class SodaMachine : MonoBehaviour
             // Hesabý "effectivePourDuration" üzerinden yapýyoruz
             float totalFillTime = effectivePourDuration + stopDuration - 0.1f;
 
-            currentCup.StartFilling(selectedColor, totalFillTime);
+            currentCup.StartFilling(selectedColor, totalFillTime, btn.drinkType);
         }
 
         // 4. BEKLE (Artýk dinamik süreyi bekliyoruz)
