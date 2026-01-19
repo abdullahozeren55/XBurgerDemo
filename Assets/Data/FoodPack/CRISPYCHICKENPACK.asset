@@ -30,7 +30,7 @@ MonoBehaviour:
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.037982523, y: -0.01654931, z: 0.10192887}
   grabLocalRotationOffset: {x: 73.9697, y: 350.41025, z: 81.61984}
-  focusTextKey: GRABABLE_PATTY_PACK
+  focusTextKey: GRABABLE_CRISPY_CHICKEN_PACK
   audioClips:
   - {fileID: 8300000, guid: 7f53f894e4f5514479c44c13474d1b4c, type: 3}
   - {fileID: 8300000, guid: 431a33a496b0f3d49a67715214327a52, type: 3}

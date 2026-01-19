@@ -231,6 +231,76 @@
     "pt": "Pegar Pacote De Alface"
   },
   {
+    "key": "INTERACTABLE_FRIES_PACK_BOX",
+    "tr": "Patates Paketi Al",
+    "en": "Take Fries Pack",
+    "zh": "拿一包薯条",
+    "ja": "ポテトのパックを取る",
+    "es": "Tomar Paquete De Papas",
+    "ru": "Взять Упаковку Картофеля Фри",
+    "pt": "Pegar Pacote De Batatas"
+  },
+  {
+    "key": "INTERACTABLE_ONION_RINGS_PACK_BOX",
+    "tr": "Soğan Halkası Paketi Al",
+    "en": "Take Onion Rings Pack",
+    "zh": "拿一包洋葱圈",
+    "ja": "オニオンリングのパックを取る",
+    "es": "Tomar Paquete De Aros De Cebolla",
+    "ru": "Взять Упаковку Луковых Колец",
+    "pt": "Pegar Pacote De Anéis De Cebola"
+  },
+  {
+    "key": "INTERACTABLE_NUGGETS_PACK_BOX",
+    "tr": "Nugget Paketi Al",
+    "en": "Take Nuggets Pack",
+    "zh": "拿一包鸡块",
+    "ja": "ナゲットのパックを取る",
+    "es": "Tomar Paquete De Nuggets",
+    "ru": "Взять Упаковку Наггетсов",
+    "pt": "Pegar Pacote De Nuggets"
+  },
+  {
+    "key": "INTERACTABLE_MOZZARELLA_STICKS_PACK_BOX",
+    "tr": "Mozzarella Çubuğu Paketi Al",
+    "en": "Take Mozzarella Sticks Pack",
+    "zh": "拿一包马苏里拉芝士条",
+    "ja": "モッツァレラスティックのパックを取る",
+    "es": "Tomar Paquete De Palitos De Mozzarella",
+    "ru": "Взять Упаковку Палочек Моцареллы",
+    "pt": "Pegar Pacote De Palitos De Mussarela"
+  },
+  {
+    "key": "INTERACTABLE_DINO_NUGGETS_PACK_BOX",
+    "tr": "Dinogget™ Paketi Al",
+    "en": "Take Dinoggets™ Pack",
+    "zh": "拿一包迪诺块™",
+    "ja": "ダイナゲット™のパックを取る",
+    "es": "Tomar Paquete De Dinoggets™",
+    "ru": "Взять Упаковку Диноггетов™",
+    "pt": "Pegar Pacote De Dinoggets™"
+  },
+  {
+    "key": "INTERACTABLE_SMILEY_FRIES_PACK_BOX",
+    "tr": "Mutlu Patatesler™ Paketi Al",
+    "en": "Take Happy Fries™ Pack",
+    "zh": "拿一包开心薯条™",
+    "ja": "ハッピーポテト™のパックを取る",
+    "es": "Tomar Paquete De Papas Felices™",
+    "ru": "Взять Упаковку Веселой Картошки™",
+    "pt": "Pegar Pacote De Batatas Felizes™"
+  },
+  {
+    "key": "INTERACTABLE_CRISPY_CHICKEN_PACK_BOX",
+    "tr": "Çıtır Tavuk Paketi Al",
+    "en": "Take Crispy Chicken Pack",
+    "zh": "拿一包香脆鸡肉",
+    "ja": "クリスピーチキンのパックを取る",
+    "es": "Tomar Paquete De Pollo Crujiente",
+    "ru": "Взять Упаковку Хрустящей Курицы",
+    "pt": "Pegar Pacote De Frango Crocante"
+  },
+  {
     "key": "INTERACTABLE_KETCHUP_BOX",
     "tr": "Ketçap Şişesi Al",
     "en": "Take Ketchup Bottle",
@@ -559,6 +629,76 @@
     "es": "Paquete De Lechuga",
     "ru": "Упаковка Салата",
     "pt": "Pacote De Alface"
+  },
+  {
+    "key": "GRABABLE_FRIES_PACK",
+    "tr": "Patates Paketi",
+    "en": "Fries Pack",
+    "zh": "一包薯条",
+    "ja": "ポテトのパック",
+    "es": "Paquete De Papas",
+    "ru": "Упаковка Картофеля Фри",
+    "pt": "Pacote De Batatas"
+  },
+  {
+    "key": "GRABABLE_ONION_RINGS_PACK",
+    "tr": "Soğan Halkası Paketi",
+    "en": "Onion Rings Pack",
+    "zh": "一包洋葱圈",
+    "ja": "オニオンリングのパック",
+    "es": "Paquete De Aros De Cebolla",
+    "ru": "Упаковка Луковых Колец",
+    "pt": "Pacote De Anéis De Cebola"
+  },
+  {
+    "key": "GRABABLE_NUGGETS_PACK",
+    "tr": "Nugget Paketi",
+    "en": "Nuggets Pack",
+    "zh": "一包鸡块",
+    "ja": "ナゲットのパック",
+    "es": "Paquete De Nuggets",
+    "ru": "Упаковка Наггетсов",
+    "pt": "Pacote De Nuggets"
+  },
+  {
+    "key": "GRABABLE_MOZZARELLA_STICKS_PACK",
+    "tr": "Mozzarella Çubuğu Paketi",
+    "en": "Mozzarella Sticks Pack",
+    "zh": "一包马苏里拉芝士条",
+    "ja": "モッツァレラスティックのパック",
+    "es": "Paquete De Palitos De Mozzarella",
+    "ru": "Упаковка Палочек Моцареллы",
+    "pt": "Pacote De Palitos De Mussarela"
+  },
+  {
+    "key": "GRABABLE_DINO_NUGGETS_PACK",
+    "tr": "Dinogget™ Paketi",
+    "en": "Dinoggets™ Pack",
+    "zh": "一包迪诺块™",
+    "ja": "ダイナゲット™のパック",
+    "es": "Paquete De Dinoggets™",
+    "ru": "Упаковка Диноггетов™",
+    "pt": "Pacote De Dinoggets™"
+  },
+  {
+    "key": "GRABABLE_SMILEY_FRIES_PACK",
+    "tr": "Mutlu Patatesler™ Paketi",
+    "en": "Happy Fries™ Pack",
+    "zh": "一包开心薯条™",
+    "ja": "ハッピーポテト™のパック",
+    "es": "Paquete De Papas Felices™",
+    "ru": "Упаковка Веселой Картошки™",
+    "pt": "Pacote De Batatas Felizes™"
+  },
+  {
+    "key": "GRABABLE_CRISPY_CHICKEN_PACK",
+    "tr": "Çıtır Tavuk Paketi",
+    "en": "Crispy Chicken Pack",
+    "zh": "一包香脆鸡肉",
+    "ja": "クリスピーチキンのパック",
+    "es": "Paquete De Pollo Crujiente",
+    "ru": "Упаковка Хрустящей Курицы",
+    "pt": "Pacote De Frango Crocante"
   },
   {
     "key": "GRABABLE_BOTTOM_BUN_RAW",

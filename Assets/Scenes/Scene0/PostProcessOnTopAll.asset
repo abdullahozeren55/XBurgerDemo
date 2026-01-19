@@ -67,7 +67,7 @@ MonoBehaviour:
     m_Value: 0.1
   _squeeze:
     m_OverrideState: 1
-    m_Value: 0.8
+    m_Value: 0.64
   _density:
     m_OverrideState: 0
     m_Value: 0

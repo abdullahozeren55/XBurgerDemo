@@ -15,37 +15,37 @@ MonoBehaviour:
   language: 0
   fontSettings:
   - type: 0
-    font: {fileID: 11400000, guid: ec65e9f71ed74a645a6dc431d263229e, type: 2}
+    font: {fileID: 11400000, guid: cebb4ac0fe62968499178d688e87c331, type: 2}
     basePixelSize: 16
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 1
     font: {fileID: 11400000, guid: 92c2019cc04f5614ca370a2e9cd15c45, type: 2}
     basePixelSize: 16
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 2
     font: {fileID: 11400000, guid: 802aac61162fae948aba76fc9a684de2, type: 2}
     basePixelSize: 16
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 3
     font: {fileID: 11400000, guid: 4af385a055b793946851b74a49452fa0, type: 2}
     basePixelSize: 16
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 4
     font: {fileID: 11400000, guid: f1b4208d41125bb4da4eef7a82ea3b6f, type: 2}
     basePixelSize: 16
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
