@@ -119,6 +119,8 @@ public class FirstPersonController : MonoBehaviour
     private float interactChargeTimer = 0f;
     private IInteractable currentInteractable;
     public bool InteractKeyIsDone;
+    public bool ThrowKeyIsDone;
+    private bool ignoreNextThrowRelease = false; // Tepsi býrakýlýnca oluþacak "Release Hayaletini" engellemek için
 
     [Header("Grab Parameters")]
     [SerializeField] private LayerMask grabableLayers;
@@ -196,7 +198,6 @@ public class FirstPersonController : MonoBehaviour
     private IInteractable _cachedInteractable;
     private IGrabable _cachedGrabable; // (Hem current hem other için tek deðiþken yeterli, çünkü ayný anda ikisine odaklanamayýz)
     private Color _cachedColor;
-    private string _cachedRawText; // Ham metni de tutalým ki dil deðiþirse anlayalým
 
     // YENÝ: Anlýk olarak kullanacaðýmýz hesaplanmýþ offset deðeri
     private float _currentFocusVOffset = 0f;
@@ -282,6 +283,7 @@ public class FirstPersonController : MonoBehaviour
         ungrabableLayer = LayerMask.NameToLayer("Ungrabable");
 
         InteractKeyIsDone = false;
+        ThrowKeyIsDone = false;
 
         inventoryItems = new IGrabable[maxInventorySlots];
 
@@ -333,6 +335,11 @@ public class FirstPersonController : MonoBehaviour
             if (InputManager.Instance.PlayerInteract())
             {
                 InteractKeyIsDone = false;
+            }
+
+            if (!InputManager.Instance.PlayerThrow())
+            {
+                ThrowKeyIsDone = false;
             }
 
             // Her karenin baþýnda hýzý varsayýlan (1.0) kabul edelim.
@@ -781,48 +788,41 @@ public class FirstPersonController : MonoBehaviour
 
     private void DecideGrabableOutlineColor()
     {
-        // Önce temizlik: Yeþil bool'larý sýfýrla (Kýrmýzýyý aþaðýda yönetiyoruz ama bunu burada sýfýrlamak güvenli)
+        // Temizlik
         if (otherGrabable != null) otherGrabable.OutlineShouldBeGreen = false;
         if (currentGrabable != null) currentGrabable.OutlineShouldBeGreen = false;
 
-        // --- YENÝ EKLENEN: TEPSÝ KONTROLÜ ---
+        // --- TEPSÝ ELÝMÝZDEYKEN ---
         if (IsHoldingTray)
         {
-            // Elimdeki (Tepsi) kýrmýzý olmasýn, kendi renginde kalsýn veya outline olmasýn
             if (currentGrabable != null) currentGrabable.OutlineShouldBeRed = false;
 
-            // Ama baktýðým diðer yerdeki eþyalar (OtherGrabable) KESÝN KIRMIZI olsun
             if (otherGrabable != null)
             {
                 otherGrabable.OutlineShouldBeRed = true;
                 otherGrabable.OutlineChangeCheck();
             }
-            return; // Aþaðýya devam etme
+            return;
         }
-        // ------------------------------------
 
-        // DURUM 1: Elim dolu ve yerde baþka bir þeye bakýyorum
+        // --- SENARYO 1: ELÝM DOLU, YERE BAKIYORUM ---
         if (currentGrabable != null && currentGrabable.IsGrabbed && otherGrabable != null)
         {
-            // --- KRÝTÝK DEÐÝÞÝKLÝK BURADA ---
-
-            // 1. Kombinasyon Kontrolü:
-            // "Elimdeki yerdekini yer mi?" VEYA "Yerdeki elimdekini yer mi?"
+            // Kombinasyon kontrolü
             bool canCombine = currentGrabable.CanCombine(otherGrabable) || otherGrabable.CanCombine(currentGrabable);
 
             if (canCombine)
             {
-                // Birleþebiliyorsa:
-                // Kýrmýzý olmasýn (Hata yok)
                 otherGrabable.OutlineShouldBeRed = false;
-                // Yeþil olsun (Kombinasyon var)
                 otherGrabable.OutlineShouldBeGreen = true;
             }
             else
             {
-                // Birleþemiyorsa standart prosedür:
-                // Yer yoksa VEYA Þu an elimdekini kullanýyorsam (örn: fýrlatma þarjý) -> KIRMIZI
-                if (!HasEmptySlot() || isUsingGrabbedItem)
+                // --- DÜZELTME BURADA ---
+                // Tepsi ise veya yer varsa Kýrmýzý OLMAZ.
+                bool isTray = otherGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                if ((!HasEmptySlot() && !isTray) || isUsingGrabbedItem)
                 {
                     otherGrabable.OutlineShouldBeRed = true;
                 }
@@ -831,17 +831,17 @@ public class FirstPersonController : MonoBehaviour
                     otherGrabable.OutlineShouldBeRed = false;
                 }
             }
-
-            // Durumu uygula
             otherGrabable.OutlineChangeCheck();
         }
-        // DURUM 2: Standart durumlar
+        // --- SENARYO 2: ELÝM BOÞ VEYA SADECE BAKMA ---
         else
         {
             if (otherGrabable != null)
             {
-                // BURADA DA AYNISI: Yer yoksa veya Meþgulsek -> KIRMIZI
-                if (!HasEmptySlot() || isUsingGrabbedItem)
+                bool isTray = otherGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                // Tepsi ise yer olmasa da alabiliriz -> Kýrmýzý Yapma
+                if ((!HasEmptySlot() && !isTray) || isUsingGrabbedItem)
                     otherGrabable.OutlineShouldBeRed = true;
                 else
                     otherGrabable.OutlineShouldBeRed = false;
@@ -849,22 +849,15 @@ public class FirstPersonController : MonoBehaviour
                 otherGrabable.OutlineChangeCheck();
             }
 
-            if (currentGrabable != null)
+            if (currentGrabable != null && !currentGrabable.IsGrabbed)
             {
-                // Yerdeki (henüz alýnmamýþ) eþyalar için:
-                if (!currentGrabable.IsGrabbed)
-                {
-                    // Yer yoksa veya Meþgulsek -> KIRMIZI
-                    if (!HasEmptySlot() || isUsingGrabbedItem)
-                        currentGrabable.OutlineShouldBeRed = true;
-                    else
-                        currentGrabable.OutlineShouldBeRed = false;
-                }
+                bool isTray = currentGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                // Tepsi ise yer olmasa da alabiliriz -> Kýrmýzý Yapma
+                if ((!HasEmptySlot() && !isTray) || isUsingGrabbedItem)
+                    currentGrabable.OutlineShouldBeRed = true;
                 else
-                {
-                    // Elimdeki eþya kendi kendine kýrmýzý olmasýn (kullanýrken outline deðiþmesin diyorsan false kalýr)
                     currentGrabable.OutlineShouldBeRed = false;
-                }
 
                 currentGrabable.OutlineChangeCheck();
             }
@@ -873,53 +866,51 @@ public class FirstPersonController : MonoBehaviour
 
     private void DecideCrosshairColor()
     {
-        // 1. KIRMIZI (Zorunlu Durumlar - Yer yok, meþgul vs.)
-        // Not: OutlineShouldBeGreen true ise Controller tarafýnda OutlineShouldBeRed'i false yapmýþtýk.
-        // O yüzden yeþil durumunda buraya girmez, güvenli.
+        // 1. ZORUNLU KIRMIZI DURUMLAR (Outline kýrmýzýysa Crosshair de kýrmýzýdýr)
         if ((currentInteractable != null && currentInteractable.OutlineShouldBeRed) ||
             (otherGrabable != null && otherGrabable.OutlineShouldBeRed) ||
             (currentGrabable != null && currentGrabable.OutlineShouldBeRed))
         {
             ChangeCrosshairColor(useCrosshairColor);
         }
-        // --- 2. YEÞÝL (KOMBÝNASYON) --- 
-        // YENÝ EKLEME BURASI
-        // Hem otherGrabable hem currentGrabable kontrol ediyoruz (ne olur ne olmaz)
+        // 2. YEÞÝL (KOMBÝNASYON)
         else if ((otherGrabable != null && otherGrabable.OutlineShouldBeGreen) ||
                  (currentGrabable != null && currentGrabable.OutlineShouldBeGreen))
         {
             ChangeCrosshairColor(combineCrosshairColor);
         }
-        // ------------------------------
-        // 3. TURUNCU / BEYAZ (Standart Grab Durumlarý)
+        // 3. STANDART DURUMLAR
         else if (currentGrabable != null)
         {
-            // Elim boþsa ve yere bakýyorsam
+            // A. Elim Boþ, Yere Bakýyorum
             if (!currentGrabable.IsGrabbed)
             {
-                // Yer varsa VE Elim meþgul deðilse -> TURUNCU
-                if (HasEmptySlot() && !isUsingGrabbedItem)
+                // --- DÜZELTME BURADA: Tepsiyse veya Yer Varsa -> TURUNCU ---
+                bool isTray = currentGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                if ((HasEmptySlot() || isTray) && !isUsingGrabbedItem)
                     ChangeCrosshairColor(grabCrosshairColor);
                 else
                     ChangeCrosshairColor(useCrosshairColor);
             }
-            // Elim doluysa ve yere (OtherGrabable) bakýyorsam
+            // B. Elim Dolu, Yere (Other) Bakýyorum
             else if (otherGrabable != null)
             {
-                // Yer varsa VE Elim meþgul deðilse -> TURUNCU
-                // (Buraya gelmesi için Yeþil veya Kýrmýzý olmamasý lazým, demek ki normal bir eþya)
-                if (HasEmptySlot() && !isUsingGrabbedItem)
+                // --- DÜZELTME BURADA: Tepsiyse veya Yer Varsa -> TURUNCU ---
+                bool isTray = otherGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                if ((HasEmptySlot() || isTray) && !isUsingGrabbedItem)
                     ChangeCrosshairColor(grabCrosshairColor); // Turuncu (Alýnabilir)
                 else
                     ChangeCrosshairColor(useCrosshairColor);  // Kýrmýzý (Yer yok veya Meþgul)
             }
-            // Hiçbiri deðilse standart renk
+            // C. Hiçbiri deðilse standart
             else
             {
                 ChangeCrosshairColor(defaultCrosshairColor);
             }
         }
-        // 4. Durum: Hiçbir þey yok
+        // 4. Hiçbir þey yok
         else
         {
             ChangeCrosshairColor(defaultCrosshairColor);
@@ -1444,8 +1435,11 @@ public class FirstPersonController : MonoBehaviour
             // SENARYO A: FIRLATILABÝLÝR BÝR EÞYA (Eski Þarjlý Sistem)
             if (currentGrabable.IsThrowable)
             {
-                if (InputManager.Instance.PlayerThrow()) // Sað týk basýlý tutma (Þarj)
+                // --- KÝLÝT KONTROLÜ EKLENDÝ (&& !throwInputConsumed) ---
+                // Eðer önceki iþlemde tuþ "tüketildiyse" buraya girme.
+                if (InputManager.Instance.PlayerThrow() && !ThrowKeyIsDone)
                 {
+                    // ... (Þarj ve Fýrlatma kodlarý aynen kalýr) ...
                     ResetHandAnim();
                     CameraManager.Instance.PlayThrowEffects(true);
                     anim.SetBool("chargingThrow", true);
@@ -1461,6 +1455,24 @@ public class FirstPersonController : MonoBehaviour
 
                 if (InputManager.Instance.PlayerThrowRelease()) // Sað týk býrakma (Fýrlat)
                 {
+                    if (ignoreNextThrowRelease)
+                    {
+                        // "Bu release sinyali aslýnda tepsiyi býrakan parmaða ait, bana (Burger'e) ait deðil."
+                        ignoreNextThrowRelease = false; // Nöbeti bitir
+
+                        // Eli temizle (Þarj efektini vs. iptal et)
+                        CameraManager.Instance.PlayThrowEffects(false);
+                        ResetHandAnim();
+                        anim.SetBool("chargingThrow", false);
+
+                        // El havada kaldýysa indir (Reset to Idle)
+                        if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
+                        rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
+                        // Not: True dedik çünkü elimizde eþya var, yukarýda kalsýn.
+
+                        return; // ÝÞLEMÝ ÝPTAL ET VE ÇIK
+                    }
+
                     CameraManager.Instance.PlayThrowEffects(false);
 
                     if (singleHandThrowCoroutine != null)
@@ -1496,6 +1508,8 @@ public class FirstPersonController : MonoBehaviour
                         currentGrabable.OnThrow(throwDir, isCrouching ? currentThrowForce * 0.5f : IsSprinting ? currentThrowForce * 1.5f : currentThrowForce);
                     }
 
+                    ThrowKeyIsDone = true;
+
                     // Temizlik
                     RemoveItemFromInventory(currentGrabable);
                     throwChargeTimer = 0f;
@@ -1517,9 +1531,10 @@ public class FirstPersonController : MonoBehaviour
             else
             {
                 // Basar basmaz býrak, þarj bekleme.
-                if (InputManager.Instance.PlayerThrow())
+                // --- KÝLÝT KONTROLÜ EKLENDÝ ---
+                if (InputManager.Instance.PlayerThrow() && !ThrowKeyIsDone)
                 {
-                    // Rig ve Animasyonlarý Sýfýrla
+                    // ... (Rig/Anim sýfýrlama kodlarý aynen kalýr) ...
                     if (rightHandRigLerpCoroutine != null)
                     {
                         StopCoroutine(rightHandRigLerpCoroutine);
@@ -1530,19 +1545,26 @@ public class FirstPersonController : MonoBehaviour
                     ResetHandAnim();
                     SetHandAnimBoolsOff();
 
-                    if (IsHoldingTray)
-                        SetTrayMode(false);
+                    if (IsHoldingTray) SetTrayMode(false);
 
-                    // Direkt Drop Çaðýr (Throw deðil)
-                    currentGrabable.OnDrop(transform.forward, minThrowForce); // Ufak bir itme kuvveti iyidir
+                    currentGrabable.OnDrop(transform.forward, minThrowForce);
 
-                    // Envanterden Sil ve Temizle
+                    // --- KRÝTÝK NOKTA: SÝNYALÝ KES ---
                     RemoveItemFromInventory(currentGrabable);
+
+                    // Eðer tepsi gittiðinde elimize yeni bir þey geldiyse (Burger vs.),
+                    // o yeni þeyin "Release" sinyalini görmezden gelmesini emrediyoruz.
+                    if (currentGrabable != null)
+                    {
+                        ignoreNextThrowRelease = true;
+                    }
+
+                    ThrowKeyIsDone = true; // <--- BU SATIR EKLENDÝ!
+                                               // Artýk ayný frame içinde baþka hiçbir "PlayerThrow" bloðu çalýþamaz.
 
                     if (currentSlotIndex == -1)
                     {
                         currentGrabable = null;
-                        // Tepsi modundan çýkýþý ResetGrab/RemoveItemFromInventory hallediyor ama garanti olsun:
                         if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
                         rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(false, false));
                     }
@@ -1639,7 +1661,9 @@ public class FirstPersonController : MonoBehaviour
                 }
                 else if (targetItem == otherGrabable)
                 {
-                    if (HasEmptySlot())
+                    bool isTray = targetItem.HandRigType == PlayerManager.HandRigTypes.HoldingTray;
+
+                    if (HasEmptySlot() || isTray)
                     {
                         PickUpItem(otherGrabable);
                         otherGrabable = null;
@@ -1873,6 +1897,56 @@ public class FirstPersonController : MonoBehaviour
     // Eþyayý envantere ve ele alma iþlemini yapan ana fonksiyon
     private void PickUpItem(IGrabable itemToPickUp)
     {
+        // --- 3. SORUN ÇÖZÜMÜ: SIRALAMA DEÐÝÞÝKLÝÐÝ ---
+        // Tepsi kontrolünü EN BAÞA koyduk. 
+        // Böylece envanter full olsa bile (emptySlotIndex bulamasa bile) buraya girip tepsiyi alabilecek.
+
+        if (itemToPickUp.HandRigType == PlayerManager.HandRigTypes.HoldingTray)
+        {
+            // 1. Mevcut elimizdeki eþyayý (varsa) sakla (Holster)
+            if (currentSlotIndex != -1 && inventoryItems[currentSlotIndex] != null)
+            {
+                IGrabable oldItem = inventoryItems[currentSlotIndex];
+                oldItem.OnHolster();
+                ((MonoBehaviour)oldItem).gameObject.SetActive(false);
+            }
+
+            // 2. Tepsiyi "currentGrabable" yap ama ARRAY'E EKLEME!
+            currentGrabable = itemToPickUp;
+
+            // Slotu -1 yap ki standart slot seçili sanmasýn
+            currentSlotIndex = -1;
+
+            // 3. Geçmiþe ekle
+            if (itemPickupHistory.Contains(itemToPickUp)) itemPickupHistory.Remove(itemToPickUp);
+            itemPickupHistory.Add(itemToPickUp);
+
+            // 4. Görsel ve Fiziksel iþlemler
+            currentGrabable.OnGrab(trayParentTransform); // Tepsi parent'ýna git
+
+            // Temizlik
+            if (otherGrabable == itemToPickUp) otherGrabable = null;
+            if (focusTextAnim != null)
+            {
+                focusTextAnim.StopShowingText();
+                focusTextAnim.StartDisappearingText();
+            }
+
+            // 5. Rig Ayarla
+            ApplyGrabHandRig();
+
+            InteractKeyIsDone = true;
+            DecideOutlineAndCrosshair();
+
+            // 6. UI'I TEPSÝ MODUNA GEÇÝR
+            if (inventoryUI != null) inventoryUI.SwitchToTrayMode(currentGrabable);
+
+            return; // Fonksiyondan çýk, aþaðýya inme!
+        }
+        // -----------------------------------------------------------
+
+        // --- STANDART ENVANTER KONTROLÜ (BURADAN DEVAM EDÝYOR) ---
+
         // 1. Önce boþ bir slot var mý diye bakýyoruz
         int emptySlotIndex = -1;
         for (int i = 0; i < inventoryItems.Length; i++)
@@ -1880,42 +1954,34 @@ public class FirstPersonController : MonoBehaviour
             if (inventoryItems[i] == null)
             {
                 emptySlotIndex = i;
-                break; // Ýlk boþ yeri bulduk, döngüden çýk
+                break; // Ýlk boþ yeri bulduk
             }
         }
 
-        // Eðer boþ yer yoksa (emptySlotIndex hala -1 ise) iþlemi iptal et
+        // Eðer boþ yer yoksa iþlemi iptal et (Tepsi burayý zaten pas geçtiði için sorun yok)
         if (emptySlotIndex == -1) return;
 
         // 2. Eðer þu an elimizde baþka bir eþya varsa onu gizle
         if (currentSlotIndex != -1 && inventoryItems[currentSlotIndex] != null)
         {
             IGrabable oldItem = inventoryItems[currentSlotIndex];
-
             oldItem.OnHolster();
-
             ((MonoBehaviour)oldItem).gameObject.SetActive(false);
         }
 
         // 3. Yeni eþyayý bulduðumuz BOÞ slota yerleþtir
         inventoryItems[emptySlotIndex] = itemToPickUp;
 
-        // --- YENÝ EKLENEN KISIM: GEÇMÝÞE KAYDET ---
-        // Eðer listede varsa önce çýkar (yer deðiþtirme ihtimaline karþý), sonra en sona ekle.
+        // Geçmiþe ekle
         if (itemPickupHistory.Contains(itemToPickUp)) itemPickupHistory.Remove(itemToPickUp);
         itemPickupHistory.Add(itemToPickUp);
-        // ------------------------------------------
 
         // 4. O slotu seçili hale getir
         currentSlotIndex = emptySlotIndex;
         currentGrabable = itemToPickUp;
 
         // 5. Fiziksel Alma Ýþlemi
-        Transform targetGrabPoint = (currentGrabable.HandRigType == PlayerManager.HandRigTypes.HoldingTray)
-                                    ? trayParentTransform
-                                    : grabPoint;
-
-        currentGrabable.OnGrab(targetGrabPoint);
+        currentGrabable.OnGrab(grabPoint);
 
         // Diðer 'Other' temizlikleri
         if (otherGrabable == itemToPickUp) otherGrabable = null;
@@ -1927,11 +1993,7 @@ public class FirstPersonController : MonoBehaviour
 
         // 6. Rig ve Animasyon
         DecideGrabAnimBool();
-
-        // --- DEÐÝÞEN KISIM BURASI ---
-        // Eski 4-5 satýrlýk Rig kodunu sildik, yerine bunu yazdýk:
         ApplyGrabHandRig();
-        // ----------------------------
 
         InteractKeyIsDone = true;
         DecideOutlineAndCrosshair();
@@ -1942,6 +2004,48 @@ public class FirstPersonController : MonoBehaviour
 
     private void RemoveItemFromInventory(IGrabable itemToRemove)
     {
+        // --- ÖZEL DURUM: TEPSÝ BIRAKIYORSAK ---
+        if (itemToRemove.HandRigType == PlayerManager.HandRigTypes.HoldingTray)
+        {
+            // 1. Geçmiþten Sil
+            if (itemPickupHistory.Contains(itemToRemove)) itemPickupHistory.Remove(itemToRemove);
+
+            // 2. UI'ý STANDART MODA GEÇÝR
+            if (inventoryUI != null) inventoryUI.SwitchToStandardMode();
+
+            // 3. Þimdi geçmiþe bakýp eski eþyayý geri getirme mantýðý (Senin yazdýðýn history logic)
+            int targetIndex = -1;
+            for (int h = itemPickupHistory.Count - 1; h >= 0; h--)
+            {
+                IGrabable candidateItem = itemPickupHistory[h];
+                for (int k = 0; k < inventoryItems.Length; k++)
+                {
+                    if (inventoryItems[k] == candidateItem)
+                    {
+                        targetIndex = k;
+                        break;
+                    }
+                }
+                if (targetIndex != -1) break;
+            }
+
+            if (targetIndex != -1)
+            {
+                EquipSlot(targetIndex);
+            }
+            else
+            {
+                currentSlotIndex = -1; // Elde biþey kalmadý
+                                       // Tepsiyi býraktýk, el boþ, o zaman eli indir.
+                if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
+                rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(false, false));
+            }
+
+            RefreshInventoryUI(); // Standart slotlarý güncelle
+            return; // Çýkýþ
+        }
+        // --------------------------------------
+
         for (int i = 0; i < inventoryItems.Length; i++)
         {
             if (inventoryItems[i] == itemToRemove)
@@ -2010,6 +2114,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void ToggleSlot(int slotIndex)
     {
+        if (IsHoldingTray) return;
         // Array sýnýr kontrolü
         if (slotIndex < 0 || slotIndex >= inventoryItems.Length) return;
 
@@ -2776,28 +2881,42 @@ public class FirstPersonController : MonoBehaviour
     {
         if (currentGrabable == null) return;
 
-        // 1. Önce eski sað el iþlemini durdur (Her ihtimale karþý)
-        if (rightHandRigLerpCoroutine != null)
-        {
-            StopCoroutine(rightHandRigLerpCoroutine);
-            rightHandRigLerpCoroutine = null;
-        }
+        // --- ADIM 1: SAÐ EL TEMÝZLÝÐÝ (HER ZAMAN) ---
+        // Sað eldeki eþya deðiþtiði için sað eli kesinlikle resetliyoruz.
+        if (rightHandRigLerpCoroutine != null) StopCoroutine(rightHandRigLerpCoroutine);
+        if (singleHandThrowCoroutine != null) StopCoroutine(singleHandThrowCoroutine);
 
-        // 2. Ortak Deðiþkenleri Ata
-        
-        // TELEFON KALDIRILACAK OYUNDAN: coyoteTimeForPhone = phoneCoyoteForGrab;
+        rightHandRigLerpCoroutine = null;
+        singleHandThrowCoroutine = null;
 
-        // 3. TÝP KONTROLÜ (Switch Case)
+        // Sað elin IK aðýrlýðýný sýfýrla ki yeni pozisyona (veya tepsi animasyonuna) temiz baþlasýn.
+        twoBoneIKConstraintRightHand.weight = 0f;
+
+        // -------------------------------------------
+
+        // TÝP KONTROLÜ
         switch (currentGrabable.HandRigType)
         {
             case PlayerManager.HandRigTypes.SingleHandGrab:
-                // ESKÝ MANTIK: Sað eli kaldýr
+                // --- SENARYO: TEK EL (BURGER VS.) ---
+                // Sol ele DOKUNMUYORUZ. Eðer kapý açýyorsa açmaya devam etsin.
+
                 currentPositionOffsetForRightHand = currentGrabable.GrabPositionOffset;
                 currentRotationOffsetForRightHand = currentGrabable.GrabRotationOffset;
+
+                // Sað el IK'sýný 0'dan 1'e götür
                 rightHandRigLerpCoroutine = StartCoroutine(LerpRightHandRig(true, false));
                 break;
 
             case PlayerManager.HandRigTypes.HoldingTray:
+                // --- SENARYO: TEPSÝ ---
+                // Ýþte burada sol elin de ipini çekiyoruz.
+                // Çünkü tepsi animasyonu (lockUpperBody) iki kolu da kullanýyor.
+
+                if (leftHandRigLerpCoroutine != null) StopCoroutine(leftHandRigLerpCoroutine);
+                leftHandRigLerpCoroutine = null;
+                twoBoneIKConstraintLeftHand.weight = 0f;
+
                 SetTrayMode(true);
                 break;
         }
