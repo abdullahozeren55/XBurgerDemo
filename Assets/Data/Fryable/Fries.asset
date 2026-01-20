@@ -40,7 +40,9 @@ MonoBehaviour:
     colliderSize: {x: 0.025907721, y: 0.014185573, z: 0.006009228}
   putOnBasketDuration: 0.3
   type: 1
-  icon: {fileID: 21300000, guid: 4a2c247d247b5b4488a742f0c54ae4c4, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: 4a2c247d247b5b4488a742f0c54ae4c4, type: 3}
+    offset: {x: 0, y: 0}
   focusTextKeys:
   - GRABABLE_FRIES_FROZEN
   - GRABABLE_FRIES_FRIED

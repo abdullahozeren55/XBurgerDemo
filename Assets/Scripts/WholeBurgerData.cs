@@ -11,7 +11,7 @@ public class WholeBurgerData : ScriptableObject
     [Space]
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType = PlayerManager.HandRigTypes.SingleHandGrab;
-    public Sprite icon;
+    public ItemIcon iconData;
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;

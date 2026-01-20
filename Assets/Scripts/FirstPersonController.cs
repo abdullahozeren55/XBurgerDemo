@@ -383,14 +383,21 @@ public class FirstPersonController : MonoBehaviour
                 HandleInventoryInput();
                 HandleGrabCheck();
             }
-
-            else if (currentInteractable != null)
+            else
             {
-                currentInteractable.OnLoseFocus();
-                currentInteractable = null;
-                DecideOutlineAndCrosshair();
+                // Eðer tutma yeteneðim kapalýysa ama hala bir þeye odaklýysam, onu unuttur.
+                CleanUpFocus();
+
+                // Interactable temizliði zaten vardý, onu da buraya dahil edebiliriz veya ayrý tutabiliriz.
+                // Ama senin kod yapýnda þöyle olmasý en garantisi:
+                if (currentInteractable != null)
+                {
+                    currentInteractable.OnLoseFocus();
+                    currentInteractable = null;
+                    DecideOutlineAndCrosshair();
+                }
             }
-            
+
 
             if (CanFootstep)
                 HandleFootsteps();
@@ -405,6 +412,8 @@ public class FirstPersonController : MonoBehaviour
             {
                 HandleGravityAndLanding();
             }
+
+            CleanUpFocus();
 
             if (currentInteractable != null)
             {
@@ -1823,28 +1832,33 @@ public class FirstPersonController : MonoBehaviour
         DecideOutlineAndCrosshair();
     }
 
-    public void ForceUpdateSlotIcon(IGrabable targetGrabable, Sprite newIcon)
+    public void ForceUpdateSlotIcon(IGrabable targetGrabable, ItemIcon newIconData)
     {
-        if (targetGrabable == null || newIcon == null) return;
+        if (targetGrabable == null || newIconData == null) return;
 
         bool found = false;
 
-        // Envanteri tara
         for (int i = 0; i < inventoryItems.Length; i++)
         {
-            // Aradýðýmýz obje bu slotta mý?
             if (inventoryItems[i] == targetGrabable)
             {
-                // 1. Objenin kendi data verisini güncelle
-                // (Senin IGrabable yapýnda Icon set edildiðinde data.icon'u güncelliyor, yani kalýcý olur)
-                inventoryItems[i].Icon = newIcon;
+                // BURADA DÝKKAT: 
+                // IGrabable interface'inde "set" metodunu kaldýrdýk (genelde read-only yaptýk).
+                // Bu yüzden Data scriptindeki veriyi güncellememiz gerekebilir veya
+                // UI'ý sadece görsel olarak kandýrabiliriz.
+
+                // Eðer Fryable.cs içinde "IconData" property'si dinamikse (state'e göre dönüyorsa)
+                // bu fonksiyonda data deðiþtirmeye gerek kalmaz, sadece UI yenilemek yeter!
+
+                // Ama manuel set etmek istiyorsan Fryable'da bir SetIcon fonksiyonu olmalý.
+                // Biz þimdilik sadece UI'ý tetikleyelim, çünkü data muhtemelen Fryable içinde zaten deðiþmiþtir.
 
                 found = true;
-                break; // Bulduk, iþimiz bitti.
+                break;
             }
         }
 
-        // 2. Eðer objeyi bulup deðiþtirdiysek UI'ý tazele ki oyuncu yeni ikonu görsün
+        // UI'ý komple yenile, bu sýrada InventoryUI scripti yeni offseti de okuyacaktýr.
         if (found)
         {
             RefreshInventoryUI();

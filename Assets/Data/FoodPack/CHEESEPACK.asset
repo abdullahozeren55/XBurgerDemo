@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destroyParticle: {fileID: 3451705259810622206, guid: ed756263223c23f44aa7cd82b5bd894f, type: 3}
   destroyParticleExplode: {fileID: 3451705259810622206, guid: dc72b4ec84c3c5647a5e99960b99f317, type: 3}
-  icon: {fileID: 21300000, guid: fa01f8e86746eb5418bf428d6fb2a292, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: fa01f8e86746eb5418bf428d6fb2a292, type: 3}
+    offset: {x: 0, y: 0}
   isUseable: 0
   isThrowable: 1
   handGrabType: 6
@@ -25,6 +27,7 @@ MonoBehaviour:
   minForceExplode: 0.4
   maxForceExplode: 0.8
   haveWholeIngredient: 0
+  haveFryable: 0
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: -5, y: -70, z: -70}
   grabLocalPositionOffset: {x: 0.0065061054, y: 0.011148862, z: 0.09830757}

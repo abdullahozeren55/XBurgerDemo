@@ -12,7 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9aa91e82199efc4e8d838b956f55c7b, type: 3}
   m_Name: HOLDER
   m_EditorClassIdentifier: 
-  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  iconData:
+  - sprite: {fileID: 21300000, guid: b8a6a0c61c8c05f4a859ef46dfbe4f56, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 5e867195cdd5cf745ba66bd55980c895, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 0e340ef513cf25c49a3ea8eb55eeace8, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 8207e63b1cabf194087a827a84a0ecb7, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 300e9280e17a54c46844da6088c4d6a9, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 2cba01580cf32224b85402364cde55a8, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: d9b8e6710d5ae374ba263b135157ce93, type: 3}
+    offset: {x: 0, y: 0}
   focusTextKeys:
   - GRABABLE_FRY_BOX
   - GRABABLE_FRIES_IN_BOX

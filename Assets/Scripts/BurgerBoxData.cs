@@ -10,7 +10,7 @@ public class BurgerBoxData : ScriptableObject
     public bool isThrowable = true;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType = PlayerManager.HandRigTypes.SingleHandGrab;
-    public Sprite[] icon;
+    public ItemIcon[] iconData;
     [Space]
     [Header("Lid Settings (Adaptive)")]
     public float minLidAngle = 32f; // Küçük burgerlerdeki havalý duruþ

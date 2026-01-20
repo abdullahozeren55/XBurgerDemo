@@ -36,7 +36,7 @@ public class Holder : MonoBehaviour, IGrabable
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
-    public Sprite Icon { get => data.icon; set => data.icon = value; }
+    public ItemIcon IconData { get => data.iconData[(int)currentIngredientType]; set => data.iconData[(int)currentIngredientType] = value; }
     public PlayerManager.HandGrabTypes HandGrabType { get => data.handGrabType; set => data.handGrabType = value; }
     public PlayerManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
 
@@ -281,6 +281,7 @@ public class Holder : MonoBehaviour, IGrabable
     private void Fill(HolderIngredient newIngedient, Fryable sourceItem)
     {
         currentIngredientType = newIngedient;
+        PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, IconData);
         UpdateVisuals();
         Destroy(sourceItem.gameObject);
     }

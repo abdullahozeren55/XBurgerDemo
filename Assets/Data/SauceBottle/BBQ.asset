@@ -17,8 +17,9 @@ MonoBehaviour:
   throwMultiplier: 1
   handGrabType: 1
   handRigType: 1
-  icon: {fileID: 21300000, guid: cde5ff9ea6741cd429b60e2c01df96c0, type: 3}
-  focusText: GRABABLE_BBQ_SAUCE_BOTTLE
+  iconData:
+    sprite: {fileID: 21300000, guid: cde5ff9ea6741cd429b60e2c01df96c0, type: 3}
+    offset: {x: 0, y: 0}
   focusTextKey: GRABABLE_BBQ_SAUCE_BOTTLE
   grabPositionOffset: {x: 0.7, y: 1, z: 3}
   grabRotationOffset: {x: -5, y: -70, z: -70}

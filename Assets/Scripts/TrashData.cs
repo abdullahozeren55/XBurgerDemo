@@ -10,7 +10,7 @@ public class TrashData : ScriptableObject
     public float throwMultiplier = 1f;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
-    public Sprite icon;
+    public ItemIcon iconData;
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;

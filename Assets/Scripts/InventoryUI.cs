@@ -1,7 +1,7 @@
+using DG.Tweening; // DOTween kütüphanesini ekledik
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using DG.Tweening; // DOTween kütüphanesini ekledik
 
 public class InventoryUI : MonoBehaviour
 {
@@ -51,12 +51,14 @@ public class InventoryUI : MonoBehaviour
             if (hasItem)
             {
                 currentSlot.icon.gameObject.SetActive(true);
-                currentSlot.icon.sprite = items[i].Icon;
+                currentSlot.icon.sprite = items[i].IconData.sprite;
+                currentSlot.icon.rectTransform.anchoredPosition = items[i].IconData.offset;
             }
             else
             {
                 currentSlot.icon.gameObject.SetActive(false);
                 currentSlot.icon.sprite = null;
+                currentSlot.icon.rectTransform.anchoredPosition = Vector2.zero;
             }
 
             // 2. RENK AYARI

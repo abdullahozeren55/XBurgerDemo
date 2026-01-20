@@ -23,9 +23,11 @@ MonoBehaviour:
   cupSize: 2
   handGrabType: 1
   handRigType: 1
-  icons:
-  - {fileID: 21300000, guid: cd650d161c9dcdb48be1cf13e5f8ede1, type: 3}
-  - {fileID: 21300000, guid: 3329983be009b664fbb25b094f412bcf, type: 3}
+  iconData:
+  - sprite: {fileID: 21300000, guid: cd650d161c9dcdb48be1cf13e5f8ede1, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 3329983be009b664fbb25b094f412bcf, type: 3}
+    offset: {x: 0, y: 0}
   isUseable: 0
   isThrowable: 1
   throwMultiplier: 1

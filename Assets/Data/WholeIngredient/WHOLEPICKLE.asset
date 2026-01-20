@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: WHOLEPICKLE
   m_EditorClassIdentifier: 
   Type: 1
-  icon: {fileID: 21300000, guid: 6b415dbd8703eff4086ff2af70f70ff7, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: 6b415dbd8703eff4086ff2af70f70ff7, type: 3}
+    offset: {x: 0, y: 0}
   destroyParticle: {fileID: 3451705259810622206, guid: 0a7065ebaeeabfb45b4dbc0c5a12be58, type: 3}
   destroyParticleExplode: {fileID: 3451705259810622206, guid: 4b2dbb41a5e35604abc0e9b39f4e956e, type: 3}
   instantiateRotationOffset: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
@@ -22,6 +24,7 @@ MonoBehaviour:
   isThrowable: 1
   throwMultiplier: 1
   handGrabType: 6
+  handRigType: 1
   minForce: 0.2
   maxForce: 0.4
   minForceExplode: 0.4

@@ -22,7 +22,10 @@ MonoBehaviour:
   ingredientType: 5
   sauceType: 0
   handGrabType: 4
-  icon: {fileID: 21300000, guid: eb0483c9ccb7a734b8c7437358190226, type: 3}
+  handRigType: 1
+  iconData:
+    sprite: {fileID: 21300000, guid: eb0483c9ccb7a734b8c7437358190226, type: 3}
+    offset: {x: 0, y: 0}
   yHeight: 0.004
   timeToPutOnTray: 0.2
   localScaleWhenGrabbed: {x: 8, y: 8, z: 8}

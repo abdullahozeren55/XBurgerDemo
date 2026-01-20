@@ -17,7 +17,9 @@ MonoBehaviour:
   throwMultiplier: 1
   handGrabType: 3
   handRigType: 1
-  icon: {fileID: 21300000, guid: 1a0e2a8a365838142ba3615d93f36658, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: 1a0e2a8a365838142ba3615d93f36658, type: 3}
+    offset: {x: 0, y: 0}
   stabableLayers:
     serializedVersion: 2
     m_Bits: 69249

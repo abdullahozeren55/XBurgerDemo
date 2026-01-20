@@ -4,6 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
+public class ItemIcon
+{
+    public Sprite sprite;
+    public Vector2 offset; // UI'da ne kadar kaydýracaðýmýz (Örn: x=2, y=-1)
+}
 public interface IGrabable
 {
     // YENÝ: Herkes gerçek sahibini göstersin
@@ -35,5 +41,5 @@ public interface IGrabable
     public bool OutlineShouldBeRed { get; set; }
     public bool OutlineShouldBeGreen { get; set; }
     public string FocusTextKey { get; set; }
-    public Sprite Icon { get; set; }
+    public ItemIcon IconData { get; set; }
 }

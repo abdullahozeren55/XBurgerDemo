@@ -24,7 +24,7 @@ public class FryableData : ScriptableObject
     [Header("Identity")]
     public float putOnBasketDuration = 0.2f; // Varsayýlan 0.2 saniye olsun
     public Holder.HolderIngredient type;
-    public Sprite icon;
+    public ItemIcon iconData;
     public string[] focusTextKeys;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;

@@ -11,7 +11,7 @@ public class Toy : MonoBehaviour, IGrabable
     [Header("Visual Parts")]
     [SerializeField] private GameObject[] childParts; // Inspector'dan atanacak parçalar
 
-    public Sprite Icon { get => data.icon; set => data.icon = value; }
+    public ItemIcon IconData { get => data.iconData; set => data.iconData = value; }
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;

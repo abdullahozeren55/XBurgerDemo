@@ -147,9 +147,9 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.ForceUpdateCurrentGrabableReference(newGrabable);
     }
 
-    public void ForceUpdatePlayerSlotIcon(IGrabable targetGrabable, Sprite newIcon)
+    public void ForceUpdatePlayerSlotIcon(IGrabable targetGrabable, ItemIcon newIconData)
     {
-        firstPersonController.ForceUpdateSlotIcon(targetGrabable, newIcon);
+        firstPersonController.ForceUpdateSlotIcon(targetGrabable, newIconData);
     }
 
     public void ChangePlayerCurrentGrabable(IGrabable objectToGrab)

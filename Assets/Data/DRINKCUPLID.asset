@@ -17,7 +17,9 @@ MonoBehaviour:
   throwMultiplier: 1
   handGrabType: 4
   handRigType: 1
-  icon: {fileID: 21300000, guid: 5b1c3d60abf220a488edb8a644f5d33f, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: bcf56e1b262abf04383deb0a6c8c15f6, type: 3}
+    offset: {x: 0, y: 0}
   grabPositionOffset: {x: 0.6, y: 1, z: 2}
   grabRotationOffset: {x: 60, y: -70, z: -70}
   grabLocalPositionOffset: {x: -0.0347, y: 0.0525, z: 0.0866}

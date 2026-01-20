@@ -14,7 +14,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
     [HideInInspector] public Tray currentTray;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
-    public Sprite Icon { get => data.icons[currentIconStateIndex]; set => data.icons[currentIconStateIndex] = value; }
+    public ItemIcon IconData { get => data.iconData[currentIconStateIndex]; set => data.iconData[currentIconStateIndex] = value; }
 
     public float GetFillDuration => data.fillDuration;
 
@@ -202,7 +202,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
         currentIconStateIndex = 1;
 
-        PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, Icon);
+        PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, IconData);
 
         UpdateFocusTextState();
 

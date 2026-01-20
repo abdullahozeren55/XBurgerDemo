@@ -16,9 +16,11 @@ MonoBehaviour:
   isThrowable: 1
   handGrabType: 10
   handRigType: 1
-  icon:
-  - {fileID: 21300000, guid: 58d16380fb4b21a4ab66a83ce4ac227a, type: 3}
-  - {fileID: 21300000, guid: 174c27038ef842a4cae4b9e195949bcf, type: 3}
+  iconData:
+  - sprite: {fileID: 21300000, guid: 58d16380fb4b21a4ab66a83ce4ac227a, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 174c27038ef842a4cae4b9e195949bcf, type: 3}
+    offset: {x: 0, y: 0}
   minLidAngle: 32
   maxLidAngle: 112
   minBurgerHeightLimit: 1.5

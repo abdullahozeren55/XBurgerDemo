@@ -17,7 +17,7 @@ public class ChildBurger : MonoBehaviour, IGrabable
 
     // Ýkon ve GrabType'ý da Parent yönetsin veya Child'a özel kalabilir.
     // Þimdilik parent'tan çekiyoruz ki tutarlý olsun.
-    public Sprite Icon { get => parentBurger.Icon; set => parentBurger.Icon = value; }
+    public ItemIcon IconData { get => parentBurger.IconData; set => parentBurger.IconData = value; }
     public PlayerManager.HandGrabTypes HandGrabType { get => parentBurger.HandGrabType; set => parentBurger.HandGrabType = value; }
 
     public PlayerManager.HandRigTypes HandRigType { get => parentBurger.HandRigType; set => parentBurger.HandRigType = value; }

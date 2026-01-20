@@ -9,7 +9,7 @@ public class SauceCapsuleData : ScriptableObject
     public SauceBottle.SauceType sauceType;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType = PlayerManager.HandRigTypes.SingleHandGrab;
-    public Sprite icon;
+    public ItemIcon iconData;
     [Space]
     public bool isUseable = false;
     public bool isThrowable = true;

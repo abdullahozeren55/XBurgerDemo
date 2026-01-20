@@ -17,7 +17,7 @@ public class GrabableChild : MonoBehaviour, IGrabable
         set { if (parentGrabable != null) parentGrabable.IsGrabbed = value; }
     }
 
-    public Sprite Icon { get => parentGrabable?.Icon; set { if (parentGrabable != null) parentGrabable.Icon = value; } }
+    public ItemIcon IconData { get => parentGrabable?.IconData; set { if (parentGrabable != null) parentGrabable.IconData = value; } }
 
     // Enum olduðu için null check biraz farklý, default deðer döndürüyoruz
     public PlayerManager.HandGrabTypes HandGrabType

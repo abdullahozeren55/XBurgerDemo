@@ -9,7 +9,7 @@ public class DrinkData : ScriptableObject
     public GameManager.DrinkTypes drinkType;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
-    public Sprite icon;
+    public ItemIcon iconData;
     [Space]
     public bool isUseable = false;
     public bool isThrowable = true;

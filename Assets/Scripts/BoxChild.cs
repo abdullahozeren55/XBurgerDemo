@@ -11,7 +11,7 @@ public class BoxChild : MonoBehaviour, IGrabable
 
     // IGrabable Propertyleri (Parent'tan oku/yaz)
     public bool IsGrabbed { get => parentBox.IsGrabbed; set => parentBox.IsGrabbed = value; }
-    public Sprite Icon { get => parentBox.Icon; set { } } // Set boþ çünkü parent yönetiyor
+    public ItemIcon IconData { get => parentBox.IconData; set { } } // Set boþ çünkü parent yönetiyor
     public PlayerManager.HandGrabTypes HandGrabType { get => parentBox.HandGrabType; set { } }
     public PlayerManager.HandRigTypes HandRigType { get => parentBox.HandRigType; set => parentBox.HandRigType = value; }
 

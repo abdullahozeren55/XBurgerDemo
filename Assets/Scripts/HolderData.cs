@@ -7,7 +7,7 @@ using static FryableData;
 public class HolderData : ScriptableObject
 {
     [Header("Identity")]
-    public Sprite icon;
+    public ItemIcon[] iconData;
     public string[] focusTextKeys;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType = PlayerManager.HandRigTypes.SingleHandGrab;

@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: WHOLETOMATO
   m_EditorClassIdentifier: 
   Type: 2
-  icon: {fileID: 21300000, guid: 14cec69cafe1add4aab542a8782a7efd, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: 14cec69cafe1add4aab542a8782a7efd, type: 3}
+    offset: {x: 0, y: 0}
   destroyParticle: {fileID: 3451705259810622206, guid: 3563ddfbd416f7a4ea221db036f7ea1b, type: 3}
   destroyParticleExplode: {fileID: 3451705259810622206, guid: 491d920c808df9c41b379bb1b09a9b80, type: 3}
   instantiateRotationOffset: {x: 0, y: 0, z: 0, w: 0}
@@ -22,6 +24,7 @@ MonoBehaviour:
   isThrowable: 1
   throwMultiplier: 1
   handGrabType: 9
+  handRigType: 1
   minForce: 0.2
   maxForce: 0.4
   minForceExplode: 0.4

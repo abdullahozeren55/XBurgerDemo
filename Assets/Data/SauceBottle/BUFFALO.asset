@@ -17,7 +17,9 @@ MonoBehaviour:
   throwMultiplier: 1
   handGrabType: 1
   handRigType: 1
-  icon: {fileID: 21300000, guid: 8a702934141114c45bd087277f03ddc1, type: 3}
+  iconData:
+    sprite: {fileID: 21300000, guid: 8a702934141114c45bd087277f03ddc1, type: 3}
+    offset: {x: 0, y: 0}
   focusTextKey: GRABABLE_BUFFALO_SAUCE_BOTTLE
   grabPositionOffset: {x: 0.7, y: 1, z: 3}
   grabRotationOffset: {x: -5, y: -70, z: -70}

@@ -11,7 +11,7 @@ public class SauceBottleData : ScriptableObject
     public float throwMultiplier = 1f;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
-    public Sprite icon;
+    public ItemIcon iconData;
     public string focusTextKey;
     [Space]
     public Vector3 grabPositionOffset;

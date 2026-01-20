@@ -7,7 +7,7 @@ public class SauceCapsule : MonoBehaviour, IGrabable
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
 
-    public Sprite Icon { get => data.icon; set => data.icon = value; }
+    public ItemIcon IconData { get => data.iconData; set => data.iconData = value; }
 
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
