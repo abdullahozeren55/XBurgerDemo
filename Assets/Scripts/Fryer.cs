@@ -7,7 +7,6 @@ public class Fryer : MonoBehaviour
     [SerializeField] private Transform oilSurfaceTransform; // Hareket edecek Yað Objesi (Plane)
     [SerializeField] private MeshRenderer oilMeshRenderer;
     [SerializeField] private ParticleSystem bubbleParticles;
-    [SerializeField] private ParticleSystem splashParticles;
 
     [Header("Turbulence Settings (Köpürme)")]
     [SerializeField] private float baseWeight = 0.2f;
@@ -17,6 +16,17 @@ public class Fryer : MonoBehaviour
     [SerializeField] private float settleDuration = 0.5f;
     [SerializeField] private float minEmission = 5f;
     [SerializeField] private float maxEmission = 30f;
+
+    [Header("Splash Juice Settings")]
+    [SerializeField] private GameObject splashPrefab; // Instantiate edilecek prefab
+    [SerializeField] private Transform[] splashSpawnPoints; // 0: Sol, 1: Sað (Yaðýn child'ý olsunlar)
+
+    [Space]
+    [SerializeField] private float minSplashEmission = 10f; // Boþ sepet için
+    [SerializeField] private float maxSplashEmission = 50f; // Full sepet için
+    [Space]
+    [SerializeField] private float minSplashSpeed = 2f;
+    [SerializeField] private float maxSplashSpeed = 6f;
 
     [Header("Physics Settings (Seviye Yükselmesi)")]
     [SerializeField] private float risePerEmptyBasket = 0.0002f; // Boþ sepet ne kadar yükseltir?
@@ -61,22 +71,23 @@ public class Fryer : MonoBehaviour
 
     // --- BASKET TARAFINDAN ÇAÐRILANLAR ---
 
-    // Artýk sadece "Dolu mu?" diye deðil, "Kaç tane var?" diye soruyoruz
-    public void OnBasketDown(int itemCount)
-    {
-        if (splashParticles != null) splashParticles.Play();
+    // Artýk "laneIndex" parametresi alýyorlar (Hangi sepet?)
 
+    public void OnBasketDown(int itemCount, int laneIndex)
+    {
         if (itemCount > 0) totalFoodItemsCount += itemCount;
         else emptyBasketsCount++;
 
-        // itemCount ne kadar çoksa Surge (Dalgalanma) o kadar þiddetli olsun
-        float surgeMultiplier = itemCount > 0 ? (float)itemCount / BASKET_CAPACITY : 0.5f; // Boþsa yarým þiddet
+        float surgeMultiplier = itemCount > 0 ? (float)itemCount / BASKET_CAPACITY : 0.5f;
 
         AnimateTurbulence(true, surgeMultiplier);
         AnimateOilLevel(true, surgeMultiplier);
+
+        // JUICE: Partikülü Çak!
+        SpawnDynamicSplash(itemCount, laneIndex);
     }
 
-    public void OnBasketUp(int itemCount)
+    public void OnBasketUp(int itemCount, int laneIndex)
     {
         if (itemCount > 0) totalFoodItemsCount -= itemCount;
         else emptyBasketsCount--;
@@ -84,8 +95,61 @@ public class Fryer : MonoBehaviour
         if (totalFoodItemsCount < 0) totalFoodItemsCount = 0;
         if (emptyBasketsCount < 0) emptyBasketsCount = 0;
 
-        AnimateTurbulence(false, 0f); // Çýkarken surge yok
+        AnimateTurbulence(false, 0f);
         AnimateOilLevel(false, 0f);
+
+        // JUICE: Çýkarken de damlasýn, ama belki biraz daha az þiddetli (tercihen)
+        SpawnDynamicSplash(itemCount, laneIndex);
+    }
+
+    // --- YENÝ JUICE FONKSÝYONU ---
+    private void SpawnDynamicSplash(int itemCount, int laneIndex)
+    {
+        if (splashPrefab == null) return;
+        if (splashSpawnPoints == null || splashSpawnPoints.Length <= laneIndex) return;
+
+        // 1. Doðru pozisyonda yarat
+        Transform targetPoint = splashSpawnPoints[laneIndex];
+        GameObject newSplash = Instantiate(splashPrefab, targetPoint.position, Quaternion.Euler(-90f, 0f, 0f)); // Rotation identity veya prefab'ýnki kalabilir
+
+        // 2. Oraný Hesapla (0 ile 1 arasý)
+        // Sepet boþsa (0 item) yine de bir aðýrlýðý var, o yüzden min 0 deðil.
+        // Amaç: Boþ sepette Min deðerler, Dolu sepette Max deðerler.
+        float ratio = Mathf.Clamp01((float)itemCount / BASKET_CAPACITY);
+
+        // 3. Deðerleri Lerple
+        float targetEmission = Mathf.Lerp(minSplashEmission, maxSplashEmission, ratio);
+        float targetSpeed = Mathf.Lerp(minSplashSpeed, maxSplashSpeed, ratio);
+
+        // 4. Particle System'e Müdahale Et
+        ParticleSystem ps = newSplash.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            // Hýz Ayarý (Start Speed)
+            var main = ps.main;
+            // Constant yerine RandomBetweenTwoConstants kullanýyoruz ki doðal dursun.
+            // Alt limit ile üst limit arasýnda hafif fark olsun.
+            main.startSpeed = new ParticleSystem.MinMaxCurve(targetSpeed * 0.8f, targetSpeed * 1.2f);
+
+            // Sayý Ayarý (Emission Burst)
+            var emission = ps.emission;
+            // Eðer Burst kullanýyorsan (ki splash için burst mantýklý):
+            if (emission.burstCount > 0)
+            {
+                ParticleSystem.Burst burst = emission.GetBurst(0);
+                burst.count = new ParticleSystem.MinMaxCurve(targetEmission);
+                emission.SetBurst(0, burst);
+            }
+            else
+            {
+                // Burst yoksa RateOverTime ile oynayalým (ama tavsiyem Burst)
+                emission.rateOverTime = targetEmission;
+            }
+        }
+
+        // NOT: Prefab'ýn üzerinde "Stop Action -> Destroy" ayarlýysa buna gerek yok.
+        // Ama garanti olsun, pis kod severiz:
+        Destroy(newSplash, 2f);
     }
 
     // --- ANÝMASYON MANTIÐI ---

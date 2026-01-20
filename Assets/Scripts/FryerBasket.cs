@@ -45,6 +45,15 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
     [Header("Fryer Integration")]
     [SerializeField] private Fryer connectedFryer; // Yað efektini tetiklemek için
+    [Tooltip("0: Sol taraf, 1: Sað Taraf (Fritözdeki spawn point array sýrasý)")]
+    [SerializeField] private int fryerLaneIndex = 0; // <--- YENÝ
+
+    [Header("Smoke Effects (Continuous)")]
+    [SerializeField] private GameObject smokePrefab; // Duman Prefab'ý
+    [SerializeField] private float minSmokeEmission = 5f; // 1 malzeme için
+    [SerializeField] private float maxSmokeEmission = 20f; // Full sepet için
+
+    private ParticleSystem currentSmokeParticles; // O anki dumanýn referansý
 
     [Header("Audio")]
     //public AudioClip liftSound; // Metal sesi
@@ -101,6 +110,8 @@ public class FryerBasket : MonoBehaviour, IInteractable
                 item.Cook(Time.deltaTime);
             }
         }
+
+        HandleSmokeLogic();
     }
 
     // --- TRIGGER LOGIC (YAKALAMA) ---
@@ -334,15 +345,14 @@ public class FryerBasket : MonoBehaviour, IInteractable
     {
         if (connectedFryer == null) return;
 
-        // Gönderilecek miktar: Eðer sepet boþsa 0, doluysa kaç tane olduðu
         int countToSend = heldItems.Count;
 
         if (enteringOil)
         {
             if (!isPhysicallyInOil)
             {
-                // Parametre deðiþti: IsHeavy yerine countToSend
-                connectedFryer.OnBasketDown(countToSend);
+                // Parametre güncellendi: laneIndex eklendi
+                connectedFryer.OnBasketDown(countToSend, fryerLaneIndex);
                 isPhysicallyInOil = true;
                 RefreshTopItemInteractability();
             }
@@ -351,8 +361,8 @@ public class FryerBasket : MonoBehaviour, IInteractable
         {
             if (isPhysicallyInOil)
             {
-                // Parametre deðiþti
-                connectedFryer.OnBasketUp(countToSend);
+                // Parametre güncellendi: laneIndex eklendi
+                connectedFryer.OnBasketUp(countToSend, fryerLaneIndex);
                 isPhysicallyInOil = false;
                 RefreshTopItemInteractability();
             }
@@ -457,5 +467,88 @@ public class FryerBasket : MonoBehaviour, IInteractable
         // Süreyi biraz arttýrdým (0.25 -> 0.4) ki yaylanma hissedilsin.
         transform.DOMove(targetPos, 0.4f).SetEase(Ease.OutBack, 3f);
         transform.DORotateQuaternion(targetRot, 0.4f).SetEase(Ease.OutBack, 3f);
+    }
+
+    // --- YENÝ JUICE FONKSÝYONU ---
+    private void HandleSmokeLogic()
+    {
+        // 1. Duman Üretmeli miyiz?
+        // - Fiziksel olarak yaðýn içinde olmalýyýz.
+        // - Sepette malzeme olmalý.
+        bool shouldEmitSmoke = isPhysicallyInOil && heldItems.Count > 0;
+
+        int cookingItemCount = 0;
+
+        if (shouldEmitSmoke)
+        {
+            // Ýçerideki "Yanmamýþ" malzemeleri say
+            // (Yanýklar piþme dumaný çýkarmaz - veya baþka duman çýkarýr ama onu karýþtýrmýyoruz)
+            foreach (var item in heldItems)
+            {
+                if (item.CurrentCookingState != Cookable.CookAmount.BURNT)
+                {
+                    cookingItemCount++;
+                }
+            }
+
+            // Eðer hepsi yanýksa duman tütmemeli
+            if (cookingItemCount == 0) shouldEmitSmoke = false;
+        }
+
+        // 2. Duruma Göre Aksiyon Al
+        if (shouldEmitSmoke)
+        {
+            // Duman yoksa yarat
+            if (currentSmokeParticles == null)
+            {
+                CreateSmoke();
+            }
+
+            // Duman varsa emission güncelle
+            if (currentSmokeParticles != null)
+            {
+                UpdateSmokeEmission(cookingItemCount);
+            }
+        }
+        else
+        {
+            // Duman tütmemeli ama referansýmýz var -> Durdur ve Býrak
+            if (currentSmokeParticles != null)
+            {
+                StopAndDetachSmoke();
+            }
+        }
+    }
+
+    private void CreateSmoke()
+    {
+        if (smokePrefab == null) return;
+
+        // Instantiate edip Sepet'e parent yapýyoruz ki sepet sallanýnca duman kaynaðý da sallansýn
+        GameObject smokeObj = Instantiate(smokePrefab, transform.position, Quaternion.Euler(-90, 0, 0), transform);
+        currentSmokeParticles = smokeObj.GetComponent<ParticleSystem>();
+    }
+
+    private void UpdateSmokeEmission(int itemCount)
+    {
+        var emission = currentSmokeParticles.emission;
+
+        // Oran: (Malzeme Sayýsý / Kapasite)
+        // Örn: 1/3, 2/3 veya 3/3
+        float ratio = Mathf.Clamp01((float)itemCount / capacity);
+
+        // Lerp ile ara deðeri bul
+        float targetRate = Mathf.Lerp(minSmokeEmission, maxSmokeEmission, ratio);
+
+        emission.rateOverTime = targetRate;
+    }
+
+    private void StopAndDetachSmoke()
+    {
+        // 1. Dumaný Durdur (Mevcutlar sönerek kaybolsun)
+        currentSmokeParticles.Stop();
+
+        // 2. Referansý unut (Zaten prefab ayarýndan kendini destroy edecek)
+        currentSmokeParticles = null;
     }
 }
