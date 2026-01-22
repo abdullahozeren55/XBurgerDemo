@@ -101,8 +101,8 @@ public class BurgerIngredientData : ScriptableObject
     public float cookingSoundMaxPitch = 1.15f;
     [Space]
     public float soundCooldown = 0.1f;
-    public float throwThreshold = 6f;
-    public float dropThreshold = 2f;
+    public float throwThreshold = 5f;
+    public float dropThreshold = 1f;
     [Space]
     public float cookedSoundMultiplier = 0.8f;
     public float burntSoundMultiplier = 0.6f;

@@ -53,4 +53,41 @@ public class FryableData : ScriptableObject
     public Material rawMat;
     public Material cookedMat;
     public Material burntMat;
+    [Space]
+    public ParticleSystem[] dropParticles;
+    public ParticleSystem[] throwParticles;
+    [Space]
+
+    [Header("Audio")]
+    public AudioClip placeSound; // Sepete yerleþme sesi (Juice/Thud)
+    [Space]
+    public AudioClip[] audioClips;
+    [Space]
+    public float grabSoundVolume = 1f;
+    public float grabSoundMinPitch = 0.85f;
+    public float grabSoundMaxPitch = 1.15f;
+    [Space]
+    public float dropSoundVolume = 1f;
+    public float dropSoundMinPitch = 0.85f;
+    public float dropSoundMaxPitch = 1.15f;
+    [Space]
+    public float throwSoundVolume = 1f;
+    public float throwSoundMinPitch = 0.85f;
+    public float throwSoundMaxPitch = 1.15f;
+    [Space]
+    public float traySoundVolume = 1f;
+    public float traySoundMinPitch = 0.85f;
+    public float traySoundMaxPitch = 1.15f;
+    [Space]
+    public float soundCooldown = 0.1f;
+    public float throwThreshold = 5f;
+    public float dropThreshold = 1f;
+    [Space]
+    public float placeSoundVolume = 1f;
+    public float placeSoundMinPitch = 0.85f;
+    public float placeSoundMaxPitch = 1.15f;
+    [Space]
+    public float cookedSoundMultiplier = 0.8f;
+    public float burntSoundMultiplier = 0.6f;
+    
 }

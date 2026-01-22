@@ -10,7 +10,7 @@ public class TrayData : ScriptableObject
     public float throwMultiplier = 1f;
     public PlayerManager.HandGrabTypes handGrabType;
     public PlayerManager.HandRigTypes handRigType;
-    public ItemIcon iconData;
+    public ItemIcon[] iconData;
     [Space]
     public Vector3 grabPositionOffset;
     public Vector3 grabRotationOffset;

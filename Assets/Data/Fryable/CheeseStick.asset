@@ -64,3 +64,37 @@ MonoBehaviour:
   rawMat: {fileID: 2100000, guid: 711a44aefdad0b54aabcf7cffe31a901, type: 2}
   cookedMat: {fileID: 2100000, guid: cf4ec116b15da6a49bf2de8d44347776, type: 2}
   burntMat: {fileID: 2100000, guid: 0a4ff4e68954ed34cafeef1143a2b637, type: 2}
+  dropParticles:
+  - {fileID: 8670732574423207768, guid: f5d0a3a7158d9b14e972db14a0696020, type: 3}
+  - {fileID: 8670732574423207768, guid: f9c388ebf911c7e458477f6e52d2c205, type: 3}
+  - {fileID: 8670732574423207768, guid: e855bb079ab070342b8f14f6e0e83efc, type: 3}
+  throwParticles:
+  - {fileID: 8670732574423207768, guid: e163a95899040bb40b5a3884478a30d7, type: 3}
+  - {fileID: 8670732574423207768, guid: 79562263b61868146bb9883c3a1a3c18, type: 3}
+  - {fileID: 8670732574423207768, guid: 50bafeb2beac55f47981a5b8b7650321, type: 3}
+  placeSound: {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
+  audioClips:
+  - {fileID: 8300000, guid: b93dbdd756280f6419be6d697d852f4f, type: 3}
+  - {fileID: 8300000, guid: 3e28540a4e7b19447a5cf58012f58e56, type: 3}
+  - {fileID: 8300000, guid: d7b91449db4f3184c8654c340db2c173, type: 3}
+  - {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
+  grabSoundVolume: 1
+  grabSoundMinPitch: 0.85
+  grabSoundMaxPitch: 1.15
+  dropSoundVolume: 1
+  dropSoundMinPitch: 0.85
+  dropSoundMaxPitch: 1.15
+  throwSoundVolume: 1
+  throwSoundMinPitch: 0.85
+  throwSoundMaxPitch: 1.15
+  traySoundVolume: 1
+  traySoundMinPitch: 0.85
+  traySoundMaxPitch: 1.15
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1
+  placeSoundVolume: 1
+  placeSoundMinPitch: 0.8
+  placeSoundMaxPitch: 1.2
+  cookedSoundMultiplier: 0.8
+  burntSoundMultiplier: 0.6

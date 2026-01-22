@@ -1552,15 +1552,19 @@ public class FirstPersonController : MonoBehaviour
                     // --- KRÝTÝK NOKTA: SÝNYALÝ KES ---
                     RemoveItemFromInventory(currentGrabable);
 
-                    // Eðer tepsi gittiðinde elimize yeni bir þey geldiyse (Burger vs.),
-                    // o yeni þeyin "Release" sinyalini görmezden gelmesini emrediyoruz.
-                    if (currentGrabable != null)
+                    if (currentSlotIndex != -1)
                     {
+                        // Elimize yeni bir þey geldiyse (Burger vb.), parmaðýmýzý çekene kadar "hayalet release"i engelle.
                         ignoreNextThrowRelease = true;
                     }
+                    else
+                    {
+                        // Eðer el boþa düþtüyse (Slot -1), ortada yanlýþlýkla fýrlatýlacak bir þey yok demektir.
+                        // Bool'u hemen kapat ki sonra yerden eþya alýnca ilk seferde tutukluk yapmasýn.
+                        ignoreNextThrowRelease = false;
+                    }
 
-                    ThrowKeyIsDone = true; // <--- BU SATIR EKLENDÝ!
-                                               // Artýk ayný frame içinde baþka hiçbir "PlayerThrow" bloðu çalýþamaz.
+                    ThrowKeyIsDone = true;
 
                     if (currentSlotIndex == -1)
                     {

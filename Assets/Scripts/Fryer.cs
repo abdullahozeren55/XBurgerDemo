@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class Fryer : MonoBehaviour
 {
+    [Header("Audio Settings")]
+    private AudioSource fryerAudioSource; // Inspector'dan ata
+    [SerializeField] private float maxVolume = 0.8f;       // Full doluyken çýkacak ses
+    [SerializeField] private float fadeDuration = 1f;    // Ses deðiþim hýzý
+
     [Header("Visuals")]
     [SerializeField] private Transform oilSurfaceTransform; // Hareket edecek Yað Objesi (Plane)
     [SerializeField] private MeshRenderer oilMeshRenderer;
@@ -38,7 +43,8 @@ public class Fryer : MonoBehaviour
 
     // Logic Variables
     private Material oilMat;
-    private int totalFoodItemsCount = 0;
+    private int totalFoodItemsCount = 0;   // Fiziksel doluluk (Sepet girmesi/çýkmasý için)
+    private int activeFoodItemsCount = 0;  // GÖRSEL doluluk (Baloncuk ve Yað seviyesi için)
     private int emptyBasketsCount = 0; // Boþ sepet sayýsý
 
     private const int BASKET_CAPACITY = 3;
@@ -49,9 +55,31 @@ public class Fryer : MonoBehaviour
     // Tween References (Çakýþma önlemek için)
     private Tween turbulenceTween;
     private Tween levelTween;
+    private int maxTotalCapacity; // Oran hesabý için (Baskets.Length * Capacity)
+    private Tween audioFadeTween; // Ses lerplemesi için
 
     private void Awake()
     {
+        fryerAudioSource = GetComponent<AudioSource>();
+
+        if (baskets != null && baskets.Length > 0)
+        {
+            // Ýlk sepetin kapasitesini baz alýyoruz
+            // (FryerBasket scriptine public eriþim açmak gerekebilir veya hardcode 3 kullanabiliriz)
+            maxTotalCapacity = baskets.Length * BASKET_CAPACITY;
+        }
+        else
+        {
+            maxTotalCapacity = 6; // Fallback
+        }
+
+        if (fryerAudioSource != null)
+        {
+            fryerAudioSource.loop = true;
+            fryerAudioSource.volume = 0f;
+            if (!fryerAudioSource.isPlaying) fryerAudioSource.Play();
+        }
+
         if (oilMeshRenderer != null)
         {
             oilMat = oilMeshRenderer.material;
@@ -76,33 +104,83 @@ public class Fryer : MonoBehaviour
 
     // Artýk "laneIndex" parametresi alýyorlar (Hangi sepet?)
 
-    public void OnBasketDown(int itemCount, int laneIndex)
+    // Artýk hem fiziksel (total) hem görsel (active) sayýyý ayrý istiyoruz
+    public void OnBasketDown(int totalItemCount, int activeItemCount, int laneIndex)
     {
-        if (itemCount > 0) totalFoodItemsCount += itemCount;
-        else emptyBasketsCount++;
+        if (totalItemCount > 0)
+        {
+            totalFoodItemsCount += totalItemCount;
+            activeFoodItemsCount += activeItemCount;
+        }
+        else { emptyBasketsCount++; }
 
-        float surgeMultiplier = itemCount > 0 ? (float)itemCount / BASKET_CAPACITY : 0.5f;
+        // --- DEÐÝÞÝKLÝK BURADA: SURGE (ANLIK DALGA) HESABI ---
+        // Eskiden: activeItemCount / BASKET_CAPACITY (Lineer)
+        // Þimdi: Sepet kapasitesinin yarýsý dolunca full coþsun.
+
+        float halfCapacity = BASKET_CAPACITY / 2f;
+        // Eðer 3 kapasiteyse 1.5 eder. Yani 2 patates atýnca fullenir.
+
+        float surgeMultiplier = 0f;
+        if (activeItemCount > 0)
+        {
+            // 0 ile Yarým Kapasite arasýný 0-1 arasýna oranla
+            surgeMultiplier = Mathf.Clamp01((float)activeItemCount / halfCapacity);
+        }
+        else if (totalItemCount == 0)
+        {
+            surgeMultiplier = 0.5f; // Boþ sepet için sabit
+        }
 
         AnimateTurbulence(true, surgeMultiplier);
         AnimateOilLevel(true, surgeMultiplier);
+        SpawnDynamicSplash(totalItemCount, laneIndex);
 
-        // JUICE: Partikülü Çak!
-        SpawnDynamicSplash(itemCount, laneIndex);
+        UpdateFryerAudio();
     }
 
-    public void OnBasketUp(int itemCount, int laneIndex)
+    public void OnBasketUp(int totalItemCount, int activeLeavingCount, int laneIndex)
     {
-        if (itemCount > 0) totalFoodItemsCount -= itemCount;
-        else emptyBasketsCount--;
+        if (totalItemCount > 0)
+        {
+            totalFoodItemsCount -= totalItemCount;
 
+            // Eðer yananlar varsa zaten OnItemBurnt ile düþmüþtük. 
+            // Sadece kalan saðlamlarý düþüyoruz.
+            activeFoodItemsCount -= activeLeavingCount;
+        }
+        else
+        {
+            emptyBasketsCount--;
+        }
+
+        // Güvenlik (Negatif olmasýn)
         if (totalFoodItemsCount < 0) totalFoodItemsCount = 0;
+        if (activeFoodItemsCount < 0) activeFoodItemsCount = 0;
         if (emptyBasketsCount < 0) emptyBasketsCount = 0;
 
+        // Çýkarken surge yok (false)
         AnimateTurbulence(false, 0f);
         AnimateOilLevel(false, 0f);
 
-        // JUICE: Çýkarken de damlasýn, ama belki biraz daha az þiddetli (tercihen)
-        SpawnDynamicSplash(itemCount, laneIndex);
+        SpawnDynamicSplash(totalItemCount, laneIndex);
+
+        UpdateFryerAudio();
+    }
+
+    // --- YENÝ: YANMA TETÝKLEYÝCÝSÝ ---
+    public void OnItemBurnt()
+    {
+        // Aktif sayýyý düþür (Köpürme azalsýn)
+        activeFoodItemsCount--;
+        if (activeFoodItemsCount < 0) activeFoodItemsCount = 0;
+
+        // SADECE Turbulence'ý güncelle. 
+        // triggerSurge = false (Dalgalanma yapma, yavaþça sön)
+        AnimateTurbulence(false, 0f);
+
+        // YENÝ: Sesi Güncelle (Biri yandý, cýzýrtý azalmalý)
+        UpdateFryerAudio();
     }
 
     // --- YENÝ JUICE FONKSÝYONU ---
@@ -160,9 +238,24 @@ public class Fryer : MonoBehaviour
     // 1. KÖPÜRME / TURBULENCE (Eski Mantýk)
     private void AnimateTurbulence(bool triggerSurge, float surgeIntensity)
     {
-        // HESAP: (Toplam Malzeme / 3) * TamSepetAðýrlýðý
-        // Yani 1 malzeme varsa 1/3 etki, 3 malzeme varsa tam etki.
-        float addedWeight = ((float)totalFoodItemsCount / BASKET_CAPACITY) * weightPerBasket;
+        // --- DEÐÝÞÝKLÝK BURADA: HEDEF AÐIRLIK (TARGET VAL) HESABI ---
+
+        // Mantýk: Toplam kapasitenin %50'si dolunca MAX Weight'e ulaþsýn.
+        float halfTotalCapacity = maxTotalCapacity / 2f;
+
+        // Aktif sayýsýný yarým kapasiteye oranla, 1'i geçemesin (Clamp01)
+        float saturationRatio = Mathf.Clamp01((float)activeFoodItemsCount / halfTotalCapacity);
+
+        // Artýk "Basket baþýna aðýrlýk" deðil, "Max Aðýrlýk" üzerinden gidiyoruz.
+        // baseWeight: Durgun yað
+        // maxTurbulenceWeight: Full coþmuþ yað (Bunu hesaplayacaðýz)
+
+        // Eskiden weightPerBasket ile çarpýyorduk, þimdi direkt hedef aralýðý belirleyelim.
+        // weightPerBasket * baskets.Length bize "Eski sistemdeki Max artýþý" verir.
+        float maxAddedWeight = weightPerBasket * baskets.Length;
+
+        // Yeni hedef deðer: Base + (Oran * MaxArtýþ)
+        float addedWeight = saturationRatio * maxAddedWeight;
         float targetVal = baseWeight + addedWeight;
 
         targetVal = Mathf.Clamp(targetVal, 0f, 1.5f);
@@ -171,7 +264,6 @@ public class Fryer : MonoBehaviour
 
         if (triggerSurge)
         {
-            // Surge miktarý da giren malzeme sayýsýna göre artsýn
             float dynamicSurge = surgeAmount * surgeIntensity;
             float surgeTarget = targetVal + dynamicSurge;
 
@@ -186,22 +278,21 @@ public class Fryer : MonoBehaviour
         }
     }
 
+    // 2. Yað Seviyesi Animasyonu
     private void AnimateOilLevel(bool isEntering, float surgeIntensity)
     {
         if (oilSurfaceTransform == null) return;
 
-        // HESAP: Her malzeme için "Tam Sepet Yükselmesi / 3" kadar yüksel
         float risePerItem = risePerFullBasket / BASKET_CAPACITY;
-
         float totalRise = (emptyBasketsCount * risePerEmptyBasket) + (totalFoodItemsCount * risePerItem);
+
         float targetZ = initialLocalZ + totalRise;
 
         if (levelTween != null && levelTween.IsActive()) levelTween.Kill();
 
         if (isEntering)
         {
-            // Dalma efekti de malzeme sayýsýna göre þiddetlensin
-            float dynamicSurge = levelSurgeAmount * (0.5f + (surgeIntensity * 0.5f)); // Min %50 surge olsun
+            float dynamicSurge = levelSurgeAmount * (0.5f + (surgeIntensity * 0.5f));
             float surgeZ = targetZ + dynamicSurge;
 
             Sequence seq = DOTween.Sequence();
@@ -211,6 +302,7 @@ public class Fryer : MonoBehaviour
         }
         else
         {
+            // Çýkarken
             levelTween = oilSurfaceTransform.DOLocalMoveZ(targetZ, settleDuration * 1.2f).SetEase(Ease.OutQuad);
         }
     }
@@ -225,11 +317,16 @@ public class Fryer : MonoBehaviour
         {
             var emission = bubbleParticles.emission;
 
-            // Mevcut aðýrlýða göre partikül sayýsýný oranla
-            // baseWeight -> minEmission
-            // baseWeight + (2 * weightPerBasket) -> maxEmission (2 sepet dolusu malzeme varsayýmýyla maxladým)
+            // --- DEÐÝÞÝKLÝK BURADA: BALONCUK SAYISI ---
+            // Eskiden: maxExpectedWeight = baseWeight + (2 * weightPerBasket)
+            // Þimdi: baseWeight + maxAddedWeight (Yani turbulence ile ayný max deðere ulaþsýn)
 
-            float maxExpectedWeight = baseWeight + (2 * weightPerBasket);
+            float maxAddedWeight = weightPerBasket * baskets.Length;
+            float maxExpectedWeight = baseWeight + maxAddedWeight;
+
+            // currentWeight zaten %50 dolulukta bu maxExpectedWeight'e ulaþacak þekilde ayarlandý (AnimateTurbulence içinde).
+            // O yüzden buradaki InverseLerp otomatik olarak erken fullenecek.
+
             float t = Mathf.InverseLerp(baseWeight, maxExpectedWeight, currentWeight);
 
             emission.rateOverTime = Mathf.Lerp(minEmission, maxEmission, t);
@@ -291,5 +388,29 @@ public class Fryer : MonoBehaviour
             // güvenle geçebilir.
             bestBasket.HandleCatch(other);
         }
+    }
+
+    // --- SES GÜNCELLEME MANTIÐI (YENÝ) ---
+    private void UpdateFryerAudio()
+    {
+        if (fryerAudioSource == null) return;
+
+        // 1. Hedef Sesi Hesapla
+        // Formül: (Aktif Sayý / Toplam Kapasite) * MaxVolume
+        // Örn: 3 patates var, kapasite 6 -> %50 * MaxVolume
+        float ratio = Mathf.Clamp01((float)activeFoodItemsCount / maxTotalCapacity);
+        float targetVolume = ratio * maxVolume;
+
+        // Eðer hiç aktif yoksa (0) ses tamamen kýsýlsýn.
+
+        // 2. Lerpleme (Tween Kill Mantýðýyla)
+        if (audioFadeTween != null && audioFadeTween.IsActive()) audioFadeTween.Kill();
+
+        float currentVol = fryerAudioSource.volume;
+
+        audioFadeTween = DOVirtual.Float(currentVol, targetVolume, fadeDuration, (v) =>
+        {
+            fryerAudioSource.volume = v;
+        }).SetEase(Ease.OutQuad);
     }
 }

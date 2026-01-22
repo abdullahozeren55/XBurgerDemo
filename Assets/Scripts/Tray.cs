@@ -21,7 +21,9 @@ public class Tray : MonoBehaviour, IGrabable
 
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
     private bool isGrabbed;
-    public ItemIcon IconData { get => data.iconData; set => data.iconData = value; }
+    public ItemIcon IconData { get => data.iconData[trayState]; set => data.iconData[trayState] = value; }
+
+    private int trayState;
 
     // --- YENÝ SLOT SÝSTEMÝ ---
     [Header("Universal Slots")]
@@ -49,7 +51,6 @@ public class Tray : MonoBehaviour, IGrabable
     public bool IsUseable { get => data.isUseable; set => data.isUseable = value; }
     public bool IsThrowable { get => data.isThrowable; set => data.isThrowable = value; }
     public float ThrowMultiplier { get => data.throwMultiplier; set => data.throwMultiplier = value; }
-    public Transform LeftHandPoint { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     public TrayData data;
     public string FocusTextKey { get => data.focusTextKey; set => data.focusTextKey = value; }
 
@@ -86,6 +87,7 @@ public class Tray : MonoBehaviour, IGrabable
 
         itemsOnTray.Clear();
         itemToSlotMap.Clear();
+        trayState = 0;
     }
 
     // ... (TryPlaceItem, RemoveItem, ChangeLayer AYNEN KALSIN) ...
@@ -250,6 +252,7 @@ public class Tray : MonoBehaviour, IGrabable
     {
         itemToSlotMap.Add(item, slotIndex);
         itemsOnTray.Add(item);
+        trayState = 1;
 
         // Slot Doluluk Kontrolü:
         // Eðer bu bir sos ise, ve limit dolmadýysa slotu HALA BOÞ GÖSTER (ki baþkasý gelebilsin)
@@ -289,7 +292,12 @@ public class Tray : MonoBehaviour, IGrabable
 
     public void RemoveItem(IGrabable item)
     {
-        if (itemsOnTray.Contains(item)) itemsOnTray.Remove(item);
+        if (itemsOnTray.Contains(item))
+        {
+            itemsOnTray.Remove(item);
+
+            if (itemsOnTray.Count <= 0) trayState = 0; 
+        }
 
         if (itemToSlotMap.ContainsKey(item))
         {

@@ -262,7 +262,13 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 attachedSmoke.Stop();
                 attachedSmoke = null; // Artýk dumaným yok
             }
-            // Else: Piþmiþse dokunma, benimle gelsin.
+            else
+            {
+                //piþmiþ veya yanmýþsa tutuyoruz ve prewarm özelliðini açýyoruz ki artýk envantere koyup geri aldýðýmýzda dumanýný baþtan oluþturmasýn hep dumanlý olsun
+                var main = attachedSmoke.main;
+                main.loop = true;
+                main.prewarm = true;
+            }
         }
 
         // Eðer bir ýzgaradaysak, önce oradan çýkýþ yapalým

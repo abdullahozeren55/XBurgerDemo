@@ -114,12 +114,13 @@ public class Grill : MonoBehaviour
         // 1. KONTROL: Veri uygunluðu
         if (!item.data.isCookable) return false;
 
+        // [YENÝ] Sadece ÇÝÐ olanlar piþebilir. Piþmiþ veya yanmýþsa alma.
+        if (item.cookAmount != CookAmount.RAW) return false;
+
         if (item.IsGrabbed) return false;
 
         // 2. KONTROL: Sahiplik Durumu (Zaten bir yerde mi?)
-        if (item.currentGrill != null) return false; // Baþka ýzgarada mý?
-        // item.currentBasket check'i yapmýyoruz çünkü class farklý ama 
-        // genel mantýkta "OnTray" layerýndaysa iþlem yapma diyebiliriz:
+        if (item.currentGrill != null) return false;
         if (item.gameObject.layer == LayerMask.NameToLayer("OnTray")) return false;
 
         // 3. KONTROL: Boþ slot var mý?
@@ -133,7 +134,7 @@ public class Grill : MonoBehaviour
         // Görsel yerleþim ve SES
         MoveItemToSlot(item, emptyIndex);
 
-        // Izgara genel sesi (Loop) güncelle
+        // Izgara genel sesi (Loop) güncelle - Eklendiði için true
         UpdateAudioCounts(item.data.ingredientType, true);
 
         return true;
@@ -148,11 +149,18 @@ public class Grill : MonoBehaviour
             occupiedSlots[index] = null;
             item.currentGrill = null;
 
-            // --- GÜNCELLEME: true parametresi ile anýnda durdur ---
+            // Partikülleri anýnda durdur
             StopCookParticles(index, true);
             StopSmokeParticles(index, true);
 
-            UpdateAudioCounts(item.data.ingredientType, false);
+            // [YENÝ MANTIK] Ses Kontrolü:
+            // Eðer item ZATEN YANMIÞSA, sesi 'OnItemStateChanged' içinde kýsmýþtýk.
+            // Burada tekrar kýsarsak sayaç bozulur.
+            // Sadece yanmamýþ (hala ses çýkaran) itemlarý toplarken sesi düþ.
+            if (item.cookAmount != CookAmount.BURNT)
+            {
+                UpdateAudioCounts(item.data.ingredientType, false);
+            }
         }
     }
 
@@ -387,9 +395,17 @@ public class Grill : MonoBehaviour
         if (activeSmokeParticles[index] != null)
             UpdateSmokeColor(activeSmokeParticles[index], item.data, newState);
 
-        // 3. YENÝ: Local Duman (Item'ýn üzerindeki)
+        // 3. Local Duman
         if (item.attachedSmoke != null)
             UpdateSmokeColor(item.attachedSmoke, item.data, newState);
+
+        // [YENÝ] 4. Ses Durumu (Yanma Kontrolü)
+        // Eðer yeni durum YANIK ise, artýk cýzýrdamayý kesmeli.
+        // Sanki ýzgaradan alýnmýþ gibi ses count'unu düþürüyoruz.
+        if (newState == CookAmount.BURNT)
+        {
+            UpdateAudioCounts(item.data.ingredientType, false);
+        }
     }
 
     private void UpdateParticleColor(ParticleSystem ps, BurgerIngredientData data, CookAmount state)

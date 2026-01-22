@@ -65,6 +65,10 @@ public class Fryable : MonoBehaviour, IGrabable
     // Baðlý olduðu sepet (Varsa)
     [HideInInspector] public FryerBasket currentBasket;
 
+    private float lastSoundTime = 0f;
+
+    private Quaternion collisionRotation;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -99,27 +103,30 @@ public class Fryable : MonoBehaviour, IGrabable
     }
 
     // --- COOKING LOGIC (Mevcut Kodun) ---
-    public void Cook(float heatAmount)
+    public bool Cook(float heatAmount)
     {
-        if (CurrentCookingState == CookAmount.BURNT) return;
+        if (CurrentCookingState == CookAmount.BURNT) return false;
         currentCookingTime += heatAmount;
-        CheckState();
+        return CheckState();
     }
 
-    private void CheckState()
+    private bool CheckState()
     {
         CookAmount oldState = CurrentCookingState;
 
-        // ARTIK DATA YERÝNE YEREL DEÐÝÞKENLERÝ KULLANIYORUZ:
         if (currentCookingTime >= targetBurnTime) CurrentCookingState = CookAmount.BURNT;
         else if (currentCookingTime >= targetCookTime) CurrentCookingState = CookAmount.REGULAR;
         else CurrentCookingState = CookAmount.RAW;
 
-        if (CurrentCookingState != oldState)
+        bool hasStateChanged = (CurrentCookingState != oldState);
+
+        if (hasStateChanged)
         {
             UpdateVisuals();
-            // Ses eklersek burada "Çýt" sesi çalabilir.
+            // Ses eklenebilir.
         }
+
+        return hasStateChanged;
     }
 
     private void UpdateVisuals()
@@ -292,6 +299,10 @@ public class Fryable : MonoBehaviour, IGrabable
 
         IsGrabbed = true;
 
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume,
+                                          data.grabSoundMinPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                                          data.grabSoundMaxPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier));
+
         transform.SetParent(grabPoint);
         transform.position = grabPoint.position;
         transform.localPosition = data.grabLocalPositionOffset;
@@ -448,18 +459,54 @@ public class Fryable : MonoBehaviour, IGrabable
         isJustDropped = false;
         isJustThrowed = false;
 
+        CalculateCollisionRotation(collision);
+
         HandleSoundFX(collision);
     }
 
     private void HandleSoundFX(Collision collision)
     {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
         float impactForce = collision.relativeVelocity.magnitude;
-        // Basit bir ses kontrolü (Veri eksikse hata vermesin diye null check)
-        //if (impactForce > 0.5f && Time.time - lastSoundTime > 0.2f && data.dropSound != null)
-        //{
-            //SoundManager.Instance.PlaySoundFX(data.dropSound, transform, 0.5f, 0.8f, 1.2f, false);
-            //lastSoundTime = Time.time;
-        //}
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= data.throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                data.throwSoundMaxPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier), false
+            );
+
+            if (data.throwParticles[(int)CurrentCookingState] != null)
+                Instantiate(data.throwParticles[(int)CurrentCookingState], transform.position, collisionRotation);
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier),
+                data.dropSoundMaxPitch * (CurrentCookingState == CookAmount.RAW ? 1f : CurrentCookingState == CookAmount.REGULAR ? data.cookedSoundMultiplier : data.burntSoundMultiplier), false
+            );
+
+            if (data.dropParticles[(int)CurrentCookingState] != null)
+                Instantiate(data.dropParticles[(int)CurrentCookingState], transform.position, collisionRotation);
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
     }
 
     // Gereksiz Interface Metodlarý
@@ -492,5 +539,22 @@ public class Fryable : MonoBehaviour, IGrabable
         {
             PlayerManager.Instance.ResetPlayerGrab(this);
         }
+    }
+
+    private void CalculateCollisionRotation(Collision collision)
+    {
+        ContactPoint contact = collision.contacts[0];
+
+        Vector3 normal = contact.normal;
+        Vector3 hitPoint = contact.point + normal * 0.02f;
+
+        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
+        if (tangent == Vector3.zero)
+            tangent = Vector3.Cross(normal, Vector3.forward);
+        tangent.Normalize();
+        Vector3 bitangent = Vector3.Cross(normal, tangent);
+
+        // Normal yönüne göre rotation hesapla
+        collisionRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
     }
 }

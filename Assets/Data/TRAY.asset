@@ -17,24 +17,28 @@ MonoBehaviour:
   throwMultiplier: 1
   handGrabType: 0
   handRigType: 3
-  icon: {fileID: 21300000, guid: 7cebde269c78ea84489f5ea6db2351b1, type: 3}
+  iconData:
+  - sprite: {fileID: 21300000, guid: 45c2f8a4075c4d743a81afc9a74d346c, type: 3}
+    offset: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: 2d007e583c7f9884bab7fa963f385454, type: 3}
+    offset: {x: 0, y: 0}
   grabPositionOffset: {x: 0, y: 0, z: 0}
   grabRotationOffset: {x: 0, y: 0, z: 0}
   maxSaucePerSlot: 5
   focusTextKey: GRABABLE_TRAY
   audioClips:
-  - {fileID: 8300000, guid: 19e9594bc172813438457584b8a663b6, type: 3}
-  - {fileID: 8300000, guid: b92f567054a7252448d18d6f96600d12, type: 3}
-  - {fileID: 8300000, guid: 5ac87daf57e5ddb4ebcfb5967ee44707, type: 3}
+  - {fileID: 8300000, guid: 075d6764c0ddb544b981fc370ba0e1ba, type: 3}
+  - {fileID: 8300000, guid: 188b6e2c2769410459bed79d50290335, type: 3}
+  - {fileID: 8300000, guid: 188b6e2c2769410459bed79d50290335, type: 3}
   grabSoundVolume: 1
-  grabSoundMinPitch: 0.85
-  grabSoundMaxPitch: 1.15
-  dropSoundVolume: 1
-  dropSoundMinPitch: 0.85
-  dropSoundMaxPitch: 1.15
-  throwSoundVolume: 1
-  throwSoundMinPitch: 0.85
-  throwSoundMaxPitch: 1.15
+  grabSoundMinPitch: 1
+  grabSoundMaxPitch: 1.2
+  dropSoundVolume: 0.8
+  dropSoundMinPitch: 1
+  dropSoundMaxPitch: 1.2
+  throwSoundVolume: 0.8
+  throwSoundMinPitch: 1
+  throwSoundMaxPitch: 1.2
   soundCooldown: 0.1
   throwThreshold: 6
   dropThreshold: 2

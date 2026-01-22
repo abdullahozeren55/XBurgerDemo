@@ -57,17 +57,35 @@ public class FryerBasket : MonoBehaviour, IInteractable
     [Tooltip("0: Sol taraf, 1: Sað Taraf (Fritözdeki spawn point array sýrasý)")]
     [SerializeField] private int fryerLaneIndex = 0; // <--- YENÝ
 
-    [Header("Smoke Effects (Continuous)")]
-    [SerializeField] private GameObject smokePrefab; // Duman Prefab'ý
-    [SerializeField] private float minSmokeEmission = 5f; // 1 malzeme için
-    [SerializeField] private float maxSmokeEmission = 20f; // Full sepet için
+    [Header("Smoke Effects & Colors")] // <--- YENÝ BAÞLIK
+    [SerializeField] private GameObject smokePrefab;
+    [SerializeField] private float minSmokeEmission = 5f;
+    [SerializeField] private float maxSmokeEmission = 20f;
 
-    private ParticleSystem currentSmokeParticles; // O anki dumanýn referansý
+    // --- YENÝ RENK AYARLARI ---
+    [System.Serializable]
+    public struct SmokeColorSet
+    {
+        public Color minColor;
+        public Color maxColor;
+    }
+    [Space]
+    [SerializeField] private SmokeColorSet rawSmokeColors;     // Çið
+    [SerializeField] private SmokeColorSet cookedSmokeColors;  // Piþmiþ
+    [SerializeField] private SmokeColorSet burntSmokeColors;   // Yanýk
+
+    private ParticleSystem currentSmokeParticles;
+    private Tween emissionTween;       // Lerp iþlemini tutacak referans
+    private int lastKnownCookingCount = -1; // Hafýza (Baþlangýçta -1 ki ilk seferi anlasýn)
 
     [Header("Audio")]
     //public AudioClip liftSound; // Metal sesi
     //public AudioClip dropSound; // Yaða girme sesi
     //public string audioTag = "SFX";
+    [SerializeField] private AudioClip sizzleSound; // O meþhur COSS sesi
+    [SerializeField] private float maxSizzleVolume = 1f; // Full doluyken ses þiddeti
+    [SerializeField] private float sizzleSoundMinPitch = 0.8f;
+    [SerializeField] private float sizzleSoundMaxPitch = 1.2f;
 
     private bool isFrying; // true: yaðda, false: askýda
     private bool isPhysicallyInOil = false;
@@ -110,13 +128,35 @@ public class FryerBasket : MonoBehaviour, IInteractable
     private void Update()
     {
         // --- PÝÞÝRME DÖNGÜSÜ ---
-        // Sadece FÝZÝKSEL OLARAK YAÐDAYSA piþir
-        // (Eskiden isFrying kontrol ediyorduk, o yüzden havada piþiyordu)
         if (isPhysicallyInOil && heldItems.Count > 0)
         {
+            bool anyStateChanged = false;
+
             foreach (var item in heldItems)
             {
-                item.Cook(Time.deltaTime);
+                // Durumu kaydetmeden önce yanýk mýydý?
+                bool wasBurnt = item.CurrentCookingState == CookAmount.BURNT;
+
+                // Cook metodunu çalýþtýr
+                if (item.Cook(Time.deltaTime))
+                {
+                    anyStateChanged = true;
+
+                    // --- YENÝ: YANMA KONTROLÜ ---
+                    // Eðer önceden yanýk deðildiyse VE þimdi yanýk olduysa
+                    if (!wasBurnt && item.CurrentCookingState == CookAmount.BURNT)
+                    {
+                        if (connectedFryer != null)
+                        {
+                            connectedFryer.OnItemBurnt();
+                        }
+                    }
+                }
+            }
+
+            if (anyStateChanged)
+            {
+                UpdateSmokeColor();
             }
         }
 
@@ -183,9 +223,23 @@ public class FryerBasket : MonoBehaviour, IInteractable
             localApexPos = foodContainer.InverseTransformPoint(basketEntryApex.position);
         }
 
+        // Animasyonun Callback'i (Animasyon bitince burasý çalýþýr)
         item.SetVisualState(targetIndex, foodContainer, currentStackHeight, localApexPos, () =>
         {
             UpdateHangingVisuals();
+
+            // --- YENÝ: JUICE SES EFEKTÝ ---
+            // Malzeme yerine oturduðunda çalsýn
+            if (item.data.placeSound != null && SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySoundFX(
+                    item.data.placeSound,
+                    item.transform, // Sesin çýkacaðý yer (3D ses)
+                    item.data.placeSoundVolume,
+                    item.data.placeSoundMinPitch,
+                    item.data.placeSoundMaxPitch
+                );
+            }
         });
 
         currentStackHeight += thisItemHeight;
@@ -301,7 +355,12 @@ public class FryerBasket : MonoBehaviour, IInteractable
                 float threshold = isEarlyReturn ? immersionThreshold/2f : immersionThreshold;
                 float hitWaterTime = duration * threshold;
 
-                currentSeq.InsertCallback(hitWaterTime, () => SyncFryerState(true));
+                currentSeq.InsertCallback(hitWaterTime, () =>
+                {
+                    SyncFryerState(true);
+
+                    PlaySizzleSound();
+                });
             }
             else
             {
@@ -354,14 +413,26 @@ public class FryerBasket : MonoBehaviour, IInteractable
     {
         if (connectedFryer == null) return;
 
-        int countToSend = heldItems.Count;
+        int totalCount = heldItems.Count;
+
+        // --- HESAPLAMA --- 
+        // Hem giriþ hem çýkýþ için "Kaçý Saðlam?" bilgisini hazýrlayalým
+        int activeCount = 0;
+        foreach (var item in heldItems)
+        {
+            if (item.CurrentCookingState != CookAmount.BURNT)
+                activeCount++;
+        }
+        // -----------------
 
         if (enteringOil)
         {
             if (!isPhysicallyInOil)
             {
-                // Parametre güncellendi: laneIndex eklendi
-                connectedFryer.OnBasketDown(countToSend, fryerLaneIndex);
+                // DÜZELTME: Artýk totalCount ve activeCount'u ayrý gönderiyoruz.
+                // Eðer hepsi yanýksa activeCount 0 gidecek ve Fryer köpürmeyecek.
+                connectedFryer.OnBasketDown(totalCount, activeCount, fryerLaneIndex);
+
                 isPhysicallyInOil = true;
                 RefreshTopItemInteractability();
             }
@@ -370,11 +441,45 @@ public class FryerBasket : MonoBehaviour, IInteractable
         {
             if (isPhysicallyInOil)
             {
-                // Parametre güncellendi: laneIndex eklendi
-                connectedFryer.OnBasketUp(countToSend, fryerLaneIndex);
+                // Çýkýþta da aynýsý (Burasý zaten böyleydi, activeCount hesaplamasýný yukarý taþýdýk sadece)
+                connectedFryer.OnBasketUp(totalCount, activeCount, fryerLaneIndex);
+
                 isPhysicallyInOil = false;
                 RefreshTopItemInteractability();
             }
+        }
+    }
+
+    private void PlaySizzleSound()
+    {
+        if (sizzleSound == null) return;
+
+        // 1. Yanmamýþ (Active) malzeme sayýsýný bul
+        int activeCount = 0;
+        foreach (var item in heldItems)
+        {
+            if (item.CurrentCookingState != CookAmount.BURNT)
+                activeCount++;
+        }
+
+        // 2. Eðer yanmamýþ malzeme yoksa ses çalma (Sessizce girsin)
+        // (Veya istersen çok kýsýk bir ses çalsýn dersen bu satýrý silip activeCount=0 ile iþleme devam edebilirsin)
+        if (activeCount == 0) return;
+
+        // 3. Oranla: (Aktif / Kapasite) * MaxVolume
+        float ratio = (float)activeCount / capacity;
+        float finalVolume = ratio * maxSizzleVolume;
+
+        // 4. Çal
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlaySoundFX(
+                sizzleSound,
+                transform,
+                finalVolume,
+                sizzleSoundMinPitch,
+                sizzleSoundMaxPitch
+            );
         }
     }
 
@@ -482,51 +587,89 @@ public class FryerBasket : MonoBehaviour, IInteractable
     private void HandleSmokeLogic()
     {
         // 1. Duman Üretmeli miyiz?
-        // - Fiziksel olarak yaðýn içinde olmalýyýz.
-        // - Sepette malzeme olmalý.
+        // Sadece "Yaðda mýyýz?" ve "Sepet dolu mu?" diye bakalým.
+        // ÝÇÝNDEKÝLERÝN YANIK OLUP OLMADIÐINA BAKMAYALIM.
         bool shouldEmitSmoke = isPhysicallyInOil && heldItems.Count > 0;
 
         int cookingItemCount = 0;
 
+        // Yine de emission hesabý için saðlamlarý sayalým
         if (shouldEmitSmoke)
         {
-            // Ýçerideki "Yanmamýþ" malzemeleri say
-            // (Yanýklar piþme dumaný çýkarmaz - veya baþka duman çýkarýr ama onu karýþtýrmýyoruz)
             foreach (var item in heldItems)
             {
-                if (item.CurrentCookingState != CookAmount.BURNT)
-                {
-                    cookingItemCount++;
-                }
+                if (item.CurrentCookingState != CookAmount.BURNT) cookingItemCount++;
             }
 
-            // Eðer hepsi yanýksa duman tütmemeli
-            if (cookingItemCount == 0) shouldEmitSmoke = false;
+            // --- SÝLÝNEN SATIR ---
+            // if (cookingItemCount == 0) shouldEmitSmoke = false; // <--- BU SATIR KATÝLDÝ, SÝLDÝK.
+            // ---------------------
         }
 
         // 2. Duruma Göre Aksiyon Al
         if (shouldEmitSmoke)
         {
-            // Duman yoksa yarat
             if (currentSmokeParticles == null)
             {
                 CreateSmoke();
+                UpdateSmokeColor(); // Ýlk oluþtuðunda renk ayarla
             }
 
-            // Duman varsa emission güncelle
             if (currentSmokeParticles != null)
             {
+                // Burasý zaten cookingItemCount 0 olsa bile çalýþacak
+                // ve emission'ý Lerp ile yavaþça min deðere çekecek.
                 UpdateSmokeEmission(cookingItemCount);
             }
         }
         else
         {
-            // Duman tütmemeli ama referansýmýz var -> Durdur ve Býrak
+            // Sadece sepet boþsa veya yaðdan çýktýysa burasý çalýþýr
             if (currentSmokeParticles != null)
             {
                 StopAndDetachSmoke();
             }
         }
+    }
+
+    // --- YENÝ: MATEMATÝKSEL RENK KARIÞTIRMA ---
+    private void UpdateSmokeColor()
+    {
+        if (currentSmokeParticles == null || heldItems.Count == 0) return;
+
+        int rawCount = 0;
+        int cookedCount = 0;
+        int burntCount = 0;
+
+        // 1. Sayým Yap
+        foreach (var item in heldItems)
+        {
+            switch (item.CurrentCookingState)
+            {
+                case CookAmount.RAW: rawCount++; break;
+                case CookAmount.REGULAR: cookedCount++; break;
+                case CookAmount.BURNT: burntCount++; break;
+            }
+        }
+
+        int total = heldItems.Count;
+
+        // 2. Aðýrlýklý Ortalama Hesapla
+        // Formül: (RawSayýsý * RawRengi + CookedSayýsý * CookedRengi + ...) / ToplamSayý
+
+        // Min Color Hesabý
+        Color mixedMin = (rawSmokeColors.minColor * rawCount +
+                          cookedSmokeColors.minColor * cookedCount +
+                          burntSmokeColors.minColor * burntCount) / total;
+
+        // Max Color Hesabý
+        Color mixedMax = (rawSmokeColors.maxColor * rawCount +
+                          cookedSmokeColors.maxColor * cookedCount +
+                          burntSmokeColors.maxColor * burntCount) / total;
+
+        // 3. Partiküle Uygula
+        var main = currentSmokeParticles.main;
+        main.startColor = new ParticleSystem.MinMaxGradient(mixedMin, mixedMax);
     }
 
     private void CreateSmoke()
@@ -538,26 +681,54 @@ public class FryerBasket : MonoBehaviour, IInteractable
         currentSmokeParticles = smokeObj.GetComponent<ParticleSystem>();
     }
 
-    private void UpdateSmokeEmission(int itemCount)
+    private void UpdateSmokeEmission(int currentCount)
     {
+        // 1. Optimizasyon: Eðer sayý deðiþmediyse boþuna iþlem yapma
+        if (currentCount == lastKnownCookingCount) return;
+
         var emission = currentSmokeParticles.emission;
 
-        // Oran: (Malzeme Sayýsý / Kapasite)
-        // Örn: 1/3, 2/3 veya 3/3
-        float ratio = Mathf.Clamp01((float)itemCount / capacity);
-
-        // Lerp ile ara deðeri bul
+        // Hedef oraný hesapla
+        float ratio = Mathf.Clamp01((float)currentCount / capacity);
         float targetRate = Mathf.Lerp(minSmokeEmission, maxSmokeEmission, ratio);
 
-        emission.rateOverTime = targetRate;
+        // 2. Önceki bir tween varsa öldür (Çakýþma kontrolü)
+        if (emissionTween != null && emissionTween.IsActive()) emissionTween.Kill();
+
+        // 3. Karar Aný: Anýnda mý, Lerp mi?
+        // Eðer lastKnownCookingCount -1 ise, bu dumanýn yeni oluþtuðu (ilk dalýþ) andýr.
+        if (lastKnownCookingCount == -1)
+        {
+            // ÝLK GÝRÝÞ: Anýnda ayarla
+            emission.rateOverTime = targetRate;
+        }
+        else
+        {
+            // DEÐÝÞÝM ANI (Biri yandý): 1 saniyede Lerple
+            // Þu anki deðeri al (Yarýda kalan bir tween varsa onun býraktýðý yerden devam eder)
+            float startRate = emission.rateOverTime.constant;
+
+            emissionTween = DOVirtual.Float(startRate, targetRate, 2f, (value) =>
+            {
+                var e = currentSmokeParticles.emission;
+                e.rateOverTime = value;
+            }).SetEase(Ease.Linear); // Linear veya OutQuad kullanýlabilir
+        }
+
+        // 4. Hafýzayý güncelle
+        lastKnownCookingCount = currentCount;
     }
 
     private void StopAndDetachSmoke()
     {
-        // 1. Dumaný Durdur (Mevcutlar sönerek kaybolsun)
-        currentSmokeParticles.Stop();
+        // Tween varsa temizle
+        if (emissionTween != null) emissionTween.Kill();
 
-        // 2. Referansý unut (Zaten prefab ayarýndan kendini destroy edecek)
+        // Hafýzayý sýfýrla ki bir sonraki sefer yaða girdiðinde yine "Anýnda" baþlasýn
+        lastKnownCookingCount = -1;
+
+        // Mevcut durdurma iþlemleri
+        currentSmokeParticles.Stop();
         currentSmokeParticles = null;
     }
 }
