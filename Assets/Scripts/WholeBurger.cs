@@ -244,4 +244,20 @@ public class WholeBurger : MonoBehaviour, IGrabable
         // C) Kendi scriptimi yok et
         Destroy(this);
     }
+
+    public List<GameObject> GetVisualParts()
+    {
+        // Eðer childVisuals listesi zaten temizse (sadece köfte, ekmek vs. varsa) direkt bunu dön:
+        return new List<GameObject>(childVisuals);
+
+        // HAFÝF NOT: Eðer childVisuals listesinde de duman varsa, 
+        // burada bir temizlik yapabilirsin. Örn:
+        /*
+        List<GameObject> cleanList = new List<GameObject>();
+        foreach(var part in childVisuals) {
+            if(part.GetComponent<ParticleSystem>() == null) cleanList.Add(part);
+        }
+        return cleanList;
+        */
+    }
 }

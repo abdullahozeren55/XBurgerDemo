@@ -48,6 +48,7 @@ public class BurgerIngredientData : ScriptableObject
     public float throwMultiplier = 1f;
     public float timeToCook = 10f;
     public float timeToBurn = 10f;
+    public float cookingVariance = 0.15f; // <--- YENÝ: Varsayýlan %15 sapma
     [Space]
     public Material rawMat;
     public Material cookedMat;

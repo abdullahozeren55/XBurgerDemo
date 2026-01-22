@@ -56,6 +56,7 @@ MonoBehaviour:
   - slotName: Slot5
     localPosition: {x: 0.0005, y: 0.0006, z: 0.00017}
     localRotation: {x: 260, y: 90, z: -90}
+  smokePrefabLocal: {fileID: 4057531667044976779, guid: aed5a5cbbb3b997419f24cd7d355c8ac, type: 3}
   grabbedLocalScale: {x: 96.55544, y: 96.55542, z: 96.55542}
   trayLocalScale: {x: 1.05, y: 1.0497532, z: 1.1559992}
   isUseable: 0

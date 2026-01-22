@@ -31,6 +31,9 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public BurgerIngredientData data;
 
+    private float targetCookTime;
+    private float targetBurnTime;
+
     [SerializeField] private BurgerCombineArea burgerCombineArea;
     public string FocusTextKey { get => data.focusTextKeys[(int)cookAmount]; set => data.focusTextKeys[(int)cookAmount] = value; }
     [Space]
@@ -90,6 +93,14 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         canAddToTray = false;
 
+        // 1. Rastgele çarpan (Örn: 0.85 ile 1.15 arasý)
+        // Ayný Fryable'daki mantýk: "Ýnce kesilen hem çabuk piþer hem çabuk yanar"
+        float varianceMultiplier = Random.Range(1f - data.cookingVariance, 1f + data.cookingVariance);
+
+        // 2. Data'daki base deðeri çarpýp yerel deðiþkene alýyoruz
+        targetCookTime = data.timeToCook * varianceMultiplier;
+        targetBurnTime = data.timeToBurn * varianceMultiplier;
+
         if (data.isSauce)
         {
             isAddedToBurger = true;
@@ -117,16 +128,17 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
         currentCookTime += deltaTime;
 
-        // Önceki durumu kaydet
         CookAmount oldState = cookAmount;
-        CookAmount newState = cookAmount; // Varsayýlan olarak aynýsý
+        CookAmount newState = cookAmount;
 
-        // Yeni durumu hesapla
-        if (currentCookTime >= data.timeToBurn)
+        // --- DEÐÝÞÝKLÝK BURADA ---
+        // Artýk data.timeToBurn yerine targetBurnTime kullanýyoruz
+        if (currentCookTime >= targetBurnTime)
         {
             newState = CookAmount.BURNT;
         }
-        else if (currentCookTime >= data.timeToCook)
+        // Artýk data.timeToCook yerine targetCookTime kullanýyoruz
+        else if (currentCookTime >= targetCookTime)
         {
             newState = CookAmount.REGULAR;
         }
@@ -134,14 +146,11 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
         {
             newState = CookAmount.RAW;
         }
+        // -------------------------
 
-        // SADECE Durum deðiþtiyse uygula
         if (newState != oldState)
         {
             ChangeCookAmount((int)newState);
-
-            // Buraya "Piþti" sesi vb. eklenebilir.
-            // SoundManager.Instance.PlayOneShot...
         }
 
         return cookAmount != CookAmount.BURNT;

@@ -59,6 +59,7 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
     [Header("Smoke Effects & Colors")] // <--- YENÝ BAÞLIK
     [SerializeField] private GameObject smokePrefab;
+    [SerializeField] private GameObject smokePrefabLocal;
     [SerializeField] private float minSmokeEmission = 5f;
     [SerializeField] private float maxSmokeEmission = 20f;
 
@@ -152,6 +153,8 @@ public class FryerBasket : MonoBehaviour, IInteractable
                         }
                     }
                 }
+
+                HandleLocalSmoke(item);
             }
 
             if (anyStateChanged)
@@ -414,38 +417,61 @@ public class FryerBasket : MonoBehaviour, IInteractable
         if (connectedFryer == null) return;
 
         int totalCount = heldItems.Count;
-
-        // --- HESAPLAMA --- 
-        // Hem giriþ hem çýkýþ için "Kaçý Saðlam?" bilgisini hazýrlayalým
         int activeCount = 0;
+
+        // Saðlamlarý say (Fryer köpürmesi için)
         foreach (var item in heldItems)
         {
             if (item.CurrentCookingState != CookAmount.BURNT)
                 activeCount++;
         }
-        // -----------------
 
         if (enteringOil)
         {
             if (!isPhysicallyInOil)
             {
-                // DÜZELTME: Artýk totalCount ve activeCount'u ayrý gönderiyoruz.
-                // Eðer hepsi yanýksa activeCount 0 gidecek ve Fryer köpürmeyecek.
+                // --- GÝRÝÞ KISMI ---
                 connectedFryer.OnBasketDown(totalCount, activeCount, fryerLaneIndex);
-
                 isPhysicallyInOil = true;
                 RefreshTopItemInteractability();
+
+                // Not: Giriþte dumanlarý Update loop'u (HandleLocalSmoke) zaten
+                // oluþturup baþlatacaðý için burada ekstra bir þey yapmaya gerek yok.
             }
         }
         else
         {
             if (isPhysicallyInOil)
             {
-                // Çýkýþta da aynýsý (Burasý zaten böyleydi, activeCount hesaplamasýný yukarý taþýdýk sadece)
+                // --- ÇIKIÞ KISMI (Burayý deðiþtirdik) ---
                 connectedFryer.OnBasketUp(totalCount, activeCount, fryerLaneIndex);
-
                 isPhysicallyInOil = false;
                 RefreshTopItemInteractability();
+
+                // YENÝ MANTIK: Sepet yaðdan çýktý, dumanlara ayar çekiyoruz.
+                foreach (var item in heldItems)
+                {
+                    if (item.attachedSmoke != null)
+                    {
+                        // Eðer ÇÝÐ ise -> Dumaný anýnda kes (Sýcak deðil)
+                        if (item.CurrentCookingState == CookAmount.RAW)
+                        {
+                            item.attachedSmoke.Stop();
+                            // Duman referansýný silmeye gerek yok, tekrar yaða girerse Play deriz.
+                        }
+                        // Eðer PÝÞMÝÞ veya YANIK ise -> Duman tütmeye devam etsin (Sýcak hissi)
+                        else
+                        {
+                            var main = item.attachedSmoke.main;
+                            main.loop = true;     // Sonsuz döngü
+                            main.prewarm = true;  // Oyuncu eline alýnca dumanlý gelsin
+
+                            // Garanti olsun diye, eðer durmuþsa çalýþtýr
+                            if (!item.attachedSmoke.isPlaying)
+                                item.attachedSmoke.Play();
+                        }
+                    }
+                }
             }
         }
     }
@@ -717,6 +743,49 @@ public class FryerBasket : MonoBehaviour, IInteractable
 
         // 4. Hafýzayý güncelle
         lastKnownCookingCount = currentCount;
+    }
+
+    private void HandleLocalSmoke(Fryable item)
+    {
+        // A) Duman yoksa oluþtur
+        if (item.attachedSmoke == null && smokePrefabLocal != null)
+        {
+            // Item'ýn içine instantiate et (Child olsun)
+            GameObject smokeObj = Instantiate(smokePrefabLocal, item.transform.position, Quaternion.identity, item.transform);
+            item.attachedSmoke = smokeObj.GetComponent<ParticleSystem>();
+        }
+
+        // B) Renk Güncelle (World smoke gibi karýþtýrma YOK, direkt duruma göre atama var)
+        if (item.attachedSmoke != null)
+        {
+            UpdateLocalSmokeColor(item.attachedSmoke, item.CurrentCookingState);
+        }
+    }
+
+    private void UpdateLocalSmokeColor(ParticleSystem ps, CookAmount state)
+    {
+        var main = ps.main;
+        SmokeColorSet targetColorSet; // Struct yapýsý FryerBasket içinde zaten tanýmlýydý
+
+        // Keskin geçiþ (Karýþtýrma yok)
+        switch (state)
+        {
+            case CookAmount.RAW:
+                targetColorSet = rawSmokeColors;
+                break;
+            case CookAmount.REGULAR:
+                targetColorSet = cookedSmokeColors;
+                break;
+            case CookAmount.BURNT:
+                targetColorSet = burntSmokeColors;
+                break;
+            default:
+                targetColorSet = rawSmokeColors;
+                break;
+        }
+
+        // Rengi ata
+        main.startColor = new ParticleSystem.MinMaxGradient(targetColorSet.minColor, targetColorSet.maxColor);
     }
 
     private void StopAndDetachSmoke()

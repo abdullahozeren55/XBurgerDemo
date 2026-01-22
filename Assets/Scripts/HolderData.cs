@@ -15,6 +15,8 @@ public class HolderData : ScriptableObject
     [Header("Tray Settings")]
     [Tooltip("Tepsideki 6 slot için ayrý ayrý ince ayarlar.")]
     public TraySlotOffset[] slotOffsets; // Inspector'da 6 eleman açýp ayarla
+    [Space]
+    public GameObject smokePrefabLocal;
 
     [Tooltip("Eline aldýðýnda scale bozulmasýn diye resetlenecek deðer (Genelde 1,1,1)")]
     public Vector3 grabbedLocalScale = Vector3.one;

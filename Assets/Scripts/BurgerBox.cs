@@ -56,6 +56,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     // --- DEÐÝÞÝKLÝK 1: Array yerine List kullanýyoruz ---
     private List<Collider> allColliders = new List<Collider>();
+    private List<GameObject> containedVisualParts = new List<GameObject>();
     // ----------------------------------------------------
 
     // Layers
@@ -251,28 +252,44 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     private void FillBox(WholeBurger burger)
     {
-        // 1. ÖNCE REFERANSI AL (HAYAT KURTARAN SATIR)
-        // Burger scripti kendini yok etmeden önce, GameObject'i kutunun deðiþkenine ata.
+        // 1. ÖNCE REFERANSI AL
         containedBurger = burger.gameObject;
 
-        // Burger boyunu al
+        containedVisualParts.Clear(); // Önce temizle
+        containedVisualParts.AddRange(burger.GetVisualParts());
+
         float burgerHeight = burger.TotalBurgerHeight;
 
-        // 2. PAKETLEME ÝÞLEMÝNÝ ÇAÐIR
-        // Bu iþlemden sonra 'burger' (WholeBurger scripti) Destroy(this) ile yok olacak.
-        // Ama yukarýda 'containedBurger' (GameObject) referansýný aldýðýmýz için güvendeyiz.
+        // 2. PAKETLEME
         burger.PackIntoBox(this, boxInnerPoint);
 
-        // --- DEÐÝÞÝKLÝK 2: Artýk 'containedBurger' dolu olduðu için hata vermeyecek ---
         Collider[] burgerColliders = containedBurger.GetComponentsInChildren<Collider>();
         if (burgerColliders != null)
         {
             allColliders.AddRange(burgerColliders);
         }
-        // ---------------------------------------------------------------------
 
-        // Layer iþlemlerini GameObject (containedBurger) üzerinden yap
-        SetLayerRecursively(containedBurger, grabbedLayer);
+        // --- DÜZELTME BURADA ---
+
+        // ESKÝ KOD (FPC bunu eziyor):
+        // SetLayerRecursively(containedBurger, grabbedLayer);
+
+        // YENÝ KOD (ZAMANLAMA HÝLESÝ):
+        // FPC'nin "Ungrabable" yapma iþleminin bitmesini beklemek için
+        // iþlemi bir sonraki kareye (Next Frame) erteliyoruz.
+        // Böylece son sözü biz söylüyoruz.
+        // Not: 'gameObject.layer' kullanýyoruz ki o arada kutuyu yere atarsan vs. bug olmasýn, kutu neyse burger de o olsun.
+
+        DOVirtual.DelayedCall(0f, () =>
+        {
+            if (containedBurger != null)
+            {
+                // Sadece listeye aldýðýmýz temiz parçalarý boya
+                UpdateVisualPartsLayer(gameObject.layer);
+            }
+        });
+
+        // -----------------------
 
         if (topPart != null)
         {
@@ -351,17 +368,19 @@ public class BurgerBox : MonoBehaviour, IGrabable
     {
         gameObject.layer = layer;
         if (topPart != null) topPart.layer = layer;
-        if (containedBurger != null) SetLayerRecursively(containedBurger, layer);
+
+        // ESKÝSÝ: if (containedBurger != null) SetLayerRecursively(containedBurger, layer);
+        // YENÝSÝ:
+        if (containedBurger != null) UpdateVisualPartsLayer(layer);
     }
 
-    private void SetLayerRecursively(GameObject obj, int newLayer)
+    private void UpdateVisualPartsLayer(int newLayer)
     {
-        if (obj == null) return;
-        obj.layer = newLayer;
-        foreach (Transform child in obj.transform)
+        if (containedVisualParts == null) return;
+
+        foreach (var part in containedVisualParts)
         {
-            if (child == null) continue;
-            SetLayerRecursively(child.gameObject, newLayer);
+            if (part != null) part.layer = newLayer;
         }
     }
 

@@ -64,6 +64,7 @@ public class Fryable : MonoBehaviour, IGrabable
 
     // Baðlý olduðu sepet (Varsa)
     [HideInInspector] public FryerBasket currentBasket;
+    [HideInInspector] public ParticleSystem attachedSmoke; // FryerBasket tarafýndan atanacak
 
     private float lastSoundTime = 0f;
 
@@ -288,6 +289,24 @@ public class Fryable : MonoBehaviour, IGrabable
             currentBasket = null;
             isAddedToBasket = false;
             isGettingPutOnBasket = false;
+        }
+
+        if (attachedSmoke != null)
+        {
+            if (CurrentCookingState == CookAmount.RAW)
+            {
+                // Çið ise dumaný durdur (Envantere dumanlý girmesin)
+                attachedSmoke.Stop();
+                attachedSmoke = null;
+            }
+            else
+            {
+                // Piþmiþ veya yanmýþsa dumaný "hazýr" hale getir
+                // Böylece cepten çýkarýnca veya elde tutarken duman tütmeye devam eder
+                var main = attachedSmoke.main;
+                main.loop = true;
+                main.prewarm = true;
+            }
         }
 
         if (boxCollider != null) boxCollider.enabled = false;

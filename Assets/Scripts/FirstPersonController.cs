@@ -2140,6 +2140,9 @@ public class FirstPersonController : MonoBehaviour
 
     private void EquipSlot(int slotIndex)
     {
+        anim.SetBool("throw", false);
+        anim.SetBool("chargingThrow", false);
+
         // 1. Elimde bir þey varsa gizle
         if (currentSlotIndex != -1 && inventoryItems[currentSlotIndex] != null)
         {

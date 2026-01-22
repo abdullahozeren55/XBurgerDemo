@@ -283,6 +283,7 @@ public class Holder : MonoBehaviour, IGrabable
         currentIngredientType = newIngedient;
         PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, IconData);
         UpdateVisuals();
+        Instantiate(data.smokePrefabLocal, transform);
         Destroy(sourceItem.gameObject);
     }
 
