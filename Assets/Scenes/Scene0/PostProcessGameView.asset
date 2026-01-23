@@ -235,7 +235,7 @@ MonoBehaviour:
     m_Value: 32
   perPixelNormals:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 0
   baseColor:
     m_OverrideState: 1
     m_Value: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}

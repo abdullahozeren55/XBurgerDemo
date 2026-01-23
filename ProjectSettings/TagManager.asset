@@ -21,6 +21,8 @@ TagManager:
   - Stain
   - BurgerIngredientTrigger
   - Car
+  - Grill
+  - Balloon
   layers:
   - Default
   - TransparentFX
