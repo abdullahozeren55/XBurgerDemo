@@ -63,20 +63,24 @@ MonoBehaviour:
   audioClips:
   - {fileID: 8300000, guid: ae7df4ee2fc19fd4a89c3bfb6446b5b1, type: 3}
   - {fileID: 8300000, guid: 5a5f45b1083b46441aa9b227335ba150, type: 3}
-  - {fileID: 8300000, guid: ecc96b1f78a831f4e857d24242063a34, type: 3}
+  - {fileID: 8300000, guid: 5a5f45b1083b46441aa9b227335ba150, type: 3}
   - {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
+  - {fileID: 8300000, guid: 209ec56a780bbdd488ccee888429721d, type: 3}
   grabSoundVolume: 1
   grabSoundMinPitch: 1
   grabSoundMaxPitch: 1.1
-  dropSoundVolume: 1
-  dropSoundMinPitch: 0.85
-  dropSoundMaxPitch: 1.15
+  dropSoundVolume: 0.9
+  dropSoundMinPitch: 0.8
+  dropSoundMaxPitch: 0.9
   throwSoundVolume: 1
-  throwSoundMinPitch: 0.85
-  throwSoundMaxPitch: 1.15
-  traySoundVolume: 1
+  throwSoundMinPitch: 0.7
+  throwSoundMaxPitch: 0.8
+  traySoundVolume: 0.7
   traySoundMinPitch: 0.7
   traySoundMaxPitch: 0.9
+  snapSoundVolume: 1
+  snapSoundMinPitch: 0.7
+  snapSoundMaxPitch: 0.8
   soundCooldown: 0.1
   throwThreshold: 6
   dropThreshold: 2

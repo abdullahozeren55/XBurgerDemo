@@ -10,6 +10,8 @@ public class DrinkCup : MonoBehaviour, IGrabable
     // ... (Mevcut Deðiþkenler Aynen Kalýyor) ...
     public IGrabable Master => this;
 
+    public float pitchMultiplier => IsFull ? 0.85f : 1.0f;
+
     // Baðlý olduðu tepsi (Varsa)
     [HideInInspector] public Tray currentTray;
     public bool IsGrabbed { get => isGrabbed; set => isGrabbed = value; }
@@ -203,6 +205,8 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
         HasLid = true;
 
+        SoundManager.Instance.PlaySoundFX(data.audioClips[4], transform, data.snapSoundVolume, data.snapSoundMinPitch, data.snapSoundMaxPitch);
+
         currentIconStateIndex = 1;
 
         PlayerManager.Instance.ForceUpdatePlayerSlotIcon(this, IconData);
@@ -212,9 +216,6 @@ public class DrinkCup : MonoBehaviour, IGrabable
         // Bardaðýn kendi parçalarýný aç
         if (lidGO != null) lidGO.SetActive(true);
         if (strawGO != null) strawGO.SetActive(true);
-
-        // Opsiyonel: Ses çal (Kapak 'çýt' sesi)
-        // SoundManager.Instance.PlaySoundFX(...) 
     }
 
     // --- YENÝ FONKSÝYON: DOLUM ÝÞLEMÝ ---
@@ -306,7 +307,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
         }
 
         HandleColliders(false);
-        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch, data.grabSoundMaxPitch);
+        SoundManager.Instance.PlaySoundFX(data.audioClips[0], transform, data.grabSoundVolume, data.grabSoundMinPitch * pitchMultiplier, data.grabSoundMaxPitch * pitchMultiplier);
         
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
@@ -429,9 +430,9 @@ public class DrinkCup : MonoBehaviour, IGrabable
         float impactForce = collision.relativeVelocity.magnitude;
         if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
         if (impactForce >= data.throwThreshold)
-            SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch * pitchMultiplier, data.throwSoundMaxPitch * pitchMultiplier);
         else
-            SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch, data.dropSoundMaxPitch);
+            SoundManager.Instance.PlaySoundFX(data.audioClips[1], transform, data.dropSoundVolume, data.dropSoundMinPitch * pitchMultiplier, data.dropSoundMaxPitch * pitchMultiplier);
         lastSoundTime = Time.time;
     }
 

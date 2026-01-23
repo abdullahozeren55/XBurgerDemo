@@ -52,6 +52,10 @@ public class DrinkCupData : ScriptableObject
     public float traySoundMinPitch = 0.8f;
     public float traySoundMaxPitch = 1.2f;
     [Space]
+    public float snapSoundVolume = 1f;
+    public float snapSoundMinPitch = 0.8f;
+    public float snapSoundMaxPitch = 1.2f;
+    [Space]
     public float soundCooldown = 0.1f;
     public float throwThreshold = 6f;
     public float dropThreshold = 2f;

@@ -294,9 +294,7 @@ public class Drink : MonoBehaviour, IGrabable
             {
                 BreakBottle(collision);
                 return;
-            }
-
-            SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch);
+            } 
         }
         else
         {
@@ -311,6 +309,8 @@ public class Drink : MonoBehaviour, IGrabable
         if (isBeingDestroyed) return;
 
         isBeingDestroyed = true;
+
+        SoundManager.Instance.PlaySoundFX(data.audioClips[2], transform, data.throwSoundVolume, data.throwSoundMinPitch, data.throwSoundMaxPitch, false);
 
         // Varsayýlan deðerler
         Vector3 hitPoint = transform.position;

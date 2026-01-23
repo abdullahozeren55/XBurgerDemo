@@ -116,7 +116,7 @@ public class Tray : MonoBehaviour, IGrabable
         // A. SOS KAPSÜLÜ ÝSE
         if (item is SauceCapsule sauce)
         {
-            // (Buradaki currentTray kontrolünü yukarýdaki fonksiyona taþýdýk)
+            if (!sauce.CanBeAddToTray) return;
 
             for (int i = 0; i < slotPoints.Length; i++)
             {

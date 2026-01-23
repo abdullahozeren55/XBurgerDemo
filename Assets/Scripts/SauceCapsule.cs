@@ -52,6 +52,7 @@ public class SauceCapsule : MonoBehaviour, IGrabable
     // --- LOGIC VARIABLES ---
     [HideInInspector] public Tray currentTray;
     private bool isGettingPutOnTray;
+    public bool CanBeAddToTray = false;
     // ----------------------
 
     private float lastSoundTime = 0f;
@@ -231,6 +232,8 @@ public class SauceCapsule : MonoBehaviour, IGrabable
         IsGrabbed = true;
         isJustDropped = false;
         isJustThrowed = false;
+
+        CanBeAddToTray = true;
 
         // --- TEPSÝDEN AYRILMA ---
         if (currentTray != null)

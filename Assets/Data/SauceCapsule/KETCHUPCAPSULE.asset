@@ -49,22 +49,22 @@ MonoBehaviour:
   grabLocalPositionOffset: {x: 0.01, y: 0.0673, z: 0.0372}
   grabLocalRotationOffset: {x: 83.94502, y: 263.01144, z: 276.32394}
   audioClips:
-  - {fileID: 8300000, guid: edf94ed3ad2a3c34287758cdf9801a31, type: 3}
-  - {fileID: 8300000, guid: 4a402b6beb4e8ba4e966aec7c80f9b9d, type: 3}
-  - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
+  - {fileID: 8300000, guid: 6bf647c058c5d4b40a03285d9f9d6662, type: 3}
+  - {fileID: 8300000, guid: a8dc100d611ce004b88f8ae661110a99, type: 3}
+  - {fileID: 8300000, guid: a8dc100d611ce004b88f8ae661110a99, type: 3}
   - {fileID: 8300000, guid: 29073a5f8ca3bbe49ba983bf8a3ec393, type: 3}
-  grabSoundVolume: 1
-  grabSoundMinPitch: 0.85
-  grabSoundMaxPitch: 1.15
-  dropSoundVolume: 1
-  dropSoundMinPitch: 0.85
-  dropSoundMaxPitch: 1.15
-  throwSoundVolume: 1
-  throwSoundMinPitch: 0.85
-  throwSoundMaxPitch: 1.15
-  traySoundVolume: 1
-  traySoundMinPitch: 0.8
-  traySoundMaxPitch: 1.2
+  grabSoundVolume: 0.4
+  grabSoundMinPitch: 1.2
+  grabSoundMaxPitch: 1.5
+  dropSoundVolume: 0.4
+  dropSoundMinPitch: 1.2
+  dropSoundMaxPitch: 1.5
+  throwSoundVolume: 0.5
+  throwSoundMinPitch: 1
+  throwSoundMaxPitch: 1.3
+  traySoundVolume: 0.5
+  traySoundMinPitch: 1.2
+  traySoundMaxPitch: 1.5
   soundCooldown: 0.1
   throwThreshold: 6
   dropThreshold: 2
