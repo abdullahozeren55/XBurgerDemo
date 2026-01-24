@@ -38,14 +38,21 @@ MonoBehaviour:
   - type: 3
     font: {fileID: 11400000, guid: 11e3424414a7a434ba753e020aa55a29, type: 2}
     basePixelSize: 19
-    verticalOffset: -2
-    characterSpacingOffset: 8
+    verticalOffset: -19
+    characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 4
     font: {fileID: 11400000, guid: 11e3424414a7a434ba753e020aa55a29, type: 2}
     basePixelSize: 19
     verticalOffset: -2
+    characterSpacingOffset: 8
+    wordSpacingOffset: 0
+    lineSpacingOffset: 0
+  - type: 5
+    font: {fileID: 11400000, guid: 11e3424414a7a434ba753e020aa55a29, type: 2}
+    basePixelSize: 19
+    verticalOffset: -15
     characterSpacingOffset: 8
     wordSpacingOffset: 0
     lineSpacingOffset: 0

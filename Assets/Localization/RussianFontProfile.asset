@@ -17,35 +17,42 @@ MonoBehaviour:
   - type: 0
     font: {fileID: 11400000, guid: 1467544fb519aa34aab208b151030745, type: 2}
     basePixelSize: 19
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: 0
     characterSpacingOffset: 0
     wordSpacingOffset: 0
-    lineSpacingOffset: 0
+    lineSpacingOffset: -32
   - type: 1
     font: {fileID: 11400000, guid: 1467544fb519aa34aab208b151030745, type: 2}
     basePixelSize: 19
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: -11
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 2
     font: {fileID: 11400000, guid: b6acaac26826fcc42bd9133b541b192d, type: 2}
     basePixelSize: 19
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: -11
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 3
     font: {fileID: 11400000, guid: c37b40747ecb6f243ab52dbe6fbff812, type: 2}
     basePixelSize: 19
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: -11
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 4
     font: {fileID: 11400000, guid: c37b40747ecb6f243ab52dbe6fbff812, type: 2}
     basePixelSize: 19
-    positionOffset: {x: 0, y: 0}
+    verticalOffset: -11
+    characterSpacingOffset: 0
+    wordSpacingOffset: 0
+    lineSpacingOffset: 0
+  - type: 5
+    font: {fileID: 11400000, guid: c37b40747ecb6f243ab52dbe6fbff812, type: 2}
+    basePixelSize: 19
+    verticalOffset: -11
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0

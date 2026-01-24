@@ -49,3 +49,10 @@ MonoBehaviour:
     characterSpacingOffset: 0
     wordSpacingOffset: 0
     lineSpacingOffset: 0
+  - type: 5
+    font: {fileID: 11400000, guid: 4af385a055b793946851b74a49452fa0, type: 2}
+    basePixelSize: 16
+    verticalOffset: 0
+    characterSpacingOffset: 0
+    wordSpacingOffset: 0
+    lineSpacingOffset: 0

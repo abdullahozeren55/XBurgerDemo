@@ -9,7 +9,8 @@ public enum FontType
     RetroUIDefaultOutlined,
     RetroUIThinOutlined,
     RetroUINoOutline,
-    KeyboardNoOutline
+    KeyboardNoOutline,
+    Dropdown
 }
 
 public class LocalizationManager : MonoBehaviour

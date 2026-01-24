@@ -2177,8 +2177,8 @@
     "zh": "界面缩放",
     "ja": "UIスケール",
     "es": "Escala De Interfaz",
-    "ru": "Масштаб Интерфейса",
-    "pt": "Escala Da Interface"
+    "ru": "Масштаб UI",
+    "pt": "Escala da UI"
   },
   {
     "key": "UI_TOAST_MACHINE",
@@ -2266,8 +2266,8 @@
     "en": "Control Hints",
     "zh": "操作提示",
     "ja": "操作ヒント",
-    "es": "Consejos De Control",
-    "ru": "Подсказки Управления",
+    "es": "Pistas",
+    "ru": "Подсказки",
     "pt": "Dicas De Controle"
   },
   {
@@ -2275,10 +2275,10 @@
     "tr": "Etkileşim Metni",
     "en": "Interaction Text",
     "zh": "交互文字",
-    "ja": "インタラクションテキスト",
-    "es": "Texto De Interacción",
-    "ru": "Текст Взаимодействия",
-    "pt": "Texto De Interação"
+    "ja": "操作テキスト",
+    "es": "Texto de Acción",
+    "ru": "Надписи",
+    "pt": "Texto de Ação"
   },
   {
     "key": "UI_MAIN_MENU_AUDIO_MASTER",
@@ -2355,9 +2355,9 @@
     "tr": "Varsayılan",
     "en": "Default",
     "zh": "默认",
-    "ja": "デフォルト",
-    "es": "Predeterminado",
-    "ru": "По умолчанию",
+    "ja": "標準",
+    "es": "Predet.",
+    "ru": "Станд.",
     "pt": "Padrão"
   },
   {
@@ -2847,7 +2847,7 @@
     "zh": "无限制",
     "ja": "無制限",
     "es": "Ilimitado",
-    "ru": "Без ограничений",
+    "ru": "Неогран.",
     "pt": "Ilimitado"
   },
   {
@@ -2857,7 +2857,7 @@
     "zh": "帧率限制",
     "ja": "FPS制限",
     "es": "Límite De FPS",
-    "ru": "Ограничение FPS",
+    "ru": "Лимит FPS",
     "pt": "Limite De FPS"
   },
   {
