@@ -210,6 +210,8 @@ public class PlayerManager : MonoBehaviour
         firstPersonController.TryChangingFocusText(grabable, text);
     }
 
+    public Transform GetHeadTransform() => CameraManager.Instance.GetFirstPersonCamTransform();
+
     public void DecideUIText()
     {
         firstPersonController.DecideUIText();

@@ -120,8 +120,6 @@ public class GameManager : MonoBehaviour
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
     private List<List<SauceBottle.SauceType>> allBurgerSauces;
 
-    public ICustomer CurrentCustomer;
-
     [Header("Other Settings")]
     [Space]
     public BurgerCombineArea burgerCombineArea;
@@ -196,12 +194,6 @@ public class GameManager : MonoBehaviour
     public void AddSauceToTray(SauceBottle.SauceType type)
     {
         burgerCombineArea.AddSauce(type);
-    }
-
-    public void SetCurrentCustomer(ICustomer customer)
-    {
-        CurrentCustomer = customer;
-        CameraManager.Instance.SetCustomerCamLookAt(CurrentCustomer.CameraLookAt);
     }
 
     public void SetOrderThrowArea(bool shouldReceive) { if (orderThrowArea != null) orderThrowArea.ShouldReceive = shouldReceive; }

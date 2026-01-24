@@ -15,7 +15,7 @@ public class PlayerBlocker : MonoBehaviour
         RefillAndShuffleBag();
     }
 
-    private void OnTriggerEnter(Collider other)
+    /*private void OnTriggerEnter(Collider other) TODO: LAZIMSA YENÝ DÝYALOG SÝSTEMÝNE GEÇÝRÝCEZ YOKSA SÝLÝCEZ BU KODU
     {
         if (other.CompareTag("Player"))
         {
@@ -37,7 +37,7 @@ public class PlayerBlocker : MonoBehaviour
                 DialogueManager.Instance.StartSelfDialogue(dialogues[selectedIndex]);
             }
         }
-    }
+    }*/
 
     // Torbayý doldurup karýþtýran fonksiyon
     private void RefillAndShuffleBag()

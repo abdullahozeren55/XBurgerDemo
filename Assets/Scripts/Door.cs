@@ -88,7 +88,7 @@ public class Door : MonoBehaviour, IInteractable
 
         if (shouldPlayDialogueAfterInteraction && !isDialoguePlayed)
         {
-            DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, shouldBeUninteractableAfterInteraction, dialogueAfterInteraction);
+            //TODO: YENÝ DÝYALOG SÝSTEMÝNE GEÇÝLECEK. ESKÝSÝ => DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, shouldBeUninteractableAfterInteraction, dialogueAfterInteraction);
             isDialoguePlayed = true;
         }
     }

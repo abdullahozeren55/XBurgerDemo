@@ -32,7 +32,7 @@ TagManager:
   - UI
   - Player
   - Ground
-  - Customer
+  - 
   - InteractableOutlined
   - Interactable
   - Uninteractable
@@ -51,7 +51,7 @@ TagManager:
   - PostProcessInGameUI
   - UI_MainMenu
   - MANAGERS
-  - ScreenPhone
+  - 
   - PostProcessGameView
   - PlayerBlocker
   - ScreenMonitor

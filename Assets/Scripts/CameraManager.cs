@@ -448,6 +448,8 @@ public class CameraManager : MonoBehaviour
         StartCoroutine(EndFOVCoroutine(preset.fovTotalDuration, preset.fovResetLerpDuration));
     }
 
+    public Transform GetFirstPersonCamTransform() => firstPersonCam != null ? firstPersonCam.transform : transform; //Olmazsa kendi transformunu döndürüyo hata vermesin diye
+
     private IEnumerator EndScreenShake(float delay, float duration)
     {
         yield return new WaitForSeconds(delay);

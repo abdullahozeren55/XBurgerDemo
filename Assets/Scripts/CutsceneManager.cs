@@ -120,11 +120,6 @@ public class CutsceneManager : MonoBehaviour
         return playableDirector != null && playableDirector.state == PlayState.Playing;
     }
 
-    public void StartSelfDialogue(DialogueData data)
-    {
-        DialogueManager.Instance.StartSelfDialogueInCutscene(data);
-    }
-
     public void SetDollyCamPath(CinemachineSmoothPath path)
     {
         dollyCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_Path = path;

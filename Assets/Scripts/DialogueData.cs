@@ -1,73 +1,35 @@
-using Cinemachine;
-using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NewDialogueData", menuName = "Data/Dialogue")]
 public class DialogueData : ScriptableObject
 {
     [System.Serializable]
-    public class DialogueSegment
+    public class DialogueLine
     {
-        public string DialogueKey;
-        [Space]
-        public DialogueManager.FontType fontType;
-        public DialogueManager.TalkingPerson talkingPerson;
-        [Space]
-        public FontStyle fontStyle;
-        [Space]
-        public float typeSpeed = 1f;
+        [Header("Settings")]
+        public string SpeakerID; // Örn: "Player", "Customer", "Radio"
+        public string LocalizationKey; // Normal metin key'i
 
-        public Vector2 DialogueOffset;
-        public bool Skippable;
-        public float autoSkipTime = 10f; //for self dialogue auto skip
-        public float delay = 0f; //waiting before start showing text
-        public float minAudioPitch = 0.85f;
-        public float maxAudioPitch = 1.15f;
+        [Header("Horror Elements")]
+        public bool IsGlitchLine; // Bu satýrda bozulma var mý?
+        public GlitchType glitchType;
+        public string GlitchAltKey; // Glitch ise görünecek "Halüsinasyon" metni
+        public float GlitchDuration; // Swap efekti için bekleme süresi
+        public AudioClip CustomVoiceOrSFX; // Özel ses efekti (Bozulma sesi vs.)
 
-        [Space]
-        public AudioClip audioToPlay;
-        public float audioToPlayVolume = 1f;
-        public float audioToPlayMinPitch = 0.85f;
-        public float audioToPlayMaxPitch = 1.15f;
-        public float audioToPlayDelay = 0f;
-        [Space]
-        public CameraManager.CameraName cam;
-        [Space]
-        public ICustomer.DialogueAnim dialogueAnim;
-        public float dialogueAnimDelay = 0f;
-        [Space]
-        public DialogueCamType dialogueCamType;
-        [Space]
-        public float TargetFOV = 60;
-        public float FOVDuration = 1f;
-        public Ease FOVEase = Ease.InOutBack;
-        public float FOVEaseValue = 1.7f;
+        [Header("Events")]
+        // Diyalog bittiðinde veya baþladýðýnda tetiklenecek eventler (Iþýk kapatma vs.)
+        public string EventTag;
     }
 
-    public enum DialogueType
+    public enum GlitchType
     {
-        NORMAL,
-        ENDSWITHACHOICE,
-        ENDSWITHACUTSCENE
+        None,
+        TextSwap,    // "Ne yaptýðýný bili-" -> "Sipariþ verebilir miyim?"
+        Corruption,  // Metnin fontu bozuk, titriyor vs.
+        HiddenMessage // Metin içinde gizli mesajlar (kýrmýzý harfler vs.)
     }
 
-    public enum DialogueCamType
-    {
-        NOTHING,
-        CHANGEFOV,
-        RESETFOV
-    }
-
-    public DialogueSegment[] dialogueSegments;
-    [Space]
-    public DialogueType type;
-    [Space]
-    public string QuestionKey;
-    public string OptionAKey;
-    public string OptionDKey;
-    public CameraManager.CameraName choiceCam;
-    [Space]
-    public CutsceneType cutsceneType;
+    public List<DialogueLine> lines;
 }

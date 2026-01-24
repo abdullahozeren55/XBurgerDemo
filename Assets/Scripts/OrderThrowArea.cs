@@ -14,7 +14,7 @@ public class OrderThrowArea : MonoBehaviour
         GameManager.Instance.orderThrowArea = this;
     }
 
-    private void OnTriggerEnter(Collider other)
+    /*private void OnTriggerEnter(Collider other) TODO: YENÝ SÝSTEME GEÇÝRÝCEZ BOZUK ÞUAN
     {
         if (ShouldReceive)
         {
@@ -39,5 +39,5 @@ public class OrderThrowArea : MonoBehaviour
             }
             
         }
-    }
+    }*/
 }

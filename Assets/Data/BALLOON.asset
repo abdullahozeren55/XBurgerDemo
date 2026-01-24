@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f737365ddf420344785798c3a06b6d09, type: 3}
   m_Name: BALLOON
   m_EditorClassIdentifier: 
-  releaseExplosionForce: 2
+  releaseExplosionForce: 1.6
+  releaseTorqueForce: 16
   destroyParticles: {fileID: 8670732574423207768, guid: 427190286de59c84b871d984523aa749, type: 3}
   popSound: {fileID: 8300000, guid: e19a457c5e6426444aa5beb3b4544504, type: 3}
   popVolume: 1

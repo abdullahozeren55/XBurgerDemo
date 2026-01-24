@@ -1,7 +1,11 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static SauceBottle;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 [System.Serializable]
 public struct TraySlotOffset
@@ -10,10 +14,88 @@ public struct TraySlotOffset
     public Vector3 localPosition;
     public Vector3 localRotation;
 }
+
+[System.Serializable]
+public class TrayContent
+{
+    // Listeler, ayný tipten birden fazla tutabilmemizi saðlar.
+    // Örn: { Cola, Cola, Fanta } -> 2 Cola, 1 Fanta var demektir.
+
+    public List<GameManager.BurgerTypes> Burgers = new List<GameManager.BurgerTypes>();
+    public List<GameManager.DrinkTypes> Drinks = new List<GameManager.DrinkTypes>();
+    public List<Holder.HolderIngredient> Sides = new List<Holder.HolderIngredient>(); // Kýzartmalar
+    public List<SauceType> Sauces = new List<SauceType>(); // Soslar
+    public List<ToyType> Toys = new List<ToyType>(); // Oyuncaklar
+
+    public void Clear()
+    {
+        Burgers.Clear();
+        Drinks.Clear();
+        Sides.Clear();
+        Sauces.Clear();
+        Toys.Clear();
+    }
+}
+
+public static class OrderValidator
+{
+    public static bool Validate(Tray tray, OrderData order)
+    {
+        // 1. BURGER KONTROLÜ
+        foreach (var req in order.RequiredBurgers)
+        {
+            // Tepside bu tipte kaç tane burger var say
+            int countOnTray = tray.CurrentContent.Burgers.Count(b => b == req.Type);
+
+            // Eðer tepsideki sayý, istenenden azsa -> BAÞARISIZ
+            if (countOnTray < req.Count)
+            {
+                Debug.Log($"Sipariþ Eksik: {req.Count} adet {req.Type} istendi, {countOnTray} bulundu.");
+                return false;
+            }
+        }
+
+        // 2. ÝÇECEK KONTROLÜ (Þiþe veya Bardak fark etmez, ikisi de Drinks listesinde)
+        foreach (var req in order.RequiredDrinks)
+        {
+            int countOnTray = tray.CurrentContent.Drinks.Count(d => d == req.Type);
+            if (countOnTray < req.Count)
+            {
+                Debug.Log($"Sipariþ Eksik: {req.Count} adet {req.Type} istendi, {countOnTray} bulundu.");
+                return false;
+            }
+        }
+
+        // 3. YAN ÜRÜN (HOLDER) KONTROLÜ
+        foreach (var req in order.RequiredSides)
+        {
+            int countOnTray = tray.CurrentContent.Sides.Count(s => s == req.Type);
+            if (countOnTray < req.Count) return false;
+        }
+
+        // 4. SOS KONTROLÜ
+        foreach (var req in order.RequiredSauces)
+        {
+            int countOnTray = tray.CurrentContent.Sauces.Count(s => s == req.Type);
+            if (countOnTray < req.Count) return false;
+        }
+
+        // 5. OYUNCAK KONTROLÜ
+        foreach (var req in order.RequiredToys)
+        {
+            int countOnTray = tray.CurrentContent.Toys.Count(t => t == req.Type);
+            if (countOnTray < req.Count) return false;
+        }
+
+        return true; // Tüm döngülerden sað çýktýysa sipariþ tamamdýr!
+    }
+}
 public class Tray : MonoBehaviour, IGrabable
 {
     // ... (Mevcut Deðiþkenler Aynen Kalsýn) ...
     public IGrabable Master => this;
+
+    public TrayContent CurrentContent = new TrayContent();
 
     public Collider GetCollider => col;
 
@@ -143,6 +225,7 @@ public class Tray : MonoBehaviour, IGrabable
             {
                 sauce.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex, stackIndex);
                 RegisterItem(item, targetSlotIndex);
+                CurrentContent.Sauces.Add(sauce.data.sauceType);
             }
             return;
         }
@@ -160,6 +243,7 @@ public class Tray : MonoBehaviour, IGrabable
             {
                 drinkCup.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
                 RegisterItem(item, targetSlotIndex);
+                CurrentContent.Drinks.Add(drinkCup.DrinkType);
             }
         }
         else if (item is Holder holder)
@@ -168,12 +252,14 @@ public class Tray : MonoBehaviour, IGrabable
             {
                 holder.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
                 RegisterItem(item, targetSlotIndex);
+                CurrentContent.Sides.Add(holder.CurrentIngredient);
             }
         }
         else if (item is Drink drink)
         {
             drink.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
             RegisterItem(item, targetSlotIndex);
+            CurrentContent.Drinks.Add(drink.data.drinkType);
         }
         else if (item is BurgerBox burgerBox)
         {
@@ -181,12 +267,14 @@ public class Tray : MonoBehaviour, IGrabable
             {
                 burgerBox.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
                 RegisterItem(item, targetSlotIndex);
+                CurrentContent.Burgers.Add(burgerBox.ContainedBurgerType);
             }
         }
         else if (item is Toy toy)
         {
             toy.PlaceOnTray(slotPoints[targetSlotIndex], slotApexes[targetSlotIndex], this, targetSlotIndex);
             RegisterItem(item, targetSlotIndex);
+            CurrentContent.Toys.Add(toy.data.toyType);
         }
     }
 
@@ -295,6 +383,24 @@ public class Tray : MonoBehaviour, IGrabable
         if (itemsOnTray.Contains(item))
         {
             itemsOnTray.Remove(item);
+
+            if (item is BurgerBox box)
+                CurrentContent.Burgers.Remove(box.ContainedBurgerType);
+
+            else if (item is DrinkCup cup)
+                CurrentContent.Drinks.Remove(cup.DrinkType);
+
+            else if (item is Drink drink)
+                CurrentContent.Drinks.Remove(drink.data.drinkType);
+
+            else if (item is Holder holder)
+                CurrentContent.Sides.Remove(holder.CurrentIngredient);
+
+            else if (item is SauceCapsule sauce)
+                CurrentContent.Sauces.Remove(sauce.data.sauceType);
+
+            else if (item is Toy toy)
+                CurrentContent.Toys.Remove(toy.data.toyType);
 
             if (itemsOnTray.Count <= 0) trayState = 0; 
         }
