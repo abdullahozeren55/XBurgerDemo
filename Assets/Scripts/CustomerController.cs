@@ -97,9 +97,26 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
         isLeavingShop = false;
         isInteractingWithDoor = false; // Reset
 
+        // 1. Rastgele bir sipariþ senaryosu seç
         var randomSelection = profile.PossibleOrders[Random.Range(0, profile.PossibleOrders.Count)];
         currentOrder = randomSelection.Order;
-        assignedDialogue = randomSelection.OrderDialogue;
+
+        // 2. Glitch Zarý At (%0 ile %100 arasý)
+        float roll = Random.Range(0f, 100f);
+
+        // Þartlar: Zar tuttuysa VE Glitch diyaloðu boþ deðilse
+        bool isGlitched = (roll < randomSelection.GlitchChance) && (randomSelection.GlitchDialogue != null);
+
+        if (isGlitched)
+        {
+            assignedDialogue = randomSelection.GlitchDialogue;
+            // Ýstersen burada müþteriye "IsGlitched = true" gibi bir flag atayýp
+            // yürürken garip sesler çýkarmasýný vs. saðlayabilirsin.
+        }
+        else
+        {
+            assignedDialogue = randomSelection.NormalDialogue;
+        }
 
         counterPoint = WorldManager.Instance.GetCounterPosition();
 

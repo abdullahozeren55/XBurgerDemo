@@ -32,7 +32,6 @@ public class CameraManager : MonoBehaviour
         public float frequency = 0.4f;
         public float shakeLerpDuration = 0.5f;
         public float shakeTotalDuration = 1f;
-        public float shakeResetLerpDuration = 0.5f;
 
         [Header("Vignette")]
         public float vignetteIntensity = 0.4f;
@@ -283,13 +282,18 @@ public class CameraManager : MonoBehaviour
 
         if (skipLensAndNoise) return; // <--- KRİTİK KORUMA
 
+        // Noise Component'ini al (Lazım olacak)
+        var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+
         if (isInstant)
         {
-            dialogueCam.DOKill(); // Lens tweenlerini öldür
+            // Anında geçişlerde önceki tweenleri öldür
+            dialogueCam.DOKill();
+            if (perlin != null) DOTween.Kill(perlin); // Perlin üzerindeki tweenleri de öldür
+
             dialogueCam.m_Lens.Dutch = dutchAngle;
             dialogueCam.m_Lens.FieldOfView = fov;
 
-            var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
             if (perlin != null)
             {
                 if (noiseType == CameraNoiseType.None)
@@ -310,17 +314,23 @@ public class CameraManager : MonoBehaviour
         else
         {
             // Lens Tween
-            DOTween.To(() => dialogueCam.m_Lens.Dutch, x => dialogueCam.m_Lens.Dutch = x, dutchAngle, moveDuration).SetEase(moveEase);
-            DOTween.To(() => dialogueCam.m_Lens.FieldOfView, x => dialogueCam.m_Lens.FieldOfView = x, fov, moveDuration).SetEase(moveEase);
+            DOTween.To(() => dialogueCam.m_Lens.Dutch, x => dialogueCam.m_Lens.Dutch = x, dutchAngle, moveDuration)
+            .SetEase(moveEase)
+            .SetTarget(dialogueCam); // <--- EKLE
 
-            // Noise Tween
-            var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            DOTween.To(() => dialogueCam.m_Lens.FieldOfView, x => dialogueCam.m_Lens.FieldOfView = x, fov, moveDuration)
+                .SetEase(moveEase)
+                .SetTarget(dialogueCam); // <--- EKLE
+
             if (perlin != null)
             {
                 if (noiseType == CameraNoiseType.None)
                 {
-                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, moveDuration);
+                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, moveDuration)
+                           .SetTarget(perlin); // <--- EKLE
+
                     DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, moveDuration)
+                           .SetTarget(perlin)  // <--- EKLE
                            .OnComplete(() => perlin.m_NoiseProfile = null);
                 }
                 else if (noiseMap.ContainsKey(noiseType))
@@ -331,8 +341,13 @@ public class CameraManager : MonoBehaviour
                     float targetAmp = preset.defaultAmplitude * ampMult;
                     float targetFreq = preset.defaultFrequency * freqMult;
 
-                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, moveDuration).SetEase(moveEase);
-                    DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, targetFreq, moveDuration).SetEase(moveEase);
+                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, moveDuration)
+                       .SetEase(moveEase)
+                       .SetTarget(perlin); // <--- EKLE
+
+                    DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, targetFreq, moveDuration)
+                           .SetEase(moveEase)
+                           .SetTarget(perlin); // <--- EKLE
                 }
             }
         }
@@ -657,6 +672,17 @@ public class CameraManager : MonoBehaviour
 
         var perlin = activeCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 
+        // --- KRİTİK NOKTA 3: TEMİZLİK ---
+        // Artık SetTarget yaptığımız için bu komutlar o hayalet tweenleri bulup yok edecek.
+
+        // 1. Kamera üzerindeki Lens tweenlerini (FOV, Dutch) öldür
+        activeCam.DOKill();
+        DOTween.Kill(activeCam); // Garanti olsun
+
+        // 2. Perlin üzerindeki Noise tweenlerini öldür
+        if (perlin != null) DOTween.Kill(perlin);
+        // --------------------------------
+
         // --- 1. MEVCUT DURUMU YEDEKLE (Snapshot) ---
         NoiseSettings originalProfile = perlin != null ? perlin.m_NoiseProfile : null;
         float originalAmp = perlin != null ? perlin.m_AmplitudeGain : 0f;
@@ -676,24 +702,33 @@ public class CameraManager : MonoBehaviour
         // --- 3. SEQUENCE OLUŞTUR ---
         Sequence jumpSeq = DOTween.Sequence();
 
-        // A) CAMERA SHAKE (Patlama ve Sönme)
+        // A) CAMERA SHAKE
         if (perlin != null)
         {
-            // Şiddetle Yüksel (Attack)
-            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, preset.amplitude, preset.shakeLerpDuration).SetEase(Ease.OutExpo));
-            jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, preset.shakeLerpDuration).SetEase(Ease.OutExpo));
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, preset.amplitude, preset.shakeLerpDuration)
+                .SetEase(Ease.OutExpo).SetTarget(perlin)); // <--- Target Ekle
 
-            // Yavaşça Sön (Decay) -> Sıfıra değil, orjinal değere dönmeye çalışacağız ama profil farklı olduğu için önce sıfırlamak daha temiz.
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, preset.shakeLerpDuration)
+                .SetEase(Ease.OutExpo).SetTarget(perlin));
+
+            // Decay (Sönme)
             float decayDuration = preset.shakeTotalDuration - preset.shakeLerpDuration;
-            if (decayDuration < 0) decayDuration = 0.1f;
+            if (decayDuration < 0.1f) decayDuration = 0.1f;
 
-            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, decayDuration).SetEase(Ease.InQuad));
-            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, decayDuration).SetEase(Ease.InQuad));
+            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, decayDuration)
+                .SetEase(Ease.InQuad).SetTarget(perlin));
+
+            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, decayDuration)
+                .SetEase(Ease.InQuad).SetTarget(perlin));
         }
 
         // B) FOV KICK
-        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, preset.fov, preset.fovLerpDuration).SetEase(Ease.OutBack));
-        jumpSeq.Insert(preset.fovTotalDuration, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, preset.fovResetLerpDuration).SetEase(Ease.InOutSine));
+        // Burada da activeCam'i target gösteriyoruz
+        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, preset.fov, preset.fovLerpDuration)
+            .SetEase(Ease.OutBack).SetTarget(activeCam));
+
+        jumpSeq.Insert(preset.fovTotalDuration, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, preset.fovResetLerpDuration)
+            .SetEase(Ease.InOutSine).SetTarget(activeCam));
 
         // C) VIGNETTE (Varsa)
         if (vignette != null)
@@ -720,8 +755,8 @@ public class CameraManager : MonoBehaviour
 
                 // Diyalogda ise: DialogueManager zaten noise update ediyor, ama biz yine de snapshot'a dönelim.
                 // Yumuşak bir geçişle eski değerlere dön (Snap olmasın diye)
-                DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, originalAmp, 0.5f);
-                DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, originalFreq, 0.5f);
+                DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, originalAmp, 0.5f).SetTarget(perlin);
+                DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, originalFreq, 0.5f).SetTarget(perlin);
             }
 
             onComplete?.Invoke();

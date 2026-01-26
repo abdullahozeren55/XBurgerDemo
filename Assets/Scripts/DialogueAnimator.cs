@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Febucci.UI;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,12 @@ public class DialogueAnimator : MonoBehaviour
     private float baseMiddleWait = -1f;
     private float baseLongWait = -1f;
 
+    // Shader Property ID'si (Performans için cache)
+    private static readonly int GlitchStrengthID = Shader.PropertyToID("_GlitchStrength");
+
+    // Orijinal materyali bozmamak için instance tutacaðýz
+    private Material textMaterialInstance;
+
     private void Awake()
     {
         // Eðer inspector'dan atanmadýysa otomatik bul
@@ -29,6 +36,46 @@ public class DialogueAnimator : MonoBehaviour
             typewriter.onTextShowed.AddListener(OnTypingFinished);
             typewriter.onTextDisappeared.AddListener(OnDisappearFinished);
         }
+
+        // --- MATERYAL HAZIRLIÐI ---
+        if (textComponent != null)
+        {
+            // .fontMaterial çaðrýsý otomatik olarak instance oluþturur.
+            textMaterialInstance = textComponent.fontMaterial;
+            // Baþlangýçta glitch'i sýfýrla
+            SetGlitchStrength(0f);
+        }
+    }
+
+    // --- YENÝ: SHADER KONTROL ---
+    public void SetGlitchStrength(float value)
+    {
+        if (textMaterialInstance != null)
+        {
+            textMaterialInstance.SetFloat(GlitchStrengthID, value);
+        }
+    }
+
+    public void TweenGlitch(float targetValue, float duration, Ease ease = Ease.Linear)
+    {
+        if (textMaterialInstance != null)
+        {
+            textMaterialInstance.DOFloat(targetValue, GlitchStrengthID, duration).SetEase(ease);
+        }
+    }
+
+    // --- YENÝ: RICH TEXT WRAPPER ---
+    public string ApplyRichText(string content, RichTextTag tags)
+    {
+        string final = content;
+
+        if (tags.HasFlag(RichTextTag.Shake)) final = $"<shake>{final}</shake>";
+        if (tags.HasFlag(RichTextTag.Wave)) final = $"<wave>{final}</wave>";
+        if (tags.HasFlag(RichTextTag.Wiggle)) final = $"<wiggle>{final}</wiggle>";
+        if (tags.HasFlag(RichTextTag.RedColor)) final = $"<color=red>{final}</color>";
+        // GlitchFont varsa: final = $"<font=\"GlitchFontSDF\">{final}</font>";
+
+        return final;
     }
 
     // --- BU FONKSÝYON DEÐERLERÝ GARANTÝ ALTINA ALIR ---
@@ -122,8 +169,18 @@ public class DialogueAnimator : MonoBehaviour
 
     public void ForceHide()
     {
-        // Acil durum kapatmasý (Reset için)
-        typewriter.StopShowingText();
+        // Typewriter hala çalýþýyorsa sustur
+        if (typewriter != null)
+        {
+            typewriter.StopShowingText();
+        }
+
+        // YENÝ: Metni fiziksel olarak sil (Ghosting'i önler)
+        if (textComponent != null)
+        {
+            textComponent.text = string.Empty;
+        }
+
         gameObject.SetActive(false);
         IsBusy = false;
     }

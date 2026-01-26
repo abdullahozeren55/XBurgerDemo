@@ -13,7 +13,13 @@ public class CustomerProfile : ScriptableObject
     public struct PotentialOrder
     {
         public OrderData Order;
-        public DialogueData OrderDialogue; // "Bana bi çizburger çek yeðenim"
+
+        [Header("Normal Interaction")]
+        public DialogueData NormalDialogue; // Eskiden OrderDialogue idi, adýný netleþtirdik.
+
+        [Header("Horror Interaction")]
+        public DialogueData GlitchDialogue; // Korkunçlu versiyon
+        [Range(0f, 100f)] public float GlitchChance; // % kaç ihtimalle korkunç olacak?
     }
 
     // Bu profildeki müþteri neleri sipariþ edebilir?

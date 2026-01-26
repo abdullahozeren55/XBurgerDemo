@@ -14,6 +14,8 @@ public class DialogueData : ScriptableObject
 
         [Header("Visuals")]
         public Color TextColor = Color.white;
+        [Tooltip("Metne eklenecek Rich Text efektleri")]
+        public RichTextTag TextEffects; // YENÝ: Çoklu seçim
 
         [Header("Flow Control")]
         [Tooltip("Oyuncu bu satýrý hýzlýca geçebilir mi?")]
@@ -43,6 +45,12 @@ public class DialogueData : ScriptableObject
         [Range(0f, 5f)] public float NoiseAmplitudeMultiplier = 1f;
         [Tooltip("Gürültü hýzý çarpaný (1 = Normal, 2 = 2 Kat Hýzlý)")]
         [Range(0f, 5f)] public float NoiseFrequencyMultiplier = 1f;
+
+        [Header("Glitch & Flow Logic")]
+        public LineBehavior Behavior = LineBehavior.Normal; // YENÝ: Satýrýn kaderi
+
+        [Tooltip("Meltdown veya HorrorReveal seçiliyse, bu süre sonunda sonraki satýra geçer.")]
+        public float AutoAdvanceDuration = 2.0f;
 
         [Header("Horror Elements")]
         public JumpscareType Jumpscare = JumpscareType.None;
