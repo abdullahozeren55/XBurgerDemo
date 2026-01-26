@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ORANGEJUICE
   m_EditorClassIdentifier: 
   focusTextKey: GRABABLE_ORANGE_JUICE
-  drinkType: 3
+  drinkType: 4
   handGrabType: 1
   handRigType: 1
   iconData:

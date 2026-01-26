@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90aebf8008e6a484b8584203c2070aa7, type: 3}
+  m_Name: LevelScenerio
+  m_EditorClassIdentifier: 
+  LoopIndex: 0
+  Waves:
+  - GroupName: TeenGirl0_Alone
+    DelayAfterPreviousGroup: 0
+    Members:
+    - ID: 8
+      ProfileForToday: {fileID: 11400000, guid: 01870921cf4af0e42b8d1c197d87a261, type: 2}

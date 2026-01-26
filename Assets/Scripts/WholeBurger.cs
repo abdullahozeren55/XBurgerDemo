@@ -5,7 +5,7 @@ public class WholeBurger : MonoBehaviour, IGrabable
 {
     [Header("Identity")]
     public WholeBurgerData data;
-    [HideInInspector] public GameManager.BurgerTypes BurgerType = GameManager.BurgerTypes.Null;
+    public GameManager.BurgerTypes BurgerType = GameManager.BurgerTypes.Null;
 
     public float TotalBurgerHeight { get; private set; }
 

@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Febucci.UI; // Text Animator namespace
+using Febucci.UI;
+using System;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -11,44 +12,51 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private AudioClip glitchSFX;
     [SerializeField] private AudioSource sfxSource;
 
-    // Sahnedeki tüm konuþmacýlarý ID'lerine göre burada tutuyoruz
-    private Dictionary<string, IDialogueSpeaker> speakers = new Dictionary<string, IDialogueSpeaker>();
+    [Header("UI Pool System")]
+    [SerializeField] private List<DialogueAnimator> dialogueAnimatorPool; // Inspector'dan 4 tane balon ata
+
+    // Aktif olarak en son kullanýlan (þu an ekranda en taze olan) balon
+    private DialogueAnimator currentActiveDialogueAnimator;
+
+    // String yerine Enum Key kullanýyoruz
+    private Dictionary<CustomerID, IDialogueSpeaker> speakers = new Dictionary<CustomerID, IDialogueSpeaker>();
 
     private DialogueData currentData;
     private int currentIndex;
     private bool isDialogueActive;
-    private bool isTyping;
-
-    // Þu an konuþan kiþi
     private IDialogueSpeaker currentSpeaker;
+    private Action onDialogueCompleteCallback;
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+
+        // Baþlangýçta tüm diyalog animatorleri kapat
+        foreach (var dialogAnim in dialogueAnimatorPool) dialogAnim.ForceHide();
     }
 
     private void Update()
     {
         if (!isDialogueActive) return;
 
-        // Input kontrolü (Senin InputManager'ýnla deðiþtir)
-        if (InputManager.Instance.PlayerInteract())
+        // InputManager entegrasyonu
+        if (InputManager.Instance != null && InputManager.Instance.PlayerInteract())
         {
-            if (isTyping)
+            // Eðer þu an aktif olan balon hala yazýyorsa -> Skip
+            if (currentActiveDialogueAnimator != null && currentActiveDialogueAnimator.IsTyping())
             {
-                // Yazýyorsa tamamla (Febucci özelliði)
-                currentSpeaker?.TextPlayer.SkipTypewriter();
+                currentActiveDialogueAnimator.SkipTypewriter();
             }
             else
             {
-                // Yazmýyorsa sonrakine geç
+                // Yazma bittiyse -> Sonraki satýra geç (Öncekini Disappear yaparak)
                 AdvanceDialogue();
             }
         }
     }
 
-    // --- SPEAKER KAYIT SÝSTEMÝ ---
+    // --- SPEAKER KAYIT SÝSTEMÝ (ENUM) ---
     public void RegisterSpeaker(IDialogueSpeaker speaker)
     {
         if (!speakers.ContainsKey(speaker.SpeakerID))
@@ -61,26 +69,53 @@ public class DialogueManager : MonoBehaviour
             speakers.Remove(speaker.SpeakerID);
     }
 
-    // --- DÝYALOG BAÞLATMA ---
-    public void StartDialogue(DialogueData data)
+    public void StartDialogue(DialogueData data, Action onComplete = null)
     {
         currentData = data;
+        onDialogueCompleteCallback = onComplete;
         currentIndex = -1;
         isDialogueActive = true;
 
-        // Player hareketini kitleme vs. buraya
-        // PlayerManager.Instance.SetPlayerBasicMovements(false);
+        if (PlayerManager.Instance != null) PlayerManager.Instance.SetPlayerBasicMovements(false);
+
+        if (CameraManager.Instance != null)
+        {
+            CameraManager.Instance.StartDialogueMode();
+
+            // --- YENÝ: KONUÞAN KÝÞÝNÝN KAFASINI KAMERAYA ÇEVÝR ---
+            // Ýlk satýrýn konuþmacýsýný bulalým
+            if (data.lines.Count > 0)
+            {
+                var firstSpeakerID = data.lines[0].SpeakerID;
+                if (speakers.ContainsKey(firstSpeakerID))
+                {
+                    // Eðer konuþan kiþi bir CustomerController ise (veya component'e sahipse)
+                    var speakerObj = speakers[firstSpeakerID] as MonoBehaviour;
+                    if (speakerObj != null)
+                    {
+                        var customer = speakerObj.GetComponent<CustomerController>();
+                        if (customer != null)
+                        {
+                            // KAMERAYA BAK EMRÝ
+                            customer.SetLookTarget(CameraManager.Instance.GetDialogueCameraTransform());
+                        }
+                    }
+                }
+            }
+        }
 
         AdvanceDialogue();
     }
 
-    public void AdvanceDialogue()
+    private void AdvanceDialogue()
     {
-        // Önceki konuþmacýyý sustur
-        if (currentSpeaker != null)
+        // 1. Önceki balon varsa, ona "Kaybolmaya Baþla" emri ver
+        if (currentActiveDialogueAnimator != null)
         {
-            currentSpeaker.OnSpeakEnd();
-            currentSpeaker.TextPlayer.ShowText(""); // Temizle
+            currentActiveDialogueAnimator.Hide();
+            // Hide() içinde StartDisappearingText çaðrýlýyor.
+            // Balon hemen kapanmayacak, animasyonla gidecek.
+            // IsBusy deðeri ancak animasyon bitince false olacak.
         }
 
         currentIndex++;
@@ -96,98 +131,121 @@ public class DialogueManager : MonoBehaviour
 
     private void PlayLine(DialogueData.DialogueLine line)
     {
-        if (!speakers.ContainsKey(line.SpeakerID))
+        // 1. Konuþmacýyý Bul (Sadece ses ve kamera için lazým artýk)
+        if (speakers.ContainsKey(line.SpeakerID))
         {
-            Debug.LogError($"Speaker ID '{line.SpeakerID}' sahnede bulunamadý!");
-            return;
+            currentSpeaker = speakers[line.SpeakerID];
         }
 
-        currentSpeaker = speakers[line.SpeakerID];
-        currentSpeaker.OnSpeakStart();
+        // 2. HAVUZDAN BALON SEÇ
+        DialogueAnimator selectedDialogueAnimator = GetAvailableDialogueAnimator();
+        currentActiveDialogueAnimator = selectedDialogueAnimator; // Artýk yeni patron bu
 
-        // Febucci eventlerini dinle (Yazma bitti mi?)
-        currentSpeaker.TextPlayer.onTextShowed.RemoveAllListeners();
-        currentSpeaker.TextPlayer.onTextShowed.AddListener(() => isTyping = false);
-        currentSpeaker.TextPlayer.onTypewriterStart.RemoveAllListeners();
-        currentSpeaker.TextPlayer.onTypewriterStart.AddListener(() => isTyping = true);
+        selectedDialogueAnimator.SetColor(line.TextColor);
 
-        // --- GLITCH MANTIÐI ---
+        // 3. Metni Göster
         if (line.IsGlitchLine)
         {
-            StartCoroutine(HandleGlitchRoutine(line));
+            StartCoroutine(HandleGlitchRoutine(line, selectedDialogueAnimator));
         }
         else
         {
-            // Normal Metin
             string finalList = LocalizationManager.Instance.GetText(line.LocalizationKey);
-            currentSpeaker.TextPlayer.ShowText(finalList);
+            selectedDialogueAnimator.Show(finalList);
         }
 
-        // Ses Efekti (Custom varsa onu çal, yoksa daktilo sesi Febucci içinden ayarlanýr)
-        if (line.CustomVoiceOrSFX != null)
+        // 4. Ses Efekti ve Kamera (Aynen Kalýyor)
+        if (line.CustomVoiceOrSFX != null) sfxSource.PlayOneShot(line.CustomVoiceOrSFX);
+
+        // --- CAMERA JUICE (GÜNCELLENDÝ) ---
+        if (CameraManager.Instance != null)
         {
-            sfxSource.PlayOneShot(line.CustomVoiceOrSFX);
+            Transform targetTrans = null;
+            CustomerID targetID = (line.FocusTargetID != CustomerID.None) ? line.FocusTargetID : line.SpeakerID;
+
+            if (speakers.ContainsKey(targetID))
+            {
+                if (speakers[targetID] is DialogueSpeaker ds) targetTrans = ds.LookAtPoint;
+                else if (speakers[targetID] is MonoBehaviour mb) targetTrans = mb.transform;
+            }
+
+            // --- ÝLK SATIR KONTROLÜ ---
+            // Eðer þu an 0. satýrý oynatýyorsak, kamera IÞINLANSIN (Instant).
+            // Sonraki satýrlarda YUMUÞAK (Tween) geçsin.
+            bool isFirstLine = (currentIndex == 0);
+
+            CameraManager.Instance.UpdateDialogueShot(
+                targetTrans,
+                line.CamMoveDuration,
+                line.CamMoveEase,
+                line.DutchAngle,
+                line.TargetFOV,
+                line.NoiseType,
+                line.NoiseAmplitudeMultiplier,
+                line.NoiseFrequencyMultiplier,
+                isFirstLine // <--- BURASI KRÝTÝK
+            );
         }
     }
 
-    // --- KORKU EFEKTLERÝ ---
-    private IEnumerator HandleGlitchRoutine(DialogueData.DialogueLine line)
+    // --- HAVUZ MANTIÐI ---
+    private DialogueAnimator GetAvailableDialogueAnimator()
     {
-        string realText = LocalizationManager.Instance.GetText(line.LocalizationKey);
-
-        switch (line.glitchType)
+        // 1. Öncelik: Hiç meþgul olmayan (Animasyonu bitmiþ, kapalý) bir animator bul
+        foreach (var dialogueAnimator in dialogueAnimatorPool)
         {
-            case DialogueData.GlitchType.TextSwap:
-                // 1. Önce Halüsinasyonu Göster
-                string fakeText = LocalizationManager.Instance.GetText(line.GlitchAltKey);
-
-                // Febucci'nin taglarýný kullanarak titrek, kýrmýzý yazdýrabiliriz
-                // Örn: <wiggle><color=red>Ne yaptýðýný biliyorum...</color></wiggle>
-                string styledFake = $"<wiggle a=0.5><color=#FF0000>{fakeText}</color></wiggle>";
-
-                currentSpeaker.TextPlayer.ShowText(styledFake);
-                isTyping = true; // Oyuncu geçemesin diye kitlemek istersen burada kontrol et
-
-                // Belirlenen süre kadar bekle (veya oyuncu okuyana kadar)
-                yield return new WaitForSeconds(line.GlitchDuration);
-
-                // 2. GLITCH EFEKTÝ (Ses + Görsel)
-                if (glitchSFX) sfxSource.PlayOneShot(glitchSFX);
-
-                // Buraya kamera shake kodu da ekleyebilirsin
-                // CameraManager.Instance.Shake(...);
-
-                // 3. Gerçek Metni Yapýþtýr (Aniden belirsin istiyorsan typewriter skip yap)
-                // <appearance> tagý Febucci'de metnin nasýl belireceðini seçer.
-                // Resetleyip normal metni veriyoruz.
-                currentSpeaker.TextPlayer.ShowText(realText);
-                break;
-
-            case DialogueData.GlitchType.Corruption:
-                // Sadece metnin belirli yerlerini bozmak.
-                // Bunu Localization dosyasýnda Tag kullanarak yapmak daha mantýklý.
-                // Örn: "Burger <shake>alabilir miyim?</shake>"
-                // Ama kodla da inject edebiliriz:
-
-                // Veya tüm metni korkunçlaþtýr:
-                string corruptedText = $"<shake a=0.2><font=\"GlitchFont\">{realText}</font></shake>";
-                currentSpeaker.TextPlayer.ShowText(corruptedText);
-                break;
+            if (!dialogueAnimator.IsBusy) return dialogueAnimator;
         }
+
+        // 2. Durum: Hepsi meþgul (Çok hýzlý geçildi). 
+        // O zaman Disappear animasyonu bitmeye EN YAKIN olaný (yani listedeki en eski active olaný) bulup resetleyelim.
+        // Basit çözüm: Listede sýrayla dönüyoruz ya, muhtemelen index 0 en eskidir.
+        // Ama biz yine de aktif olanlardan birini kurban seçelim.
+
+        Debug.LogWarning("Tüm diyalog animatorleri meþgul! Birini zorla sýfýrlýyorum.");
+
+        // Ýlkini al, zorla kapat ve onu ver.
+        var victim = dialogueAnimatorPool[0];
+        victim.ForceHide();
+        return victim;
+    }
+
+    private IEnumerator HandleGlitchRoutine(DialogueData.DialogueLine line, DialogueAnimator dialogueAnimator)
+    {
+        // Glitch mantýðý artýk bubble.Show() üzerinden çalýþacak
+        // ...
+        yield return null;
     }
 
     private void EndDialogue()
     {
         isDialogueActive = false;
-        if (currentSpeaker != null)
+        // Son balon da kaybolsun
+        if (currentActiveDialogueAnimator != null)
         {
-            currentSpeaker.OnSpeakEnd();
-            currentSpeaker.TextPlayer.ShowText("");
+            currentActiveDialogueAnimator.Hide();
         }
 
-        // PlayerManager.Instance.SetPlayerBasicMovements(true);
-        Debug.Log("Diyalog Bitti.");
+        if (PlayerManager.Instance != null) PlayerManager.Instance.SetPlayerBasicMovements(true);
 
-        // Buradan Customer scriptine "Sipariþ verdim, hadi ben beklemeye geçiyorum" sinyali atacaðýz.
+        if (CameraManager.Instance != null) CameraManager.Instance.EndDialogueMode();
+
+        // --- YENÝ: HERKESÝN KAFASINI SERBEST BIRAK ---
+        // Sahnedeki tüm kayýtlý konuþmacýlarý gez ve eðer müþteriyseler bakýþlarýný sýfýrla
+        foreach (var kvp in speakers)
+        {
+            var speakerObj = kvp.Value as MonoBehaviour;
+            if (speakerObj != null)
+            {
+                var customer = speakerObj.GetComponent<CustomerController>();
+                if (customer != null)
+                {
+                    customer.ClearLookTarget(); // Player'a dön
+                }
+            }
+        }
+
+        onDialogueCompleteCallback?.Invoke();
+        onDialogueCompleteCallback = null;
     }
 }

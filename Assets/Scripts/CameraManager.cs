@@ -1,12 +1,17 @@
-﻿using AtmosphericHeightFog;
-using Cinemachine;
+﻿using Cinemachine;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
+public enum CameraNoiseType
+{
+    None,           // Sabit kamera
+    IdleBreathing,  // Varsayılan: Hafif el titremesi / Nefes alma
+    Tension,        // Gergin anlar: Biraz daha hızlı titreme
+    Jumpscare,      // Anlık şok: Sert ve geniş sarsıntı
+}
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance;
@@ -57,6 +62,15 @@ public class CameraManager : MonoBehaviour
         public CinemachineVirtualCamera vCam;
     }
 
+    [System.Serializable]
+    public struct NoisePreset
+    {
+        public CameraNoiseType type;
+        public NoiseSettings settingsAsset; // Cinemachine Asset'i
+        public float defaultAmplitude;
+        public float defaultFrequency;
+    }
+
     [Header("Gameplay Cameras")]
     [SerializeField] private CameraEntry[] cameras;
 
@@ -102,6 +116,27 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private float colorAdjustmentsIncreaseTimeForColdRoom = 1f;
     [SerializeField] private float colorAdjustmentsDecreaseTimeForColdRoom = 0.5f;
 
+    [Header("Dialogue Camera System")]
+    [SerializeField] private CinemachineVirtualCamera dialogueCam;
+    [SerializeField] private Transform dialogueLookTarget; // Kameranın LookAt slotundaki boş obje
+
+    [Header("Auto-Framing Settings")]
+    [Tooltip("Kamera müşterinin yüzünden ne kadar uzakta dursun?")]
+    [SerializeField] private float faceToFaceDistance = 0.8f;
+    [Tooltip("Kamera müşterinin göz hizasından ne kadar aşağıda/yukarıda olsun?")]
+    [SerializeField] private float heightOffset = 0.1f;
+    [Tooltip("Yumuşatma hızı")]
+    [SerializeField] private float repositionDuration = 1f;
+
+    [Header("Noise Configuration")]
+    [SerializeField] private List<NoisePreset> noisePresets; // Inspector'dan doldur
+
+    // Hızlı erişim için Dictionary (Awake'te dolduracağız)
+    private Dictionary<CameraNoiseType, NoisePreset> noiseMap = new Dictionary<CameraNoiseType, NoisePreset>();
+
+    private int defaultPriority = 10;
+    private int activePriority = 20;
+
     private float normalFOV;
     private float normalVignetteValue;
     private Color normalVignetteColor;
@@ -139,6 +174,13 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
+        // Listeyi Dictionary'e çevir (Hız için)
+        foreach (var preset in noisePresets)
+        {
+            if (!noiseMap.ContainsKey(preset.type))
+                noiseMap.Add(preset.type, preset);
+        }
+
         // Main Camera üzerindeki Brain'i bul
         if (Camera.main != null)
             cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>();
@@ -172,6 +214,126 @@ public class CameraManager : MonoBehaviour
                 normalColorAdjustmentsColor = colorAdjustments.colorFilter.value;
             }
         }
+    }
+
+    public void StartDialogueMode()
+    {
+        if (dialogueCam != null)
+        {
+            dialogueCam.Priority = activePriority;
+            // Başlangıçta target'ı resetleyebilirsin veya olduğu yerde bırakabilirsin
+        }
+    }
+
+    public void EndDialogueMode()
+    {
+        if (dialogueCam != null)
+        {
+            dialogueCam.Priority = defaultPriority;
+        }
+    }
+
+    public void UpdateDialogueShot(Transform targetTransform, float moveDuration, Ease moveEase, float dutchAngle, float fov, CameraNoiseType noiseType, float ampMult, float freqMult, bool isInstant = false) // <--- YENİ PARAMETRE
+    {
+        if (dialogueCam == null || dialogueLookTarget == null) return;
+
+        // --- HESAPLAMALAR ---
+        Vector3 targetLookPos = targetTransform != null ? targetTransform.position : dialogueLookTarget.position;
+        Vector3 targetCamPos = dialogueCam.transform.position; // Varsayılan: Olduğu yerde kalsın
+
+        // Eğer bir hedef varsa Auto-Framing pozisyonunu hesapla
+        if (targetTransform != null)
+        {
+            // Hedefin (Root/Gövde) baktığı yönü bul
+            Vector3 customerForward = targetTransform.root.forward;
+            // İdeal pozisyon: Yüzün önünde + Yükseklik farkı
+            targetCamPos = targetTransform.position + (customerForward * faceToFaceDistance);
+            targetCamPos.y += heightOffset;
+        }
+
+        // --- UYGULAMA (SNAP vs TWEEN) ---
+
+        if (isInstant)
+        {
+            // 1. ÖNCEKİ TWEENLERİ ÖLDÜR (Çakışma olmasın)
+            dialogueLookTarget.DOKill();
+            dialogueCam.transform.DOKill();
+            dialogueCam.DOKill(); // Lens tweenlerini de kapsar
+
+            // 2. DEĞERLERİ ANINDA ATA (IŞINLA)
+            dialogueLookTarget.position = targetLookPos;
+            dialogueCam.transform.position = targetCamPos;
+
+            // Lens
+            dialogueCam.m_Lens.Dutch = dutchAngle;
+            dialogueCam.m_Lens.FieldOfView = fov;
+
+            // Noise (Anında geçiş)
+            var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            if (perlin != null)
+            {
+                if (noiseType == CameraNoiseType.None)
+                {
+                    perlin.m_NoiseProfile = null;
+                    perlin.m_AmplitudeGain = 0;
+                    perlin.m_FrequencyGain = 0;
+                }
+                else if (noiseMap.ContainsKey(noiseType))
+                {
+                    NoisePreset preset = noiseMap[noiseType];
+                    perlin.m_NoiseProfile = preset.settingsAsset;
+                    perlin.m_AmplitudeGain = preset.defaultAmplitude * ampMult;
+                    perlin.m_FrequencyGain = preset.defaultFrequency * freqMult;
+                }
+            }
+        }
+        else
+        {
+            // --- NORMAL TWEEN AKIŞI (YUMUŞAK GEÇİŞ) ---
+
+            // 1. Hedefe Bak (LookAt Target)
+            dialogueLookTarget.DOMove(targetLookPos, moveDuration).SetEase(moveEase);
+
+            // 2. Kamera Pozisyonu (Auto-Framing)
+            if (targetTransform != null)
+            {
+                dialogueCam.transform.DOMove(targetCamPos, repositionDuration).SetEase(Ease.OutCubic);
+            }
+
+            // 3. Lens
+            DOTween.To(() => dialogueCam.m_Lens.Dutch, x => dialogueCam.m_Lens.Dutch = x, dutchAngle, moveDuration).SetEase(moveEase);
+            DOTween.To(() => dialogueCam.m_Lens.FieldOfView, x => dialogueCam.m_Lens.FieldOfView = x, fov, moveDuration).SetEase(moveEase);
+
+            // 4. Noise
+            var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            if (perlin != null)
+            {
+                if (noiseType == CameraNoiseType.None)
+                {
+                    // Noise kapatma tweeni
+                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, moveDuration);
+                    DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, moveDuration)
+                           .OnComplete(() => perlin.m_NoiseProfile = null);
+                }
+                else if (noiseMap.ContainsKey(noiseType))
+                {
+                    NoisePreset preset = noiseMap[noiseType];
+                    if (perlin.m_NoiseProfile != preset.settingsAsset) perlin.m_NoiseProfile = preset.settingsAsset;
+
+                    float targetAmp = preset.defaultAmplitude * ampMult;
+                    float targetFreq = preset.defaultFrequency * freqMult;
+
+                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, moveDuration).SetEase(moveEase);
+                    DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, targetFreq, moveDuration).SetEase(moveEase);
+                }
+            }
+        }
+    }
+
+    public Transform GetDialogueCameraTransform()
+    {
+        if (dialogueCam != null) return dialogueCam.transform;
+        return transform; // Fallback
     }
 
     // --- YENİ EKLENEN: MENÜ VE OYUN GEÇİŞ SİSTEMİ ---

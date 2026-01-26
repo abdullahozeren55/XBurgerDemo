@@ -17,6 +17,7 @@ public interface ICustomer
 
 public enum CustomerState
 {
+    ApproachingDoor,
     Entering,       // Kapýdan giriyor
     WaitingInLine,  // Sýrada (Opsiyonel)
     AtCounter,      // Kasada, sipariþ vermeye hazýr

@@ -1,12 +1,13 @@
-using UnityEngine;
-using UnityEngine.AI;
+using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening; // Tweenler için þart
+using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(DialogueSpeaker))]
-[RequireComponent(typeof(Animator))]
+// [RequireComponent(typeof(Animator))] <-- Bunu kaldýrdým, child'da olabilir.
 public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 {
     [Header("Runtime Data")]
@@ -14,8 +15,8 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     [SerializeField] private OrderData currentOrder;
 
     [Header("Settings")]
-    [SerializeField] private Transform trayHoldPoint; // Tepsiyi tutacaðý nokta (Göðüs kemiðinin altýnda bir empty obje)
-    [SerializeField] private float headLookWeight = 1f; // Kafa çevirme hýzý/aðýrlýðý
+    [SerializeField] private Transform trayHoldPoint;
+    [SerializeField] private float headLookWeight = 1f;
 
     // State Machine
     public CustomerState CurrentState { get; private set; }
@@ -28,10 +29,16 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     private bool outlineShouldBeRed;
 
     public bool CanInteract { get => canInteract; set => canInteract = value; }
-    private bool canInteract; // Sadece kasada true olur
+    private bool canInteract;
 
     public string FocusTextKey { get => focusTextKey; set => focusTextKey = value; }
     [SerializeField] private string focusTextKey;
+
+    // YENÝ: Seçilen diyaloðu hafýzada tutmak için
+    [SerializeField] private DialogueData assignedDialogue;
+
+    // YENÝ: Kafa takibi yumuþaklýðý için
+    private float currentLookWeight = 0f;
 
     // Components
     private NavMeshAgent agent;
@@ -50,10 +57,24 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
+    private bool isLeavingShop = false;
+    private Door currentTargetDoor;
+
+    // --- FIX 1: COROUTINE SPAM ENGELLEYÝCÝ ---
+    private bool isInteractingWithDoor = false;
+
+    // YENÝ: IK Hedefini geçici olarak deðiþtirmek için
+    private Transform overrideLookTarget;
+    // YENÝ: Bakýlan noktanýn anlýk (yumuþatýlmýþ) pozisyonu
+    private Vector3 currentSmoothedLookPos;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        anim = GetComponent<Animator>(); // "GetComponentInChildren" yerine direkt component (Rootta varsa)
+        // --- FIX 2: ANIMATOR BULMA ---
+        // Animator genelde child (mesh) objesindedir. GetComponent root'ta bulamazsa child'a bakar.
+        anim = GetComponentInChildren<Animator>();
+
         dialogueSpeaker = GetComponent<DialogueSpeaker>();
         meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
 
@@ -62,7 +83,6 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
 
-        // Baþlangýçta etkileþim kapalý
         CanInteract = false;
     }
 
@@ -74,41 +94,65 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
             meshRenderer.material = profile.SkinMaterial;
 
         agent.speed = profile.WalkSpeed;
+        isLeavingShop = false;
+        isInteractingWithDoor = false; // Reset
 
         var randomSelection = profile.PossibleOrders[Random.Range(0, profile.PossibleOrders.Count)];
         currentOrder = randomSelection.Order;
+        assignedDialogue = randomSelection.OrderDialogue;
 
         counterPoint = WorldManager.Instance.GetCounterPosition();
 
-        GoToState(CustomerState.Entering);
+        var entryInfo = WorldManager.Instance.GetRandomEntryDoor();
+        currentTargetDoor = entryInfo.targetDoor;
+        agent.SetDestination(entryInfo.interactionPoint.position);
+
+        GoToState(CustomerState.ApproachingDoor);
     }
 
     private void Update()
     {
         switch (CurrentState)
         {
-            case CustomerState.Entering:
-                // Kasaya yaklaþtý mý?
-                if (!agent.pathPending && agent.remainingDistance < 0.2f)
+            case CustomerState.ApproachingDoor:
+                // --- FIX 1: SPAM ENGELÝ ---
+                // Eðer zaten kapýyla uðraþýyorsak tekrar coroutine baþlatma!
+                if (!isInteractingWithDoor && !agent.pathPending && agent.remainingDistance < 0.2f)
                 {
-                    RotateBodyToCounter(); // Vücudu sabitle
+                    StartCoroutine(DoorInteractionRoutine());
+                }
+                break;
+
+            case CustomerState.Entering:
+                // Kapýdan geçti, kasaya gidiyor
+
+                // Datadan gelen deðeri kullanýyoruz
+                float stopDist = currentProfile != null ? currentProfile.ArrivalDistance : 0.5f;
+
+                // KONTROL GÜNCELLENDÝ:
+                // 1. Yol hesaplamasý bitmiþ mi?
+                // 2. Kalan mesafe, belirlediðimiz eþikten (stopDist) küçük mü?
+                if (!agent.pathPending && agent.remainingDistance <= stopDist)
+                {
+                    // Ekstra Güvenlik: Yol gerçekten bitti mi veya gidilemez mi oldu?
+                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f || agent.remainingDistance < 0.1f)
+                    {
+                        // Hiçbir þey yapma, NavMesh bazen sapýtýr.
+                    }
+
+                    // Gelmiþ sayýyoruz
+                    RotateBodyToCounter();
                     GoToState(CustomerState.AtCounter);
                 }
                 break;
 
             case CustomerState.AtCounter:
-                // Idle animasyonu oynuyor.
-                // Interaction bekleniyor.
                 break;
 
             case CustomerState.Ordering:
-                // Diyalog oynuyor... 
-                // HandleFinishDialogue çaðrýlana kadar buradayýz.
                 break;
 
             case CustomerState.WaitingForFood:
-                // Bekliyor...
-                // Kafa takibi OnAnimatorIK içinde yapýlýyor.
                 break;
 
             case CustomerState.MovingToSeat:
@@ -123,45 +167,89 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
                     if (!agent.pathPending && agent.remainingDistance < 0.2f)
                     {
-                        // Koltuða vardý
                         GoToState(CustomerState.Eating);
                     }
                 }
                 break;
 
             case CustomerState.Eating:
-                // Yeme animasyonu...
-                // Ýleride "Yeme bitti, kalk git" mantýðý buraya eklenecek.
+                // Test rutini (EatingRoutine) dýþarýdan veya buradan tetiklenebilir.
+                break;
+
+            case CustomerState.Leaving:
+                if (!agent.pathPending && agent.remainingDistance < 1f)
+                {
+                    gameObject.SetActive(false);
+                }
                 break;
         }
     }
 
-    // --- ANÝMASYON IK (HEAD TRACKING) ---
+    // --- KAFA TAKÝBÝ (HEAD TRACKING) ---
     private void OnAnimatorIK(int layerIndex)
     {
-        // Sadece belirli durumlarda kafayý çevirsin
-        if (CurrentState == CustomerState.AtCounter ||
-            CurrentState == CustomerState.Ordering ||
-            CurrentState == CustomerState.WaitingForFood)
-        {
-            if (PlayerManager.Instance != null)
-            {
-                // Bakýlacak hedef (Player'ýn kamerasý)
-                Transform target = PlayerManager.Instance.GetHeadTransform(); // PlayerManager'a bu metodu eklemelisin!
+        bool shouldLook = (CurrentState == CustomerState.AtCounter ||
+                           CurrentState == CustomerState.Ordering ||
+                           CurrentState == CustomerState.WaitingForFood);
 
-                if (target != null)
-                {
-                    // Aðýrlýðý ayarla (1 = Tam bakýþ, 0 = Hiç)
-                    anim.SetLookAtWeight(1f, 0.2f, 1f, 0.5f, 0.7f);
-                    anim.SetLookAtPosition(target.position);
-                }
+        if (shouldLook)
+        {
+            Transform target = null;
+
+            // 1. Hedef Belirleme
+            if (overrideLookTarget != null)
+                target = overrideLookTarget;
+            else if (PlayerManager.Instance != null)
+                target = PlayerManager.Instance.GetHeadTransform();
+
+            // 2. Aðýrlýk Yumuþatma (Gözler ne kadar aktif?)
+            float targetWeight = (target != null) ? headLookWeight : 0f;
+            currentLookWeight = Mathf.Lerp(currentLookWeight, targetWeight, Time.deltaTime * 5f);
+
+            // 3. POZÝSYON YUMUÞATMA (Asýl Olay Burasý)
+            if (target != null)
+            {
+                // Eðer ilk kez bakýyorsak (sýfýr noktasýndaysa) direkt ata ki kafasý yerden kalkmasýn
+                if (currentSmoothedLookPos == Vector3.zero)
+                    currentSmoothedLookPos = target.position;
+
+                // Hedef pozisyona doðru yavaþça kay (Saniyede 5 birim hýzla)
+                // Bu sayede Player'dan Kameraya geçerken kafa "kayarak" döner.
+                currentSmoothedLookPos = Vector3.Lerp(currentSmoothedLookPos, target.position, Time.deltaTime * 5f);
+            }
+
+            // 4. IK Uygulama
+            anim.SetLookAtWeight(currentLookWeight, 0.2f, 1f, 0.5f, 0.7f);
+
+            // Eðer hedef null ise (bakmýyorsa) eski pozisyonda kalsýn, weight 0 olacaðý için sorun olmaz.
+            // Ama hedef varsa yumuþatýlmýþ pozisyonu kullan.
+            if (target != null)
+            {
+                anim.SetLookAtPosition(currentSmoothedLookPos);
+            }
+            else
+            {
+                // Hedef yoksa kafanýn önünü hedef al ki kilitlenip kalmasýn (Opsiyonel)
+                // anim.SetLookAtPosition(transform.position + transform.forward);
             }
         }
         else
         {
-            // Diðer durumlarda kafayý serbest býrak
-            anim.SetLookAtWeight(0);
+            // Bakma modu kapalýysa aðýrlýðý düþür
+            currentLookWeight = Mathf.Lerp(currentLookWeight, 0f, Time.deltaTime * 5f);
+            anim.SetLookAtWeight(currentLookWeight);
         }
+    }
+
+    // --- YENÝ HELPER METODLAR (DialogueManager Çaðýracak) ---
+    public void SetLookTarget(Transform target)
+    {
+        overrideLookTarget = target;
+    }
+
+    public void ClearLookTarget()
+    {
+        overrideLookTarget = null;
     }
 
     private void RotateBodyToCounter()
@@ -169,38 +257,45 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
         Transform faceTarget = WorldManager.Instance.GetCounterFacePoint();
         if (faceTarget != null)
         {
-            // NavMesh rotasyonunu kapatýp manuel döndürüyoruz ki titremesin
             agent.updateRotation = false;
             transform.DORotateQuaternion(faceTarget.rotation, 0.5f).SetEase(Ease.OutSine);
         }
     }
 
-    // --- IINTERACTABLE ---
+    // --- ETKÝLEÞÝM (DÝYALOG BAÞLATMA) ---
     public void OnInteract()
     {
         if (!CanInteract) return;
 
+        // Sadece kasada bekliyorsa konuþabilir
         if (CurrentState == CustomerState.AtCounter)
         {
+            // State deðiþtir (Tekrar týklanmasýn ve Idle oynamaya devam etsin)
             GoToState(CustomerState.Ordering);
 
-            // Sipariþi bul ve diyaloðu baþlat
-            var selectedOrderSet = currentProfile.PossibleOrders.FirstOrDefault(x => x.Order == currentOrder);
-
-            if (selectedOrderSet.OrderDialogue != null)
+            if (assignedDialogue != null)
             {
-                DialogueManager.Instance.StartDialogue(selectedOrderSet.OrderDialogue);
+                // Diyaloðu baþlat ve BÝTÝNCE ne yapacaðýný söyle (Callback)
+                DialogueManager.Instance.StartDialogue(assignedDialogue, OnOrderingFinished);
             }
             else
             {
-                // Diyalog yoksa direkt sipariþi vermiþ sayalým (Test için)
-                Debug.LogWarning("Müþterinin bu sipariþ için diyaloðu yok!");
-                HandleFinishDialogue();
+                Debug.LogWarning("Müþterinin diyaloðu yok! Direkt sipariþ vermiþ sayýyorum.");
+                OnOrderingFinished();
             }
         }
     }
 
-    // --- TEPSÝ ALMA ---
+    // Callback Fonksiyonu: Diyalog bitince burasý çalýþacak
+    private void OnOrderingFinished()
+    {
+        // Ekrana sipariþi yazdýrabilirsin (UI Manager'a haber ver)
+        // UIManager.Instance.ShowOrderTicket(currentOrder);
+
+        // Sipariþ beklemeye geç
+        GoToState(CustomerState.WaitingForFood);
+    }
+
     public bool TryReceiveTray(Tray tray)
     {
         if (CurrentState != CustomerState.WaitingForFood) return false;
@@ -209,69 +304,50 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
         if (isOrderCorrect)
         {
-            // 1. Tepsiyi Kap
             GrabTray(tray);
 
-            // 2. Teþekkür et
             if (currentProfile.CorrectOrderDialogue)
                 DialogueManager.Instance.StartDialogue(currentProfile.CorrectOrderDialogue);
             else
-                HandleFinishDialogue(); // Diyalog yoksa direkt git
+                HandleFinishDialogue();
 
             return true;
         }
         else
         {
-            // Yanlýþ Sipariþ
             if (currentProfile.WrongOrderDialogue)
                 DialogueManager.Instance.StartDialogue(currentProfile.WrongOrderDialogue);
-
-            // Yanlýþta tepsiyi almýyoruz, geri dönüyoruz.
             return false;
         }
     }
 
     private void GrabTray(Tray tray)
     {
-        // Tray scriptindeki "OnGrab" benzeri cleanup iþlemleri
-        // Ama oyuncu deðil NPC aldýðý için manual yapýyoruz.
-
-        // Fiziði kapat
         var trayRb = tray.GetComponent<Rigidbody>();
         if (trayRb) trayRb.isKinematic = true;
 
         var trayCol = tray.GetComponent<Collider>();
         if (trayCol) trayCol.enabled = false;
 
-        // Ebeveyn deðiþtir (Chest Point)
         tray.transform.SetParent(trayHoldPoint != null ? trayHoldPoint : transform);
 
-        // Yumuþak geçiþ (Snap)
         tray.transform.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutBack);
         tray.transform.DOLocalRotate(Vector3.zero, 0.5f);
-
-        // Eðer Animation Rigging (TwoBoneIK) kullanýyorsan, burada Target'ý tepsiye çekmen gerekir.
-        // anim.SetIKPositionWeight(...) veya Rig Builder weight = 1
     }
 
-    // --- DÝYALOG BÝTÝÞÝ (DialogueManager çaðýrýr) ---
     public void HandleFinishDialogue()
     {
-        // Hangi aþamadaydýk?
         if (CurrentState == CustomerState.Ordering)
         {
-            // Sipariþi verdi, þimdi beklemeye geçiyor
             GoToState(CustomerState.WaitingForFood);
         }
-        else if (CurrentState == CustomerState.WaitingForFood) // Teþekkür diyaloðu bitti
+        else if (CurrentState == CustomerState.WaitingForFood)
         {
-            // Yemeðe gidiyor
             GoToState(CustomerState.MovingToSeat);
         }
         else if (CurrentState == CustomerState.Eating)
         {
-            // Yemek bitti diyaloðu (varsa) -> Eve git
-            GoToState(CustomerState.Leaving); // Leaving state'i eklersen
+            GoToState(CustomerState.Leaving);
         }
     }
 
@@ -279,45 +355,83 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     {
         CurrentState = newState;
 
-        // State'e özel ayarlar
         switch (newState)
         {
+            // --- FIX 3: EKSÝK OLAN ANIMASYONLARI EKLEDÝM ---
+            case CustomerState.ApproachingDoor:
+                agent.isStopped = false;
+                agent.updateRotation = true;
+                anim.SetBool("walk", true); // Artýk kapýya giderken yürüyecek!
+                break;
+
+            case CustomerState.Leaving: // Çýkarken de yürümeli
+                agent.isStopped = false;
+                agent.updateRotation = true;
+                anim.SetBool("walk", true);
+                break;
+            // ------------------------------------------------
+
+            case CustomerState.Entering:
+                agent.isStopped = false;
+                agent.updateRotation = true;
+                anim.SetBool("walk", true);
+
+                // --- FIX: NULL CHECK VE GÜVENLÝK ---
+                if (counterPoint == null)
+                {
+                    // Eðer deðiþken boþsa, WorldManager'dan tekrar çekmeyi dene
+                    if (WorldManager.Instance != null)
+                        counterPoint = WorldManager.Instance.GetCounterPosition();
+                }
+
+                if (counterPoint != null)
+                {
+                    agent.SetDestination(counterPoint.position);
+                }
+                else
+                {
+                    // Buraya düþüyorsa WorldManager sahneye koyulmamýþ veya Instance oluþmamýþ demektir.
+                    Debug.LogError($"KRÝTÝK HATA: '{gameObject.name}' kasaya gidemiyor çünkü CounterPoint YOK! WorldManager sahnede mi?");
+                }
+                break;
+
             case CustomerState.AtCounter:
                 CanInteract = true;
-                ChangeLayer(interactableLayer); // Layer aç
-                agent.isStopped = true; // Dur
-                anim.SetBool("Idle", true); // Animasyon
+                ChangeLayer(interactableLayer);
+
+                // --- BURAYI GÜÇLENDÝRDÝK ---
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero; // Fiziði tamamen öldür
+                agent.ResetPath(); // Hedefi unut ki tekrar yürümeye kalkmasýn
+
+                anim.SetBool("walk", false);
+                // ---------------------------
                 break;
 
             case CustomerState.Ordering:
-                CanInteract = false; // Konuþurken tekrar týklanmasýn
+                CanInteract = false;
                 ChangeLayer(uninteractableLayer);
                 break;
 
             case CustomerState.WaitingForFood:
-                CanInteract = false; // Tepsi beklerken etkileþim yok (Tepsi triggerý hariç)
+                CanInteract = false;
                 ChangeLayer(uninteractableLayer);
-                // Burada "OrderThrowArea" aktif edilecek (GameManager üzerinden)
-                // GameManager.Instance.SetOrderThrowArea(true);
                 break;
 
             case CustomerState.MovingToSeat:
                 agent.isStopped = false;
-                agent.updateRotation = true; // Yürürken rotasyonu geri aç
-                anim.SetBool("Idle", false);
-                anim.SetBool("Walking", true); // Yürüme animasyonu
+                agent.updateRotation = true;
+                anim.SetBool("walk", true);
                 break;
 
             case CustomerState.Eating:
                 agent.isStopped = true;
-                anim.SetBool("Walking", false);
+                anim.SetBool("walk", false);
                 anim.SetBool("Sitting", true);
-                // Rotasyonu koltuða göre ayarla (Seat scriptinden gelen veriyle)
                 break;
         }
     }
 
-    // --- UTILS ---
     public void OnFocus()
     {
         if (!CanInteract) return;
@@ -340,6 +454,7 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
     public void ChangeLayer(int layer)
     {
+        gameObject.layer = layer;
         if (meshRenderer) meshRenderer.gameObject.layer = layer;
     }
 
@@ -350,6 +465,65 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
     public void OnScareEvent()
     {
-        // Korku eventi (Zýplama, Baðýrma vs.)
+    }
+
+    public IEnumerator EatingRoutine()
+    {
+        yield return new WaitForSeconds(5f);
+        StartLeaving();
+    }
+
+    public void StartLeaving()
+    {
+        if (assignedTable != null) assignedTable.ReleaseTable();
+
+        isLeavingShop = true;
+
+        var exitInfo = WorldManager.Instance.GetRandomExitDoor();
+        currentTargetDoor = exitInfo.targetDoor;
+
+        agent.SetDestination(exitInfo.interactionPoint.position);
+
+        anim.SetBool("Sitting", false);
+        // agent.isStopped ve animasyon ayarý GoToState içinde yapýlýyor
+
+        GoToState(CustomerState.ApproachingDoor);
+    }
+
+    private IEnumerator DoorInteractionRoutine()
+    {
+        isInteractingWithDoor = true; // KÝLÝTLE
+
+        agent.isStopped = true;
+        anim.SetBool("walk", false);
+
+        if (currentTargetDoor != null && !currentTargetDoor.isOpened)
+        {
+            transform.DOLookAt(currentTargetDoor.transform.position, 0.3f, AxisConstraint.Y);
+            yield return new WaitForSeconds(0.3f);
+
+            currentTargetDoor.OpenByNPC();
+            yield return new WaitForSeconds(0.3f);
+        }
+
+        agent.isStopped = false;
+
+        if (isLeavingShop)
+        {
+            // Çýkýyoruz -> Despawn Noktasýna git
+            Transform despawnPoint = WorldManager.Instance.GetSpawnPosition(); // User isteði: Spawn ve Despawn ayný
+            if (despawnPoint != null)
+                agent.SetDestination(despawnPoint.position);
+
+            GoToState(CustomerState.Leaving);
+        }
+        else
+        {
+            // Giriyoruz -> Kasaya git
+            // Counter point zaten null check ile GoToState içinde kullanýlýyor
+            GoToState(CustomerState.Entering);
+        }
+
+        isInteractingWithDoor = false; // KÝLÝDÝ AÇ (Gerçi state deðiþtiði için gerek kalmaz ama temizlik)
     }
 }

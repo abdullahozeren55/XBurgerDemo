@@ -14,28 +14,58 @@ public enum CookAmount
     REGULAR,
     BURNT
 }
+
+// Müşterileri kodda tanımak için Enum (String yerine Enum daha güvenli)
+public enum CustomerID
+{
+    None,       // Boş/Tanımsız durumlar için
+    Player,     // Sinan (Sen)
+
+    // --- Müşteriler ---
+    FamilyFather,
+    FamilyMother,
+    FamilyKid,
+    OldMan,
+    OldWoman,
+    AloneKid,
+    TeenGirl0,
+    TeenGirl1,
+
+    // --- Diğer Hedefler (Gerekirse eklersin) ---
+    // Radio,
+    // TV,
+    // TableCenter
+}
 public class GameManager : MonoBehaviour
 {
     public enum BurgerTypes
     {
+        Null,
         ClassicBurger,
         CheeseBurger,
         DoubleCheeseBurger,
         FullyLoadedBurger,
-        BudgetBurger,
-        BrokeAhhBurger,
-        GoutBurger,
-        XBurger,
-        LongAhhBurger,
-        TomatoLoverBurger,
-        BBQBurger,
-        BasicBurger,
-        RandomBullShitBurger,
-        Null
+        GardenBurger,
+        DoubleGardenBurger,
+        SmokedBurger,
+        FlamingBurger,
+        PlusBurger,
+        CrispyChickenBurger,
+        FlamingChickenBurger,
+        SmokedChickenBurger,
+        ExtremeChickenBurger,
+        ChickBurger,
+        GrownUpBurger,
+        UndefinedBurger0,
+        UndefinedBurger1,
+        UndefinedBurger2,
+        UndefinedBurger3,
+        UndefinedBurger4,
     }
 
     public enum DrinkTypes
     {
+        Null,
         Cola,
         OrangeSoda,
         LemonLime,
@@ -43,7 +73,6 @@ public class GameManager : MonoBehaviour
         Lemonade,
         CherryJuice,
         Ayran,
-        Null
     }
 
     public enum CupSize
@@ -81,6 +110,9 @@ public class GameManager : MonoBehaviour
     private bool _savedCursorLocked = true;                     // Hafızadaki kilit durumu
 
     [Header("Burger Lists")]
+    public List<BurgerIngredientData.IngredientType> nullBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> nullBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
     public List<BurgerIngredientData.IngredientType> classicBurger = new List<BurgerIngredientData.IngredientType>();
     public List <SauceBottle.SauceType> classicBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
@@ -93,29 +125,38 @@ public class GameManager : MonoBehaviour
     public List<BurgerIngredientData.IngredientType> fullyLoadedBurger = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> fullyLoadedBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> budgetBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> budgetBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> gardenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> gardenBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> brokeAhhBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> brokeAhhBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> doubleGardenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> doubleGardenBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> goutBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> goutBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> smokedBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> smokedBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> xBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> xBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> flamingBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> flamingBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> longAhhBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> longAhhBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> plusBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> plusBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> tomatoLoverBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> tomatoLoverBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> crispyChickenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> crispyChickenBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> bbqBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> bbqBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> flamingChickenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> flamingChickenBurgerSauces = new List<SauceBottle.SauceType>();
     [Space]
-    public List<BurgerIngredientData.IngredientType> basicBurger = new List<BurgerIngredientData.IngredientType>();
-    public List<SauceBottle.SauceType> basicBurgerSauces = new List<SauceBottle.SauceType>();
+    public List<BurgerIngredientData.IngredientType> smokedChickenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> smokedChickenBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
+    public List<BurgerIngredientData.IngredientType> extremeChickenBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> extremeChickenBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
+    public List<BurgerIngredientData.IngredientType> chickBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> chickBurgerSauces = new List<SauceBottle.SauceType>();
+    [Space]
+    public List<BurgerIngredientData.IngredientType> grownUpBurger = new List<BurgerIngredientData.IngredientType>();
+    public List<SauceBottle.SauceType> grownUpBurgerSauces = new List<SauceBottle.SauceType>();
 
     private List<List<BurgerIngredientData.IngredientType>> allBurgerMenus;
     private List<List<SauceBottle.SauceType>> allBurgerSauces;
@@ -148,34 +189,42 @@ public class GameManager : MonoBehaviour
 
         allBurgerMenus = new List<List<BurgerIngredientData.IngredientType>>()
         {
+            nullBurger,
             classicBurger,
             cheeseBurger,
             doubleCheeseBurger,
             fullyLoadedBurger,
-            budgetBurger,
-            brokeAhhBurger,
-            goutBurger,
-            xBurger,
-            longAhhBurger,
-            tomatoLoverBurger,
-            bbqBurger,
-            basicBurger,
+            gardenBurger,
+            doubleGardenBurger,
+            smokedBurger,
+            flamingBurger,
+            plusBurger,
+            crispyChickenBurger,
+            flamingChickenBurger,
+            smokedChickenBurger,
+            extremeChickenBurger,
+            chickBurger,
+            grownUpBurger,
         };
 
         allBurgerSauces = new List<List<SauceBottle.SauceType>>()
         {
+            nullBurgerSauces,
             classicBurgerSauces,
             cheeseBurgerSauces,
             doubleCheeseBurgerSauces,
             fullyLoadedBurgerSauces,
-            budgetBurgerSauces,
-            brokeAhhBurgerSauces,
-            goutBurgerSauces,
-            xBurgerSauces,
-            longAhhBurgerSauces,
-            tomatoLoverBurgerSauces,
-            bbqBurgerSauces,
-            basicBurgerSauces
+            gardenBurgerSauces,
+            doubleGardenBurgerSauces,
+            smokedBurgerSauces,
+            flamingBurgerSauces,
+            plusBurgerSauces,
+            crispyChickenBurgerSauces,
+            flamingChickenBurgerSauces,
+            smokedChickenBurgerSauces,
+            extremeChickenBurgerSauces,
+            chickBurgerSauces,
+            grownUpBurgerSauces,
         };
 
         SetOrderThrowArea(false);
@@ -261,7 +310,34 @@ public class GameManager : MonoBehaviour
         }
 
         // Hiçbiri tutmadıysa -> Random Bullshit Burger (Enum'ın son elemanı)
-        return BurgerTypes.RandomBullShitBurger;
+        return FindCurrentUndefinedBurger();
+    }
+
+    private BurgerTypes FindCurrentUndefinedBurger()
+    {
+        if (LoopManager.Instance == null) return BurgerTypes.UndefinedBurger0; //FALLBACK
+
+        switch (LoopManager.Instance.LoopCount)
+        {
+            case 0:
+                return BurgerTypes.UndefinedBurger0;
+
+            case 1:
+                return BurgerTypes.UndefinedBurger1;
+
+            case 2:
+                return BurgerTypes.UndefinedBurger2;
+
+            case 3:
+                return BurgerTypes.UndefinedBurger3;
+
+            case 4:
+                return BurgerTypes.UndefinedBurger4;
+
+            default:
+                return BurgerTypes.UndefinedBurger0;
+        }
+
     }
 
     private bool AreListsEqual(List<BurgerIngredientData.IngredientType> list1, List<BurgerIngredientData.IngredientType> list2)

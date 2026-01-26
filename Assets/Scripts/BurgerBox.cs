@@ -1,6 +1,6 @@
 using DG.Tweening;
-using UnityEngine;
 using System.Collections.Generic; // List için gerekli
+using UnityEngine;
 
 public class BurgerBox : MonoBehaviour, IGrabable
 {
@@ -41,7 +41,7 @@ public class BurgerBox : MonoBehaviour, IGrabable
 
     public string FocusTextKey
     {
-        get { return data.focusTextKeys[0]; }
+        get { return data.focusTextKeys[(int)ContainedBurgerType]; }
         set { }
     }
 

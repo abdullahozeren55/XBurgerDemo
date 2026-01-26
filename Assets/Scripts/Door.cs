@@ -1,39 +1,35 @@
 using DG.Tweening;
 using System.Collections;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using static CameraManager;
+using UnityEngine.AI; // NavMeshObstacle için gerekli
 
 public class Door : MonoBehaviour, IInteractable
 {
+    // ... (Eski deðiþkenler aynen kalýyor) ...
     public bool CanInteract { get => canInteract; set => canInteract = value; }
     [SerializeField] private bool canInteract;
-
     public DoorData data;
 
-    public enum DoorState
-    {
-        Normal,
-        Locked,
-        Jumpscare
-    }
-
+    public enum DoorState { Normal, Locked, Jumpscare }
     public DoorState doorState = DoorState.Normal;
 
-    [Header("Settings")] 
+    [Header("NPC & NavMesh Settings")]
+    [SerializeField] private NavMeshObstacle navObstacle; // Inspector'dan ata
+    [SerializeField] private bool autoCloseForNPC = true;
+    [SerializeField] private float autoCloseDelay = 3f;
+
+    // ... (Jumpscare vs deðiþkenleri aynen kalsýn) ...
+    [Header("Settings")]
     [SerializeField] private GameObject jumpscareGO;
     public bool shouldBeUninteractableAfterInteraction;
     public bool shouldPlayDialogueAfterInteraction;
-    [Space]
     public DialogueData dialogueAfterInteraction;
     private bool isDialoguePlayed = false;
     private bool isLockedAnimating = false;
-    
+
     public string FocusTextKey { get => data.focusTextKeys[doorStateNum]; set => data.focusTextKeys[doorStateNum] = value; }
     private int doorStateNum = 0;
     public PlayerManager.HandRigTypes HandRigType { get => data.handRigType; set => data.handRigType = value; }
-
     public bool OutlineShouldBeRed { get => outlineShouldBeRed; set => outlineShouldBeRed = value; }
     private bool outlineShouldBeRed;
 
@@ -41,14 +37,17 @@ public class Door : MonoBehaviour, IInteractable
     private Vector3 closeEuler;
     private Vector3 openEuler;
 
+    // Layers
     private int interactableLayer;
     private int interactableOutlinedLayer;
     private int interactableOutlinedRedLayer;
     private int uninteractableLayer;
 
+    private Coroutine autoCloseCoroutine;
+
     private void Awake()
     {
-
+        // Parent üzerinden dönüyor, koruyoruz
         closeEuler = transform.parent.localRotation.eulerAngles;
         openEuler = new Vector3(closeEuler.x, closeEuler.y + data.openYRotation, closeEuler.z);
 
@@ -56,56 +55,86 @@ public class Door : MonoBehaviour, IInteractable
         interactableOutlinedLayer = LayerMask.NameToLayer("InteractableOutlined");
         interactableOutlinedRedLayer = LayerMask.NameToLayer("InteractableOutlinedRed");
         uninteractableLayer = LayerMask.NameToLayer("Uninteractable");
+
+        // Baþlangýçta obstacle ayarý
+        if (navObstacle != null)
+        {
+            navObstacle.carving = true; // Kapalýyken delik açsýn
+        }
     }
 
-    public void ChangeLayer(int layerIndex)
-    {
-        gameObject.layer = layerIndex;
-    }
-
-    public void HandleFinishDialogue()
-    {
-    }
-
+    // --- OYUNCU ÝÇÝN (E Tuþu) ---
     public void OnInteract()
     {
         if (!CanInteract) return;
+        ToggleDoor(true); // Player açtý
+    }
 
+    // --- NPC ÝÇÝN (Müþteri) ---
+    public void OpenByNPC()
+    {
+        if (isOpened) return; // Zaten açýksa elleme
+        ToggleDoor(false); // NPC açtý, ses/efekt farký olabilir diye ayýrdým
+
+        // Otomatik kapatma
+        if (autoCloseForNPC)
+        {
+            if (autoCloseCoroutine != null) StopCoroutine(autoCloseCoroutine);
+            autoCloseCoroutine = StartCoroutine(AutoCloseRoutine());
+        }
+    }
+
+    private void ToggleDoor(bool isPlayerAction)
+    {
         switch (doorState)
         {
             case DoorState.Normal:
-                HandleRotation();
+                HandleRotation(isPlayerAction);
                 break;
-
             case DoorState.Locked:
-                HandleLocked();
+                HandleLocked(); // Kilitliyse NPC de açamaz
                 break;
-
             case DoorState.Jumpscare:
                 HandleJumpscare();
                 break;
         }
-
-        if (shouldPlayDialogueAfterInteraction && !isDialoguePlayed)
-        {
-            //TODO: YENÝ DÝYALOG SÝSTEMÝNE GEÇÝLECEK. ESKÝSÝ => DialogueManager.Instance.StartAfterInteractionSelfDialogue(this, shouldBeUninteractableAfterInteraction, dialogueAfterInteraction);
-            isDialoguePlayed = true;
-        }
     }
 
-    public void HandleRotation()
+    public void HandleRotation(bool isPlayerAction)
     {
         isOpened = !isOpened;
+
+        // --- NAVMESH UPDATE ---
+        if (navObstacle != null)
+        {
+            // Eðer açýldýysa carving kapat (geçilebilir olsun)
+            // Eðer kapandýysa carving aç (duvar olsun)
+            navObstacle.carving = !isOpened;
+        }
+        // ----------------------
+
         SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform, data.openVolume, 1f, 1f, true, data.audioTag);
 
         doorStateNum = isOpened ? 1 : 0;
-
-        PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
+        if (PlayerManager.Instance != null) PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
 
         transform.parent.DOKill();
         transform.parent.DOLocalRotate(isOpened ? openEuler : closeEuler, data.timeToRotate)
             .SetEase(Ease.InOutSine);
     }
+
+    private IEnumerator AutoCloseRoutine()
+    {
+        yield return new WaitForSeconds(autoCloseDelay);
+        if (isOpened)
+        {
+            // Kapýyý kapat
+            HandleRotation(false);
+        }
+    }
+
+    // ... (HandleLocked, HandleJumpscare, OnFocus, OnLoseFocus AYNEN KALSIN) ...
+    // Sadece HandleJumpscare içinde de navObstacle.carving = false; yapmayý unutma ki kapý uçunca geçilebilsin.
 
     private void HandleLocked()
     {
@@ -125,80 +154,48 @@ public class Door : MonoBehaviour, IInteractable
            .OnComplete(() =>
            {
                doorStateNum = 2;
-
                PlayerManager.Instance.TryChangingFocusText(this, FocusTextKey);
-
                isLockedAnimating = false;
            });
     }
 
     private void HandleJumpscare()
     {
-
         ChangeLayer(uninteractableLayer);
         isOpened = true;
 
+        if (navObstacle != null) navObstacle.carving = false; // Geçilebilir yap
+
         SoundManager.Instance.PlaySoundFX(isOpened ? data.openSound : data.closeSound, transform, data.openVolume, 1f, 1f);
 
-        // Baþlangýç pozisyonu
         Vector3 startPos = jumpscareGO.transform.position;
         Vector3 targetPos = startPos + transform.TransformDirection(data.jumpscareMoveAmount);
 
-        // Kapý açýlma tweener'ý
-        Tween doorTween = transform.parent.DOLocalRotate(openEuler, data.timeToRotate)
-            .SetEase(Ease.InOutSine);
+        Tween doorTween = transform.parent.DOLocalRotate(openEuler, data.timeToRotate).SetEase(Ease.InOutSine);
+        Tween jumpscareTween = jumpscareGO.transform.DOMove(targetPos, data.timeToJumpscare).SetEase(Ease.OutBack);
 
-        // Jumpscare tweener'ý
-        Tween jumpscareTween = jumpscareGO.transform.DOMove(targetPos, data.timeToJumpscare)
-            .SetEase(Ease.OutBack);
-
-        // Sequence ile birleþtirme
         Sequence seq = DOTween.Sequence();
         seq.Append(doorTween);
-
-        seq.Insert(data.timeToRotate * data.jumpscareDoorRotatePercentValue, jumpscareTween); // Kapý animasyonunun %x'inde baþlasýn
-
+        seq.Insert(data.timeToRotate * data.jumpscareDoorRotatePercentValue, jumpscareTween);
         seq.InsertCallback(data.timeToRotate * data.jumpscareSoundEffectPercentValue, () =>
         {
             SoundManager.Instance.PlaySoundFX(data.jumpscareSound, transform, data.jumpscareVolume, 1f, 1f);
         });
-
         seq.InsertCallback(data.timeToRotate * data.jumpscareEffectPercentValue, () =>
         {
             CameraManager.Instance.PlayJumpscareEffects(data.jumpscareType);
         });
-
-        // Bitince state normal'e dönsün
         seq.OnComplete(() =>
         {
             doorState = DoorState.Normal;
         });
     }
 
-    public void OnFocus()
-    {
-        if (!CanInteract) return;
-
-        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer);
-    }
-
-    public void OnLoseFocus()
-    {
-        if (!CanInteract) return;
-
-        ChangeLayer(interactableLayer);
-    }
-
-    public void OutlineChangeCheck()
-    {
-        if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
-            ChangeLayer(interactableOutlinedRedLayer);
-        else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
-            ChangeLayer(interactableOutlinedLayer);
-    }
-
-    public void SetLayerUninteractable(bool should)
-    {
-        ChangeLayer(should ? uninteractableLayer : interactableLayer);
-    }
+    // ... (Interface implementation'lar aynen kalýyor) ...
+    public void ChangeLayer(int layerIndex) { gameObject.layer = layerIndex; }
+    public void HandleFinishDialogue() { }
+    public void OnFocus() { if (!CanInteract) return; ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer); }
+    public void OnLoseFocus() { if (!CanInteract) return; ChangeLayer(interactableLayer); }
+    public void OutlineChangeCheck() { if (gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed) ChangeLayer(interactableOutlinedRedLayer); else if (gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed) ChangeLayer(interactableOutlinedLayer); }
+    public void SetLayerUninteractable(bool should) { ChangeLayer(should ? uninteractableLayer : interactableLayer); }
 }

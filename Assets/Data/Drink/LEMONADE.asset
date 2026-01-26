@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LEMONADE
   m_EditorClassIdentifier: 
   focusTextKey: GRABABLE_LEMONADE
-  drinkType: 4
+  drinkType: 5
   handGrabType: 1
   handRigType: 1
   iconData:

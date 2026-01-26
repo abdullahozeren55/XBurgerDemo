@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "HorrorGame/Level Scenario")]
+[CreateAssetMenu(fileName = "NewLevelScenerio", menuName = "Data/LevelScenerio")]
 public class LevelScenario : ScriptableObject
 {
-    public int DayIndex; // Örn: 1. Gün
+    public int LoopIndex; // Örn: 1. Loop
     public List<CustomerGroupData> Waves; // Müþteri dalgalarý
 }
 
@@ -23,17 +23,4 @@ public struct CustomerRoleAssignment
 {
     public CustomerID ID; // Kim bu?
     public CustomerProfile ProfileForToday; // Bugün ne giyecek, ne yiyecek? (Hasta hali, Mutlu hali vs.)
-}
-
-// Müþterileri kodda tanýmak için Enum (String yerine Enum daha güvenli)
-public enum CustomerID
-{
-    FamilyFather,
-    FamilyMother,
-    FamilyKid,
-    OldMan,
-    OldWoman,
-    AloneKid,
-    TeenGirl0,
-    TeenGirl1,
 }

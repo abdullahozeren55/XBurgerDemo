@@ -2869,6 +2869,66 @@
     "es": "VSync",
     "ru": "VSync",
     "pt": "VSync"
+  },
+  {
+    "key": "TEENGIRL0_GREETING_0",
+    "tr": "Merhaba kolay gelsin.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
+  },
+  {
+    "key": "TEENGIRL0_GREETING_1",
+    "tr": "Kolay gelsin.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
+  },
+  {
+    "key": "TEENGIRL0_GREETING_2",
+    "tr": "Merhaba.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
+  },
+  {
+    "key": "TEENGIRL0_CRISPYCHICKEN_COLA",
+    "tr": "Bi Çıtır Tavuk Burger bi de Kola istiyorum.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
+  },
+  {
+    "key": "TEENGIRL0_CHEESEBURGER_COLA",
+    "tr": "Bi Çizburger bi de Kola istiyorum.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
+  },
+  {
+    "key": "TEENGIRL0_GARDENBURGER_ORANGESODA",
+    "tr": "Bi Bahçıvan Burger bi de Portakallı Gazoz istiyorum.",
+    "en": "...",
+    "zh": "...",
+    "ja": "...",
+    "es": "...",
+    "ru": "...",
+    "pt": "..."
   }
 ]
 

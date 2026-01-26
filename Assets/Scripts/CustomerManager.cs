@@ -27,9 +27,11 @@ public class CustomerManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
+    private IEnumerator Start() // void yerine IEnumerator
     {
-        // Test için Start'ta baþlatýyoruz, normalde GameManager baþlatýr
+        // Bir kare bekle. Bu, tüm Singletonlarýn hazýr olmasýný garantiler.
+        yield return null;
+
         if (CurrentScenario != null)
             StartCoroutine(RunScenarioRoutine());
     }

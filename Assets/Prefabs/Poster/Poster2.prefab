@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 2053957877360227748}
   - component: {fileID: 6997104476409177429}
   - component: {fileID: 6971901394295448584}
-  - component: {fileID: 1477871582082202391}
   - component: {fileID: 6400974484683906263}
+  - component: {fileID: 636469172324249226}
   m_Layer: 7
   m_Name: Poster2
   m_TagString: Ground
@@ -85,27 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1477871582082202391
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3308567649766359341}
-  m_Material: {fileID: 13400000, guid: 98dae046336849249ae2f6e68b60bb31, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.0004461, y: 0.088841, z: 1.40082}
-  m_Center: {x: -0.00022311509, y: 0.039860863, z: 0.00040984162}
 --- !u!114 &6400974484683906263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,3 +169,24 @@ MonoBehaviour:
       material: {fileID: 2100000, guid: 0044a4fd4d211154d86c823b433f523c, type: 2}
     - loopIndex: 2
       material: {fileID: 2100000, guid: 939eafa5643cf7b448ca0182c1d5a250, type: 2}
+--- !u!65 &636469172324249226
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3308567649766359341}
+  m_Material: {fileID: 13400000, guid: 98dae046336849249ae2f6e68b60bb31, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0004461, y: 0.08884098, z: 1.4008197}
+  m_Center: {x: -0.00022311509, y: 0.039860852, z: 0.00040984154}

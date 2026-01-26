@@ -7,6 +7,7 @@ public class CustomerProfile : ScriptableObject
     public string ProfileID; // "OldMan", "Teenager"
     public Material SkinMaterial; // Görünüþü
     public float WalkSpeed = 3.5f;
+    public float ArrivalDistance = 0.5f;
 
     [System.Serializable]
     public struct PotentialOrder

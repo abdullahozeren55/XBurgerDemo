@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AYRAN
   m_EditorClassIdentifier: 
   focusTextKey: GRABABLE_AYRAN
-  drinkType: 6
+  drinkType: 7
   handGrabType: 1
   handRigType: 1
   iconData:

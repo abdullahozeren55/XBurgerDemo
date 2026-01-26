@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9d4b025253a01428d678aaf123643f, type: 3}
+  m_Name: TeenGirl0
+  m_EditorClassIdentifier: 
+  ProfileID: TeenGirl0
+  SkinMaterial: {fileID: 2100000, guid: ef4e9ee46bb11c446afa5b924ce387e6, type: 2}
+  WalkSpeed: 2
+  ArrivalDistance: 0.2
+  PossibleOrders:
+  - Order: {fileID: 11400000, guid: ad7f0333ae6c17d48a36c8c97a4fe159, type: 2}
+    OrderDialogue: {fileID: 11400000, guid: 6ec247b077d348c47942a377a55fe252, type: 2}
+  - Order: {fileID: 11400000, guid: ab0898b132ccf8f42975babde904e8bd, type: 2}
+    OrderDialogue: {fileID: 11400000, guid: e202e55c36c5c2f489f9b991f085efa2, type: 2}
+  - Order: {fileID: 11400000, guid: c764a92bd6f3d5549a6315362b879d45, type: 2}
+    OrderDialogue: {fileID: 11400000, guid: 489e48d125b603748b4485504893b5d0, type: 2}
+  WrongOrderDialogue: {fileID: 0}
+  CorrectOrderDialogue: {fileID: 0}

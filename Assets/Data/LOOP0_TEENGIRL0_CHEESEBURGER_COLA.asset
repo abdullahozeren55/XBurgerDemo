@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02eb87e73e22d8241af6e84e70b394ab, type: 3}
+  m_Name: LOOP0_TEENGIRL0_CHEESEBURGER_COLA
+  m_EditorClassIdentifier: 
+  lines:
+  - SpeakerID: 8
+    LocalizationKey: TEENGIRL0_GREETING_1
+    TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
+    FocusTargetID: 8
+    CamMoveDuration: 1
+    CamMoveEase: 4
+    DutchAngle: 0
+    TargetFOV: 60
+    NoiseType: 1
+    NoiseAmplitudeMultiplier: 1
+    NoiseFrequencyMultiplier: 1
+    IsGlitchLine: 0
+    glitchType: 0
+    GlitchAltKey: 
+    GlitchDuration: 0
+    CustomVoiceOrSFX: {fileID: 0}
+    EventTag: 
+  - SpeakerID: 8
+    LocalizationKey: TEENGIRL0_CHEESEBURGER_COLA
+    TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
+    FocusTargetID: 8
+    CamMoveDuration: 1
+    CamMoveEase: 4
+    DutchAngle: 0
+    TargetFOV: 60
+    NoiseType: 1
+    NoiseAmplitudeMultiplier: 1
+    NoiseFrequencyMultiplier: 1
+    IsGlitchLine: 0
+    glitchType: 0
+    GlitchAltKey: 
+    GlitchDuration: 0
+    CustomVoiceOrSFX: {fileID: 0}
+    EventTag: 

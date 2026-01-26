@@ -199,6 +199,8 @@ public class Knife : MonoBehaviour, IGrabable
 
     private void StickToSurface(Collision collision)
     {
+        if (collision.gameObject.CompareTag("Balloon") || collision.gameObject.CompareTag("Customer")) return;
+
         // Get the surface normal from the collision
         Vector3 surfaceNormal = collision.GetContact(0).normal;
 
@@ -219,7 +221,7 @@ public class Knife : MonoBehaviour, IGrabable
         rb.angularVelocity = Vector3.zero;
 
         // Attach the knife to the surface (set parent to the wall or surface)
-        transform.SetParent(collision.transform);
+        transform.SetParent(collision.transform, true);
         rb.isKinematic = true;
 
         Instantiate(data.throwParticles, knifeEdgeTransform.position, Quaternion.identity);

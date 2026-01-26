@@ -23,6 +23,7 @@ TagManager:
   - Car
   - Grill
   - Balloon
+  - Ball
   layers:
   - Default
   - TransparentFX

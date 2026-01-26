@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CHERRYJUICE
   m_EditorClassIdentifier: 
   focusTextKey: GRABABLE_CHERRY_JUICE
-  drinkType: 5
+  drinkType: 6
   handGrabType: 1
   handRigType: 1
   iconData:

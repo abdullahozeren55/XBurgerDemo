@@ -43,9 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: Typecast_DefaultOutlined
   m_EditorClassIdentifier: 
-  hashCode: -1549909123
+  hashCode: -1387837683
   material: {fileID: -3981377753250825819}
-  materialHashCode: 116476349
+  materialHashCode: -1760540531
   m_Version: 1.1.0
   m_SourceFontFileGUID: 3849833754833de48976063d68fa41aa
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 3849833754833de48976063d68fa41aa, type: 3}

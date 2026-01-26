@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 3610479892853279118}
   - component: {fileID: 7335435365834864709}
   - component: {fileID: 6854231333666997441}
-  - component: {fileID: 3117311527774634476}
   - component: {fileID: 6700404248342293947}
+  - component: {fileID: 1412514138622828109}
   m_Layer: 7
   m_Name: Poster3
   m_TagString: Ground
@@ -85,27 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3117311527774634476
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6304203188984412034}
-  m_Material: {fileID: 13400000, guid: 98dae046336849249ae2f6e68b60bb31, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.0013127, y: 0.073438495, z: 1.4008197}
-  m_Center: {x: -0.00065644085, y: 0.032159604, z: 0.00040984154}
 --- !u!114 &6700404248342293947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,3 +169,24 @@ MonoBehaviour:
       material: {fileID: 2100000, guid: cd151a3c0ff0bab4f8aa84030fc027f2, type: 2}
     - loopIndex: 2
       material: {fileID: 2100000, guid: 295392781c011a34384ad4b1b66c1b86, type: 2}
+--- !u!65 &1412514138622828109
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6304203188984412034}
+  m_Material: {fileID: 13400000, guid: 98dae046336849249ae2f6e68b60bb31, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0013127, y: 0.073438495, z: 1.4008197}
+  m_Center: {x: -0.00065644085, y: 0.032159604, z: 0.00040984154}
