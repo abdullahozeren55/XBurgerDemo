@@ -66,6 +66,7 @@ public class Settings : MonoBehaviour
 
     public static event Action OnPromptsChanged;
     public static event Action OnStickLayoutChangedEvent;
+    public static event Action<float> OnDistortionChanged;
     public static bool IsXboxPrompts = true;
 
     [Header("Audio Sliders")]
@@ -377,6 +378,9 @@ public class Settings : MonoBehaviour
 
         // Çarpanı Başlangıçta Ayarla
         UpdateDistortionMultiplier(savedIndex);
+
+        // YENİ: Başlangıçta event'i tetikle ki herkes güncel değeri bilsin
+        OnDistortionChanged?.Invoke(GlobalDistortionMultiplier);
     }
 
     // --- YENİ SETTER METODU (Unity Event'e Bağlayacaksın) ---
@@ -386,7 +390,8 @@ public class Settings : MonoBehaviour
         PlayerPrefs.Save();
         UpdateDistortionMultiplier(index);
 
-        Debug.Log($"Distortion Level Set: {index} (Multiplier: {GlobalDistortionMultiplier})");
+        // YENİ: Değişikliği herkese duyur
+        OnDistortionChanged?.Invoke(GlobalDistortionMultiplier);
     }
 
     // --- YENİ HELPER: ÇARPAN MANTIĞI ---

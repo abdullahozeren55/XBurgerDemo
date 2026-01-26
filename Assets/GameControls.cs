@@ -217,6 +217,24 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CycleSlotLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""e072f6a1-c9fb-41cc-90ff-9412ea40f582"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CycleSlotRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""19f1fd1d-98ea-491e-89b5-878caf4ba1ab"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -344,7 +362,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""77bb85ec-635a-43c3-8939-e87193fc59bd"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -388,7 +406,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""59852d0e-1c5b-4d93-866b-37762fc2bdbc"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -410,7 +428,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""5d64a3cb-54c5-4e22-95e1-add4097608e1"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -558,6 +576,50 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Slot4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e93a9af4-531e-4706-b598-2bad5085bc5f"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CycleSlotLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f5e49306-93b1-4362-8356-d1b8dca01126"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CycleSlotLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3211c125-bb36-493e-ad64-acd7a4b09121"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CycleSlotRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bf4a8375-68a6-4d1e-8d6b-47fa211302e3"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CycleSlotRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -915,6 +977,8 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_Player_Slot2 = m_Player.FindAction("Slot2", throwIfNotFound: true);
         m_Player_Slot3 = m_Player.FindAction("Slot3", throwIfNotFound: true);
         m_Player_Slot4 = m_Player.FindAction("Slot4", throwIfNotFound: true);
+        m_Player_CycleSlotLeft = m_Player.FindAction("CycleSlotLeft", throwIfNotFound: true);
+        m_Player_CycleSlotRight = m_Player.FindAction("CycleSlotRight", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1020,6 +1084,8 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Slot2;
     private readonly InputAction m_Player_Slot3;
     private readonly InputAction m_Player_Slot4;
+    private readonly InputAction m_Player_CycleSlotLeft;
+    private readonly InputAction m_Player_CycleSlotRight;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1088,6 +1154,14 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Slot4 => m_Wrapper.m_Player_Slot4;
         /// <summary>
+        /// Provides access to the underlying input action "Player/CycleSlotLeft".
+        /// </summary>
+        public InputAction @CycleSlotLeft => m_Wrapper.m_Player_CycleSlotLeft;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/CycleSlotRight".
+        /// </summary>
+        public InputAction @CycleSlotRight => m_Wrapper.m_Player_CycleSlotRight;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -1155,6 +1229,12 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Slot4.started += instance.OnSlot4;
             @Slot4.performed += instance.OnSlot4;
             @Slot4.canceled += instance.OnSlot4;
+            @CycleSlotLeft.started += instance.OnCycleSlotLeft;
+            @CycleSlotLeft.performed += instance.OnCycleSlotLeft;
+            @CycleSlotLeft.canceled += instance.OnCycleSlotLeft;
+            @CycleSlotRight.started += instance.OnCycleSlotRight;
+            @CycleSlotRight.performed += instance.OnCycleSlotRight;
+            @CycleSlotRight.canceled += instance.OnCycleSlotRight;
         }
 
         /// <summary>
@@ -1208,6 +1288,12 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Slot4.started -= instance.OnSlot4;
             @Slot4.performed -= instance.OnSlot4;
             @Slot4.canceled -= instance.OnSlot4;
+            @CycleSlotLeft.started -= instance.OnCycleSlotLeft;
+            @CycleSlotLeft.performed -= instance.OnCycleSlotLeft;
+            @CycleSlotLeft.canceled -= instance.OnCycleSlotLeft;
+            @CycleSlotRight.started -= instance.OnCycleSlotRight;
+            @CycleSlotRight.performed -= instance.OnCycleSlotRight;
+            @CycleSlotRight.canceled -= instance.OnCycleSlotRight;
         }
 
         /// <summary>
@@ -1519,6 +1605,20 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSlot4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CycleSlotLeft" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCycleSlotLeft(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CycleSlotRight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCycleSlotRight(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

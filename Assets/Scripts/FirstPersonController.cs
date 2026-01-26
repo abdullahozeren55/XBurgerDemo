@@ -93,6 +93,15 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("Headbob Parameters")]
     [SerializeField] private Transform eyeLevel;
+    [Tooltip("Bu karakterin kendine has kafa sallanma þiddeti (Örn: 1.5 verip arttýrabilirsin)")]
+    [SerializeField] private float internalBobMultiplier = 1.5f;
+
+    [Tooltip("Kafanýn ne kadar 'stabil' durmaya çalýþacaðý. Düþük deðer = Daha az titreme ama gecikmeli takip.")]
+    [SerializeField] private float bobSmoothingSpeed = 9f; // 9-10 arasý genelde iyidir
+
+    // Hesaplama için gizli deðiþken
+    private Vector3 smoothedLocalHeadPos;
+    private bool isHeadbobInitialized = false;
 
     [Header("Sliding Parameters")]
     private Vector3 hitPointNormal;
@@ -714,7 +723,42 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleHeadbob()
     {
-        cameraFollow.position = eyeLevel.position;
+        if (eyeLevel == null || cameraFollow == null) return;
+
+        // 1. GÜNCEL DURUMU AL
+        // Kafa kemiðinin, karakterin merkezine (Root) göre yerel pozisyonunu bul.
+        // Local Space kullandýðýmýz için karakter koþsa bile (Global hareket) bu deðer sadece animasyonun salýnýmýný içerir.
+        Vector3 currentLocalPos = transform.InverseTransformPoint(eyeLevel.position);
+
+        // Ýlk açýlýþta kameranýn (0,0,0)'dan uçup gelmemesi için initialize yapýyoruz
+        if (!isHeadbobInitialized)
+        {
+            smoothedLocalHeadPos = currentLocalPos;
+            isHeadbobInitialized = true;
+        }
+
+        // 2. STABÝL NOKTAYI HESAPLA (Low Pass Filter)
+        // Bu nokta, kafayý takip eder ama ani titremeleri (High Frequency Noise) görmezden gelir.
+        // Yani "Headbob kapalýyken" kameranýn duracaðý yer burasýdýr.
+        smoothedLocalHeadPos = Vector3.Lerp(smoothedLocalHeadPos, currentLocalPos, Time.deltaTime * bobSmoothingSpeed);
+
+        // 3. TÝTREMEYÝ AYIKLA (Delta)
+        // Gerçek kafa ile stabil nokta arasýndaki fark = Saf Headbob hareketi
+        Vector3 bobDelta = currentLocalPos - smoothedLocalHeadPos;
+
+        // 4. ÇARPANLARI UYGULA
+        // Hem senin verdiðin internal çarpaný (1.5x) hem de ayarlardan gelen global çarpaný (0x - 1x) kullan.
+        float finalMultiplier = internalBobMultiplier * Settings.GlobalDistortionMultiplier;
+
+        // Farký çarpanla büyüt veya küçült
+        Vector3 finalBobEffect = bobDelta * finalMultiplier;
+
+        // 5. SONUCU BÝRLEÞTÝR
+        // Stabil noktaya, iþlenmiþ titremeyi ekle.
+        Vector3 finalLocalPos = smoothedLocalHeadPos + finalBobEffect;
+
+        // 6. DÜNYA KOORDÝNATINA ÇEVÝR VE UYGULA
+        cameraFollow.position = transform.TransformPoint(finalLocalPos);
     }
 
     private void DecideInteractableOutlineColor()
@@ -2110,10 +2154,75 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleInventoryInput()
     {
+        // Standart 1-2-3-4 tuþlarý
         if (InputManager.Instance.PlayerSlot1()) ToggleSlot(0);
         if (InputManager.Instance.PlayerSlot2()) ToggleSlot(1);
         if (InputManager.Instance.PlayerSlot3()) ToggleSlot(2);
         if (InputManager.Instance.PlayerSlot4()) ToggleSlot(3);
+
+        // --- YENÝ: Q ve E ile Döngü ---
+        // Tepsi tutuyorsak çalýþmasýn (Zaten CycleInventory içinde de kontrol var ama burasý double check olsun)
+        if (!IsHoldingTray)
+        {
+            if (InputManager.Instance.PlayerCycleSlotLeft())
+            {
+                CycleInventory(-1); // Sola git
+            }
+
+            if (InputManager.Instance.PlayerCycleSlotRight())
+            {
+                CycleInventory(1); // Saða git
+            }
+        }
+    }
+
+    // YENÝ FONKSÝYON: Dolu olan slotlar arasýnda gezinmeyi saðlar
+    private void CycleInventory(int direction)
+    {
+        if (IsHoldingTray) return; // Güvenlik önlemi
+
+        // Envanterde hiç eþya yoksa döngüye girip sistemi yormayalým
+        bool hasAnyItem = false;
+        foreach (var item in inventoryItems)
+        {
+            if (item != null)
+            {
+                hasAnyItem = true;
+                break;
+            }
+        }
+        if (!hasAnyItem) return;
+
+        int searchIndex = currentSlotIndex;
+        // Eðer el boþsa (-1), aramaya 0'dan baþla (saða gidiyorsan) veya sondan baþla (sola gidiyorsan)
+        if (searchIndex == -1)
+        {
+            searchIndex = direction > 0 ? -1 : 0;
+            // Mantýk: -1'deyiz, saða (1) basýnca 0 olsun istiyoruz (-1 + 1 = 0).
+            // Sola (-1) basýnca son slot olsun istiyoruz. Aþaðýdaki döngü bunu halleder.
+        }
+
+        int attempts = 0;
+
+        // En fazla slot sayýsý kadar dene (Sonsuz döngü korumasý)
+        while (attempts < maxInventorySlots)
+        {
+            searchIndex += direction;
+
+            // Dizi sýnýrlarýný aþarsak baþa/sona sar (Wrap Around)
+            if (searchIndex >= maxInventorySlots) searchIndex = 0;
+            if (searchIndex < 0) searchIndex = maxInventorySlots - 1;
+
+            attempts++;
+
+            // 1. O slotta eþya var mý?
+            // 2. O slot þu anki slotumuzdan farklý mý? (Kendine dönme)
+            if (inventoryItems[searchIndex] != null && searchIndex != currentSlotIndex)
+            {
+                EquipSlot(searchIndex);
+                return;
+            }
+        }
     }
 
     private void ToggleSlot(int slotIndex)

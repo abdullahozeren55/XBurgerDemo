@@ -131,6 +131,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CycleSlotLeft",
+                    "type": "Button",
+                    "id": "e072f6a1-c9fb-41cc-90ff-9412ea40f582",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CycleSlotRight",
+                    "type": "Button",
+                    "id": "19f1fd1d-98ea-491e-89b5-878caf4ba1ab",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -258,7 +276,7 @@
                 {
                     "name": "",
                     "id": "77bb85ec-635a-43c3-8939-e87193fc59bd",
-                    "path": "<Gamepad>/leftTrigger",
+                    "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -302,7 +320,7 @@
                 {
                     "name": "",
                     "id": "59852d0e-1c5b-4d93-866b-37762fc2bdbc",
-                    "path": "<Gamepad>/leftShoulder",
+                    "path": "<Gamepad>/leftTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -324,7 +342,7 @@
                 {
                     "name": "",
                     "id": "5d64a3cb-54c5-4e22-95e1-add4097608e1",
-                    "path": "<Gamepad>/rightShoulder",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -472,6 +490,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "Slot4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e93a9af4-531e-4706-b598-2bad5085bc5f",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CycleSlotLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f5e49306-93b1-4362-8356-d1b8dca01126",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CycleSlotLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3211c125-bb36-493e-ad64-acd7a4b09121",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CycleSlotRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bf4a8375-68a6-4d1e-8d6b-47fa211302e3",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CycleSlotRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

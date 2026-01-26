@@ -2401,14 +2401,14 @@
     "pt": "Volume"
   },
   {
-    "key": "UI_DISTORTION",
-    "tr": "Bozulma",
-    "en": "Distortion",
-    "zh": "失真",
-    "ja": "歪み",
-    "es": "Distorsión",
-    "ru": "Искажение",
-    "pt": "Distorção"
+    "key": "UI_SHAKE_AND_DISTORTION",
+    "tr": "Sallantı ve Bozulma",
+    "en": "Shake & Distortion",
+    "zh": "震动与失真",
+    "ja": "揺れ & 歪み",
+    "es": "Temblor y Distorsión",
+    "ru": "Тряска/Искаж.",
+    "pt": "Tremor e Distorção"
   },
   {
     "key": "UI_INTERACT",
@@ -2517,7 +2517,7 @@
     "zh": "反转Y轴",
     "ja": "Y軸反転",
     "es": "Invertir Eje Y",
-    "ru": "Инвертировать Ось Y",
+    "ru": "Инверсия Y",
     "pt": "Inverter Eixo Y"
   },
   {
@@ -2537,7 +2537,7 @@
     "zh": "蹲伏模式",
     "ja": "しゃがみモード",
     "es": "Modo Agacharse",
-    "ru": "Режим Приседания",
+    "ru": "Приседание",
     "pt": "Modo De Agachamento"
   },
   {

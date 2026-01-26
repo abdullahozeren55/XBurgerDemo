@@ -23,13 +23,13 @@ MonoBehaviour:
   - type: 1
     font: {fileID: 11400000, guid: 7618cb53130fc3348a938b513bf55012, type: 2}
     basePixelSize: 19
-    characterSpacingOffset: 8
+    characterSpacingOffset: 4
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 2
     font: {fileID: 11400000, guid: c6e2ccef97f89ec499ac2c0503a8346b, type: 2}
     basePixelSize: 19
-    characterSpacingOffset: 4
+    characterSpacingOffset: 2
     wordSpacingOffset: 0
     lineSpacingOffset: 0
   - type: 3

@@ -221,6 +221,9 @@ public class InputManager : MonoBehaviour
     public bool PlayerSlot3() => _gameControls.Player.Slot3.triggered;
     public bool PlayerSlot4() => _gameControls.Player.Slot4.triggered;
 
+    public bool PlayerCycleSlotLeft() => _gameControls.Player.CycleSlotLeft.triggered;
+    public bool PlayerCycleSlotRight() => _gameControls.Player.CycleSlotRight.triggered;
+
     public bool PlayerPause()
     {
         return _gameControls.Player.Pause.triggered || _gameControls.UI.Pause.triggered;

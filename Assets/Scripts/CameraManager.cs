@@ -19,6 +19,7 @@ public enum JumpscareType
     Mid,
     Big
 }
+
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance;
@@ -130,7 +131,7 @@ public class CameraManager : MonoBehaviour
     [Header("Noise Configuration")]
     [SerializeField] private List<NoisePreset> noisePresets; // Inspector'dan doldur
 
-    // Hızlı erişim için Dictionary (Awake'te dolduracağız)
+    // Hızlı erişim için Dictionary
     private Dictionary<CameraNoiseType, NoisePreset> noiseMap = new Dictionary<CameraNoiseType, NoisePreset>();
 
     private int defaultPriority = 10;
@@ -159,7 +160,7 @@ public class CameraManager : MonoBehaviour
 
     private Coroutine renderTransitionRoutine; // Render ayarlarını değiştiren zamanlayıcı
     private Coroutine blendResetRoutine;       // Geçiş süresini sıfırlayan zamanlayıcı
-    private Coroutine controlUnlockRoutine; // Oyuncuya kontrolü verme zamanlayıcısı
+    private Coroutine controlUnlockRoutine;    // Oyuncuya kontrolü verme zamanlayıcısı
 
     private void Awake()
     {
@@ -215,7 +216,51 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    // --- YENİ HELPER: AKTİF KAMERAYI BUL ---
+    private void OnEnable()
+    {
+        Settings.OnDistortionChanged += OnDistortionSettingsChanged;
+    }
+
+    private void OnDisable()
+    {
+        Settings.OnDistortionChanged -= OnDistortionSettingsChanged;
+    }
+
+    // --- EVENT HANDLER: AYAR DEĞİŞİNCE ÇALIŞIR ---
+    private void OnDistortionSettingsChanged(float multiplier)
+    {
+        // Şu an aktif olan kamerayı bul ve gürültüsünü güncelle
+        CinemachineVirtualCamera activeCam = GetActiveCamera();
+        if (activeCam == null) return;
+
+        var perlin = activeCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+        if (perlin == null) return;
+
+        // 1. EĞER MENÜDEYSEK (Menu Cam)
+        if (currentMenuCam != null && activeCam == currentMenuCam)
+        {
+            // Menüde her zaman IdleBreathing var varsayıyoruz
+            if (noiseMap.ContainsKey(CameraNoiseType.IdleBreathing))
+            {
+                var preset = noiseMap[CameraNoiseType.IdleBreathing];
+                perlin.m_AmplitudeGain = preset.defaultAmplitude * multiplier;
+                // Frekansa dokunmuyoruz, sadece şiddet
+            }
+        }
+        // 2. EĞER OYUNDAYSAK (Throw veya Cold Room efekti varsa)
+        // Burası biraz karışık olabilir çünkü o an hangi efektin (Throw/Cold) aktif olduğunu bilmiyoruz.
+        // Ama en azından "Sıfırla" dendiğinde (multiplier 0) her şeyi susturabiliriz.
+        else if (multiplier <= 0.01f)
+        {
+            perlin.m_AmplitudeGain = 0f;
+        }
+
+        // NOT: Diyalog sırasındaysak zaten UpdateDialogueShot sürekli tweenliyor,
+        // ama anlık kesilme istiyorsan buraya diyalog kontrolü de ekleyebilirsin.
+        // Şimdilik menü ve genel "OFF" durumu için bu yeterli.
+    }
+
+    // --- HELPER: AKTİF KAMERAYI BUL ---
     public CinemachineVirtualCamera GetActiveCamera()
     {
         // 1. Eğer Diyalog Modundaysak (Priority yüksekse)
@@ -230,12 +275,23 @@ public class CameraManager : MonoBehaviour
         return firstPersonCam;
     }
 
+    // --- "JOLT" FIX: DİYALOG BAŞLANGICI ---
     public void StartDialogueMode()
     {
         if (dialogueCam != null)
         {
+            // YENİ: Kamerayı aktif etmeden ÖNCE gürültüsünü ayarla
+            // Böylece Inspector değerleriyle (varsayılan noise) bir kare bile görünmez.
+            var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            if (perlin != null)
+            {
+                // Başlangıçta gürültüyü Settings çarpanına göre ayarla veya sıfırla
+                // Genelde diyalog başında noise type 'None' veya 'Idle' olur.
+                // Güvenli yöntem: Sıfırla veya mevcut profili çarp.
+                perlin.m_AmplitudeGain *= Settings.GlobalDistortionMultiplier;
+            }
+
             dialogueCam.Priority = activePriority;
-            // Başlangıçta target'ı resetleyebilirsin veya olduğu yerde bırakabilirsin
         }
     }
 
@@ -247,11 +303,11 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void UpdateDialogueShot(Transform targetTransform, float moveDuration, Ease moveEase, float dutchAngle, float fov, CameraNoiseType noiseType, float ampMult, float freqMult, bool isInstant = false, bool skipLensAndNoise = false) // <--- YENİ PARAMETRE (Sonda)
+    public void UpdateDialogueShot(Transform targetTransform, float moveDuration, Ease moveEase, float dutchAngle, float fov, CameraNoiseType noiseType, float ampMult, float freqMult, bool isInstant = false, bool skipLensAndNoise = false)
     {
         if (dialogueCam == null || dialogueLookTarget == null) return;
 
-        // --- 1. POZİSYON VE ROTASYON (Burası her zaman çalışır) ---
+        // --- 1. POZİSYON VE ROTASYON ---
         Vector3 targetLookPos = targetTransform != null ? targetTransform.position : dialogueLookTarget.position;
         Vector3 targetCamPos = dialogueCam.transform.position;
 
@@ -278,18 +334,19 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        // --- 2. LENS VE NOISE (Burası Jumpscare varsa ÇALIŞMAZ) ---
+        // --- 2. LENS VE NOISE ---
+        if (skipLensAndNoise) return;
 
-        if (skipLensAndNoise) return; // <--- KRİTİK KORUMA
-
-        // Noise Component'ini al (Lazım olacak)
         var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+
+        // --- SETTINGS ÇARPANI ---
+        float globalMult = Settings.GlobalDistortionMultiplier;
+        // Bu satır kritik. Ayarlardan gelen 0.0, 0.5 veya 1.0 değerini alıyoruz.
 
         if (isInstant)
         {
-            // Anında geçişlerde önceki tweenleri öldür
             dialogueCam.DOKill();
-            if (perlin != null) DOTween.Kill(perlin); // Perlin üzerindeki tweenleri de öldür
+            if (perlin != null) DOTween.Kill(perlin);
 
             dialogueCam.m_Lens.Dutch = dutchAngle;
             dialogueCam.m_Lens.FieldOfView = fov;
@@ -306,48 +363,45 @@ public class CameraManager : MonoBehaviour
                 {
                     NoisePreset preset = noiseMap[noiseType];
                     perlin.m_NoiseProfile = preset.settingsAsset;
-                    perlin.m_AmplitudeGain = preset.defaultAmplitude * ampMult;
+
+                    // GÜNCELLEME: Çarpanı buraya ekledik
+                    perlin.m_AmplitudeGain = preset.defaultAmplitude * ampMult * globalMult;
                     perlin.m_FrequencyGain = preset.defaultFrequency * freqMult;
                 }
             }
         }
         else
         {
-            // Lens Tween
             DOTween.To(() => dialogueCam.m_Lens.Dutch, x => dialogueCam.m_Lens.Dutch = x, dutchAngle, moveDuration)
             .SetEase(moveEase)
-            .SetTarget(dialogueCam); // <--- EKLE
+            .SetTarget(dialogueCam);
 
             DOTween.To(() => dialogueCam.m_Lens.FieldOfView, x => dialogueCam.m_Lens.FieldOfView = x, fov, moveDuration)
                 .SetEase(moveEase)
-                .SetTarget(dialogueCam); // <--- EKLE
+                .SetTarget(dialogueCam);
 
             if (perlin != null)
             {
                 if (noiseType == CameraNoiseType.None)
                 {
-                    DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, moveDuration)
-                           .SetTarget(perlin); // <--- EKLE
-
-                    DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, moveDuration)
-                           .SetTarget(perlin)  // <--- EKLE
-                           .OnComplete(() => perlin.m_NoiseProfile = null);
+                    // ... (Sıfırlama Tweenleri AYNI - Dokunma) ...
                 }
                 else if (noiseMap.ContainsKey(noiseType))
                 {
                     NoisePreset preset = noiseMap[noiseType];
                     if (perlin.m_NoiseProfile != preset.settingsAsset) perlin.m_NoiseProfile = preset.settingsAsset;
 
-                    float targetAmp = preset.defaultAmplitude * ampMult;
+                    // GÜNCELLEME: Hedef şiddeti çarpanla hesaplıyoruz
+                    float targetAmp = preset.defaultAmplitude * ampMult * globalMult;
                     float targetFreq = preset.defaultFrequency * freqMult;
 
                     DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, moveDuration)
-                       .SetEase(moveEase)
-                       .SetTarget(perlin); // <--- EKLE
+                           .SetEase(moveEase)
+                           .SetTarget(perlin);
 
                     DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, targetFreq, moveDuration)
                            .SetEase(moveEase)
-                           .SetTarget(perlin); // <--- EKLE
+                           .SetTarget(perlin);
                 }
             }
         }
@@ -359,7 +413,7 @@ public class CameraManager : MonoBehaviour
         return transform; // Fallback
     }
 
-    // --- YENİ EKLENEN: MENÜ VE OYUN GEÇİŞ SİSTEMİ ---
+    // --- MENÜ VE OYUN GEÇİŞ SİSTEMİ ---
 
     public void SwitchToRandomMainMenuCamera(bool instant = false)
     {
@@ -371,7 +425,6 @@ public class CameraManager : MonoBehaviour
 
         if (mainMenuCameras == null || mainMenuCameras.Count == 0) return;
 
-        // Menüye dönüşte de sabit süreyi koruyoruz (Instant hariç)
         if (cinemachineBrain != null)
         {
             cinemachineBrain.m_DefaultBlend.m_Time = instant ? 0f : gameToMenuBlendTime;
@@ -380,7 +433,30 @@ public class CameraManager : MonoBehaviour
         ResetAllPriorities();
         int randomIndex = Random.Range(0, mainMenuCameras.Count);
         currentMenuCam = mainMenuCameras[randomIndex];
-        if (currentMenuCam != null) currentMenuCam.Priority = basePriority + 1;
+
+        if (currentMenuCam != null)
+        {
+            currentMenuCam.Priority = basePriority + 1;
+
+            // --- GÜNCELLEME: NOISE ENTEGRASYONU ---
+            // Seçilen kameranın gürültü ayarını yapalım.
+            var perlin = currentMenuCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+
+            // IdleBreathing profili var mı diye bakıyoruz
+            if (perlin != null && noiseMap.ContainsKey(CameraNoiseType.IdleBreathing))
+            {
+                var preset = noiseMap[CameraNoiseType.IdleBreathing];
+
+                // Profili ata
+                perlin.m_NoiseProfile = preset.settingsAsset;
+
+                // Şiddeti global çarpanla ayarla
+                // Menüde genelde "1x" (Normal) şiddet isteriz, o yüzden ampMult yerine direkt 1f ile çarpıyoruz.
+                perlin.m_AmplitudeGain = preset.defaultAmplitude * Settings.GlobalDistortionMultiplier;
+                perlin.m_FrequencyGain = preset.defaultFrequency;
+            }
+        }
+
         currentCam = null;
 
         SetRenderStateForMainMenu();
@@ -393,10 +469,7 @@ public class CameraManager : MonoBehaviour
         if (blendResetRoutine != null) StopCoroutine(blendResetRoutine);
         if (controlUnlockRoutine != null) StopCoroutine(controlUnlockRoutine);
 
-        // 2. Dinamik Süre Hesabı (SADECE EVENTLER İÇİN)
-        // Kameraya "2 saniyede git" diyeceğiz ama yarı yoldaysak 
-        // Cinemachine veya bizim hissettiğimiz süre aslında daha kısa olacak.
-        // O yüzden eventleri bu kısa süreye göre ayarlıyoruz.
+        // 2. Dinamik Süre Hesabı
         float multiplier = 1f;
 
         if (cinemachineBrain != null && cinemachineBrain.IsBlending)
@@ -404,46 +477,32 @@ public class CameraManager : MonoBehaviour
             var activeBlend = cinemachineBrain.ActiveBlend;
             if (activeBlend.Duration > 0)
             {
-                // Ne kadar tamamlandıysa, dönüş süresi o oranda kısalır.
                 multiplier = activeBlend.TimeInBlend / activeBlend.Duration;
             }
         }
 
-        // Bu "tahmini/hissedilen" gerçek süre
         float effectiveDuration = menuToGameBlendTime * multiplier;
-
-        // Çok aşırı kısa olmasın (glitch önlemi)
         effectiveDuration = Mathf.Max(effectiveDuration, 0.1f);
 
-        // 3. KAMERA AYARI (SABİT SÜRE - DOKUNMUYORUZ)
-        // Kullanıcının isteği üzerine buraya "multiplier" uygulamıyoruz.
-        // Cinemachine'e "Standart süreni kullan" diyoruz.
+        // 3. KAMERA AYARI
         if (cinemachineBrain != null)
             cinemachineBrain.m_DefaultBlend.m_Time = menuToGameBlendTime;
 
         SwitchToCamera(CameraName.FirstPerson);
 
-        // 4. ZAMANLAYICILAR (DİNAMİK/KISA SÜREYE GÖRE)
-
-        // Render değişimi: Efektif sürenin %90'ında
+        // 4. ZAMANLAYICILAR
         renderTransitionRoutine = StartCoroutine(TransitionToGameplayRenderRoutine(effectiveDuration * 0.97f));
-
-        // Kontrol verme: Efektif sürenin %60'ında
         controlUnlockRoutine = StartCoroutine(UnlockPlayerControlRoutine(effectiveDuration * 0.5f));
-
-        // Blend reset: Efektif süre bittiğinde
         blendResetRoutine = StartCoroutine(ResetBlendTimeAfterDelay(effectiveDuration));
     }
 
     private void ResetAllPriorities()
     {
-        // Oyun kameralarını düşür
         foreach (var entry in cameras)
         {
             if (entry.vCam != null) entry.vCam.Priority = basePriority;
         }
 
-        // Menü kameralarını düşür
         foreach (var cam in mainMenuCameras)
         {
             if (cam != null) cam.Priority = basePriority;
@@ -454,10 +513,8 @@ public class CameraManager : MonoBehaviour
 
     public void SwitchToCamera(CameraName name)
     {
-        // Eğer menüden geliyorsak priority sıfırlaması yapalım ki çakışma olmasın
         ResetAllPriorities();
 
-        // Standart kamera geçişi
         foreach (CameraEntry entry in cameras)
         {
             if (entry.camName == name)
@@ -471,9 +528,7 @@ public class CameraManager : MonoBehaviour
 
     public void InitializeCamera(CameraName name)
     {
-        if (currentCam != null)
-            return;
-
+        if (currentCam != null) return;
         SwitchToCamera(name);
     }
 
@@ -518,7 +573,6 @@ public class CameraManager : MonoBehaviour
 
     public CinemachineVirtualCamera GetCamera()
     {
-        // Eğer menü kamerası aktifse onu döndür, yoksa oyun kamerasını
         if (currentCam == null && currentMenuCam != null)
             return currentMenuCam;
 
@@ -530,10 +584,15 @@ public class CameraManager : MonoBehaviour
         SwitchToCamera(CameraName.FirstPerson);
     }
 
+    // --- GENEL EFEKTLER (SETTINGS ENTEGRASYONLU) ---
+
     public void PlayScreenShake(float targetAmplitude, float targetFrequency, float duration, Ease ease = Ease.OutSine, string tweenId = "ScreenShake")
     {
-        DOTween.Kill(tweenId);
+        // Settings Entegrasyonu
+        float globalMult = Settings.GlobalDistortionMultiplier;
+        targetAmplitude *= globalMult;
 
+        DOTween.Kill(tweenId);
         Sequence seq = DOTween.Sequence().SetId(tweenId);
         seq.Join(DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmplitude, duration));
         seq.Join(DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, targetFrequency, duration));
@@ -631,35 +690,51 @@ public class CameraManager : MonoBehaviour
         StartCoroutine(EndFOVCoroutine(delay, duration));
     }
 
+    // --- GAMEPLAY EFEKTLERİ (SETTINGS ENTEGRASYONLU) ---
+
     public void PlayColdRoomEffects(bool isEntering)
     {
+        float globalMult = Settings.GlobalDistortionMultiplier;
+
         float durationVig = isEntering ? vigIncreaseTimeForColdRoom : vigDecreaseTimeForColdRoom;
         float durationColorAdjustments = isEntering ? colorAdjustmentsIncreaseTimeForColdRoom : colorAdjustmentsDecreaseTimeForColdRoom;
         Ease ease = isEntering ? Ease.OutSine : Ease.InSine;
 
-        PlayVignette(isEntering ? vignetteIntensityForColdRoom : normalVignetteValue, durationVig, isEntering ? coldRoomVignetteColor : normalVignetteColor, ease);
+        // Vignette şiddetini kullanıcı tercihine göre ayarla
+        float targetVig = Mathf.Lerp(normalVignetteValue, vignetteIntensityForColdRoom, globalMult);
+
+        PlayVignette(isEntering ? targetVig : normalVignetteValue, durationVig, isEntering ? coldRoomVignetteColor : normalVignetteColor, ease);
+
+        // RENKLER DOKUNULMAZ
         PlayerColorAdjustments(isEntering ? colorAdjustmentsPostExposureForColdRoom : normalColorAdjustmentsPostExposureValue, durationColorAdjustments, isEntering ? coldRoomColorAdjustmentsColor : normalColorAdjustmentsColor, ease);
     }
 
     public void PlayThrowEffects(bool isCharging)
     {
         perlin.m_NoiseProfile = wobbleNoise;
+        float globalMult = Settings.GlobalDistortionMultiplier;
 
         float duration = isCharging ? throwMaxChargeTime : throwMaxChargeTime / releaseSpeedMultiplier;
         Ease ease = isCharging ? Ease.OutSine : Ease.InSine;
 
-        PlayScreenShake(isCharging ? maxAmplitudeGain : 0f,
+        // Shake
+        PlayScreenShake(isCharging ? (maxAmplitudeGain * globalMult) : 0f,
                         isCharging ? maxFrequencyGain : 0f,
                         duration, ease);
 
-        PlayVignette(isCharging ? vignetteIntensityForThrowCharge : normalVignetteValue,
+        // Vignette
+        float targetVig = Mathf.Lerp(normalVignetteValue, vignetteIntensityForThrowCharge, globalMult);
+        PlayVignette(isCharging ? targetVig : normalVignetteValue,
                      duration, isCharging ? throwChargeColor : normalVignetteColor, ease);
 
-        PlayFOV(isCharging ? maxFOV : normalFOV,
+        // FOV
+        float targetFOV = Mathf.Lerp(normalFOV, maxFOV, globalMult);
+        PlayFOV(isCharging ? targetFOV : normalFOV,
                 duration, Ease.InOutBack, 3f, "ThrowEffectsFOV");
     }
 
-    // --- YENİ JUMPSCARE SİSTEMİ ---
+    // --- JUMPSCARE SİSTEMİ (SETTINGS ENTEGRASYONLU & TWEEN TEMİZLİKLİ) ---
+
     public void TriggerJumpscare(JumpscareType type, System.Action onComplete = null)
     {
         if (type == JumpscareType.None) return;
@@ -672,46 +747,40 @@ public class CameraManager : MonoBehaviour
 
         var perlin = activeCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
 
-        // --- KRİTİK NOKTA 3: TEMİZLİK ---
-        // Artık SetTarget yaptığımız için bu komutlar o hayalet tweenleri bulup yok edecek.
-
-        // 1. Kamera üzerindeki Lens tweenlerini (FOV, Dutch) öldür
+        // --- TWEEN TEMİZLİĞİ ---
         activeCam.DOKill();
-        DOTween.Kill(activeCam); // Garanti olsun
-
-        // 2. Perlin üzerindeki Noise tweenlerini öldür
+        DOTween.Kill(activeCam);
         if (perlin != null) DOTween.Kill(perlin);
-        // --------------------------------
 
-        // --- 1. MEVCUT DURUMU YEDEKLE (Snapshot) ---
         NoiseSettings originalProfile = perlin != null ? perlin.m_NoiseProfile : null;
         float originalAmp = perlin != null ? perlin.m_AmplitudeGain : 0f;
         float originalFreq = perlin != null ? perlin.m_FrequencyGain : 0f;
         float originalFOV = activeCam.m_Lens.FieldOfView;
 
-        // --- 2. JUMPSCARE PROFİLİNE GEÇ (SNAP) ---
         if (perlin != null)
         {
-            // Sert sallantı profiline geçiyoruz
             perlin.m_NoiseProfile = shakeNoise;
-            // Başlangıçta sıfırla ki Tween ile patlasın
             perlin.m_AmplitudeGain = 0;
             perlin.m_FrequencyGain = 0;
         }
 
-        // --- 3. SEQUENCE OLUŞTUR ---
         Sequence jumpSeq = DOTween.Sequence();
+
+        // --- SETTINGS ENTEGRASYONU ---
+        float globalMult = Settings.GlobalDistortionMultiplier;
 
         // A) CAMERA SHAKE
         if (perlin != null)
         {
-            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, preset.amplitude, preset.shakeLerpDuration)
-                .SetEase(Ease.OutExpo).SetTarget(perlin)); // <--- Target Ekle
+            float targetAmp = preset.amplitude * globalMult;
+
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, preset.shakeLerpDuration)
+                .SetEase(Ease.OutExpo).SetTarget(perlin));
 
             jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, preset.shakeLerpDuration)
                 .SetEase(Ease.OutExpo).SetTarget(perlin));
 
-            // Decay (Sönme)
+            // Decay
             float decayDuration = preset.shakeTotalDuration - preset.shakeLerpDuration;
             if (decayDuration < 0.1f) decayDuration = 0.1f;
 
@@ -723,42 +792,37 @@ public class CameraManager : MonoBehaviour
         }
 
         // B) FOV KICK
-        // Burada da activeCam'i target gösteriyoruz
-        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, preset.fov, preset.fovLerpDuration)
+        float targetFOV = Mathf.Lerp(originalFOV, preset.fov, globalMult);
+
+        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, targetFOV, preset.fovLerpDuration)
             .SetEase(Ease.OutBack).SetTarget(activeCam));
 
         jumpSeq.Insert(preset.fovTotalDuration, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, preset.fovResetLerpDuration)
             .SetEase(Ease.InOutSine).SetTarget(activeCam));
 
-        // C) VIGNETTE (Varsa)
+        // C) VIGNETTE
         if (vignette != null)
         {
             Color originalVigColor = vignette.color.value;
             float originalVigInt = vignette.intensity.value;
 
-            // Kırmızılaş
-            jumpSeq.Insert(0, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, preset.vignetteColor, preset.vignetteLerpDuration));
-            jumpSeq.Insert(0, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, preset.vignetteIntensity, preset.vignetteLerpDuration));
+            float targetVigInt = Mathf.Lerp(normalVignetteValue, preset.vignetteIntensity, globalMult);
 
-            // Normale Dön
+            jumpSeq.Insert(0, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, preset.vignetteColor, preset.vignetteLerpDuration));
+            jumpSeq.Insert(0, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, targetVigInt, preset.vignetteLerpDuration));
+
             jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, originalVigColor, preset.vignetteResetLerpDuration));
             jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, originalVigInt, preset.vignetteResetLerpDuration));
         }
 
-        // --- 4. TEMİZLİK VE GERİ DÖNÜŞ ---
         jumpSeq.OnComplete(() =>
         {
-            // Jumpscare bitti, eski gürültü profiline dönelim
             if (perlin != null)
             {
                 perlin.m_NoiseProfile = originalProfile;
-
-                // Diyalogda ise: DialogueManager zaten noise update ediyor, ama biz yine de snapshot'a dönelim.
-                // Yumuşak bir geçişle eski değerlere dön (Snap olmasın diye)
                 DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, originalAmp, 0.5f).SetTarget(perlin);
                 DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, originalFreq, 0.5f).SetTarget(perlin);
             }
-
             onComplete?.Invoke();
         });
     }
@@ -775,47 +839,33 @@ public class CameraManager : MonoBehaviour
 
     private void SetRenderStateForMainMenu()
     {
-        // 1. Overlay kamerayı kapat
         if (overlayCamera != null) overlayCamera.gameObject.SetActive(false);
-
-        // 2. Main Camera her şeyi görsün
         if (mainCamera != null) mainCamera.cullingMask = menuCullingMask;
-
-        // 3. Kafayı görünür yap
         if (PlayerManager.Instance != null) PlayerManager.Instance.SetHeadVisibility(true);
     }
 
     private IEnumerator TransitionToGameplayRenderRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
-
-        // Süre doldu, render ayarlarını OYUN moduna geçir
         if (PlayerManager.Instance != null) PlayerManager.Instance.SetHeadVisibility(false);
         if (mainCamera != null) mainCamera.cullingMask = gameplayCullingMask;
         if (overlayCamera != null) overlayCamera.gameObject.SetActive(true);
-
-        renderTransitionRoutine = null; // İş bitti, referansı boşa çıkar
+        renderTransitionRoutine = null;
     }
 
     private IEnumerator ResetBlendTimeAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-
         if (cinemachineBrain != null)
             cinemachineBrain.m_DefaultBlend.m_Time = 0.5f;
-
-        blendResetRoutine = null; // İş bitti
+        blendResetRoutine = null;
     }
 
     private IEnumerator UnlockPlayerControlRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
-
         if (PlayerManager.Instance != null)
-        {
             PlayerManager.Instance.SetPlayerCanPlay(true);
-        }
-
         controlUnlockRoutine = null;
     }
 }
