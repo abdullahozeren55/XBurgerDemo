@@ -10,7 +10,6 @@ public enum CameraNoiseType
     None,           // Sabit kamera
     IdleBreathing,  // Varsayılan: Hafif el titremesi / Nefes alma
     Tension,        // Gergin anlar: Biraz daha hızlı titreme
-    Jumpscare,      // Anlık şok: Sert ve geniş sarsıntı
 }
 public class CameraManager : MonoBehaviour
 {

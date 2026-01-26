@@ -42,7 +42,8 @@ public class DialogueData : ScriptableObject
         public AudioClip CustomVoiceOrSFX;
 
         [Header("Events")]
-        public string EventTag;
+        [Tooltip("Bu satýr oynarken gerçekleþecek olaylar (Birden fazla seçilebilir)")]
+        public DialogueEvent Events;
     }
 
     public enum GlitchType

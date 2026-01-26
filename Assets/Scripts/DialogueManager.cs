@@ -185,6 +185,11 @@ public class DialogueManager : MonoBehaviour
                 line.NoiseFrequencyMultiplier,
                 isFirstLine // <--- BURASI KRÝTÝK
             );
+
+            if (line.Events != DialogueEvent.None)
+            {
+                HandleDialogueEvents(line.Events);
+            }
         }
     }
 
@@ -247,5 +252,39 @@ public class DialogueManager : MonoBehaviour
 
         onDialogueCompleteCallback?.Invoke();
         onDialogueCompleteCallback = null;
+    }
+
+    // --- YENÝ EVENT MANTIÐI ---
+    private void HandleDialogueEvents(DialogueEvent events)
+    {
+        // 1. Iþýklar Titreyecek mi?
+        if (events.HasFlag(DialogueEvent.LightFlicker))
+        {
+            // Örn: LightManager.Instance.FlickerLights();
+            Debug.Log("EVENT: Iþýklar titriyor...");
+        }
+
+        // 2. Iþýklar Sönecek mi?
+        if (events.HasFlag(DialogueEvent.LightsOff))
+        {
+            // Örn: LightManager.Instance.Blackout(true);
+            Debug.Log("EVENT: Zifiri karanlýk...");
+        }
+
+        // 3. Kapý Çarpacak mý?
+        if (events.HasFlag(DialogueEvent.DoorSlam))
+        {
+            // Örn: WorldManager.Instance.SlamAllDoors();
+            Debug.Log("EVENT: Kapýlar çarpýyor!");
+        }
+
+        // 4. Jumpscare?
+        if (events.HasFlag(DialogueEvent.SpawnJumpscare))
+        {
+            // Örn: CustomerManager.Instance.SpawnStalker();
+            Debug.Log("EVENT: Bir þeyler ters gidiyor...");
+        }
+
+        // ... Diðerlerini de buraya eklersin ...
     }
 }

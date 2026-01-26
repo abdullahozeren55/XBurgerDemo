@@ -36,6 +36,26 @@ public enum CustomerID
     // TV,
     // TableCenter
 }
+
+[System.Flags]
+public enum DialogueEvent
+{
+    None = 0,
+
+    // Atmosfer Olayları
+    LightFlicker = 1 << 0, // 1
+    LightsOff = 1 << 1, // 2
+    DoorSlam = 1 << 2, // 4
+    RadioGlitch = 1 << 3, // 8
+
+    // Ses Olayları
+    PlayCreepySound = 1 << 4, // 16
+    StopMusic = 1 << 5, // 32
+
+    // Oyun Mekaniği
+    UnlockDoor = 1 << 6, // 64
+    SpawnJumpscare = 1 << 7  // 128
+}
 public class GameManager : MonoBehaviour
 {
     public enum BurgerTypes

@@ -30,11 +30,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _GlitchAmount: 0
-    - _GlitchColorSplit: 0.4
-    - _GlitchFrequency: 32
+    - _GlitchColorSplit: 0.008
+    - _GlitchFrequency: 16
     - _GlitchSpeed: 50
     - _GlitchStrength: 0
-    - _GlitchVertical: 64
+    - _GlitchVertical: 32
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &11400000

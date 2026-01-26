@@ -1,4 +1,4 @@
-Shader "Custom/PixelFontOutline_Glitch_Chromatic_Final"
+Shader "Custom/PixelFontOutline_Glitch_IndependentColors"
 {
     Properties
     {
@@ -19,8 +19,7 @@ Shader "Custom/PixelFontOutline_Glitch_Chromatic_Final"
         [Range(0, 1)] _GlitchStrength ("Glitch Strength", Float) = 0.0
         [Range(0, 50)] _GlitchFrequency ("Glitch Speed", Float) = 10.0
         [Range(1, 100)] _GlitchVertical ("Vertical Noise Density", Float) = 20.0
-        // YENÝ: Renklerin ne kadar ayrýþacaðýný belirler
-        [Range(0, 0.05)] _GlitchColorSplit ("Color Split Amount", Float) = 0.01 
+        [Range(0, 0.1)] _GlitchColorSplit ("Color Split Amount", Float) = 0.01 
 
         // --- MASK FIX STANDARTLARI ---
         [HideInInspector] _StencilComp ("Stencil Comparison", Float) = 8
@@ -91,11 +90,10 @@ Shader "Custom/PixelFontOutline_Glitch_Chromatic_Final"
             float _OutlineThickness;
             float4 _ClipRect;
 
-            // GLITCH DEÐÝÞKENLERÝ
             float _GlitchStrength;
             float _GlitchFrequency;
             float _GlitchVertical;
-            float _GlitchColorSplit; // Yeni eklenen deðiþken
+            float _GlitchColorSplit;
 
             float random(float2 uv)
             {
@@ -108,16 +106,16 @@ Shader "Custom/PixelFontOutline_Glitch_Chromatic_Final"
                 OUT.worldPosition = IN.vertex;
                 OUT.vertex = UnityObjectToClipPos(IN.vertex);
                 OUT.texcoord = TRANSFORM_TEX(IN.texcoord, _MainTex);
+                // Vertex Color'ý burada alýyoruz (Text Animator rengi buraya gönderir)
                 OUT.color = IN.color * _Color; 
                 return OUT;
             }
 
             fixed4 frag(v2f IN) : SV_Target
             {
-                // 1. GLITCH VE NOISE HESAPLAMASI
-                // ------------------------------
+                // 1. GLITCH HESAPLAMALARI
                 float2 glitchUV = IN.texcoord;
-                float splitAmount = 0.0; // Renk ayrýþma miktarý
+                float splitAmount = 0.0;
 
                 if (_GlitchStrength > 0.0)
                 {
@@ -126,66 +124,76 @@ Shader "Custom/PixelFontOutline_Glitch_Chromatic_Final"
 
                     if (noiseVal > (1.0 - _GlitchStrength * 0.5)) 
                     {
-                        // 1. Ana Koordinat Kaymasý (Mevcut özellik)
                         float shift = (random(float2(noiseVal, timeStep)) - 0.5) * 2.0; 
                         glitchUV.x += shift * _GlitchStrength * 0.1;
-
-                        // 2. Renk Ayrýþmasý (Yeni Özellik)
-                        // Glitch anýnda rastgele bir renk ayrýþmasý hesaplýyoruz.
-                        // noiseVal'i kullanarak her satýrda farklý yöne ayrýlsýn istiyoruz.
                         splitAmount = shift * _GlitchColorSplit * _GlitchStrength;
                     }
                 }
                 
-                // 2. TEXTURE OKUMALARI (CHROMATIC ABERRATION)
-                // -------------------------------------------
-                // RGB kanallarý için 3 ayrý UV koordinatý
-                float2 uvR = glitchUV + float2(splitAmount, 0); // Kýrmýzý saða/sola
-                float2 uvG = glitchUV;                          // Yeþil merkezde (orijinal glitch konumu)
-                float2 uvB = glitchUV - float2(splitAmount, 0); // Mavi tam ters yöne
+                // 2. TEXTURE OKUMALARI
+                // R ve B kanallarýný merkezden ayýrýyoruz (Offset)
+                float2 uvR = glitchUV + float2(splitAmount, 0); 
+                float2 uvG = glitchUV; 
+                float2 uvB = glitchUV - float2(splitAmount, 0); 
                 
-                // 3 kere texture okuyoruz (Maliyet artýþý, analizde açýklayacaðým)
-                float alphaR = tex2D(_MainTex, uvR).a;
-                float alphaG = tex2D(_MainTex, uvG).a;
-                float alphaB = tex2D(_MainTex, uvB).a;
-
-                // Maksimum alpha'yý buluyoruz ki maskeleme doðru olsun
-                float maxAlpha = max(alphaR, max(alphaG, alphaB));
+                float aR = tex2D(_MainTex, uvR).a;
+                float aG = tex2D(_MainTex, uvG).a;
+                float aB = tex2D(_MainTex, uvB).a;
 
                 fixed4 finalColor = fixed4(0,0,0,0);
                 bool hasColor = false;
 
-                // 3. ANA YAZI RENGÝNÝ OLUÞTURMA
+                // Maksimum alpha alaný (Hem glitch hem yazý görünsün diye)
+                float maxAlpha = max(aR, max(aG, aB));
+
+                // 3. RENK KARIÞTIRMA (BURASI DEÐÝÞTÝ)
                 if (maxAlpha > 0.1)
                 {
-                    // Temel renk (Scriptten gelen FaceColor ve VertexColor)
-                    fixed4 baseCol = IN.color * _FaceColor;
-
-                    // RGB Kanallarýný birleþtiriyoruz:
-                    // Kýrmýzý kanalýna -> R texture alphasýný atýyoruz
-                    // Yeþil kanalýna  -> G texture alphasýný atýyoruz
-                    // Mavi kanalýna   -> B texture alphasýný atýyoruz
-                    finalColor.r = baseCol.r * alphaR;
-                    finalColor.g = baseCol.g * alphaG;
-                    finalColor.b = baseCol.b * alphaB;
+                    // A. Baz Metin Rengi:
+                    // Sadece MERKEZ (aG) piksellerini kullanýcýnýn istediði renge boyuyoruz.
+                    fixed4 baseText = IN.color * _FaceColor;
                     
-                    // Alpha, en görünür olan kanalýn alphasý olur.
-                    finalColor.a = baseCol.a * maxAlpha;
+                    // Baþlangýç rengimiz metnin kendi rengi (Sadece yeþil kanalý hizasýnda var)
+                    float3 finalRGB = baseText.rgb * aG;
+
+                    // B. Glitch Efektleri (Additive / Ekleme):
+                    // Eðer glitch varsa ve renkler ayrýþýyorsa, kenarlara SAF KIRMIZI ve MAVÝ ekliyoruz.
+                    // "max(0, aR - aG)" formülü þu iþe yarar:
+                    // Sadece merkezin DIÞINDA kalan kýrmýzýlarý al. Böylece metnin ortasý boyanmaz.
+                    
+                    if (_GlitchStrength > 0.0)
+                    {
+                        // Kýrmýzý Hayalet (Texture'ýn kaymýþ hali - Orijinal hali)
+                        float redGhost = max(0.0, aR - aG);
+                        // Mavi Hayalet
+                        float blueGhost = max(0.0, aB - aG);
+
+                        // Bu hayaletleri final renge EKLE (Add). 
+                        // Metin siyah olsa bile (0,0,0), bu deðerler (1,0,0) olduðu için görünür.
+                        finalRGB.r += redGhost; 
+                        finalRGB.b += blueGhost;
+                        
+                        // Ýstersen yeþil kanalýyla da oynayabilirsin ama genelde R ve B yeterlidir.
+                    }
+
+                    finalColor.rgb = finalRGB;
+                    
+                    // Alpha ayarý: Text Animator "Fade Out" yaptýðýnda (IN.color.a düþtüðünde)
+                    // glitch efektleri de þeffaflaþmalý.
+                    finalColor.a = baseText.a * maxAlpha;
                     
                     hasColor = true;
                 }
 
                 // 4. OUTLINE KONTROLÜ
-                // Performans için Outline'a renk ayrýþmasý uygulamýyoruz.
-                // Outline sadece "Merkez" (Yeþil) koordinata göre çizilir.
-                // Bu sayede renkler outline'ýn dýþýna taþar (glitch hissini artýrýr).
+                // Outline hala sadece merkez (Green) koordinatýna göre çalýþýr.
                 else if (_OutlineThickness > 0.0)
                 {
+                    // ... (Burada deðiþiklik yok, ayný optimizasyon)
                     float baseStep = 1.0 / _AtlasWidth;
                     float offset = baseStep * max(0.0, _OutlineThickness);
                     float alphaSum = 0.0;
                     
-                    // Outline için hala 8 okuma yapýyoruz (glitchUV kullanarak)
                     alphaSum += tex2D(_MainTex, glitchUV + float2(offset, 0)).a;
                     alphaSum += tex2D(_MainTex, glitchUV - float2(offset, 0)).a;
                     alphaSum += tex2D(_MainTex, glitchUV + float2(0, offset)).a;

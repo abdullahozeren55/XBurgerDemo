@@ -21,7 +21,7 @@ MonoBehaviour:
     CamMoveEase: 4
     DutchAngle: 0
     TargetFOV: 60
-    NoiseType: 1
+    NoiseType: 2
     NoiseAmplitudeMultiplier: 1
     NoiseFrequencyMultiplier: 1
     IsGlitchLine: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
     GlitchAltKey: 
     GlitchDuration: 0
     CustomVoiceOrSFX: {fileID: 0}
-    EventTag: 
+    Events: -1
   - SpeakerID: 8
     LocalizationKey: TEENGIRL0_CRISPYCHICKEN_COLA
     TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
@@ -46,4 +46,4 @@ MonoBehaviour:
     GlitchAltKey: 
     GlitchDuration: 0
     CustomVoiceOrSFX: {fileID: 0}
-    EventTag: 
+    Events: 0
