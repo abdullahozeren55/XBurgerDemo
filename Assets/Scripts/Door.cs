@@ -183,7 +183,7 @@ public class Door : MonoBehaviour, IInteractable
         });
         seq.InsertCallback(data.timeToRotate * data.jumpscareEffectPercentValue, () =>
         {
-            CameraManager.Instance.PlayJumpscareEffects(data.jumpscareType);
+            CameraManager.Instance.TriggerJumpscare(data.jumpscareType);
         });
         seq.OnComplete(() =>
         {

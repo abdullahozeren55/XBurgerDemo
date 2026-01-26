@@ -10,7 +10,7 @@ public class DoorData : ScriptableObject
     [Space]
     public string audioTag;
     public PlayerManager.HandRigTypes handRigType;
-    public CameraManager.JumpscareType jumpscareType;
+    public JumpscareType jumpscareType;
     [Space]
     public float timeToRotate = 0.3f;
     public float openYRotation = 90f;

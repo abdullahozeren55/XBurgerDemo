@@ -9,18 +9,87 @@ public class DialogueAnimator : MonoBehaviour
 
     public bool IsBusy { get; private set; } = false;
 
+    // Orijinal hýz deðerlerini saklamak için
+    private float baseNormalWait = -1f; // -1 veriyoruz ki baþlatýlmadýðýný anlayalým
+    private float baseMiddleWait = -1f;
+    private float baseLongWait = -1f;
+
     private void Awake()
     {
         // Eðer inspector'dan atanmadýysa otomatik bul
         if (textComponent == null)
             textComponent = GetComponent<TMP_Text>();
 
-        // Text Animator genelde TMP ile ayný objededir ama deðilse childlarda ara
-        if (textComponent == null)
-            textComponent = GetComponentInChildren<TMP_Text>();
-        // Eventleri dinle
-        typewriter.onTextShowed.AddListener(OnTypingFinished);
-        typewriter.onTextDisappeared.AddListener(OnDisappearFinished);
+        if (typewriter != null)
+        {
+            // --- YENÝ: EVENT BAÐLANTISI ---
+            // Her karakter göründüðünde bu fonksiyon çalýþacak
+            typewriter.onCharacterVisible.AddListener(OnCharacterVisible);
+
+            typewriter.onTextShowed.AddListener(OnTypingFinished);
+            typewriter.onTextDisappeared.AddListener(OnDisappearFinished);
+        }
+    }
+
+    // --- BU FONKSÝYON DEÐERLERÝ GARANTÝ ALTINA ALIR ---
+    private void EnsureInitialized()
+    {
+        // Eðer zaten almýþsak ve deðerler saçma (0) deðilse çýk
+        if (baseNormalWait > 0f) return;
+
+        if (typewriter != null)
+        {
+            // Deðerleri çek
+            baseNormalWait = typewriter.waitForNormalChars;
+            baseMiddleWait = typewriter.waitMiddle;
+            baseLongWait = typewriter.waitLong;
+
+            // KORUMA: Eðer hala 0 geldiyse (Inspector'da 0.04 ayarlý olsa bile bazen Scripting order yüzünden 0 gelebilir)
+            // Febucci'nin varsayýlanlarýna veya manuel bir güvenli deðere çek.
+            if (baseNormalWait <= 0.0001f)
+            {
+                // HATA VAR DEMEKTÝR. Log basalým.
+                Debug.LogWarning($"[DialogueAnimator] Base wait time 0 olarak algýlandý! Inspector deðerlerini kontrol et. Obje: {gameObject.name}");
+
+                // Fallback (Acil durum) deðerleri
+                baseNormalWait = 0.04f;
+                baseMiddleWait = 0.08f;
+                baseLongWait = 0.16f;
+            }
+        }
+    }
+
+    // --- BU FONKSÝYON HER HARFTE ÇALIÞIR ---
+    private void OnCharacterVisible(char c)
+    {
+        // Boþluk karakterlerinde ses çalmasýn (Opsiyonel ama önerilir)
+        if (char.IsWhiteSpace(c)) return;
+
+        // Manager'a "Sýradaki sesi çal" de
+        if (DialogueManager.Instance != null)
+        {
+            DialogueManager.Instance.PlayNextTypewriterSound();
+        }
+    }
+
+    // --- YENÝ: HIZ AYARLAMA ---
+    public void SetSpeed(float multiplier)
+    {
+        if (typewriter == null) return;
+
+        // Önce base deðerlerin doðru olduðundan emin ol
+        EnsureInitialized();
+
+        // Güvenlik: 0'a bölme veya negatif hatasý olmasýn
+        if (multiplier <= 0.01f) multiplier = 0.01f;
+
+        // Speed artarsa, bekleme süresi AZALIR. (Ters Orantý)
+        // Hýz 2x ise -> Süre 0.5x olmalý.
+        // Math: Base / Multiplier
+
+        typewriter.waitForNormalChars = baseNormalWait / multiplier;
+        typewriter.waitMiddle = baseMiddleWait / multiplier;
+        typewriter.waitLong = baseLongWait / multiplier;
     }
 
     public void SetColor(Color color)

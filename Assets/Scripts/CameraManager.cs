@@ -11,6 +11,14 @@ public enum CameraNoiseType
     IdleBreathing,  // Varsayılan: Hafif el titremesi / Nefes alma
     Tension,        // Gergin anlar: Biraz daha hızlı titreme
 }
+
+public enum JumpscareType
+{
+    None,
+    Small,
+    Mid,
+    Big
+}
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance;
@@ -38,13 +46,6 @@ public class CameraManager : MonoBehaviour
         public float fovLerpDuration = 0.4f;
         public float fovTotalDuration = 1f;
         public float fovResetLerpDuration = 0.4f;
-    }
-
-    public enum JumpscareType
-    {
-        Small,
-        Mid,
-        Big
     }
 
     public enum CameraName
@@ -215,6 +216,21 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    // --- YENİ HELPER: AKTİF KAMERAYI BUL ---
+    public CinemachineVirtualCamera GetActiveCamera()
+    {
+        // 1. Eğer Diyalog Modundaysak (Priority yüksekse)
+        if (dialogueCam != null && dialogueCam.Priority >= activePriority)
+            return dialogueCam;
+
+        // 2. Eğer Menüdeysek
+        if (currentMenuCam != null && currentMenuCam.Priority > defaultPriority)
+            return currentMenuCam;
+
+        // 3. Oyun Modundaysak (First Person)
+        return firstPersonCam;
+    }
+
     public void StartDialogueMode()
     {
         if (dialogueCam != null)
@@ -232,42 +248,47 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void UpdateDialogueShot(Transform targetTransform, float moveDuration, Ease moveEase, float dutchAngle, float fov, CameraNoiseType noiseType, float ampMult, float freqMult, bool isInstant = false) // <--- YENİ PARAMETRE
+    public void UpdateDialogueShot(Transform targetTransform, float moveDuration, Ease moveEase, float dutchAngle, float fov, CameraNoiseType noiseType, float ampMult, float freqMult, bool isInstant = false, bool skipLensAndNoise = false) // <--- YENİ PARAMETRE (Sonda)
     {
         if (dialogueCam == null || dialogueLookTarget == null) return;
 
-        // --- HESAPLAMALAR ---
+        // --- 1. POZİSYON VE ROTASYON (Burası her zaman çalışır) ---
         Vector3 targetLookPos = targetTransform != null ? targetTransform.position : dialogueLookTarget.position;
-        Vector3 targetCamPos = dialogueCam.transform.position; // Varsayılan: Olduğu yerde kalsın
+        Vector3 targetCamPos = dialogueCam.transform.position;
 
-        // Eğer bir hedef varsa Auto-Framing pozisyonunu hesapla
         if (targetTransform != null)
         {
-            // Hedefin (Root/Gövde) baktığı yönü bul
             Vector3 customerForward = targetTransform.root.forward;
-            // İdeal pozisyon: Yüzün önünde + Yükseklik farkı
             targetCamPos = targetTransform.position + (customerForward * faceToFaceDistance);
             targetCamPos.y += heightOffset;
         }
 
-        // --- UYGULAMA (SNAP vs TWEEN) ---
+        if (isInstant)
+        {
+            dialogueLookTarget.DOKill();
+            dialogueCam.transform.DOKill();
+            dialogueLookTarget.position = targetLookPos;
+            dialogueCam.transform.position = targetCamPos;
+        }
+        else
+        {
+            dialogueLookTarget.DOMove(targetLookPos, moveDuration).SetEase(moveEase);
+            if (targetTransform != null)
+            {
+                dialogueCam.transform.DOMove(targetCamPos, repositionDuration).SetEase(Ease.OutCubic);
+            }
+        }
+
+        // --- 2. LENS VE NOISE (Burası Jumpscare varsa ÇALIŞMAZ) ---
+
+        if (skipLensAndNoise) return; // <--- KRİTİK KORUMA
 
         if (isInstant)
         {
-            // 1. ÖNCEKİ TWEENLERİ ÖLDÜR (Çakışma olmasın)
-            dialogueLookTarget.DOKill();
-            dialogueCam.transform.DOKill();
-            dialogueCam.DOKill(); // Lens tweenlerini de kapsar
-
-            // 2. DEĞERLERİ ANINDA ATA (IŞINLA)
-            dialogueLookTarget.position = targetLookPos;
-            dialogueCam.transform.position = targetCamPos;
-
-            // Lens
+            dialogueCam.DOKill(); // Lens tweenlerini öldür
             dialogueCam.m_Lens.Dutch = dutchAngle;
             dialogueCam.m_Lens.FieldOfView = fov;
 
-            // Noise (Anında geçiş)
             var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
             if (perlin != null)
             {
@@ -288,28 +309,16 @@ public class CameraManager : MonoBehaviour
         }
         else
         {
-            // --- NORMAL TWEEN AKIŞI (YUMUŞAK GEÇİŞ) ---
-
-            // 1. Hedefe Bak (LookAt Target)
-            dialogueLookTarget.DOMove(targetLookPos, moveDuration).SetEase(moveEase);
-
-            // 2. Kamera Pozisyonu (Auto-Framing)
-            if (targetTransform != null)
-            {
-                dialogueCam.transform.DOMove(targetCamPos, repositionDuration).SetEase(Ease.OutCubic);
-            }
-
-            // 3. Lens
+            // Lens Tween
             DOTween.To(() => dialogueCam.m_Lens.Dutch, x => dialogueCam.m_Lens.Dutch = x, dutchAngle, moveDuration).SetEase(moveEase);
             DOTween.To(() => dialogueCam.m_Lens.FieldOfView, x => dialogueCam.m_Lens.FieldOfView = x, fov, moveDuration).SetEase(moveEase);
 
-            // 4. Noise
+            // Noise Tween
             var perlin = dialogueCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
             if (perlin != null)
             {
                 if (noiseType == CameraNoiseType.None)
                 {
-                    // Noise kapatma tweeni
                     DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, moveDuration);
                     DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, moveDuration)
                            .OnComplete(() => perlin.m_NoiseProfile = null);
@@ -635,39 +644,91 @@ public class CameraManager : MonoBehaviour
                 duration, Ease.InOutBack, 3f, "ThrowEffectsFOV");
     }
 
-    public void PlayJumpscareEffects(JumpscareType type)
+    // --- YENİ JUMPSCARE SİSTEMİ ---
+    public void TriggerJumpscare(JumpscareType type, System.Action onComplete = null)
     {
-        perlin.m_NoiseProfile = shakeNoise;
+        if (type == JumpscareType.None) return;
 
         var preset = jumpscarePresets.Find(p => p.type == type);
-        if (preset == null)
+        if (preset == null) return;
+
+        CinemachineVirtualCamera activeCam = GetActiveCamera();
+        if (activeCam == null) return;
+
+        var perlin = activeCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+
+        // --- 1. MEVCUT DURUMU YEDEKLE (Snapshot) ---
+        NoiseSettings originalProfile = perlin != null ? perlin.m_NoiseProfile : null;
+        float originalAmp = perlin != null ? perlin.m_AmplitudeGain : 0f;
+        float originalFreq = perlin != null ? perlin.m_FrequencyGain : 0f;
+        float originalFOV = activeCam.m_Lens.FieldOfView;
+
+        // --- 2. JUMPSCARE PROFİLİNE GEÇ (SNAP) ---
+        if (perlin != null)
         {
-            Debug.LogWarning($"No preset found for jumpscare type {type}");
-            return;
+            // Sert sallantı profiline geçiyoruz
+            perlin.m_NoiseProfile = shakeNoise;
+            // Başlangıçta sıfırla ki Tween ile patlasın
+            perlin.m_AmplitudeGain = 0;
+            perlin.m_FrequencyGain = 0;
         }
 
-        PlayScreenShake(preset.amplitude, preset.frequency, preset.shakeLerpDuration, Ease.OutBack);
-        PlayVignette(preset.vignetteIntensity, preset.vignetteLerpDuration, preset.vignetteColor, Ease.OutSine);
-        PlayFOV(preset.fov, preset.fovLerpDuration, Ease.OutSine);
+        // --- 3. SEQUENCE OLUŞTUR ---
+        Sequence jumpSeq = DOTween.Sequence();
 
-        StartCoroutine(EndScreenShake(preset.shakeTotalDuration, preset.shakeResetLerpDuration));
-        StartCoroutine(EndVignette(preset.vignetteTotalDuration, preset.vignetteResetLerpDuration));
-        StartCoroutine(EndFOVCoroutine(preset.fovTotalDuration, preset.fovResetLerpDuration));
+        // A) CAMERA SHAKE (Patlama ve Sönme)
+        if (perlin != null)
+        {
+            // Şiddetle Yüksel (Attack)
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, preset.amplitude, preset.shakeLerpDuration).SetEase(Ease.OutExpo));
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, preset.shakeLerpDuration).SetEase(Ease.OutExpo));
+
+            // Yavaşça Sön (Decay) -> Sıfıra değil, orjinal değere dönmeye çalışacağız ama profil farklı olduğu için önce sıfırlamak daha temiz.
+            float decayDuration = preset.shakeTotalDuration - preset.shakeLerpDuration;
+            if (decayDuration < 0) decayDuration = 0.1f;
+
+            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, decayDuration).SetEase(Ease.InQuad));
+            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, decayDuration).SetEase(Ease.InQuad));
+        }
+
+        // B) FOV KICK
+        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, preset.fov, preset.fovLerpDuration).SetEase(Ease.OutBack));
+        jumpSeq.Insert(preset.fovTotalDuration, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, preset.fovResetLerpDuration).SetEase(Ease.InOutSine));
+
+        // C) VIGNETTE (Varsa)
+        if (vignette != null)
+        {
+            Color originalVigColor = vignette.color.value;
+            float originalVigInt = vignette.intensity.value;
+
+            // Kırmızılaş
+            jumpSeq.Insert(0, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, preset.vignetteColor, preset.vignetteLerpDuration));
+            jumpSeq.Insert(0, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, preset.vignetteIntensity, preset.vignetteLerpDuration));
+
+            // Normale Dön
+            jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, originalVigColor, preset.vignetteResetLerpDuration));
+            jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, originalVigInt, preset.vignetteResetLerpDuration));
+        }
+
+        // --- 4. TEMİZLİK VE GERİ DÖNÜŞ ---
+        jumpSeq.OnComplete(() =>
+        {
+            // Jumpscare bitti, eski gürültü profiline dönelim
+            if (perlin != null)
+            {
+                perlin.m_NoiseProfile = originalProfile;
+
+                // Diyalogda ise: DialogueManager zaten noise update ediyor, ama biz yine de snapshot'a dönelim.
+                // Yumuşak bir geçişle eski değerlere dön (Snap olmasın diye)
+                DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, originalAmp, 0.5f);
+                DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, originalFreq, 0.5f);
+            }
+
+            onComplete?.Invoke();
+        });
     }
 
     public Transform GetFirstPersonCamTransform() => firstPersonCam != null ? firstPersonCam.transform : transform;
-    private IEnumerator EndScreenShake(float delay, float duration)
-    {
-        yield return new WaitForSeconds(delay);
-        perlin.m_NoiseProfile = shakeNoise;
-        PlayScreenShake(0f, 0f, duration, Ease.OutExpo);
-    }
-
-    private IEnumerator EndVignette(float delay, float duration)
-    {
-        yield return new WaitForSeconds(delay);
-        PlayVignette(normalVignetteValue, duration, normalVignetteColor, Ease.InSine);
-    }
 
     private IEnumerator EndFOVCoroutine(float delay, float duration)
     {

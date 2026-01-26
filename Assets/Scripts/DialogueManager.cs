@@ -4,13 +4,37 @@ using UnityEngine;
 using Febucci.UI;
 using System;
 
+public enum TypewriterSoundType
+{
+    None,
+    Soft,   // Pýt pýt (Normal konuþma)
+    Medium, // Tak tuk (Sert adam)
+    Hard    // Çat Çut (Daktilo veya Robot)
+}
+
+[System.Serializable]
+public struct TypewriterSoundProfile
+{
+    public TypewriterSoundType type;
+    public AudioClip clipA; // Dýt
+    public AudioClip clipB; // Düt
+
+    [Range(0f, 1f)] public float volume;
+    public float minPitch;
+    public float maxPitch;
+}
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
 
-    [Header("Glitch Settings")]
-    [SerializeField] private AudioClip glitchSFX;
-    [SerializeField] private AudioSource sfxSource;
+    [Header("Typewriter Audio Settings")]
+    [SerializeField] private List<TypewriterSoundProfile> soundProfiles;
+
+    // Hýzlý eriþim için Dictionary
+    private Dictionary<TypewriterSoundType, TypewriterSoundProfile> soundProfileMap;
+
+    // Sesin A mý B mi olduðunu takip etmek için
+    private bool useClipA = true;
 
     [Header("UI Pool System")]
     [SerializeField] private List<DialogueAnimator> dialogueAnimatorPool; // Inspector'dan 4 tane balon ata
@@ -27,6 +51,13 @@ public class DialogueManager : MonoBehaviour
     private IDialogueSpeaker currentSpeaker;
     private Action onDialogueCompleteCallback;
 
+    // YENÝ: Þu anki satýrýn datasýna Update'den eriþmek için
+    private DialogueData.DialogueLine currentLineData;
+
+    // YENÝ: Delayleri durdurabilmek için Coroutine referanslarý
+    private Coroutine textDelayRoutine;
+    private Coroutine jumpscareDelayRoutine;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -34,23 +65,35 @@ public class DialogueManager : MonoBehaviour
 
         // Baþlangýçta tüm diyalog animatorleri kapat
         foreach (var dialogAnim in dialogueAnimatorPool) dialogAnim.ForceHide();
+
+        // Listeyi Dictionary'e çevir (Performans)
+        soundProfileMap = new Dictionary<TypewriterSoundType, TypewriterSoundProfile>();
+        foreach (var profile in soundProfiles)
+        {
+            if (!soundProfileMap.ContainsKey(profile.type))
+                soundProfileMap.Add(profile.type, profile);
+        }
     }
 
     private void Update()
     {
         if (!isDialogueActive) return;
 
-        // InputManager entegrasyonu
         if (InputManager.Instance != null && InputManager.Instance.PlayerInteract())
         {
-            // Eðer þu an aktif olan balon hala yazýyorsa -> Skip
+            // 1. Durum: Yazý hala yazýlýyor
             if (currentActiveDialogueAnimator != null && currentActiveDialogueAnimator.IsTyping())
             {
-                currentActiveDialogueAnimator.SkipTypewriter();
+                // YENÝ: Eðer Skippable ise geç, deðilse basma tuþa
+                if (currentLineData != null && currentLineData.IsSkippable)
+                {
+                    currentActiveDialogueAnimator.SkipTypewriter();
+                }
             }
+            // 2. Durum: Yazý bitti, sonraki satýra geçmek isteniyor
             else
             {
-                // Yazma bittiyse -> Sonraki satýra geç (Öncekini Disappear yaparak)
+                // Yazý bittiyse her türlü geçebilir (veya buraya da istersen delay koyabilirsin)
                 AdvanceDialogue();
             }
         }
@@ -109,13 +152,13 @@ public class DialogueManager : MonoBehaviour
 
     private void AdvanceDialogue()
     {
-        // 1. Önceki balon varsa, ona "Kaybolmaya Baþla" emri ver
+        // Önceki satýrdan kalan bekleyen iþleri (Delayleri) iptal et
+        if (textDelayRoutine != null) StopCoroutine(textDelayRoutine);
+        if (jumpscareDelayRoutine != null) StopCoroutine(jumpscareDelayRoutine);
+
         if (currentActiveDialogueAnimator != null)
         {
             currentActiveDialogueAnimator.Hide();
-            // Hide() içinde StartDisappearingText çaðrýlýyor.
-            // Balon hemen kapanmayacak, animasyonla gidecek.
-            // IsBusy deðeri ancak animasyon bitince false olacak.
         }
 
         currentIndex++;
@@ -131,10 +174,14 @@ public class DialogueManager : MonoBehaviour
 
     private void PlayLine(DialogueData.DialogueLine line)
     {
-        // 1. Konuþmacýyý Bul (Sadece ses ve kamera için lazým artýk)
+        currentLineData = line; // Update'de eriþmek için kaydet
+
+        // 1. Konuþmacýyý Bul
+        IDialogueSpeaker activeSpeaker = null; // Yerel deðiþken yaptýk
         if (speakers.ContainsKey(line.SpeakerID))
         {
-            currentSpeaker = speakers[line.SpeakerID];
+            activeSpeaker = speakers[line.SpeakerID];
+            // Burada OnSpeakStart'ý çaðýrmýyoruz, yazý baþlayýnca çaðýracaðýz (Opsiyonel)
         }
 
         // 2. HAVUZDAN BALON SEÇ
@@ -143,19 +190,12 @@ public class DialogueManager : MonoBehaviour
 
         selectedDialogueAnimator.SetColor(line.TextColor);
 
-        // 3. Metni Göster
-        if (line.IsGlitchLine)
-        {
-            StartCoroutine(HandleGlitchRoutine(line, selectedDialogueAnimator));
-        }
-        else
-        {
-            string finalList = LocalizationManager.Instance.GetText(line.LocalizationKey);
-            selectedDialogueAnimator.Show(finalList);
-        }
+        selectedDialogueAnimator.SetSpeed(line.TypewriterSpeedMultiplier);
 
-        // 4. Ses Efekti ve Kamera (Aynen Kalýyor)
-        if (line.CustomVoiceOrSFX != null) sfxSource.PlayOneShot(line.CustomVoiceOrSFX);
+        // 2. Ses Sýrasýný Sýfýrla
+        useClipA = true;
+
+        bool hasJumpscare = (line.Jumpscare != JumpscareType.None);
 
         // --- CAMERA JUICE (GÜNCELLENDÝ) ---
         if (CameraManager.Instance != null)
@@ -183,13 +223,23 @@ public class DialogueManager : MonoBehaviour
                 line.NoiseType,
                 line.NoiseAmplitudeMultiplier,
                 line.NoiseFrequencyMultiplier,
-                isFirstLine // <--- BURASI KRÝTÝK
+                (currentIndex == 0), // isInstant
+                hasJumpscare         // <--- YENÝ: skipLensAndNoise
             );
 
             if (line.Events != DialogueEvent.None)
             {
                 HandleDialogueEvents(line.Events);
             }
+
+            // --- JUMPSCARE (DELAYLI) ---
+            if (line.Jumpscare != JumpscareType.None)
+            {
+                jumpscareDelayRoutine = StartCoroutine(JumpscareRoutine(line.JumpscareDelay, line.Jumpscare));
+            }
+
+            // --- METÝN GÖSTERÝMÝ (DELAYLI) ---
+            textDelayRoutine = StartCoroutine(TextRoutine(line.TextDelay, line, selectedDialogueAnimator));
         }
     }
 
@@ -213,13 +263,6 @@ public class DialogueManager : MonoBehaviour
         var victim = dialogueAnimatorPool[0];
         victim.ForceHide();
         return victim;
-    }
-
-    private IEnumerator HandleGlitchRoutine(DialogueData.DialogueLine line, DialogueAnimator dialogueAnimator)
-    {
-        // Glitch mantýðý artýk bubble.Show() üzerinden çalýþacak
-        // ...
-        yield return null;
     }
 
     private void EndDialogue()
@@ -286,5 +329,48 @@ public class DialogueManager : MonoBehaviour
         }
 
         // ... Diðerlerini de buraya eklersin ...
+    }
+
+    private IEnumerator TextRoutine(float delay, DialogueData.DialogueLine line, DialogueAnimator dialogueAnimator)
+    {
+        if (delay > 0) yield return new WaitForSeconds(delay);
+
+        string finalList = LocalizationManager.Instance.GetText(line.LocalizationKey);
+        dialogueAnimator.Show(finalList);
+    }
+
+    private IEnumerator JumpscareRoutine(float delay, JumpscareType type)
+    {
+        if (delay > 0) yield return new WaitForSeconds(delay);
+
+        if (CameraManager.Instance != null)
+            CameraManager.Instance.TriggerJumpscare(type);
+    }
+
+    public void PlayNextTypewriterSound()
+    {
+        // Eðer þu anki satýrýn ses ayarý 'None' ise veya data yoksa çalma
+        if (currentLineData == null || currentLineData.SoundType == TypewriterSoundType.None) return;
+
+        // Profili bul
+        if (!soundProfileMap.ContainsKey(currentLineData.SoundType)) return;
+        TypewriterSoundProfile profile = soundProfileMap[currentLineData.SoundType];
+
+        // A/B Seçimi
+        AudioClip clipToPlay = useClipA ? profile.clipA : profile.clipB;
+
+        // Çal
+        if (SoundManager.Instance != null && clipToPlay != null)
+        {
+            SoundManager.Instance.PlayTypewriterSoundFX(
+                clipToPlay,
+                profile.volume,
+                profile.minPitch,
+                profile.maxPitch
+            );
+        }
+
+        // Sýrayý deðiþtir
+        useClipA = !useClipA;
     }
 }

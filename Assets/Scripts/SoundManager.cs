@@ -17,6 +17,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource soundFXObjectForAmbiance;
     [Space]
     [SerializeField] private AudioSource soundFXObjectForUI;
+    [Space]
+    [SerializeField] private AudioSource soundFXObjectForTypewriter;
 
     [Header("Ambiance Settings")]
     public AudioSource mainAmbianceSource;
@@ -138,6 +140,25 @@ public class SoundManager : MonoBehaviour
         audioSource.Play();
 
         Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public AudioSource PlayTypewriterSoundFX(AudioClip audioClip, float volume = 1f, float minPitch = 0.85f, float maxPitch = 1.15f)
+    {
+        AudioSource audioSource = Instantiate(soundFXObjectForTypewriter, Vector3.zero, Quaternion.identity);
+
+        audioSource.clip = audioClip;
+
+        audioSource.volume = volume;
+
+        audioSource.pitch = Random.Range(minPitch, maxPitch);
+
+        float clipLength = audioSource.clip.length / audioSource.pitch;
+
+        audioSource.Play();
+
+        Destroy(audioSource.gameObject, clipLength);
+
+        return audioSource;
     }
 
     public void PlaySoundFXWithRandomDelay(AudioClip audioClip, Transform spawnTransform, float volume = 1f, float minPitch = 0.85f, float maxPitch = 1.15f, float minDelay = 0.05f, float maxDelay = 0.25f)

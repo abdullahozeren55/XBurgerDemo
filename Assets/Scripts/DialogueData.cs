@@ -15,6 +15,16 @@ public class DialogueData : ScriptableObject
         [Header("Visuals")]
         public Color TextColor = Color.white;
 
+        [Header("Flow Control")]
+        [Tooltip("Oyuncu bu satýrý hýzlýca geçebilir mi?")]
+        public bool IsSkippable = true;
+
+        [Tooltip("Yazý yazma hýzý çarpaný. (1 = Normal, 2 = 2x Hýzlý, 0.5 = Yavaþ)")]
+        [Range(0.1f, 5f)] public float TypewriterSpeedMultiplier = 1f;
+
+        [Tooltip("Satýr baþladýktan kaç saniye sonra METÝN yazmaya baþlasýn?")]
+        public float TextDelay = 0f;
+
         [Header("Camera Juice")]
         public CustomerID FocusTargetID;
         [Range(0f, 5f)] public float CamMoveDuration = 1f;
@@ -35,20 +45,16 @@ public class DialogueData : ScriptableObject
         [Range(0f, 5f)] public float NoiseFrequencyMultiplier = 1f;
 
         [Header("Horror Elements")]
-        public bool IsGlitchLine;
-        public GlitchType glitchType;
-        public string GlitchAltKey;
-        public float GlitchDuration;
-        public AudioClip CustomVoiceOrSFX;
+        public JumpscareType Jumpscare = JumpscareType.None;
+        [Tooltip("Satýr baþladýktan kaç saniye sonra JUMPSCARE patlasýn?")]
+        public float JumpscareDelay = 0f;
+
+        [Header("Audio")]
+        public TypewriterSoundType SoundType = TypewriterSoundType.Soft;
 
         [Header("Events")]
         [Tooltip("Bu satýr oynarken gerçekleþecek olaylar (Birden fazla seçilebilir)")]
         public DialogueEvent Events;
-    }
-
-    public enum GlitchType
-    {
-        None, TextSwap, Corruption, HiddenMessage
     }
 
     public List<DialogueLine> lines;

@@ -16,23 +16,9 @@ MonoBehaviour:
   - SpeakerID: 8
     LocalizationKey: TEENGIRL0_GREETING_2
     TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
-    FocusTargetID: 8
-    CamMoveDuration: 1
-    CamMoveEase: 4
-    DutchAngle: 0
-    TargetFOV: 60
-    NoiseType: 2
-    NoiseAmplitudeMultiplier: 1
-    NoiseFrequencyMultiplier: 1
-    IsGlitchLine: 0
-    glitchType: 0
-    GlitchAltKey: 
-    GlitchDuration: 0
-    CustomVoiceOrSFX: {fileID: 0}
-    Events: -1
-  - SpeakerID: 8
-    LocalizationKey: TEENGIRL0_GARDENBURGER_ORANGESODA
-    TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
+    IsSkippable: 1
+    TypewriterSpeedMultiplier: 1
+    TextDelay: 0
     FocusTargetID: 8
     CamMoveDuration: 1
     CamMoveEase: 4
@@ -41,9 +27,33 @@ MonoBehaviour:
     NoiseType: 1
     NoiseAmplitudeMultiplier: 1
     NoiseFrequencyMultiplier: 1
+    Jumpscare: 0
+    JumpscareDelay: 0
     IsGlitchLine: 0
     glitchType: 0
     GlitchAltKey: 
     GlitchDuration: 0
-    CustomVoiceOrSFX: {fileID: 0}
+    SoundType: 1
+    Events: 0
+  - SpeakerID: 8
+    LocalizationKey: TEENGIRL0_GARDENBURGER_ORANGESODA
+    TextColor: {r: 0.18039216, g: 0.27450982, b: 0.47058824, a: 1}
+    IsSkippable: 1
+    TypewriterSpeedMultiplier: 1
+    TextDelay: 0
+    FocusTargetID: 8
+    CamMoveDuration: 1
+    CamMoveEase: 4
+    DutchAngle: 0
+    TargetFOV: 60
+    NoiseType: 1
+    NoiseAmplitudeMultiplier: 1
+    NoiseFrequencyMultiplier: 1
+    Jumpscare: 0
+    JumpscareDelay: 0
+    IsGlitchLine: 0
+    glitchType: 0
+    GlitchAltKey: 
+    GlitchDuration: 0
+    SoundType: 1
     Events: 0
