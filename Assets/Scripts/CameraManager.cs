@@ -197,16 +197,16 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {
-        if (GameManager.Instance != null && GameManager.Instance.PostProcessVolume != null)
+        if (PostProcessManager.Instance != null && PostProcessManager.Instance.PostProcessVolumeOnTopAll != null)
         {
-            if (GameManager.Instance.PostProcessVolume.profile.TryGet(out Vignette v))
+            if (PostProcessManager.Instance.PostProcessVolumeOnTopAll.profile.TryGet(out Vignette v))
             {
                 vignette = v;
                 normalVignetteValue = vignette.intensity.value;
                 normalVignetteColor = vignette.color.value;
             }
 
-            if (GameManager.Instance.PostProcessVolume.profile.TryGet(out ColorAdjustments c))
+            if (PostProcessManager.Instance.PostProcessVolumeOnTopAll.profile.TryGet(out ColorAdjustments c))
             {
                 colorAdjustments = c;
                 normalColorAdjustmentsPostExposureValue = colorAdjustments.postExposure.value;

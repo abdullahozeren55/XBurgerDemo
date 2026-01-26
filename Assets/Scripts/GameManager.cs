@@ -1,9 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -188,8 +184,6 @@ public class GameManager : MonoBehaviour
     public OrderThrowArea orderThrowArea;
 
     public static GameManager Instance;
-
-    public Volume PostProcessVolume;
 
     private void Awake()
     {

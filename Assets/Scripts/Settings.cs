@@ -33,8 +33,10 @@ public class Settings : MonoBehaviour
     [Header("Quality Settings")]
     public TMP_Dropdown qualityDropdown;
 
-    [Header("Pixelation Settings")]
-    public TMP_Dropdown pixelationDropdown;
+    [Header("Distortion Settings")]
+    public TMP_Dropdown distortionDropdown;
+    // Static olarak her yerden erişilebilir çarpan (Limitör)
+    public static float GlobalDistortionMultiplier { get; private set; } = 1f;
 
     [Header("UI Scale Settings")]
     public TMP_Dropdown uiScaleDropdown;
@@ -91,7 +93,6 @@ public class Settings : MonoBehaviour
     private readonly int[] fpsValues = { 30, 60, 75, 120, 144, 165, 240, 300, 360, -1 };
 
     private readonly List<string> qualityKeys = new List<string> { "UI_TOAST_MACHINE", "UI_LOW", "UI_MEDIUM", "UI_HIGH", "UI_ULTRA" };
-    private readonly List<string> pixelationKeys = new List<string> { "UI_MAIN_MENU_PIXELATION_0", "UI_MAIN_MENU_PIXELATION_1", "UI_MAIN_MENU_PIXELATION_2" };
     private readonly List<string> onOffKeys = new List<string> { "UI_ON", "UI_OFF" };
     private readonly List<string> offOnKeys = new List<string> { "UI_OFF", "UI_ON" }; // Invert Y için
     private readonly List<string> holdToggleKeys = new List<string> { "UI_HOLD", "UI_TOGGLE" };
@@ -106,7 +107,7 @@ public class Settings : MonoBehaviour
         InitializeQuality();
         InitializeVideoSettings();
         InitializeAudio();
-        InitializePixelation();
+        InitializeDistortion();
         InitializeGameplaySettings();
         InitializeControls();
     }
@@ -352,31 +353,56 @@ public class Settings : MonoBehaviour
     public void OnUIScaleChanged(int index) { PlayerPrefs.SetInt("UIScaleOffset", index); PlayerPrefs.Save(); StartCoroutine(ApplyUIScaleRoutine(index)); }
     private IEnumerator ApplyUIScaleRoutine(int offset) { if (MenuManager.Instance != null) { MenuManager.Instance.RefreshAllCanvases(offset); Canvas.ForceUpdateCanvases(); yield return null; yield return null; MenuManager.Instance.FixMenuPositions(); } }
 
-    private void InitializePixelation()
+    private void InitializeDistortion()
     {
-        pixelationDropdown.ClearOptions();
+        distortionDropdown.ClearOptions();
         List<string> options = new List<string>();
 
-        foreach (string key in pixelationKeys)
+        foreach (string key in aimAssistKeys) //Aim Assist ile aynı seçeneklere sahip diye kullandım
         {
             string localizedName = "MISSING";
             if (LocalizationManager.Instance != null)
                 localizedName = LocalizationManager.Instance.GetText(key);
 
-            // Formatla
+            // Senin Dropdown Formatlayıcın
             options.Add(FormatDropdownText(localizedName));
         }
 
-        pixelationDropdown.AddOptions(options);
+        distortionDropdown.AddOptions(options);
 
-        int currentLimit = PlayerPrefs.GetInt("TextureMipmapLimit", 0);
-        QualitySettings.globalTextureMipmapLimit = currentLimit;
-        pixelationDropdown.value = currentLimit;
-        pixelationDropdown.RefreshShownValue();
+        // Varsayılan: HIGH (3) -> Yani %100 Bozulma
+        int savedIndex = PlayerPrefs.GetInt("DistortionLevel", 3);
+        distortionDropdown.value = savedIndex;
+        distortionDropdown.RefreshShownValue();
+
+        // Çarpanı Başlangıçta Ayarla
+        UpdateDistortionMultiplier(savedIndex);
     }
 
-    // ... (SetPixelation, UpdateVolumeText, InitializeAudio, Slider Callbacks AYNI) ...
-    public void SetPixelation(int limitIndex) { QualitySettings.globalTextureMipmapLimit = limitIndex; PlayerPrefs.SetInt("TextureMipmapLimit", limitIndex); PlayerPrefs.Save(); }
+    // --- YENİ SETTER METODU (Unity Event'e Bağlayacaksın) ---
+    public void SetDistortion(int index)
+    {
+        PlayerPrefs.SetInt("DistortionLevel", index);
+        PlayerPrefs.Save();
+        UpdateDistortionMultiplier(index);
+
+        Debug.Log($"Distortion Level Set: {index} (Multiplier: {GlobalDistortionMultiplier})");
+    }
+
+    // --- YENİ HELPER: ÇARPAN MANTIĞI ---
+    private void UpdateDistortionMultiplier(int index)
+    {
+        switch (index)
+        {
+            case 0: GlobalDistortionMultiplier = 0.0f; break; // OFF: Hiç bozulma yok (Midesi bulananlar için)
+            case 1: GlobalDistortionMultiplier = 0.3f; break; // LOW: Az
+            case 2: GlobalDistortionMultiplier = 0.7f; break; // MEDIUM: Orta
+            case 3: GlobalDistortionMultiplier = 1.0f; break; // HIGH: Tam gaz
+            default: GlobalDistortionMultiplier = 1.0f; break;
+        }
+    }
+
+    // ... (UpdateVolumeText, InitializeAudio, Slider Callbacks AYNI) ...
     private void UpdateVolumeText(TMP_Text textComp, float value) { if (textComp != null) { int percentage = Mathf.RoundToInt(value * 100); textComp.text = "%" + percentage; } }
     private void InitializeAudio() { float masterVol = PlayerPrefs.GetFloat("MasterVol", defaultMasterVolume); float soundFXVol = PlayerPrefs.GetFloat("SoundFXVol", defaultSoundFXVolume); float musicVol = PlayerPrefs.GetFloat("MusicVol", defaultMusicVolume); float ambianceVol = PlayerPrefs.GetFloat("AmbianceVol", defaultAmbianceVolume); float typewriterVol = PlayerPrefs.GetFloat("TypewriterVol", defaultTypewriterVolume); float uiVol = PlayerPrefs.GetFloat("UIVol", defaultUIVolume); if (masterSlider) masterSlider.value = masterVol; if (soundFXSlider) soundFXSlider.value = soundFXVol; if (musicSlider) musicSlider.value = musicVol; if (ambianceSlider) ambianceSlider.value = ambianceVol; if (typewriterSlider) typewriterSlider.value = typewriterVol; if (uiSlider) uiSlider.value = uiVol; UpdateVolumeText(masterText, masterVol); UpdateVolumeText(soundFXText, soundFXVol); UpdateVolumeText(musicText, musicVol); UpdateVolumeText(ambianceText, ambianceVol); UpdateVolumeText(typewriterText, typewriterVol); UpdateVolumeText(uiText, uiVol); if (SoundManager.Instance != null) { SoundManager.Instance.SetMasterVolume(masterVol); SoundManager.Instance.SetSoundFXVolume(soundFXVol); SoundManager.Instance.SetMusicVolume(musicVol); SoundManager.Instance.SetAmbianceVolume(ambianceVol); SoundManager.Instance.SetTypewriterVolume(typewriterVol); SoundManager.Instance.SetUIVolume(uiVol); } }
     public void OnMasterSliderChanged(float val) { if (SoundManager.Instance != null) SoundManager.Instance.SetMasterVolume(val); PlayerPrefs.SetFloat("MasterVol", val); UpdateVolumeText(masterText, val); }
@@ -494,7 +520,7 @@ public class Settings : MonoBehaviour
         // böylece yeni dilin fontuyla tekrar formatlanıyorlar.
         InitializeQuality();
         InitializeVideoSettings();
-        InitializePixelation();
+        InitializeDistortion();
         InitializeUIScale();
         InitializeGameplaySettings();
         InitializeControls();
@@ -505,5 +531,12 @@ public class Settings : MonoBehaviour
     public void ResetGamepadUISettings() { if (stickLayoutDropdown != null) { stickLayoutDropdown.value = 0; stickLayoutDropdown.RefreshShownValue(); OnStickLayoutChanged(0); } if (controllerPromptsDropdown != null) { controllerPromptsDropdown.value = 0; controllerPromptsDropdown.RefreshShownValue(); OnControllerPromptsChanged(0); } if (aimAssistDropdown != null) { aimAssistDropdown.value = 1; aimAssistDropdown.RefreshShownValue(); OnAimAssistChanged(1); } Debug.Log("Gamepad Dropdownları ve Ayarları Sıfırlandı."); }
     public void ResetControlsSettings() { if (mouseSensSlider != null) { mouseSensSlider.value = 30f; OnMouseSensChanged(30f); } if (gamepadSensSlider != null) { gamepadSensSlider.value = 50f; OnGamepadSensChanged(50f); } if (invertYDropdown != null) { invertYDropdown.value = 0; invertYDropdown.RefreshShownValue(); OnInvertYChanged(0); } if (sprintModeDropdown != null) { sprintModeDropdown.value = 0; sprintModeDropdown.RefreshShownValue(); OnSprintModeChanged(0); } if (crouchModeDropdown != null) { crouchModeDropdown.value = 0; crouchModeDropdown.RefreshShownValue(); OnCrouchModeChanged(0); } Debug.Log("Kontrol Ayarları Varsayılanlara Döndü."); }
     public void ResetAudioSettings() { if (masterSlider != null) { masterSlider.value = defaultMasterVolume; OnMasterSliderChanged(defaultMasterVolume); } if (soundFXSlider != null) { soundFXSlider.value = defaultSoundFXVolume; OnSoundFXSliderChanged(defaultSoundFXVolume); } if (musicSlider != null) { musicSlider.value = defaultMusicVolume; OnMusicSliderChanged(defaultMusicVolume); } if (ambianceSlider != null) { ambianceSlider.value = defaultAmbianceVolume; OnAmbianceSliderChanged(defaultAmbianceVolume); } if (typewriterSlider != null) { typewriterSlider.value = defaultTypewriterVolume; OnTypewriterSliderChanged(defaultTypewriterVolume); } if (uiSlider != null) { uiSlider.value = defaultUIVolume; OnUISliderChanged(defaultUIVolume); } Debug.Log("Ses Ayarları Varsayılanlara Döndü."); }
-    public void ResetGeneralSettings() { if (qualityDropdown != null) { qualityDropdown.value = 2; qualityDropdown.RefreshShownValue(); SetQuality(2); } if (vSyncDropdown != null) { vSyncDropdown.value = 0; vSyncDropdown.RefreshShownValue(); SetVSync(0); } if (fpsDropdown != null) { int lastIndex = fpsValues.Length - 1; fpsDropdown.value = lastIndex; fpsDropdown.RefreshShownValue(); SetMaxFPS(lastIndex); } if (uiScaleDropdown != null) { uiScaleDropdown.value = 0; uiScaleDropdown.RefreshShownValue(); OnUIScaleChanged(0); } if (hintsDropdown != null) { hintsDropdown.value = 0; hintsDropdown.RefreshShownValue(); SetHints(0); } if (interactTextDropdown != null) { interactTextDropdown.value = 0; interactTextDropdown.RefreshShownValue(); SetInteractText(0); } if (pixelationDropdown != null) { pixelationDropdown.value = 0; pixelationDropdown.RefreshShownValue(); SetPixelation(0); } Debug.Log("Genel Ayarlar (Çözünürlük Hariç) Varsayılanlara Döndü."); }
+    public void ResetGeneralSettings() { if (qualityDropdown != null) { qualityDropdown.value = 2; qualityDropdown.RefreshShownValue(); SetQuality(2); } if (vSyncDropdown != null) { vSyncDropdown.value = 0; vSyncDropdown.RefreshShownValue(); SetVSync(0); } if (fpsDropdown != null) { int lastIndex = fpsValues.Length - 1; fpsDropdown.value = lastIndex; fpsDropdown.RefreshShownValue(); SetMaxFPS(lastIndex); } if (uiScaleDropdown != null) { uiScaleDropdown.value = 0; uiScaleDropdown.RefreshShownValue(); OnUIScaleChanged(0); } if (hintsDropdown != null) { hintsDropdown.value = 0; hintsDropdown.RefreshShownValue(); SetHints(0); } if (interactTextDropdown != null) { interactTextDropdown.value = 0; interactTextDropdown.RefreshShownValue(); SetInteractText(0); }
+        if (distortionDropdown != null)
+        {
+            distortionDropdown.value = 2; // Default High
+            distortionDropdown.RefreshShownValue();
+            SetDistortion(2);
+        }
+        Debug.Log("Genel Ayarlar (Çözünürlük Hariç) Varsayılanlara Döndü."); }
 }

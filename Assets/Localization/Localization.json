@@ -2161,16 +2161,6 @@
     "pt": "Idioma"
   },
   {
-    "key": "UI_MAIN_MENU_PIXELATION",
-    "tr": "Pikselleşme",
-    "en": "Pixelation",
-    "zh": "像素化",
-    "ja": "ピクセル化",
-    "es": "Pixelación",
-    "ru": "Пикселизация",
-    "pt": "Pixelização"
-  },
-  {
     "key": "UI_MAIN_MENU_UI_SCALE",
     "tr": "Arayüz Boyutu",
     "en": "Interface Scale",
@@ -2229,36 +2219,6 @@
     "es": "Ultra",
     "ru": "Ультра",
     "pt": "Ultra"
-  },
-  {
-    "key": "UI_MAIN_MENU_PIXELATION_0",
-    "tr": "Pikselden Nefret Ederim (Yok)",
-    "en": "I Hate Pixels (None)",
-    "zh": "我讨厌像素 (无)",
-    "ja": "ドット絵は嫌いだ (なし)",
-    "es": "Odio Los Píxeles (Nada)",
-    "ru": "Ненавижу Пиксели (Нет)",
-    "pt": "Odeio Pixels (Nada)"
-  },
-  {
-    "key": "UI_MAIN_MENU_PIXELATION_1",
-    "tr": "Siz Koyun Ben Dur Derim (Az)",
-    "en": "Just A Sprinkle (Low)",
-    "zh": "撒一点点 (低)",
-    "ja": "隠し味程度に (低)",
-    "es": "Una Pizca (Baja)",
-    "ru": "Щепотку (Низкая)",
-    "pt": "Só Uma Pitada (Baixa)"
-  },
-  {
-    "key": "UI_MAIN_MENU_PIXELATION_2",
-    "tr": "Piksel Piksel Anadolu (Çok)",
-    "en": "I'm Legally Blind (High)",
-    "zh": "我要瞎了 (高)",
-    "ja": "メガネ忘れた (高)",
-    "es": "Estoy Ciego (Alta)",
-    "ru": "Мои Глаза! (Высокая)",
-    "pt": "Estou Legalmente Cego (Alta)"
   },
   {
     "key": "UI_MAIN_MENU_CONTROL_HINTS",
@@ -2439,6 +2399,16 @@
     "es": "Volumen",
     "ru": "Громкость",
     "pt": "Volume"
+  },
+  {
+    "key": "UI_DISTORTION",
+    "tr": "Bozulma",
+    "en": "Distortion",
+    "zh": "失真",
+    "ja": "歪み",
+    "es": "Distorsión",
+    "ru": "Искажение",
+    "pt": "Distorção"
   },
   {
     "key": "UI_INTERACT",

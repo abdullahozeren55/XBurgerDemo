@@ -44,6 +44,10 @@ public class LoopManager : MonoBehaviour
     public int LoopPartCount = 0;
     public float transitionDuration = 10f;
 
+    [Header("Madness Progression")]
+    [Tooltip("X Ekseni: Loop Sayýsý, Y Ekseni: Delilik Seviyesi (0-1)")]
+    public AnimationCurve madnessCurve; // Grafikle ayarla: Loop 1'de 0.1, Loop 2'de 0.3 vs.
+
     [Header("Scene References")]
     public Light sun;
     [SerializeField] private Material originalSkyboxMat;
@@ -127,6 +131,14 @@ public class LoopManager : MonoBehaviour
         if (l == null) l = lightObj.GetComponentInChildren<Light>();
         if (l != null && !defaultLightIntensities.ContainsKey(l))
             defaultLightIntensities.Add(l, l.intensity);
+    }
+
+    public float GetCurrentMadness()
+    {
+        // Settings'den gelen Global Çarpaný burada iþleme katmýyoruz.
+        // Burasý saf "Oyunun Zorluðu".
+        // Settings freni en son aþamada (PostProcessManager'da) basýlacak.
+        return madnessCurve.Evaluate(LoopCount);
     }
 
     public void NextLoopState()
