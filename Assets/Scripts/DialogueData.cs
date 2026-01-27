@@ -54,6 +54,10 @@ public class DialogueData : ScriptableObject
 
         [Header("Horror Elements")]
         public JumpscareType Jumpscare = JumpscareType.None;
+        [Tooltip("Jumpscare'in tepe noktasýna çýkýþ süresi.")]
+        [Min(0f)] public float JumpscareFadeInDuration = 0.5f;
+        [Tooltip("Jumpscare'in sönümlenme süresi.")]
+        [Min(0f)] public float JumpscareFadeOutDuration = 1.5f;
         [Tooltip("Satýr baþladýktan kaç saniye sonra JUMPSCARE patlasýn?")]
         public float JumpscareDelay = 0f;
 
@@ -63,6 +67,12 @@ public class DialogueData : ScriptableObject
         [Header("Events")]
         [Tooltip("Bu satýr oynarken gerçekleþecek olaylar (Birden fazla seçilebilir)")]
         public DialogueEvent Events;
+        [Tooltip("Eventlerin (Glitch vb.) tepe noktasýna çýkýþ süresi.")]
+        [Min(0f)] public float EventFadeInDuration = 0.5f;
+        [Tooltip("Eventlerin sönümlenme süresi.")]
+        [Min(0f)] public float EventFadeOutDuration = 1.5f;
+        [Tooltip("Bu satýr baþladýktan kaç saniye sonra aþaðýdaki eventler tetiklensin?")]
+        public float EventDelay = 0f; // YENÝ
     }
 
     public List<DialogueLine> lines;

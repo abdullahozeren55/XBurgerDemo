@@ -735,7 +735,8 @@ public class CameraManager : MonoBehaviour
 
     // --- JUMPSCARE SİSTEMİ (SETTINGS ENTEGRASYONLU & TWEEN TEMİZLİKLİ) ---
 
-    public void TriggerJumpscare(JumpscareType type, System.Action onComplete = null)
+    // Parametreleri güncelledik: fadeInDuration ve fadeOutDuration eklendi (Varsayılan -1)
+    public void TriggerJumpscare(JumpscareType type, float overrideFadeIn = -1f, float overrideFadeOut = -1f, System.Action onComplete = null)
     {
         if (type == JumpscareType.None) return;
 
@@ -766,53 +767,68 @@ public class CameraManager : MonoBehaviour
 
         Sequence jumpSeq = DOTween.Sequence();
 
-        // --- SETTINGS ENTEGRASYONU ---
+        // --- GLOBAL SETTINGS ÇARPANI ---
         float globalMult = Settings.GlobalDistortionMultiplier;
+
+        // --- SÜRE HESAPLAMALARI (RANDOM JITTER) ---
+        // Eğer Data'dan değer gelmişse onu kullan, yoksa Preset'tekini kullan.
+        float baseIn = overrideFadeIn > 0 ? overrideFadeIn : preset.shakeLerpDuration;
+        float baseOut = overrideFadeOut > 0 ? overrideFadeOut : (preset.shakeTotalDuration - preset.shakeLerpDuration);
 
         // A) CAMERA SHAKE
         if (perlin != null)
         {
+            // %10 Sapma
+            float shakeInTime = baseIn * Random.Range(0.9f, 1.1f);
+            float shakeOutTime = baseOut * Random.Range(0.9f, 1.1f);
+
             float targetAmp = preset.amplitude * globalMult;
 
-            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, preset.shakeLerpDuration)
+            // Yüksel
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, targetAmp, shakeInTime)
                 .SetEase(Ease.OutExpo).SetTarget(perlin));
 
-            jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, preset.shakeLerpDuration)
+            jumpSeq.Insert(0, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, preset.frequency, shakeInTime)
                 .SetEase(Ease.OutExpo).SetTarget(perlin));
 
-            // Decay
-            float decayDuration = preset.shakeTotalDuration - preset.shakeLerpDuration;
-            if (decayDuration < 0.1f) decayDuration = 0.1f;
-
-            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, decayDuration)
+            // Alçal (Yükseliş bittikten hemen sonra başlar)
+            jumpSeq.Insert(shakeInTime, DOTween.To(() => perlin.m_AmplitudeGain, x => perlin.m_AmplitudeGain = x, 0f, shakeOutTime)
                 .SetEase(Ease.InQuad).SetTarget(perlin));
 
-            jumpSeq.Insert(preset.shakeLerpDuration, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, decayDuration)
+            jumpSeq.Insert(shakeInTime, DOTween.To(() => perlin.m_FrequencyGain, x => perlin.m_FrequencyGain = x, 0f, shakeOutTime)
                 .SetEase(Ease.InQuad).SetTarget(perlin));
         }
 
         // B) FOV KICK
+        float fovInTime = baseIn * Random.Range(0.85f, 1.15f); // Biraz daha farklı sapma
+        float fovOutTime = baseOut * Random.Range(0.85f, 1.15f);
+
         float targetFOV = Mathf.Lerp(originalFOV, preset.fov, globalMult);
 
-        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, targetFOV, preset.fovLerpDuration)
+        jumpSeq.Insert(0, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, targetFOV, fovInTime)
             .SetEase(Ease.OutBack).SetTarget(activeCam));
 
-        jumpSeq.Insert(preset.fovTotalDuration, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, preset.fovResetLerpDuration)
+        jumpSeq.Insert(fovInTime, DOTween.To(() => activeCam.m_Lens.FieldOfView, x => activeCam.m_Lens.FieldOfView = x, originalFOV, fovOutTime)
             .SetEase(Ease.InOutSine).SetTarget(activeCam));
 
         // C) VIGNETTE
         if (vignette != null)
         {
+            float vigInTime = baseIn * Random.Range(0.9f, 1.1f);
+            float vigOutTime = baseOut * Random.Range(0.9f, 1.1f);
+
             Color originalVigColor = vignette.color.value;
             float originalVigInt = vignette.intensity.value;
 
             float targetVigInt = Mathf.Lerp(normalVignetteValue, preset.vignetteIntensity, globalMult);
 
-            jumpSeq.Insert(0, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, preset.vignetteColor, preset.vignetteLerpDuration));
-            jumpSeq.Insert(0, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, targetVigInt, preset.vignetteLerpDuration));
+            // Yüksel
+            jumpSeq.Insert(0, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, preset.vignetteColor, vigInTime));
+            jumpSeq.Insert(0, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, targetVigInt, vigInTime));
 
-            jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, originalVigColor, preset.vignetteResetLerpDuration));
-            jumpSeq.Insert(preset.vignetteTotalDuration, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, originalVigInt, preset.vignetteResetLerpDuration));
+            // Alçal
+            jumpSeq.Insert(vigInTime, DOTween.To(() => vignette.color.value, x => vignette.color.value = x, originalVigColor, vigOutTime));
+            jumpSeq.Insert(vigInTime, DOTween.To(() => vignette.intensity.value, x => vignette.intensity.value = x, originalVigInt, vigOutTime));
         }
 
         jumpSeq.OnComplete(() =>

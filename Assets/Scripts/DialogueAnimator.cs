@@ -72,7 +72,6 @@ public class DialogueAnimator : MonoBehaviour
         if (tags.HasFlag(RichTextTag.Shake)) final = $"<shake>{final}</shake>";
         if (tags.HasFlag(RichTextTag.Wave)) final = $"<wave>{final}</wave>";
         if (tags.HasFlag(RichTextTag.Wiggle)) final = $"<wiggle>{final}</wiggle>";
-        if (tags.HasFlag(RichTextTag.RedColor)) final = $"<color=red>{final}</color>";
         // GlitchFont varsa: final = $"<font=\"GlitchFontSDF\">{final}</font>";
 
         return final;

@@ -1,5 +1,3 @@
-// PostProcessManager.cs
-
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -12,11 +10,18 @@ public class PostProcessManager : MonoBehaviour
     [Header("References")]
     public Volume PostProcessVolumeOnTopAll;
 
-    [Header("Chromatic Aberration Settings")]
-    [SerializeField] private float baseChromaticAmount = 0.5f;
+    [Header("Settings")]
+    [Tooltip("Loop son seviyeye geldiðinde (Madness 1.0) ulaþýlacak kalýcý CA miktarý.")]
+    [SerializeField] private float loopMaxChromatic = 0.5f;
 
+    [Tooltip("Event tetiklendiðinde eklenecek ekstra CA miktarý.")]
+    [SerializeField] private float eventGlitchAmount = 1.0f;
+
+    // Efekt Bileþeni
     private ChromaticAberration chromaticAberration;
-    private float eventGlitchIntensity = 0f;
+
+    // Deðiþkenler
+    private float currentEventIntensity = 0f;
 
     private void Awake()
     {
@@ -31,72 +36,87 @@ public class PostProcessManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Evente abone ol
-        Settings.OnDistortionChanged += RefreshVisuals;
+        Settings.OnDistortionChanged += OnSettingsChanged;
     }
 
     private void OnDisable()
     {
-        // Abonelikten çýk (Hata almamak için þart)
-        Settings.OnDistortionChanged -= RefreshVisuals;
+        Settings.OnDistortionChanged -= OnSettingsChanged;
     }
 
     private void Start()
     {
-        // Baþlangýçta bir kere çalýþtýr
-        RefreshVisuals(Settings.GlobalDistortionMultiplier);
+        // Baþlangýçta Loop deðerine göre bir kere ayarla
+        RefreshVisuals();
     }
 
-    // ARTIK UPDATE YOK! Sadece gerektiðinde çalýþýr.
-    private void RefreshVisuals(float multiplier)
+    private void OnSettingsChanged(float multiplier)
+    {
+        RefreshVisuals();
+    }
+
+    // --- GÖRSEL GÜNCELLEME MERKEZÝ ---
+    // Bunu hem Start'ta, hem ayar deðiþince, HEM DE TWEEN SIRASINDA çaðýracaðýz.
+    private void RefreshVisuals()
     {
         if (chromaticAberration == null) return;
 
-        // 1. Loop Etkisi (Static)
-        float loopIntensity = 0f;
+        // 1. Loop'un getirdiði kalýcý delilik
+        float loopContribution = 0f;
         if (LoopManager.Instance != null)
         {
-            loopIntensity = LoopManager.Instance.GetCurrentMadness() * baseChromaticAmount;
+            loopContribution = LoopManager.Instance.GetCurrentMadness() * loopMaxChromatic;
         }
 
-        // 2. Event Etkisi (Dynamic - O an varsa)
-        float currentEventIntensity = eventGlitchIntensity;
+        // 2. Event'in getirdiði anlýk delilik
+        float eventContribution = currentEventIntensity;
 
-        // 3. Toplam
-        float totalRaw = loopIntensity + currentEventIntensity;
+        // 3. Toplam Ham Deðer
+        float totalRaw = loopContribution + eventContribution;
 
-        // 4. Uygula
-        float finalVal = totalRaw * multiplier;
+        // 4. SON FREN: Ayarlar
+        float finalIntensity = totalRaw * Settings.GlobalDistortionMultiplier;
 
-        chromaticAberration.intensity.value = finalVal;
+        // 5. Uygula
+        chromaticAberration.intensity.value = finalIntensity;
 
-        // Volume aðýrlýðýný ayarla
-        if (finalVal > 0.01f) PostProcessVolumeOnTopAll.weight = 1f;
-        // Tamamen 0 ise kapatabiliriz ama geçiþlerde sorun olmasýn diye 1 tutmak daha güvenli
+        // Volume aðýrlýðý kontrolü (Gereksiz render'ý önlemek için)
+        if (finalIntensity <= 0.001f) PostProcessVolumeOnTopAll.weight = 0f;
+        else PostProcessVolumeOnTopAll.weight = 1f;
     }
 
-    public void TriggerGlitchEvent(float intensity, float duration)
+    // --- API: GLITCH TETÝKLEYÝCÝ ---
+    public void TriggerChromaticGlitch(float targetRiseTime, float targetDecayTime)
     {
-        DOTween.Kill("GlitchEvent");
+        DOTween.Kill("GlitchTween");
 
-        // Event baþladýðýnda Tween ile deðeri deðiþtiriyoruz.
-        // Ama "Update" olmadýðý için, her adýmda (OnUpdate) deðeri volume'e iþlememiz lazým.
+        // --- RANDOM JITTER EKLEME ---
+        // Gelen süreleri %10 aþaðý veya yukarý saptýrýyoruz (0.9x ile 1.1x arasý)
+        // Böylece 3 tane efekt ayný anda çalýþsa bile milisaniyelik farklar olur.
+        float randomizerIn = Random.Range(0.9f, 1.1f);
+        float randomizerOut = Random.Range(0.9f, 1.1f);
 
-        Sequence seq = DOTween.Sequence().SetId("GlitchEvent");
+        float finalRise = targetRiseTime * randomizerIn;
+        float finalDecay = targetDecayTime * randomizerOut;
 
-        seq.Append(DOTween.To(() => eventGlitchIntensity, x =>
+        // Güvenlik: Süre 0 olmasýn (Tween patlar)
+        if (finalRise < 0.05f) finalRise = 0.05f;
+        if (finalDecay < 0.05f) finalDecay = 0.05f;
+
+        Sequence seq = DOTween.Sequence().SetId("GlitchTween");
+
+        // A) YÜKSELÝÞ
+        seq.Append(DOTween.To(() => currentEventIntensity, x =>
         {
-            eventGlitchIntensity = x;
-            // Her karede görseli güncelle (Çarpaný dikkate alarak)
-            RefreshVisuals(Settings.GlobalDistortionMultiplier);
-        }, intensity, duration * 0.1f));
+            currentEventIntensity = x;
+            RefreshVisuals();
+        }, eventGlitchAmount, finalRise).SetEase(Ease.OutCubic));
 
-        seq.AppendInterval(duration * 0.4f);
-
-        seq.Append(DOTween.To(() => eventGlitchIntensity, x =>
+        // B) DÜÞÜÞ
+        seq.Append(DOTween.To(() => currentEventIntensity, x =>
         {
-            eventGlitchIntensity = x;
-            RefreshVisuals(Settings.GlobalDistortionMultiplier);
-        }, 0f, duration * 0.5f));
+            currentEventIntensity = x;
+            RefreshVisuals();
+        }, 0f, finalDecay).SetEase(Ease.InQuad));
     }
 }

@@ -32,8 +32,6 @@ public enum RichTextTag
     Shake = 1 << 0,    // <shake>Titreme</shake>
     Wave = 1 << 1,     // <wave>Dalga</wave>
     Wiggle = 1 << 2,   // <wiggle>Kýpýrkýpýr</wiggle>
-    RedColor = 1 << 3, // <color=red>Kýrmýzý</color>
-    GlitchFont = 1 << 4 // <font="GlitchSDF">Font deðiþimi</font> (Varsa)
 }
 
 public enum LineBehavior
@@ -83,6 +81,7 @@ public class DialogueManager : MonoBehaviour
     // YENÝ: Delayleri durdurabilmek için Coroutine referanslarý
     private Coroutine textDelayRoutine;
     private Coroutine jumpscareDelayRoutine;
+    private Coroutine eventDelayRoutine;
 
     private void Awake()
     {
@@ -189,6 +188,7 @@ public class DialogueManager : MonoBehaviour
         // Önceki satýrdan kalan bekleyen iþleri iptal et
         if (textDelayRoutine != null) StopCoroutine(textDelayRoutine);
         if (jumpscareDelayRoutine != null) StopCoroutine(jumpscareDelayRoutine);
+        if (eventDelayRoutine != null) StopCoroutine(eventDelayRoutine);
 
         // --- KRÝTÝK DÜZELTME BURADA ---
         if (currentActiveDialogueAnimator != null)
@@ -291,15 +291,20 @@ public class DialogueManager : MonoBehaviour
                 hasJumpscare         // <--- YENÝ: skipLensAndNoise
             );
 
+            float organicTextDelay = GetOrganicDelay(line.TextDelay);
+            float organicJumpscareDelay = GetOrganicDelay(line.JumpscareDelay);
+            float organicEventDelay = GetOrganicDelay(line.EventDelay);
+            float organicAutoAdvanceDuration = GetOrganicDelay(line.AutoAdvanceDuration);
+
             if (line.Events != DialogueEvent.None)
             {
-                HandleDialogueEvents(line.Events);
+                eventDelayRoutine = StartCoroutine(ProcessEventsRoutine(organicEventDelay, line.Events));
             }
 
             // --- JUMPSCARE (DELAYLI) ---
             if (line.Jumpscare != JumpscareType.None)
             {
-                jumpscareDelayRoutine = StartCoroutine(JumpscareRoutine(line.JumpscareDelay, line.Jumpscare));
+                jumpscareDelayRoutine = StartCoroutine(JumpscareRoutine(organicJumpscareDelay, line.Jumpscare, line.JumpscareFadeInDuration, line.JumpscareFadeOutDuration));
             }
 
             // 4. BEHAVIOR LOGIC (YENÝ KISIM)
@@ -313,27 +318,27 @@ public class DialogueManager : MonoBehaviour
                     StopGlitchAudio(0.1f);
                     // Standart akýþ
                     selectedDialogueAnimator.SetGlitchStrength(0f); // Temizle
-                    textDelayRoutine = StartCoroutine(TextRoutine(line.TextDelay, line, selectedDialogueAnimator, processedText));
+                    textDelayRoutine = StartCoroutine(TextRoutine(organicTextDelay, line, selectedDialogueAnimator, processedText));
                     break;
 
                 case LineBehavior.Meltdown:
                     // Normal baþla -> Sonra Glitchle -> Sonra Yok Ol
                     selectedDialogueAnimator.SetGlitchStrength(0f);
                     // Burada Typewriter normal çalýþacak
-                    textDelayRoutine = StartCoroutine(TextRoutine(line.TextDelay, line, selectedDialogueAnimator, processedText));
+                    textDelayRoutine = StartCoroutine(TextRoutine(organicTextDelay, line, selectedDialogueAnimator, processedText));
 
                     // Meltdown Özel Rutini: Yazý bitimine yakýn veya belli sürede glitchi artýr
-                    StartCoroutine(MeltdownRoutine(selectedDialogueAnimator, line.AutoAdvanceDuration));
+                    StartCoroutine(MeltdownRoutine(selectedDialogueAnimator, organicAutoAdvanceDuration));
                     break;
 
                 case LineBehavior.HorrorReveal:
                     // Glitchli baþla -> Hafif oyna -> Sonunda Patla
                     selectedDialogueAnimator.SetGlitchStrength(0f);
                     // Horror reveal genelde yavaþ olur, hýz ayarýný datadan yaparsýn.
-                    textDelayRoutine = StartCoroutine(TextRoutine(line.TextDelay, line, selectedDialogueAnimator, processedText));
+                    textDelayRoutine = StartCoroutine(TextRoutine(organicTextDelay, line, selectedDialogueAnimator, processedText));
 
                     // Horror Özel Rutini
-                    StartCoroutine(HorrorRevealRoutine(selectedDialogueAnimator, line.AutoAdvanceDuration));
+                    StartCoroutine(HorrorRevealRoutine(selectedDialogueAnimator, organicAutoAdvanceDuration));
                     break;
 
                 case LineBehavior.InstantRecover:
@@ -341,10 +346,28 @@ public class DialogueManager : MonoBehaviour
                     // Typewriter yok, anýnda belirir, Glitch sýfýr.
                     selectedDialogueAnimator.SetGlitchStrength(0f);
                     // Delay varsa bekle, sonra PAT diye göster
-                    textDelayRoutine = StartCoroutine(InstantTextRoutine(line.TextDelay, line, selectedDialogueAnimator, processedText));
+                    textDelayRoutine = StartCoroutine(InstantTextRoutine(organicTextDelay, line, selectedDialogueAnimator, processedText));
                     break;
             }
         }
+    }
+
+    // --- YENÝ: ORGANÝK DELAY HESAPLAYICI ---
+    private float GetOrganicDelay(float baseDelay)
+    {
+        if (baseDelay <= 0.05f) return 0f; // Çok küçükse direkt oynat
+
+        // %10 aþaðý veya yukarý sapma
+        // Örn: 2.0 saniye -> 1.8 ile 2.2 arasýnda deðiþir.
+        return baseDelay * UnityEngine.Random.Range(0.9f, 1.1f);
+    }
+
+    // --- YENÝ: EVENT RUTÝNÝ ---
+    private IEnumerator ProcessEventsRoutine(float delay, DialogueEvent events)
+    {
+        if (delay > 0) yield return new WaitForSeconds(delay);
+
+        HandleDialogueEvents(events);
     }
 
     // --- HAVUZ MANTIÐI ---
@@ -404,35 +427,17 @@ public class DialogueManager : MonoBehaviour
     // --- YENÝ EVENT MANTIÐI ---
     private void HandleDialogueEvents(DialogueEvent events)
     {
-        // 1. Iþýklar Titreyecek mi?
-        if (events.HasFlag(DialogueEvent.LightFlicker))
+        if (events.HasFlag(DialogueEvent.ChromaticAberrationGlitch))
         {
-            // Örn: LightManager.Instance.FlickerLights();
-            Debug.Log("EVENT: Iþýklar titriyor...");
+            if (PostProcessManager.Instance != null)
+            {
+                // Özel ayarlý glitch'i tetikle
+                PostProcessManager.Instance.TriggerChromaticGlitch(
+                    currentLineData.EventFadeInDuration,
+                    currentLineData.EventFadeOutDuration
+                );
+            }
         }
-
-        // 2. Iþýklar Sönecek mi?
-        if (events.HasFlag(DialogueEvent.LightsOff))
-        {
-            // Örn: LightManager.Instance.Blackout(true);
-            Debug.Log("EVENT: Zifiri karanlýk...");
-        }
-
-        // 3. Kapý Çarpacak mý?
-        if (events.HasFlag(DialogueEvent.DoorSlam))
-        {
-            // Örn: WorldManager.Instance.SlamAllDoors();
-            Debug.Log("EVENT: Kapýlar çarpýyor!");
-        }
-
-        // 4. Jumpscare?
-        if (events.HasFlag(DialogueEvent.SpawnJumpscare))
-        {
-            // Örn: CustomerManager.Instance.SpawnStalker();
-            Debug.Log("EVENT: Bir þeyler ters gidiyor...");
-        }
-
-        // ... Diðerlerini de buraya eklersin ...
     }
 
     // --- YENÝ RUTÝNLER ---
@@ -516,12 +521,16 @@ public class DialogueManager : MonoBehaviour
             PlayNextTypewriterSound(); // Ýlk harf için tetik (veya Febucci eventi halleder)
     }
 
-    private IEnumerator JumpscareRoutine(float delay, JumpscareType type)
+    private IEnumerator JumpscareRoutine(float delay, JumpscareType type, float fadeIn, float fadeOut)
     {
         if (delay > 0) yield return new WaitForSeconds(delay);
 
-        if (CameraManager.Instance != null)
-            CameraManager.Instance.TriggerJumpscare(type);
+        if (CameraManager.Instance != null && currentLineData != null)
+        {
+            // Data'daki Fade In ve Fade Out sürelerini gönderiyoruz
+            // CameraManager içinde bunlar randomize edilecek.
+            CameraManager.Instance.TriggerJumpscare(type, fadeIn, fadeOut);
+        }
     }
 
     public void PlayNextTypewriterSound()
