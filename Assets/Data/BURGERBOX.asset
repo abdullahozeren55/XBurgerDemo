@@ -21,9 +21,9 @@ MonoBehaviour:
     offset: {x: 0, y: 0}
   - sprite: {fileID: 21300000, guid: 174c27038ef842a4cae4b9e195949bcf, type: 3}
     offset: {x: 0, y: 0}
-  minLidAngle: 32
-  maxLidAngle: 112
-  minBurgerHeightLimit: 1.5
+  minLidAngle: 24
+  maxLidAngle: 148
+  minBurgerHeightLimit: 0.4
   maxBurgerHeightLimit: 2
   timeToPutOnTray: 0.2
   throwMultiplier: 1

@@ -45,6 +45,15 @@ public class WholeBurger : MonoBehaviour, IGrabable
     private int grabbedLayer;
     private int grabableOutlinedGreenLayer;
 
+    private bool isJustThrowed;
+    private bool isJustDropped;
+
+    private float lastSoundTime = 0f;
+
+    private Quaternion collisionRotation;
+
+    private float pitchMultiplier;
+
     private void Awake()
     {
         // BURADA GETCOMPONENT YAPMIYORUZ!
@@ -68,11 +77,24 @@ public class WholeBurger : MonoBehaviour, IGrabable
         rb = rigidBody;
         data = burgerData;
 
+        pitchMultiplier = height >= 1 ? 0.8f : height >= 0.5f ? 1f : 1.2f;
+
         // Enum'ý kaydet
         BurgerType = type;
 
         TotalBurgerHeight = height;
         ChangeLayer(grabableLayer);
+
+        if (data.dropParticle != null)
+            Instantiate(data.dropParticle, transform.position, Quaternion.identity);
+
+        SoundManager.Instance.PlaySoundFX(
+                data.audioClips[3],
+                transform,
+                data.initSoundVolume,
+                data.initSoundMinPitch * pitchMultiplier,
+                data.initSoundMaxPitch * pitchMultiplier, false
+            );
     }
 
     // --- IGrabable Implementation ---
@@ -99,12 +121,20 @@ public class WholeBurger : MonoBehaviour, IGrabable
         transform.localRotation = Quaternion.Euler(data.grabLocalRotationOffset);
 
         ChangeLayer(grabbedLayer);
+
+        SoundManager.Instance.PlaySoundFX(
+                data.audioClips[0],
+                transform,
+                data.grabSoundVolume,
+                data.grabSoundMinPitch * pitchMultiplier,
+                data.grabSoundMaxPitch * pitchMultiplier, false
+            );
     }
 
-    public void OnDrop(Vector3 direction, float force) => Release(direction, force);
-    public void OnThrow(Vector3 direction, float force) => Release(direction, force);
+    public void OnDrop(Vector3 direction, float force) => Release(direction, force, false);
+    public void OnThrow(Vector3 direction, float force) => Release(direction, force, true);
 
-    private void Release(Vector3 direction, float force)
+    private void Release(Vector3 direction, float force, bool isThrowed)
     {
         ToggleChildColliders(true);
 
@@ -118,17 +148,22 @@ public class WholeBurger : MonoBehaviour, IGrabable
             rb.AddForce(direction * force, ForceMode.Impulse);
         }
 
-        ChangeLayer(ungrabableLayer);
+        if (isThrowed) isJustThrowed = true;
+        else isJustDropped = true;
+
+            ChangeLayer(ungrabableLayer);
     }
 
     public void OnFocus()
     {
-        ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(OutlineShouldBeRed ? interactableOutlinedRedLayer : grabableOutlinedLayer);
     }
 
     public void OnLoseFocus()
     {
-        ChangeLayer(grabableLayer);
+        if (!isJustDropped && !isJustThrowed)
+            ChangeLayer(grabableLayer);
     }
 
     public void OutlineChangeCheck()
@@ -181,7 +216,30 @@ public class WholeBurger : MonoBehaviour, IGrabable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!IsGrabbed && gameObject.layer == ungrabableLayer) ChangeLayer(grabableLayer);
+        if (!IsGrabbed && !collision.gameObject.CompareTag("Player"))
+        {
+            if (isJustThrowed)
+            {
+                CalculateCollisionRotation(collision);
+
+                ChangeLayer(grabableLayer);
+
+                isJustThrowed = false;
+            }
+            else if (isJustDropped)
+            {
+                CalculateCollisionRotation(collision);
+
+                ChangeLayer(grabableLayer);
+
+                isJustDropped = false;
+            }
+            
+            HandleSoundFX(collision);
+
+        }
+
+
     }
 
     private void ToggleChildColliders(bool state)
@@ -259,5 +317,67 @@ public class WholeBurger : MonoBehaviour, IGrabable
         }
         return cleanList;
         */
+    }
+
+    private void CalculateCollisionRotation(Collision collision)
+    {
+        ContactPoint contact = collision.contacts[0];
+
+        Vector3 normal = contact.normal;
+        Vector3 hitPoint = contact.point + normal * 0.02f;
+
+        Vector3 tangent = Vector3.Cross(normal, Vector3.up);
+        if (tangent == Vector3.zero)
+            tangent = Vector3.Cross(normal, Vector3.forward);
+        tangent.Normalize();
+        Vector3 bitangent = Vector3.Cross(normal, tangent);
+
+        // Normal yönüne göre rotation hesapla
+        collisionRotation = Quaternion.LookRotation(normal) * Quaternion.Euler(0, 180, 0);
+    }
+
+    private void HandleSoundFX(Collision collision)
+    {
+        // --- 2. Hýz Hesaplama ---
+        // Çarpýþmanýn þiddetini alýyoruz
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        // --- 3. Spam Korumasý ve Sessizlik ---
+        // Eðer çok yavaþ sürtünüyorsa (dropThreshold altý) veya
+        // son sesin üzerinden çok az zaman geçtiyse çýk.
+        if (impactForce < data.dropThreshold || Time.time - lastSoundTime < data.soundCooldown) return;
+
+        // --- 4. Hýza Göre Ses Seçimi ---
+        if (impactForce >= data.throwThreshold)
+        {
+            // === FIRLATMA SESÝ (Hýzlý) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[2],
+                transform,
+                data.throwSoundVolume,
+                data.throwSoundMinPitch * pitchMultiplier,
+                data.throwSoundMaxPitch * pitchMultiplier, false
+            );
+
+            if (data.throwParticle != null)
+                Instantiate(data.throwParticle, transform.position, collisionRotation);
+        }
+        else
+        {
+            // === DÜÞME SESÝ (Yavaþ/Orta) ===
+            SoundManager.Instance.PlaySoundFX(
+                data.audioClips[1],
+                transform,
+                data.dropSoundVolume,
+                data.dropSoundMinPitch * pitchMultiplier,
+                data.dropSoundMaxPitch * pitchMultiplier, false
+            );
+
+            if (data.dropParticle != null)
+                Instantiate(data.dropParticle, transform.position, collisionRotation);
+        }
+
+        // Ses çaldýk, zamaný kaydet
+        lastSoundTime = Time.time;
     }
 }

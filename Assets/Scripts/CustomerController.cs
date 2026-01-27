@@ -370,6 +370,19 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
     private void GoToState(CustomerState newState)
     {
+        // Eski state'ten çýkarken temizlik yapalým
+        if (CurrentState == CustomerState.AtCounter ||
+            CurrentState == CustomerState.Ordering ||
+            CurrentState == CustomerState.WaitingForFood)
+        {
+            // Eðer kasadan ayrýlýyorsak (Leaving veya MovingToSeat) kaydý sil.
+            // Ama Ordering -> WaitingForFood geçiþinde silme, çünkü hala kasada.
+            if (newState != CustomerState.Ordering && newState != CustomerState.WaitingForFood && newState != CustomerState.AtCounter)
+            {
+                CustomerManager.Instance.UnregisterCustomerAtCounter(this);
+            }
+        }
+
         CurrentState = newState;
 
         switch (newState)
@@ -422,6 +435,10 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
                 agent.ResetPath(); // Hedefi unut ki tekrar yürümeye kalkmasýn
 
                 anim.SetBool("walk", false);
+
+                // --- YENÝ: Kendimizi kaydettiriyoruz ---
+                CustomerManager.Instance.RegisterCustomerAtCounter(this);
+
                 // ---------------------------
                 break;
 
@@ -433,9 +450,11 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
             case CustomerState.WaitingForFood:
                 CanInteract = false;
                 ChangeLayer(uninteractableLayer);
+                // Not: Burada Unregister YAPMIYORUZ çünkü hala kasada bekliyor.
                 break;
 
             case CustomerState.MovingToSeat:
+                // Kasa ile iþimiz bitti, yukarýdaki 'if' bloðu zaten Unregister yapacak.
                 agent.isStopped = false;
                 agent.updateRotation = true;
                 anim.SetBool("walk", true);
@@ -542,5 +561,15 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
         }
 
         isInteractingWithDoor = false; // KÝLÝDÝ AÇ (Gerçi state deðiþtiði için gerek kalmaz ama temizlik)
+    }
+
+    public void OnWrongOrderReceived()
+    {
+        // Eðer zaten konuþuyorsa bölme veya üst üste bindirme
+        // Basitçe:
+        if (currentProfile.WrongOrderDialogue != null)
+        {
+            DialogueManager.Instance.StartDialogue(currentProfile.WrongOrderDialogue);
+        }
     }
 }

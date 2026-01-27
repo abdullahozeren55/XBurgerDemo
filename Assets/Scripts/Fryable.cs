@@ -221,7 +221,9 @@ public class Fryable : MonoBehaviour, IGrabable
         seq.OnComplete(() => {
             isAddedToBasket = true;
             isGettingPutOnBasket = false;
-            // if (data.dropSound) SoundManager.Instance.PlaySoundFX...
+
+            if (data.dropParticles[(int)CurrentCookingState] != null)
+                Instantiate(data.dropParticles[(int)CurrentCookingState], transform.position, Quaternion.identity);
 
             // YENÝ: Animasyon bitti, sepete haber ver layer'ýmý ayarlasýn
             if (currentBasket != null)

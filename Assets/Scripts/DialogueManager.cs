@@ -112,12 +112,26 @@ public class DialogueManager : MonoBehaviour
     {
         if (!isDialogueActive) return;
 
+        // --- YENÝ: INPUT ENGELLEYÝCÝ ---
+        // Eðer þu anki satýr "Meltdown" veya "HorrorReveal" ise, kontrol tamamen bizdedir.
+        // Oyuncu 'E' tuþuna bassa bile algýlamamalýyýz.
+        // Bu satýrlar sadece Coroutine süreleri dolunca (AutoAdvance) geçecek.
+        if (currentLineData != null)
+        {
+            if (currentLineData.Behavior == LineBehavior.Meltdown ||
+                currentLineData.Behavior == LineBehavior.HorrorReveal)
+            {
+                return; // Oyuncu inputunu yoksay ve çýk
+            }
+        }
+        // -------------------------------
+
         if (InputManager.Instance != null && InputManager.Instance.PlayerInteract())
         {
             // 1. Durum: Yazý hala yazýlýyor
             if (currentActiveDialogueAnimator != null && currentActiveDialogueAnimator.IsTyping())
             {
-                // YENÝ: Eðer Skippable ise geç, deðilse basma tuþa
+                // Sadece NORMAL ve INSTANT satýrlarda, eðer IsSkippable açýksa geçilebilir
                 if (currentLineData != null && currentLineData.IsSkippable)
                 {
                     currentActiveDialogueAnimator.SkipTypewriter();
@@ -126,7 +140,6 @@ public class DialogueManager : MonoBehaviour
             // 2. Durum: Yazý bitti, sonraki satýra geçmek isteniyor
             else
             {
-                // Yazý bittiyse her türlü geçebilir (veya buraya da istersen delay koyabilirsin)
                 AdvanceDialogue();
             }
         }

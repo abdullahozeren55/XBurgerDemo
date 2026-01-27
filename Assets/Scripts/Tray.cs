@@ -41,53 +41,60 @@ public static class OrderValidator
 {
     public static bool Validate(Tray tray, OrderData order)
     {
-        // 1. BURGER KONTROLÜ
+        var content = tray.CurrentContent;
+
+        // --- ADIM 1: TOPLAM OBJE SAYISI KONTROLÜ (FAZLALIK ENGELLEME) ---
+        // Tepsideki toplam eþya sayýsý
+        int totalItemsOnTray = content.Burgers.Count +
+                               content.Drinks.Count +
+                               content.Sides.Count +
+                               content.Sauces.Count +
+                               content.Toys.Count;
+
+        // Sipariþteki toplam eþya sayýsý
+        int totalItemsInOrder = order.RequiredBurgers.Sum(x => x.Count) +
+                                order.RequiredDrinks.Sum(x => x.Count) +
+                                order.RequiredSides.Sum(x => x.Count) +
+                                order.RequiredSauces.Sum(x => x.Count) +
+                                order.RequiredToys.Sum(x => x.Count);
+
+        // Eðer sayýlar tutmuyorsa (Eksik veya FAZLA ise) direkt reddet.
+        if (totalItemsOnTray != totalItemsInOrder)
+        {
+            Debug.Log($"Sayý uyuþmazlýðý! Tepsi: {totalItemsOnTray}, Sipariþ: {totalItemsInOrder}");
+            return false;
+        }
+
+        // --- ADIM 2: TÜR KONTROLÜ (BÝREBÝR EÞLEÞME) ---
+        // Sayýlar tutuyorsa, içerik doðru mu diye bak.
+        // Artýk ">=" deðil "==" kullanýyoruz.
+
         foreach (var req in order.RequiredBurgers)
         {
-            // Tepside bu tipte kaç tane burger var say
-            int countOnTray = tray.CurrentContent.Burgers.Count(b => b == req.Type);
-
-            // Eðer tepsideki sayý, istenenden azsa -> BAÞARISIZ
-            if (countOnTray < req.Count)
-            {
-                Debug.Log($"Sipariþ Eksik: {req.Count} adet {req.Type} istendi, {countOnTray} bulundu.");
-                return false;
-            }
+            if (content.Burgers.Count(x => x == req.Type) != req.Count) return false;
         }
 
-        // 2. ÝÇECEK KONTROLÜ (Þiþe veya Bardak fark etmez, ikisi de Drinks listesinde)
         foreach (var req in order.RequiredDrinks)
         {
-            int countOnTray = tray.CurrentContent.Drinks.Count(d => d == req.Type);
-            if (countOnTray < req.Count)
-            {
-                Debug.Log($"Sipariþ Eksik: {req.Count} adet {req.Type} istendi, {countOnTray} bulundu.");
-                return false;
-            }
+            if (content.Drinks.Count(x => x == req.Type) != req.Count) return false;
         }
 
-        // 3. YAN ÜRÜN (HOLDER) KONTROLÜ
         foreach (var req in order.RequiredSides)
         {
-            int countOnTray = tray.CurrentContent.Sides.Count(s => s == req.Type);
-            if (countOnTray < req.Count) return false;
+            if (content.Sides.Count(x => x == req.Type) != req.Count) return false;
         }
 
-        // 4. SOS KONTROLÜ
         foreach (var req in order.RequiredSauces)
         {
-            int countOnTray = tray.CurrentContent.Sauces.Count(s => s == req.Type);
-            if (countOnTray < req.Count) return false;
+            if (content.Sauces.Count(x => x == req.Type) != req.Count) return false;
         }
 
-        // 5. OYUNCAK KONTROLÜ
         foreach (var req in order.RequiredToys)
         {
-            int countOnTray = tray.CurrentContent.Toys.Count(t => t == req.Type);
-            if (countOnTray < req.Count) return false;
+            if (content.Toys.Count(x => x == req.Type) != req.Count) return false;
         }
 
-        return true; // Tüm döngülerden sað çýktýysa sipariþ tamamdýr!
+        return true;
     }
 }
 public class Tray : MonoBehaviour, IGrabable
@@ -147,8 +154,15 @@ public class Tray : MonoBehaviour, IGrabable
     private bool isJustDropped;
     private float lastSoundTime = 0f;
 
+    private ServingZone currentZone; // Hangi zone içindeyim?
+
     // --- SÝGORTA ÝÇÝN COROUTINE REFERANSI ---
     private Coroutine safetyResetCoroutine;
+
+    public void SetCurrentServingZone(ServingZone zone)
+    {
+        currentZone = zone;
+    }
 
     private void Awake()
     {
@@ -548,6 +562,12 @@ public class Tray : MonoBehaviour, IGrabable
         // Eðer 1 saniye içinde yere çarpýp düzelmezse, biz elle düzeltiriz.
         if (safetyResetCoroutine != null) StopCoroutine(safetyResetCoroutine);
         safetyResetCoroutine = StartCoroutine(SafetyLayerReset());
+
+        // Eðer bir servis alanýnýn içindeyken yere býrakýldýysam, Zone'a haber ver.
+        if (currentZone != null)
+        {
+            currentZone.ProcessTray(this);
+        }
     }
 
     // --- DÜZELTÝLEN THROW ---
@@ -569,6 +589,12 @@ public class Tray : MonoBehaviour, IGrabable
         // Sigorta
         if (safetyResetCoroutine != null) StopCoroutine(safetyResetCoroutine);
         safetyResetCoroutine = StartCoroutine(SafetyLayerReset());
+
+        // Eðer bir servis alanýnýn içindeyken yere býrakýldýysam, Zone'a haber ver.
+        if (currentZone != null)
+        {
+            currentZone.ProcessTray(this);
+        }
     }
 
     // --- YENÝ: SÝGORTA COROUTINE ---

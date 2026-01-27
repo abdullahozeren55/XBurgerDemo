@@ -71,9 +71,30 @@ public class GameManager : MonoBehaviour
     public enum DrinkTypes
     {
         Null,
+
+        // --- TEMEL TİPLER (Butonlar ve Reçeteler için Referans) ---
         Cola,
         OrangeSoda,
         LemonLime,
+
+        // --- BOYUTLU İÇECEKLER (Bardağın İçine Girecekler) ---
+
+        // Cola Varyasyonları
+        ColaSmall,
+        ColaMedium,
+        ColaLarge,
+
+        // Orange Soda Varyasyonları
+        OrangeSodaSmall,
+        OrangeSodaMedium,
+        OrangeSodaLarge,
+
+        // Lemon Lime Varyasyonları
+        LemonLimeSmall,
+        LemonLimeMedium,
+        LemonLimeLarge,
+
+        // --- TEK TİP (Şişe) İÇECEKLER ---
         OrangeJuice,
         Lemonade,
         CherryJuice,
@@ -169,8 +190,6 @@ public class GameManager : MonoBehaviour
     [Header("Other Settings")]
     [Space]
     public BurgerCombineArea burgerCombineArea;
-    [Space]
-    public OrderThrowArea orderThrowArea;
 
     public static GameManager Instance;
 
@@ -230,8 +249,6 @@ public class GameManager : MonoBehaviour
             grownUpBurgerSauces,
         };
 
-        SetOrderThrowArea(false);
-
     }
 
     private void LateUpdate()
@@ -247,8 +264,6 @@ public class GameManager : MonoBehaviour
     {
         burgerCombineArea.AddSauce(type);
     }
-
-    public void SetOrderThrowArea(bool shouldReceive) { if (orderThrowArea != null) orderThrowArea.ShouldReceive = shouldReceive; }
 
     public void SetCursor(CursorType type)
     {

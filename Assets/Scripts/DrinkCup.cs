@@ -536,7 +536,7 @@ public class DrinkCup : MonoBehaviour, IGrabable
     private void UpdateFocusTextState()
     {
         // 1. Eðer boþsa -> Index 0
-        if (!IsFull && !IsGettingFilled) // Dolarken de boþ sayabiliriz veya doluyor diyebiliriz, þimdilik boþ sayalým.
+        if (!IsFull && !IsGettingFilled)
         {
             currentTextStateIndex = 0;
             return;
@@ -548,15 +548,30 @@ public class DrinkCup : MonoBehaviour, IGrabable
 
         switch (DrinkType)
         {
+            // COLA AÝLESÝ
             case GameManager.DrinkTypes.Cola:
+            case GameManager.DrinkTypes.ColaSmall:
+            case GameManager.DrinkTypes.ColaMedium:
+            case GameManager.DrinkTypes.ColaLarge:
                 baseIndex = 1;
                 break;
+
+            // ORANGE AÝLESÝ
             case GameManager.DrinkTypes.OrangeSoda:
+            case GameManager.DrinkTypes.OrangeSodaSmall:
+            case GameManager.DrinkTypes.OrangeSodaMedium:
+            case GameManager.DrinkTypes.OrangeSodaLarge:
                 baseIndex = 3;
                 break;
+
+            // LEMON AÝLESÝ
             case GameManager.DrinkTypes.LemonLime:
+            case GameManager.DrinkTypes.LemonLimeSmall:
+            case GameManager.DrinkTypes.LemonLimeMedium:
+            case GameManager.DrinkTypes.LemonLimeLarge:
                 baseIndex = 5;
                 break;
+
             default:
                 baseIndex = 0; // Tanýmsýzsa boþ göster
                 break;

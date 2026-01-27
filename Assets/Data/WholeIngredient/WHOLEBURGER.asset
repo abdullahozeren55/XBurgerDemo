@@ -48,3 +48,25 @@ MonoBehaviour:
   - BURGER_FALLBACK_2
   - BURGER_FALLBACK_3
   - BURGER_FALLBACK_4
+  dropParticle: {fileID: 8670732574423207768, guid: 9547fb2c79761da4ba1cd4691dc15b5b, type: 3}
+  throwParticle: {fileID: 8670732574423207768, guid: 4bd525876351ecf4cb6d70b06eb60f4f, type: 3}
+  audioClips:
+  - {fileID: 8300000, guid: 4b125dc5bc95ec04e867f0357eff41bf, type: 3}
+  - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
+  - {fileID: 8300000, guid: f0efa123572028a43a704e66046edc85, type: 3}
+  - {fileID: 8300000, guid: adc98767172a396419264e0177062e47, type: 3}
+  grabSoundVolume: 0.9
+  grabSoundMinPitch: 0.7
+  grabSoundMaxPitch: 1
+  dropSoundVolume: 0.9
+  dropSoundMinPitch: 0.7
+  dropSoundMaxPitch: 1
+  throwSoundVolume: 0.9
+  throwSoundMinPitch: 0.5
+  throwSoundMaxPitch: 0.7
+  initSoundVolume: 0.8
+  initSoundMinPitch: 1.2
+  initSoundMaxPitch: 1.4
+  soundCooldown: 0.1
+  throwThreshold: 5
+  dropThreshold: 1

@@ -81,7 +81,7 @@ MonoBehaviour:
     NoiseAmplitudeMultiplier: 1
     NoiseFrequencyMultiplier: 1
     Behavior: 2
-    AutoAdvanceDuration: 0.6
+    AutoAdvanceDuration: 3
     Jumpscare: 1
     JumpscareFadeInDuration: 0.4
     JumpscareFadeOutDuration: 0.8

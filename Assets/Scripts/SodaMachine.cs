@@ -74,6 +74,32 @@ public class SodaMachine : MonoBehaviour
     private int ungrabableLayer;
     private int grababaleLayer;
 
+    // Yardýmcý Metot: Buton tipi + Bardak boyutu = Gerçek Ýçecek Tipi
+    private GameManager.DrinkTypes GetSpecificDrinkType(GameManager.DrinkTypes baseType, GameManager.CupSize size)
+    {
+        switch (baseType)
+        {
+            case GameManager.DrinkTypes.Cola:
+                if (size == GameManager.CupSize.Small) return GameManager.DrinkTypes.ColaSmall;
+                if (size == GameManager.CupSize.Medium) return GameManager.DrinkTypes.ColaMedium;
+                return GameManager.DrinkTypes.ColaLarge;
+
+            case GameManager.DrinkTypes.OrangeSoda:
+                if (size == GameManager.CupSize.Small) return GameManager.DrinkTypes.OrangeSodaSmall;
+                if (size == GameManager.CupSize.Medium) return GameManager.DrinkTypes.OrangeSodaMedium;
+                return GameManager.DrinkTypes.OrangeSodaLarge;
+
+            case GameManager.DrinkTypes.LemonLime:
+                if (size == GameManager.CupSize.Small) return GameManager.DrinkTypes.LemonLimeSmall;
+                if (size == GameManager.CupSize.Medium) return GameManager.DrinkTypes.LemonLimeMedium;
+                return GameManager.DrinkTypes.LemonLimeLarge;
+
+            default:
+                // Boyutu olmayan bir þeyse (Ayran vs.) olduðu gibi döndür
+                return baseType;
+        }
+    }
+
     private void Awake()
     {
         if (streamLine != null)
@@ -168,9 +194,12 @@ public class SodaMachine : MonoBehaviour
         // --- SADECE BARDAK VARSA ÇALIÞACAK KISIMLAR ---
         if (currentCup != null)
         {
-            // Görsel dolumu baþlat
+            // YENÝ: Boyuta göre spesifik tipi belirle
+            GameManager.DrinkTypes finalDrinkType = GetSpecificDrinkType(btn.drinkType, currentCup.data.cupSize);
+
+            // Görsel dolumu baþlat (Final tipi gönderiyoruz)
             float totalFillTime = effectivePourDuration + stopDuration - 0.1f;
-            currentCup.StartFilling(selectedColor, totalFillTime, btn.drinkType);
+            currentCup.StartFilling(selectedColor, totalFillTime, finalDrinkType);
 
             // --- DOLUM SESÝ (Sadece bardak varsa çalar) ---
             if (SoundManager.Instance != null && cupFillSounds != null && cupFillSounds.Length > 0)

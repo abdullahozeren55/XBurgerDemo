@@ -110,6 +110,9 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
             meshCol.convex = false;
 
+            if (data.dropParticles[(int)cookAmount] != null)
+                Instantiate(data.dropParticles[(int)cookAmount], transform.position, Quaternion.identity);
+
             SetOnGrabableLayer();
         }
 
@@ -238,6 +241,9 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
                 SetOnGrabableLayer();
             else
                 SetOnTrayLayer();
+
+            if (data.dropParticles[(int)cookAmount] != null)
+                Instantiate(data.dropParticles[(int)cookAmount], transform.position, Quaternion.identity);
 
             SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.traySoundVolume, data.traySoundMinPitch, data.traySoundMaxPitch);
         });
@@ -618,6 +624,9 @@ public class BurgerIngredient : MonoBehaviour, IGrabable
 
     public void PlayPutOnSoundEffect()
     {
+        if (data.dropParticles[(int)cookAmount] != null)
+            Instantiate(data.dropParticles[(int)cookAmount], transform.position, Quaternion.identity);
+
         SoundManager.Instance.PlaySoundFX(data.audioClips[3], transform, data.traySoundVolume, data.traySoundMinPitch, data.traySoundMaxPitch);
     }
 }

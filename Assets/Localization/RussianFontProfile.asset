@@ -35,9 +35,9 @@ MonoBehaviour:
   - type: 3
     font: {fileID: 11400000, guid: c37b40747ecb6f243ab52dbe6fbff812, type: 2}
     basePixelSize: 19
-    characterSpacingOffset: 0
-    wordSpacingOffset: 0
-    lineSpacingOffset: 0
+    characterSpacingOffset: -2
+    wordSpacingOffset: -12
+    lineSpacingOffset: -19
   - type: 4
     font: {fileID: 11400000, guid: c37b40747ecb6f243ab52dbe6fbff812, type: 2}
     basePixelSize: 19

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 020f53f5e018e904f90117985b081fe1, type: 3}
   m_Name: GardenBurger-OrangeSoda
   m_EditorClassIdentifier: 
-  OrderName: Cheeseburger-Cola
+  OrderName: GardenBurger-MediumOrangeSoda
   RequiredBurgers:
   - Type: 5
     Count: 1
   RequiredDrinks:
-  - Type: 2
+  - Type: 8
     Count: 1
   RequiredSides: []
   RequiredSauces: []

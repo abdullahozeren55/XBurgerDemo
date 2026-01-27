@@ -29,6 +29,9 @@ public class MonitorManager : MonoBehaviour
     }
 
     [Header("Burger Page Settings")]
+    // YENÝ: Hangi font tipini kullanacaðýz?
+    public FontType burgerFontType = FontType.RetroUINoOutline;
+
     public Image burgerImage;
     public Image burgerImageWorld;
     public Sprite[] burgerSprites;
@@ -46,6 +49,16 @@ public class MonitorManager : MonoBehaviour
     public string[] headerKeys;
     [Space]
     private int currentBurgerIndex = 0;
+
+    // --- HAFIZA DEÐÝÞKENLERÝ (Font Boyutlarý için) ---
+    private float _initHeaderSize;
+    private float _initIngSize;
+    private float _initDescSize;
+
+    // Karakter boþluklarýný da korumak istersen (Opsiyonel ama önerilir):
+    private float _initHeaderSpacing;
+    private float _initIngSpacing;
+    private float _initDescSpacing;
 
     [Header("Notepad Page Settings")]
     public InputMirror notePadInputMirror;
@@ -92,6 +105,24 @@ public class MonitorManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        // --- BAÞLANGIÇ DEÐERLERÝNÝ KAYDET ---
+        // Oyun baþýndaki (muhtemelen Ýngilizce/Latin) boyutlarý referans alýyoruz.
+        if (headerTMP != null)
+        {
+            _initHeaderSize = headerTMP.fontSize;
+            _initHeaderSpacing = headerTMP.characterSpacing;
+        }
+        if (ingredientsTMP != null)
+        {
+            _initIngSize = ingredientsTMP.fontSize;
+            _initIngSpacing = ingredientsTMP.characterSpacing;
+        }
+        if (descriptionTMP != null)
+        {
+            _initDescSize = descriptionTMP.fontSize;
+            _initDescSpacing = descriptionTMP.characterSpacing;
+        }
     }
 
     private void Start()
@@ -103,6 +134,9 @@ public class MonitorManager : MonoBehaviour
         }
 
         StartCoroutine(MarqueeDriverLoop());
+
+        // Baþlangýçta fontlarý bir kere ayarla
+        RefreshPage();
     }
 
     private void Update()
@@ -219,32 +253,56 @@ public class MonitorManager : MonoBehaviour
     // Hem SetBurgerPage çaðýrýr, hem de Dil Deðiþimi çaðýrýr
     private void RefreshPage()
     {
-        // Güvenlik kontrolü (Index dizi dýþýna taþmasýn)
         if (currentBurgerIndex < 0 || currentBurgerIndex >= burgerSprites.Length) return;
 
-        // --- GÖRSEL ---
-        // Görsel dil deðiþiminden etkilenmez ama yine de burada durabilir
+        // --- 1. GÖRSEL ---
         burgerImage.sprite = burgerSprites[currentBurgerIndex];
         burgerImageWorld.sprite = burgerImage.sprite;
 
-        // --- METÝNLER (LocalizationManager'dan çekilecek) ---
+        // --- 2. FONT VE DÝL AYARLARI ---
         if (LocalizationManager.Instance != null)
         {
-            // Malzemeler
-            string ingText = LocalizationManager.Instance.GetText(ingredientKeys[currentBurgerIndex]);
-            ingredientsTMP.text = ingText;
-            ingredientsTMPWorld.text = ingText;
+            // A. FONT AYARLARINI HESAPLA
+            // LocalizedText'teki mantýðýn aynýsý:
+            var targetData = LocalizationManager.Instance.GetFontDataForCurrentLanguage(burgerFontType);
+            var defaultData = LocalizationManager.Instance.GetDefaultFontData(burgerFontType);
 
-            // Açýklama
-            string descText = LocalizationManager.Instance.GetText(descriptionKeys[currentBurgerIndex]);
-            descriptionTMP.text = descText;
-            descriptionTMPWorld.text = descText;
+            float defaultBase = Mathf.Max(defaultData.basePixelSize, 0.1f);
+            float ratio = targetData.basePixelSize / defaultBase; // Boyut Oraný
 
-            // Baþlýk
+            // Spacing Farký
+            float charSpacingDiff = targetData.characterSpacingOffset - defaultData.characterSpacingOffset;
+
+            // B. METÝNLERÝ VE FONTLARI GÜNCELLE
+
+            // --- Header ---
             string headText = LocalizationManager.Instance.GetText(headerKeys[currentBurgerIndex]);
-            headerTMP.text = headText;
-            headerTMPWorld.text = headText;
+            UpdateTextComp(headerTMP, headText, targetData.font, _initHeaderSize * ratio, _initHeaderSpacing + charSpacingDiff);
+            UpdateTextComp(headerTMPWorld, headText, targetData.font, _initHeaderSize * ratio, _initHeaderSpacing + charSpacingDiff);
+
+            // --- Ingredients ---
+            string ingText = LocalizationManager.Instance.GetText(ingredientKeys[currentBurgerIndex]);
+            UpdateTextComp(ingredientsTMP, ingText, targetData.font, _initIngSize * ratio, _initIngSpacing + charSpacingDiff);
+            UpdateTextComp(ingredientsTMPWorld, ingText, targetData.font, _initIngSize * ratio, _initIngSpacing + charSpacingDiff);
+
+            // --- Description ---
+            string descText = LocalizationManager.Instance.GetText(descriptionKeys[currentBurgerIndex]);
+            UpdateTextComp(descriptionTMP, descText, targetData.font, _initDescSize * ratio, _initDescSpacing + charSpacingDiff);
+            UpdateTextComp(descriptionTMPWorld, descText, targetData.font, _initDescSize * ratio, _initDescSpacing + charSpacingDiff);
         }
+    }
+
+    // Kod tekrarýný önlemek için yardýmcý metod
+    private void UpdateTextComp(TMP_Text textComp, string content, TMP_FontAsset font, float size, float spacing)
+    {
+        if (textComp == null) return;
+
+        textComp.text = content;
+
+        if (font != null) textComp.font = font;
+
+        textComp.fontSize = size;
+        textComp.characterSpacing = spacing;
     }
 
     public void HandleMusicPlayerPage(bool open)

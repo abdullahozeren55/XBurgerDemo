@@ -220,8 +220,6 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private GameObject interactUI; 
     [SerializeField] private GameObject dropUI;
     [SerializeField] private GameObject throwUI;
-    [SerializeField] private GameObject useTakeInteractParent;
-    [SerializeField] private GameObject throwDropParent;
     private bool showHints = true;
     private bool showInteractText = true;
 
@@ -1118,19 +1116,6 @@ public class FirstPersonController : MonoBehaviour
         if (useUI) useUI.SetActive(showUse);
         if (dropUI) dropUI.SetActive(showDrop);
         if (throwUI) throwUI.SetActive(showThrow);
-
-        // --- 5. PARENT YÖNETÝMÝ ---
-        if (useTakeInteractParent != null)
-        {
-            bool parentActive = showUse || showTake || showInteract;
-            useTakeInteractParent.SetActive(parentActive);
-        }
-
-        if (throwDropParent != null)
-        {
-            bool parentActive = showDrop || showThrow;
-            throwDropParent.SetActive(parentActive);
-        }
     }
 
     // Yardýmcý fonksiyonu da güncelle ki hepsini kapatsýn
@@ -1141,10 +1126,6 @@ public class FirstPersonController : MonoBehaviour
         if (useUI) useUI.SetActive(isActive);
         if (dropUI) dropUI.SetActive(isActive);
         if (throwUI) throwUI.SetActive(isActive);
-
-        // Parentlarý da kapat
-        if (useTakeInteractParent) useTakeInteractParent.SetActive(isActive);
-        if (throwDropParent) throwDropParent.SetActive(isActive);
     }
 
     private void DecideOutlineAndCrosshair()

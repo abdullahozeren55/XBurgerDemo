@@ -1715,10 +1715,10 @@
     "tr": "Klasik Burger",
     "en": "Classic Burger",
     "zh": "经典汉堡",
-    "ja": "クラシックバーガー",
-    "es": "Hamburguesa Clásica",
-    "ru": "Классический Бургер",
-    "pt": "Hambúrguer Clássico"
+    "ja": "クラシック",
+    "es": "Burger Clásica",
+    "ru": "Классика",
+    "pt": "Burger Clássico"
   },
   {
     "key": "BURGER_CHEESE",
@@ -1726,7 +1726,7 @@
     "en": "Cheeseburger",
     "zh": "芝士汉堡",
     "ja": "チーズバーガー",
-    "es": "Hamburguesa Con Queso",
+    "es": "Cheeseburger",
     "ru": "Чизбургер",
     "pt": "Cheeseburger"
   },
@@ -1735,9 +1735,9 @@
     "tr": "Duble Çizburger",
     "en": "Double Cheeseburger",
     "zh": "双层芝士汉堡",
-    "ja": "ダブルチーズバーガー",
-    "es": "Hamburguesa Doble Con Queso",
-    "ru": "Двойной Чизбургер",
+    "ja": "ダブルチーズ",
+    "es": "Cheeseburger Doble",
+    "ru": "Дв. Чизбургер",
     "pt": "Cheeseburger Duplo"
   },
   {
@@ -1745,110 +1745,110 @@
     "tr": "Full Karışık Burger",
     "en": "Fully Loaded Burger",
     "zh": "至尊汉堡",
-    "ja": "デラックスバーガー",
-    "es": "Hamburguesa Suprema",
-    "ru": "Бургер Гранд",
-    "pt": "Hambúrguer Completo"
+    "ja": "デラックス",
+    "es": "Burger Suprema",
+    "ru": "Гранд-Бургер",
+    "pt": "Burger Completo"
   },
   {
     "key": "BURGER_GARDEN",
     "tr": "Bahçıvan Burger",
     "en": "Garden Burger",
     "zh": "田园汉堡",
-    "ja": "ガーデンバーガー",
-    "es": "Hamburguesa De La Huerta",
-    "ru": "Фермерский Бургер",
-    "pt": "Hambúrguer Da Horta"
+    "ja": "ガーデン",
+    "es": "Burger Huerta",
+    "ru": "Фермерский",
+    "pt": "Burger da Horta"
   },
   {
     "key": "BURGER_DOUBLE_GARDEN",
     "tr": "Duble Bahçıvan Burger",
     "en": "Double Garden Burger",
     "zh": "双层田园汉堡",
-    "ja": "ダブルガーデンバーガー",
-    "es": "Hamburguesa Doble De La Huerta",
-    "ru": "Двойной Фермерский Бургер",
-    "pt": "Hambúrguer Da Horta Duplo"
+    "ja": "Wガーデン",
+    "es": "Burger Huerta Doble",
+    "ru": "Дв. Фермерский",
+    "pt": "Burger Horta Duplo"
   },
   {
     "key": "BURGER_SMOKED",
     "tr": "Dumanlı Burger",
     "en": "Smoked Burger",
     "zh": "烟熏汉堡",
-    "ja": "スモークバーガー",
-    "es": "Hamburguesa Ahumada",
-    "ru": "Копченый Бургер",
-    "pt": "Hambúrguer Defumado"
+    "ja": "スモーク",
+    "es": "Burger Ahumada",
+    "ru": "Копченый",
+    "pt": "Burger Defumado"
   },
   {
     "key": "BURGER_FLAMING",
     "tr": "Alevli Burger",
     "en": "Flaming Burger",
     "zh": "火焰汉堡",
-    "ja": "フレイミングバーガー",
-    "es": "Hamburguesa En Llamas",
-    "ru": "Пылающий Бургер",
-    "pt": "Hambúrguer Em Chamas"
+    "ja": "フレイミング",
+    "es": "Burger Fuego",
+    "ru": "Пылающий",
+    "pt": "Burger Fogo"
   },
   {
     "key": "BURGER_PLUS",
     "tr": "Artı Burger",
     "en": "Plus Burger",
     "zh": "普拉斯汉堡",
-    "ja": "プラスバーガー",
-    "es": "Hamburguesa Plus",
+    "ja": "プラス",
+    "es": "Burger Plus",
     "ru": "Бургер Плюс",
-    "pt": "Hambúrguer Plus"
+    "pt": "Burger Plus"
   },
   {
     "key": "BURGER_CRISPY_CHICKEN",
     "tr": "Çıtır Tavuk Burger",
     "en": "Crispy Chicken Burger",
     "zh": "香脆鸡肉汉堡",
-    "ja": "クリスピーチキンバーガー",
-    "es": "Hamburguesa De Pollo Crujiente",
-    "ru": "Хрустящий Куриный Бургер",
-    "pt": "Hambúrguer De Frango Crocante"
+    "ja": "クリスピーチキン",
+    "es": "Pollo Crujiente",
+    "ru": "Хруст. Чикен",
+    "pt": "Frango Croc."
   },
   {
     "key": "BURGER_FLAMING_CHICKEN",
     "tr": "Alevli Tavuk Burger",
     "en": "Flaming Chicken Burger",
     "zh": "火焰鸡肉汉堡",
-    "ja": "フレイミングチキンバーガー",
-    "es": "Hamburguesa De Pollo En Llamas",
-    "ru": "Пылающий Куриный Бургер",
-    "pt": "Hambúrguer De Frango Em Chamas"
+    "ja": "フレイミングチキン",
+    "es": "Pollo Fuego",
+    "ru": "Пылающий Чикен",
+    "pt": "Frango Fogo"
   },
   {
     "key": "BURGER_SMOKED_CHICKEN",
     "tr": "Dumanlı Tavuk Burger",
     "en": "Smoked Chicken Burger",
     "zh": "烟熏鸡肉汉堡",
-    "ja": "スモークチキンバーガー",
-    "es": "Hamburguesa De Pollo Ahumada",
-    "ru": "Копченый Куриный Бургер",
-    "pt": "Hambúrguer De Frango Defumado"
+    "ja": "スモークチキン",
+    "es": "Pollo Ahumado",
+    "ru": "Копченый Чикен",
+    "pt": "Frango Defumado"
   },
   {
     "key": "BURGER_EXTREME_CHICKEN",
     "tr": "Aşırı Tavuk Burger",
     "en": "Extreme Chicken Burger",
     "zh": "极限鸡肉汉堡",
-    "ja": "エクストリームチキンバーガー",
-    "es": "Hamburguesa De Pollo Extrema",
-    "ru": "Экстремальный Куриный Бургер",
-    "pt": "Hambúrguer De Frango Extremo"
+    "ja": "エクストリームチキン",
+    "es": "Pollo Extremo",
+    "ru": "Экстрим Чикен",
+    "pt": "Frango Extremo"
   },
   {
     "key": "BURGER_CHICK",
     "tr": "Civciv Burger",
     "en": "Chick Burger",
     "zh": "小鸡汉堡",
-    "ja": "ひよこバーガー",
-    "es": "Hamburguesa Pollito",
-    "ru": "Бургер Цыпленок",
-    "pt": "Hambúrguer Pintinho"
+    "ja": "ひよこ",
+    "es": "Burger Pollito",
+    "ru": "Цыпленок",
+    "pt": "Burger Pintinho"
   },
   {
     "key": "BURGER_GROWN_UP",
@@ -1856,9 +1856,9 @@
     "en": "Grown Up Burger",
     "zh": "小大人汉堡",
     "ja": "おとなバーガー",
-    "es": "Hamburguesa De Niño Grande",
-    "ru": "Бургер «Я Уже Большой»",
-    "pt": "Hambúrguer De Gente Grande"
+    "es": "Niño Grande",
+    "ru": "Я Большой",
+    "pt": "Gente Grande"
   },
   {
     "key": "BURGER_FALLBACK_0",
@@ -1911,6 +1911,306 @@
     "pt": "Crime Do Chef"
   },
   {
+    "key": "BURGER_CLASSIC_SLOGAN",
+    "tr": "Macera aramayanların tercihi...",
+    "en": "For those not seeking adventure...",
+    "zh": "献给不爱冒险的人...",
+    "ja": "冒険を求めないあなたに…",
+    "es": "Para los que no buscan aventuras...",
+    "ru": "Выбор не ищущих приключений...",
+    "pt": "Para quem não busca aventuras..."
+  },
+  {
+    "key": "BURGER_CHEESE_SLOGAN",
+    "tr": "Peynirsiz yapamam diyenlere...",
+    "en": "For those who can't live without cheese...",
+    "zh": "给无芝士不欢的人...",
+    "ja": "チーズがないとダメな人に…",
+    "es": "Para los que no viven sin queso...",
+    "ru": "Для тех, кто не может без сыра...",
+    "pt": "Para quem não vive sem queijo..."
+  },
+  {
+    "key": "BURGER_DOUBLE_CHEESE_SLOGAN",
+    "tr": "Asıl ben peynirsiz yapamam diyenlere...",
+    "en": "For those who REALLY can't live without cheese...",
+    "zh": "给真的离不开芝士的人...",
+    "ja": "いや、私こそチーズが必要という人に…",
+    "es": "Para los que REALMENTE no viven sin queso...",
+    "ru": "Для тех, кто ВООБЩЕ не может без сыра...",
+    "pt": "Para quem REALMENTE não vive sem queijo..."
+  },
+  {
+    "key": "BURGER_FULLY_LOADED_SLOGAN",
+    "tr": "Vicdanımız kadar hafif!",
+    "en": "As light as our conscience!",
+    "zh": "像我们的良心一样轻！",
+    "ja": "我々の良心と同じくらい軽い！",
+    "es": "¡Tan ligera como nuestra conciencia!",
+    "ru": "Легкий, как наша совесть!",
+    "pt": "Tão leve quanto nossa consciência!"
+  },
+  {
+    "key": "BURGER_GARDEN_SLOGAN",
+    "tr": "Ekmek arası köfte ve minik bir bahçe...",
+    "en": "A patty, bread, and a tiny garden...",
+    "zh": "肉饼、面包和一个小花园...",
+    "ja": "パンと肉、そして小さな庭…",
+    "es": "Carne, pan y un pequeño jardín...",
+    "ru": "Котлета, хлеб и маленький сад...",
+    "pt": "Carne, pão e um pequeno jardim..."
+  },
+  {
+    "key": "BURGER_DOUBLE_GARDEN_SLOGAN",
+    "tr": "Ekmek arası köfte ve devasa bir bahçe...",
+    "en": "A patty, bread, and a huge garden...",
+    "zh": "肉饼、面包和一个大花园...",
+    "ja": "パンと肉、そして巨大な庭…",
+    "es": "Carne, pan y un jardín enorme...",
+    "ru": "Котлета, хлеб и огромный сад...",
+    "pt": "Carne, pão e um jardim enorme..."
+  },
+  {
+    "key": "BURGER_SMOKED_SLOGAN",
+    "tr": "Lezzetinden tütüyor!",
+    "en": "Smoking with flavor!",
+    "zh": "美味到冒烟！",
+    "ja": "煙るほどの旨さ！",
+    "es": "¡Humeando de sabor!",
+    "ru": "Дымится от вкуса!",
+    "pt": "Fumegando de sabor!"
+  },
+  {
+    "key": "BURGER_FLAMING_SLOGAN",
+    "tr": "Buralar yandı!",
+    "en": "This place is on fire!",
+    "zh": "这里着火了！",
+    "ja": "ここはもう燃えている！",
+    "es": "¡Esto está que arde!",
+    "ru": "Здесь всё горит!",
+    "pt": "Tá pegando fogo!"
+  },
+  {
+    "key": "BURGER_PLUS_SLOGAN",
+    "tr": "Bu kadar lezzetli olması BÜYÜK BİR ARTI!",
+    "en": "Being this tasty is a BIG PLUS!",
+    "zh": "如此美味是个大大的普拉斯！",
+    "ja": "この旨さは、大きなプラス！",
+    "es": "¡Ser tan rica es un GRAN PLUS!",
+    "ru": "Такой вкус — это БОЛЬШОЙ ПЛЮС!",
+    "pt": "Ser tão gostoso é um GRANDE PLUS!"
+  },
+  {
+    "key": "BURGER_CRISPY_CHICKEN_SLOGAN",
+    "tr": "Çıtır çıtır bir lezzet!",
+    "en": "A crispy crunchy flavor!",
+    "zh": "酥脆美味！",
+    "ja": "サクサクの美味しさ！",
+    "es": "¡Un sabor crujiente!",
+    "ru": "Хрустящий вкус!",
+    "pt": "Um sabor crocante!"
+  },
+  {
+    "key": "BURGER_FLAMING_CHICKEN_SLOGAN",
+    "tr": "Buralar alev alev!",
+    "en": "It's blazing in here!",
+    "zh": "这里烈火熊熊！",
+    "ja": "辺り一面、炎上中！",
+    "es": "¡Todo está en llamas!",
+    "ru": "Здесь всё в огне!",
+    "pt": "Tudo em chamas!"
+  },
+  {
+    "key": "BURGER_SMOKED_CHICKEN_SLOGAN",
+    "tr": "Lezzetinden her yer duman altı!",
+    "en": "The flavor is smoking up the place!",
+    "zh": "美味得烟雾缭绕！",
+    "ja": "旨さで辺りが煙たい！",
+    "es": "¡Sabor que llena todo de humo!",
+    "ru": "От вкуса дым стоит столбом!",
+    "pt": "Sabor que deixa tudo enfumaçado!"
+  },
+  {
+    "key": "BURGER_EXTREME_CHICKEN_SLOGAN",
+    "tr": "Ekmeğin arasına bütün tavuk koyup yemekten bir adım öncesi!",
+    "en": "One step away from putting a whole chicken between bread!",
+    "zh": "离夹着整只鸡吃只差一步！",
+    "ja": "パンに丸鶏を挟む、その一歩手前！",
+    "es": "¡A un paso de poner un pollo entero entre panes!",
+    "ru": "В шаге от того, чтобы засунуть целую курицу в хлеб!",
+    "pt": "A um passo de colocar um frango inteiro no pão!"
+  },
+  {
+    "key": "BURGER_CHICK_SLOGAN",
+    "tr": "Çocukların favorisi!",
+    "en": "The kids' favorite!",
+    "zh": "小朋友的最爱！",
+    "ja": "子供たちのお気に入り！",
+    "es": "¡El favorito de los niños!",
+    "ru": "Любимец детей!",
+    "pt": "O favorito das crianças!"
+  },
+  {
+    "key": "BURGER_GROWN_UP_SLOGAN",
+    "tr": "Civcivlikten tavukluğa terfi etme yolunda ilerleyen küçüklerin tercihi!",
+    "en": "The choice for little ones graduating from chick to chicken!",
+    "zh": "献给正在从“小鸡”晋升为“大鸡”的小朋友们！",
+    "ja": "ひよこからニワトリへと昇進中の、ちびっ子たちの選択！",
+    "es": "¡La elección de los peques que ascienden de pollito a pollo!",
+    "ru": "Выбор малышей на пути превращения из цыпленка в курицу!",
+    "pt": "A escolha dos pequenos sendo promovidos de pintinho a frango!"
+  },
+  {
+    "key": "BURGER_CLASSIC_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nMarul x1\nTurşu x1\nÜst Ekmek x1\n\nKetçap\nMayonez",
+    "en": "Bottom Bun x1\nPatty x1\nLettuce x1\nPickle x1\nTop Bun x1\n\nKetchup\nMayo",
+    "zh": "底层面包 x1\n肉饼 x1\n生菜 x1\n酸黄瓜 x1\n顶层面包 x1\n\n番茄酱\n蛋黄酱",
+    "ja": "下バンズ x1\nパティ x1\nレタス x1\nピクルス x1\n上バンズ x1\n\nケチャップ\nマヨネーズ",
+    "es": "Pan Inf. x1\nCarne x1\nLechuga x1\nPepinillo x1\nPan Sup. x1\n\nKétchup\nMayonesa",
+    "ru": "Ниж. Булка x1\nКотлета x1\nСалат x1\nОгурец x1\nВерх. Булка x1\n\nКетчуп\nМайонез",
+    "pt": "Pão Inf. x1\nCarne x1\nAlface x1\nPicles x1\nPão Sup. x1\n\nKetchup\nMaionese"
+  },
+  {
+    "key": "BURGER_CHEESE_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir x1\nTurşu x1\nÜst Ekmek x1\n\nKetçap\nHardal",
+    "en": "Bottom Bun x1\nPatty x1\nCheese x1\nPickle x1\nTop Bun x1\n\nKetchup\nMustard",
+    "zh": "底层面包 x1\n肉饼 x1\n芝士 x1\n酸黄瓜 x1\n顶层面包 x1\n\n番茄酱\n芥末酱",
+    "ja": "下バンズ x1\nパティ x1\nチーズ x1\nピクルス x1\n上バンズ x1\n\nケチャップ\nマスタード",
+    "es": "Pan Inf. x1\nCarne x1\nQueso x1\nPepinillo x1\nPan Sup. x1\n\nKétchup\nMostaza",
+    "ru": "Ниж. Булка x1\nКотлета x1\nСыр x1\nОгурец x1\nВерх. Булка x1\n\nКетчуп\nГорчица",
+    "pt": "Pão Inf. x1\nCarne x1\nQueijo x1\nPicles x1\nPão Sup. x1\n\nKetchup\nMostarda"
+  },
+  {
+    "key": "BURGER_DOUBLE_CHEESE_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x2\nPeynir x2\nTurşu x2\nÜst Ekmek x1\n\nKetçap\nHardal",
+    "en": "Bottom Bun x1\nPatty x2\nCheese x2\nPickle x2\nTop Bun x1\n\nKetchup\nMustard",
+    "zh": "底层面包 x1\n肉饼 x2\n芝士 x2\n酸黄瓜 x2\n顶层面包 x1\n\n番茄酱\n芥末酱",
+    "ja": "下バンズ x1\nパティ x2\nチーズ x2\nピクルス x2\n上バンズ x1\n\nケチャップ\nマスタード",
+    "es": "Pan Inf. x1\nCarne x2\nQueso x2\nPepinillo x2\nPan Sup. x1\n\nKétchup\nMostaza",
+    "ru": "Ниж. Булка x1\nКотлета x2\nСыр x2\nОгурец x2\nВерх. Булка x1\n\nКетчуп\nГорчица",
+    "pt": "Pão Inf. x1\nCarne x2\nQueijo x2\nPicles x2\nPão Sup. x1\n\nKetchup\nMostarda"
+  },
+  {
+    "key": "BURGER_FULLY_LOADED_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir x1\nDomates x1\nSoğan x1\nMarul x1\nTurşu x1\nÜst Ekmek x1\n\nKetçap\nMayonez\nHardal",
+    "en": "Bottom Bun x1\nPatty x1\nCheese x1\nTomato x1\nOnion x1\nLettuce x1\nPickle x1\nTop Bun x1\n\nKetchup\nMayo\nMustard",
+    "zh": "底层面包 x1\n肉饼 x1\n芝士 x1\n番茄 x1\n洋葱 x1\n生菜 x1\n酸黄瓜 x1\n顶层面包 x1\n\n番茄酱\n蛋黄酱\n芥末酱",
+    "ja": "下バンズ x1\nパティ x1\nチーズ x1\nトマト x1\nタマネギ x1\nレタス x1\nピクルス x1\n上バンズ x1\n\nケチャップ\nマヨネーズ\nマスタード",
+    "es": "Pan Inf. x1\nCarne x1\nQueso x1\nTomate x1\nCebolla x1\nLechuga x1\nPepinillo x1\nPan Sup. x1\n\nKétchup\nMayonesa\nMostaza",
+    "ru": "Ниж. Булка x1\nКотлета x1\nСыр x1\nПомидор x1\nЛук x1\nСалат x1\nОгурец x1\nВерх. Булка x1\n\nКетчуп\nМайонез\nГорчица",
+    "pt": "Pão Inf. x1\nCarne x1\nQueijo x1\nTomate x1\nCebola x1\nAlface x1\nPicles x1\nPão Sup. x1\n\nKetchup\nMaionese\nMostarda"
+  },
+  {
+    "key": "BURGER_GARDEN_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nDomates x1\nSoğan x1\nMarul x1\nTurşu x1\nÜst Ekmek x1\n\nKetçap\nMayonez",
+    "en": "Bottom Bun x1\nPatty x1\nTomato x1\nOnion x1\nLettuce x1\nPickle x1\nTop Bun x1\n\nKetchup\nMayo",
+    "zh": "底层面包 x1\n肉饼 x1\n番茄 x1\n洋葱 x1\n生菜 x1\n酸黄瓜 x1\n顶层面包 x1\n\n番茄酱\n蛋黄酱",
+    "ja": "下バンズ x1\nパティ x1\nトマト x1\nタマネギ x1\nレタス x1\nピクルス x1\n上バンズ x1\n\nケチャップ\nマヨネーズ",
+    "es": "Pan Inf. x1\nCarne x1\nTomate x1\nCebolla x1\nLechuga x1\nPepinillo x1\nPan Sup. x1\n\nKétchup\nMayonesa",
+    "ru": "Ниж. Булка x1\nКотлета x1\nПомидор x1\nЛук x1\nСалат x1\nОгурец x1\nВерх. Булка x1\n\nКетчуп\nМайонез",
+    "pt": "Pão Inf. x1\nCarne x1\nTomate x1\nCebola x1\nAlface x1\nPicles x1\nPão Sup. x1\n\nKetchup\nMaionese"
+  },
+  {
+    "key": "BURGER_DOUBLE_GARDEN_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nDomates x2\nSoğan x2\nMarul x2\nTurşu x2\nÜst Ekmek x1\n\nKetçap\nMayonez",
+    "en": "Bottom Bun x1\nPatty x1\nTomato x2\nOnion x2\nLettuce x2\nPickle x2\nTop Bun x1\n\nKetchup\nMayo",
+    "zh": "底层面包 x1\n肉饼 x1\n番茄 x2\n洋葱 x2\n生菜 x2\n酸黄瓜 x2\n顶层面包 x1\n\n番茄酱\n蛋黄酱",
+    "ja": "下バンズ x1\nパティ x1\nトマト x2\nタマネギ x2\nレタス x2\nピクルス x2\n上バンズ x1\n\nケチャップ\nマヨネーズ",
+    "es": "Pan Inf. x1\nCarne x1\nTomate x2\nCebolla x2\nLechuga x2\nPepinillo x2\nPan Sup. x1\n\nKétchup\nMayonesa",
+    "ru": "Ниж. Булка x1\nКотлета x1\nПомидор x2\nЛук x2\nСалат x2\nОгурец x2\nВерх. Булка x1\n\nКетчуп\nМайонез",
+    "pt": "Pão Inf. x1\nCarne x1\nTomate x2\nCebola x2\nAlface x2\nPicles x2\nPão Sup. x1\n\nKetchup\nMaionese"
+  },
+  {
+    "key": "BURGER_SMOKED_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir x1\nSoğan x1\nÜst Ekmek x1\n\nBarbekü Sos",
+    "en": "Bottom Bun x1\nPatty x1\nCheese x1\nOnion x1\nTop Bun x1\n\nBBQ Sauce",
+    "zh": "底层面包 x1\n肉饼 x1\n芝士 x1\n洋葱 x1\n顶层面包 x1\n\n烧烤酱",
+    "ja": "下バンズ x1\nパティ x1\nチーズ x1\nタマネギ x1\n上バンズ x1\n\nBBQソース",
+    "es": "Pan Inf. x1\nCarne x1\nQueso x1\nCebolla x1\nPan Sup. x1\n\nSalsa Barbacoa",
+    "ru": "Ниж. Булка x1\nКотлета x1\nСыр x1\nЛук x1\nВерх. Булка x1\n\nСоус Барбекю",
+    "pt": "Pão Inf. x1\nCarne x1\nQueijo x1\nCebola x1\nPão Sup. x1\n\nMolho Barbecue"
+  },
+  {
+    "key": "BURGER_FLAMING_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir x1\nSoğan x1\nÜst Ekmek x1\n\nBuffalo Sos",
+    "en": "Bottom Bun x1\nPatty x1\nCheese x1\nOnion x1\nTop Bun x1\n\nBuffalo Sauce",
+    "zh": "底层面包 x1\n肉饼 x1\n芝士 x1\n洋葱 x1\n顶层面包 x1\n\n水牛城辣酱",
+    "ja": "下バンズ x1\nパティ x1\nチーズ x1\nタマネギ x1\n上バンズ x1\n\nバッファローソース",
+    "es": "Pan Inf. x1\nCarne x1\nQueso x1\nCebolla x1\nPan Sup. x1\n\nSalsa Buffalo",
+    "ru": "Ниж. Булка x1\nКотлета x1\nСыр x1\nЛук x1\nВерх. Булка x1\n\nСоус Баффало",
+    "pt": "Pão Inf. x1\nCarne x1\nQueijo x1\nCebola x1\nPão Sup. x1\n\nMolho Buffalo"
+  },
+  {
+    "key": "BURGER_PLUS_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x2\nPeynir x2\nTurşu x2\nSoğan x2\nMarul x2\nÜst Ekmek x1\n\nMayonez\nHardal",
+    "en": "Bottom Bun x1\nPatty x2\nCheese x2\nPickle x2\nOnion x2\nLettuce x2\nTop Bun x1\n\nMayo\nMustard",
+    "zh": "底层面包 x1\n肉饼 x2\n芝士 x2\n酸黄瓜 x2\n洋葱 x2\n生菜 x2\n顶层面包 x1\n\n蛋黄酱\n芥末酱",
+    "ja": "下バンズ x1\nパティ x2\nチーズ x2\nピクルス x2\nタマネギ x2\nレタス x2\n上バンズ x1\n\nマヨネーズ\nマスタード",
+    "es": "Pan Inf. x1\nCarne x2\nQueso x2\nPepinillo x2\nCebolla x2\nLechuga x2\nPan Sup. x1\n\nMayonesa\nMostaza",
+    "ru": "Ниж. Булка x1\nКотлета x2\nСыр x2\nОгурец x2\nЛук x2\nСалат x2\nВерх. Булка x1\n\nМайонез\nГорчица",
+    "pt": "Pão Inf. x1\nCarne x2\nQueijo x2\nPicles x2\nCebola x2\nAlface x2\nPão Sup. x1\n\nMaionese\nMostarda"
+  },
+  {
+    "key": "BURGER_CRISPY_CHICKEN_RECIPE",
+    "tr": "Alt Ekmek x1\nÇıtır Tavuk x1\nMarul x1\nÜst Ekmek x1\n\nMayonez",
+    "en": "Bottom Bun x1\nCrispy Chicken x1\nLettuce x1\nTop Bun x1\n\nMayo",
+    "zh": "底层面包 x1\n香脆鸡肉 x1\n生菜 x1\n顶层面包 x1\n\n蛋黄酱",
+    "ja": "下バンズ x1\nC.チキン x1\nレタス x1\n上バンズ x1\n\nマヨネーズ",
+    "es": "Pan Inf. x1\nPollo Cruj. x1\nLechuga x1\nPan Sup. x1\n\nMayonesa",
+    "ru": "Ниж. Булка x1\nХруст. Кур. x1\nСалат x1\nВерх. Булка x1\n\nМайонез",
+    "pt": "Pão Inf. x1\nFrango Croc. x1\nAlface x1\nPão Sup. x1\n\nMaionese"
+  },
+  {
+    "key": "BURGER_FLAMING_CHICKEN_RECIPE",
+    "tr": "Alt Ekmek x1\nÇıtır Tavuk x1\nPeynir x1\nSoğan x1\nÜst Ekmek x1\n\nMayonez\nBuffalo Sos",
+    "en": "Bottom Bun x1\nCrispy Chicken x1\nCheese x1\nOnion x1\nTop Bun x1\n\nMayo\nBuffalo Sauce",
+    "zh": "底层面包 x1\n香脆鸡肉 x1\n芝士 x1\n洋葱 x1\n顶层面包 x1\n\n蛋黄酱\n水牛城辣酱",
+    "ja": "下バンズ x1\nC.チキン x1\nチーズ x1\nタマネギ x1\n上バンズ x1\n\nマヨネーズ\nバッファローソース",
+    "es": "Pan Inf. x1\nPollo Cruj. x1\nQueso x1\nCebolla x1\nPan Sup. x1\n\nMayonesa\nSalsa Buffalo",
+    "ru": "Ниж. Булка x1\nХруст. Кур. x1\nСыр x1\nЛук x1\nВерх. Булка x1\n\nМайонез\nСоус Баффало",
+    "pt": "Pão Inf. x1\nFrango Croc. x1\nQueijo x1\nCebola x1\nPão Sup. x1\n\nMaionese\nMolho Buffalo"
+  },
+  {
+    "key": "BURGER_SMOKED_CHICKEN_RECIPE",
+    "tr": "Alt Ekmek x1\nÇıtır Tavuk x1\nPeynir x1\nSoğan x1\nÜst Ekmek x1\n\nMayonez\nBarbekü Sos",
+    "en": "Bottom Bun x1\nCrispy Chicken x1\nCheese x1\nOnion x1\nTop Bun x1\n\nMayo\nBBQ Sauce",
+    "zh": "底层面包 x1\n香脆鸡肉 x1\n芝士 x1\n洋葱 x1\n顶层面包 x1\n\n蛋黄酱\n烧烤酱",
+    "ja": "下バンズ x1\nC.チキン x1\nチーズ x1\nタマネギ x1\n上バンズ x1\n\nマヨネーズ\nBBQソース",
+    "es": "Pan Inf. x1\nPollo Cruj. x1\nQueso x1\nCebolla x1\nPan Sup. x1\n\nMayonesa\nSalsa Barbacoa",
+    "ru": "Ниж. Булка x1\nХруст. Кур. x1\nСыр x1\nЛук x1\nВерх. Булка x1\n\nМайонез\nСоус Барбекю",
+    "pt": "Pão Inf. x1\nFrango Croc. x1\nQueijo x1\nCebola x1\nPão Sup. x1\n\nMaionese\nMolho Barbecue"
+  },
+  {
+    "key": "BURGER_EXTREME_CHICKEN_RECIPE",
+    "tr": "Alt Ekmek x1\nÇıtır Tavuk x2\nPeynir x2\nMarul x2\nÜst Ekmek x1\n\nMayonez\nHardal",
+    "en": "Bottom Bun x1\nCrispy Chicken x2\nCheese x2\nLettuce x2\nTop Bun x1\n\nMayo\nMustard",
+    "zh": "底层面包 x1\n香脆鸡肉 x2\n芝士 x2\n生菜 x2\n顶层面包 x1\n\n蛋黄酱\n芥末酱",
+    "ja": "下バンズ x1\nC.チキン x2\nチーズ x2\nレタス x2\n上バンズ x1\n\nマヨネーズ\nマスタード",
+    "es": "Pan Inf. x1\nPollo Cruj. x2\nQueso x2\nLechuga x2\nPan Sup. x1\n\nMayonesa\nMostaza",
+    "ru": "Ниж. Булка x1\nХруст. Кур. x2\nСыр x2\nСалат x2\nВерх. Булка x1\n\nМайонез\nГорчица",
+    "pt": "Pão Inf. x1\nFrango Croc. x2\nQueijo x2\nAlface x2\nPão Sup. x1\n\nMaionese\nMostarda"
+  },
+  {
+    "key": "BURGER_CHICK_RECIPE",
+    "tr": "Alt Ekmek x1\nÇıtır Tavuk x1\nÜst Ekmek x1\n\nKetçap",
+    "en": "Bottom Bun x1\nCrispy Chicken x1\nTop Bun x1\n\nKetchup",
+    "zh": "底层面包 x1\n香脆鸡肉 x1\n顶层面包 x1\n\n番茄酱",
+    "ja": "下バンズ x1\nC.チキン x1\n上バンズ x1\n\nケチャップ",
+    "es": "Pan Inf. x1\nPollo Cruj. x1\nPan Sup. x1\n\nKétchup",
+    "ru": "Ниж. Булка x1\nХруст. Кур. x1\nВерх. Булка x1\n\nКетчуп",
+    "pt": "Pão Inf. x1\nFrango Croc. x1\nPão Sup. x1\n\nKetchup"
+  },
+  {
+    "key": "BURGER_GROWN_UP_RECIPE",
+    "tr": "Alt Ekmek x1\nKöfte x1\nÜst Ekmek x1\n\nKetçap",
+    "en": "Bottom Bun x1\nPatty x1\nTop Bun x1\n\nKetchup",
+    "zh": "底层面包 x1\n肉饼 x1\n顶层面包 x1\n\n番茄酱",
+    "ja": "下バンズ x1\nパティ x1\n上バンズ x1\n\nケチャップ",
+    "es": "Pan Inf. x1\nCarne x1\nPan Sup. x1\n\nKétchup",
+    "ru": "Ниж. Булка x1\nКотлета x1\nВерх. Булка x1\n\nКетчуп",
+    "pt": "Pão Inf. x1\nCarne x1\nPão Sup. x1\n\nKetchup"
+  },
+  {
     "key": "SELF_TALK_WORLD_LIMIT_O",
     "tr": "Bu tarafta işim yok.",
     "en": "Nothing for me that way."
@@ -1939,136 +2239,6 @@
     "key": "SELF_TALK_WORLD_LIMIT_5",
     "tr": "Uzaklaşma! Yabancı semtteyiz.",
     "en": "Dont go too far we dont know this neighbourhood."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_CLASSIC",
-    "tr": "Alt Ekmek x1\nKöfte x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\n\nKetçap\nMayonez",
-    "en": "Bottom Bun x1\nPatty x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\n\nKetchup\nMayo"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_CHEESE",
-    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nTurşu Dilimi x1\nÜst Ekmek x1\n\nKetçap\nHardal",
-    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nPickle Slice x1\nTop Bun x1\n\nKetchup\nMustard"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_DOUBLE_CHEESE",
-    "tr": "Alt Ekmek x1\nKöfte x2\nPeynir Dilimi x2\nTurşu Dilimi x2\nÜst Ekmek x1\n\nKetçap\nHardal",
-    "en": "Bottom Bun x1\nPatty x2\nCheese Slice x2\nPickle Slice x2\nTop Bun x1\n\nKetchup\nMustard"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_FULLY_LOADED",
-    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\n\nKetçap\nMayonez\nHardal\nBarbekü Sosu",
-    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\n\nKetchup\nMayo\nMustard\nBBQ Sauce"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_BUDGET",
-    "tr": "Alt Ekmek x1\nMarul Dilimi x1\nSoğan Dilimi x1\nTurşu Dilimi x1\nDomates Dilimi x1\nÜst Ekmek x1\n\nKetçap\nMayonez",
-    "en": "Bottom Bun x1\nLettuce Slice x1\nOnion Slice x1\nPickle Slice x1\nTomato Slice x1\nTop Bun x1\n\nKetchup\nMayo"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_BROKE_AHH",
-    "tr": "Alt Ekmek x1\nÜst Ekmek x1",
-    "en": "Bottom Bun x1\nTop Bun x1"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_GOUT",
-    "tr": "Alt Ekmek x1\nKöfte x5\nÜst Ekmek x1",
-    "en": "Bottom Bun x1\nPatty x5\nTop Bun x1"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_X",
-    "tr": "Alt Ekmek x2\nKöfte x2\nPeynir Dilimi x2\nMarul Dilimi x2\nSoğan Dilimi x2\nTurşu Dilimi x2\nÜst Ekmek x1\n\nMayonez\nHardal",
-    "en": "Bottom Bun x2\nPatty x2\nCheese Slice x2\nLettuce Slice x2\nOnion Slice x2\nPickle Slice x2\nTop Bun x1\n\nMayo\nMustard"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_LONG_AHH",
-    "tr": "Alt Ekmek x1\nKöfte x3\nPeynir Dilimi x3\nMarul Dilimi x3\nÜst Ekmek x1\n\nKetçap\nMayonez\nHardal",
-    "en": "Bottom Bun x1\nPatty x3\nCheese Slice x3\nLettuce Slice x3\nTop Bun x1\n\nKetchup\nMayo\nMustard"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_TOMATO_LOVER",
-    "tr": "Alt Ekmek x1\nKöfte x1\nDomates Dilimi x4\nÜst Ekmek x1\n\nKetçap",
-    "en": "Bottom Bun x1\nPatty x1\nTomato Slice x4\nTop Bun x1\n\nKetchup"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_BBQ",
-    "tr": "Alt Ekmek x1\nKöfte x1\nPeynir Dilimi x1\nSoğan Dilimi x1\nÜst Ekmek x1\n\nMayonez\nBarbekü Sosu",
-    "en": "Bottom Bun x1\nPatty x1\nCheese Slice x1\nOnion Slice x1\nTop Bun x1\n\nMayo\nBBQ Sauce"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_INGREDIENTS_BASIC",
-    "tr": "Alt Ekmek x1\nKöfte x1\nÜst Ekmek x1\n\nKetçap",
-    "en": "Bottom Bun x1\nPatty x1\nTop Bun x1\n\nKetchup"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_CLASSIC",
-    "tr": "Macera aramayanların klasik lezzeti...",
-    "en": "For those who like to play it safe..."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_CHEESE",
-    "tr": "\"Peynirsiz yapamam.\" diyenlere...",
-    "en": "For those who say, \"I can't live without cheese.\""
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_DOUBLE_CHEESE",
-    "tr": "\"Asıl ben peynirsiz yapamam.\" diyenlere...",
-    "en": "For those who say, \"No, seriously, I can not live without cheese.\""
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_FULLY_LOADED",
-    "tr": "Her şey... HER ŞEY.",
-    "en": "Everything... LITERALLY EVERYTHING."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_BUDGET",
-    "tr": "\"Hem burgerimi yiyorum hem de param cebimde kalıyor. Et mi? O da ne?\"",
-    "en": "\"Full stomach, full wallet. Meat? Never heard of her.\""
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_BROKE_AHH",
-    "tr": "\"Ekmek zeki toplumların temel gıda maddesidir.\" -fukaraburgerfan34",
-    "en": "\"Bread is the fuel of high-IQ societies.\" -brokeahhburgerfan67"
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_GOUT",
-    "tr": "Ekmek arası bütün dana.",
-    "en": "A whole cow between two buns."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_X",
-    "tr": "Ağzının tadını bilenlere...",
-    "en": "For those with refined taste..."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_LONG_AHH",
-    "tr": "Dönerden bıkan, zurnadan ise bıkamayanların favorisi...",
-    "en": "For those who believe length matters..."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_TOMATO_LOVER",
-    "tr": "\"Keşke domates olarak doğsaydım.\"",
-    "en": "\"I wish I was born as a tomato.\""
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_BBQ",
-    "tr": "Gerçek gurmelerin seçimi...",
-    "en": "The choice of true gourmets..."
-  },
-  {
-    "key": "UI_MONITOR_BURGER_DESCRIPTION_BASIC",
-    "tr": "Durumu \"Merhaba! Ben VırtApp kullanıyorum.\" olanların tek tercihi...",
-    "en": "The #1 choice for people whose status is \"Hey there! I am using VirtApp\""
-  },
-  {
-    "key": "UI_TRACK",
-    "tr": "Parça",
-    "en": "Track",
-    "zh": "曲目",
-    "ja": "トラック",
-    "es": "Pista",
-    "ru": "Трек",
-    "pt": "Faixa"
   },
   {
     "key": "UI_MAIN_MENU_CONTINUE",
@@ -2343,42 +2513,72 @@
   {
     "key": "UI_MONITOR_BURGER_LIST",
     "tr": "Burger Listesi",
-    "en": "Burger List"
+    "en": "Burger List",
+    "zh": "汉堡列表",
+    "ja": "バーガーリスト",
+    "es": "Lista de Burgers",
+    "ru": "Список Бургеров",
+    "pt": "Lista de Burgers"
   },
   {
     "key": "UI_MONITOR_NOTEPAD",
     "tr": "Not Defteri",
-    "en": "Notepad"
+    "en": "Notepad",
+    "zh": "记事本",
+    "ja": "メモ帳",
+    "es": "Bloc de Notas",
+    "ru": "Блокнот",
+    "pt": "Bloco de Notas"
   },
   {
     "key": "UI_MONITOR_MUSIC_PLAYER",
     "tr": "Müzik Çalar",
-    "en": "Music Player"
+    "en": "Music Player",
+    "zh": "音乐播放器",
+    "ja": "音楽プレーヤー",
+    "es": "Reproductor",
+    "ru": "Плеер",
+    "pt": "Reprodutor"
   },
   {
     "key": "UI_MONITOR_RECYCLE_BIN",
     "tr": "Geri Dönüşüm Kutusu",
-    "en": "Recycle Bin"
+    "en": "Recycle Bin",
+    "zh": "回收站",
+    "ja": "ごみ箱",
+    "es": "Papelera",
+    "ru": "Корзина",
+    "pt": "Lixeira"
+  },
+  {
+    "key": "UI_HOW_TO",
+    "tr": "Nasıl?",
+    "en": "How To?",
+    "zh": "如何？",
+    "ja": "ハウツー",
+    "es": "¿Cómo?",
+    "ru": "Как?",
+    "pt": "Como?"
   },
   {
     "key": "UI_START",
     "tr": "Başlat",
-    "en": "Start"
-  },
-  {
-    "key": "UI_MONITOR_HOW_TO_PREPARE_BURGER",
-    "tr": "Burger Nasıl Hazırlanır?",
-    "en": "How To Prepare Burger?"
-  },
-  {
-    "key": "UI_MONITOR_HOW_TO_INSTRUCTIONS",
-    "tr": "1. Malzemeleri soğuk odadan temin edin.\n2. Bıçakla paketleri açın ve ekmeği bölün.\n3. Köfte ve ekmeği ızgarada yakmadan pişirin.\n4. Sebzeleri dilimleyin.\n5. Alt Ekmek ile başlayın, sos/malzemeleri dizin, Üst Ekmek ile bitirin.\n6. Ürünü paketleyip servis edin.\n\nDÜZELTME: Hatalı malzemeyi en üstten tıklayarak geri alabilirsiniz.",
-    "en": "1. Retrieve ingredients from cold storage.\n2. Open packs and slice the bun.\n3. Grill patty and bun (avoid burning).\n4. Slice the vegetables.\n5. Start with Bottom Bun, add sauce/toppings, end with Top Bun.\n6. Pack and serve the order.\n\nCORRECTION: Click the top item to remove/undo layers."
+    "en": "Start",
+    "zh": "开始",
+    "ja": "スタート",
+    "es": "Inicio",
+    "ru": "Пуск",
+    "pt": "Iniciar"
   },
   {
     "key": "UI_MONITOR_NOTEPAD_PLACEHOLDER",
     "tr": "Metin giriniz…",
-    "en": "Enter text…"
+    "en": "Enter text…",
+    "zh": "输入文本…",
+    "ja": "テキストを入力…",
+    "es": "Escribe texto…",
+    "ru": "Введите текст…",
+    "pt": "Digite o texto…"
   },
   {
     "key": "UI_MONITOR_NOTEPAD_DELETED_NOTE_HEADER",
