@@ -289,31 +289,6 @@ public class DialogueManager : MonoBehaviour
     {
         currentLineData = line; // Update'de erişmek için kaydet
 
-        // --- ISPIYONCU LOG ---
-        if (speakers.ContainsKey(line.SpeakerID))
-        {
-            var sp = speakers[line.SpeakerID];
-            var mb = sp as MonoBehaviour;
-            Debug.Log($"<color=green>✔ BULUNDU:</color> Satır '{line.SpeakerID}' istiyor. Sözlükte '{mb.name}' objesi var. LookAtPoint: {(sp.LookAtPoint != null ? "VAR" : "YOK")}");
-        }
-        else
-        {
-            Debug.LogError($"<color=red>❌ BULUNAMADI:</color> Satır '{line.SpeakerID}' istiyor ama sözlükte YOK! Kamera eski yerinde kalacak.");
-
-            // Sözlükte kimler var dökümünü alalım:
-            string kimlerVar = "";
-            foreach (var key in speakers.Keys) kimlerVar += key + ", ";
-            Debug.Log($"Sözlükteki Mevcut Kişiler: {kimlerVar}");
-        }
-        // ---------------------
-
-        // 1. Konuşmacıyı Bul
-        IDialogueSpeaker activeSpeaker = null;
-        if (speakers.ContainsKey(line.SpeakerID))
-        {
-            activeSpeaker = speakers[line.SpeakerID];
-        }
-
         // 2. HAVUZDAN BALON SEÇ
         DialogueAnimator selectedDialogueAnimator = GetAvailableDialogueAnimator();
         currentActiveDialogueAnimator = selectedDialogueAnimator;

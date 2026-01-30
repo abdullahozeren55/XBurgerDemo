@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9d4b025253a01428d678aaf123643f, type: 3}
+  m_Name: FamilyFather
+  m_EditorClassIdentifier: 
+  ID: 2
+  SkinMaterial: {fileID: 2100000, guid: a88e1be2188149244b2c3be7e9864b30, type: 2}
+  WalkSpeed: 1.5
+  ArrivalDistance: 0.2
+  SitPositionOffset: {x: 0, y: -0.494, z: 0.225}
+  SitRotationOffset: {x: 0, y: 0, z: 0}
+  PossibleOrders:
+  - Order: {fileID: 11400000, guid: 9f1951c216fb88d4582f78fbffb4888d, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 7213dac9d27ae954291d89afafd2cee2, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleWrongOrderDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: ca847c5100cffe74ca9e6131e636ebf0, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleCorrectOrderDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: bd54cfdb3eca91547946a8b2baa972d3, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleEmptyTrayDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: d99dc643246fb7b40990852942448c5d, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleKnifeHitDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: acadfa406e11de34fac740defe235785, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  FootstepSounds: {fileID: 11400000, guid: feb076469b0f79c40b8cdc301428e2fd, type: 2}

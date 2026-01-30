@@ -135,6 +135,12 @@ public class GameManager : MonoBehaviour
     private CursorType _savedCursorType = CursorType.Default;   // Hafızadaki imleç
     private bool _savedCursorLocked = true;                     // Hafızadaki kilit durumu
 
+    [Header("Sounds")]
+    [SerializeField] private AudioClip mouseClickSound;
+    [SerializeField] private float mouseClickVolume = 0.8f;
+    [SerializeField] private float mouseClickMinPitch = 0.9f;
+    [SerializeField] private float mouseClickMaxPitch = 1.1f;
+
     [Header("Burger Lists")]
     public List<BurgerIngredientData.IngredientType> nullBurger = new List<BurgerIngredientData.IngredientType>();
     public List<SauceBottle.SauceType> nullBurgerSauces = new List<SauceBottle.SauceType>();
@@ -455,5 +461,11 @@ public class GameManager : MonoBehaviour
 
         // 7. UYGULA
         cursorRect.localPosition = localPoint;
+
+        if (_currentCursorType == CursorType.Retro && InputManager.Instance && SoundManager.Instance)
+        {
+            if (InputManager.Instance.PlayerInteract())
+                SoundManager.Instance.PlayUISoundFX(mouseClickSound, mouseClickVolume, mouseClickMinPitch, mouseClickMaxPitch);
+        }
     }
 }

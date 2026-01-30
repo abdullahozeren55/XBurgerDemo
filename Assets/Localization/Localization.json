@@ -2531,6 +2531,16 @@
     "pt": "Bloco de Notas"
   },
   {
+    "key": "UI_MONITOR_ORDERS",
+    "tr": "Siparişler",
+    "en": "Orders",
+    "zh": "订单",
+    "ja": "注文",
+    "es": "Pedidos",
+    "ru": "Заказы",
+    "pt": "Pedidos"
+  },
+  {
     "key": "UI_MONITOR_MUSIC_PLAYER",
     "tr": "Müzik Çalar",
     "en": "Music Player",
@@ -3193,42 +3203,42 @@
   {
     "key": "CURSED_SPEECH_10",
     "tr": "NE YAPTIĞINI BİLİYORSUN.",
-    "en": "",
-    "zh": "",
-    "ja": "",
-    "es": "",
-    "ru": "",
-    "pt": ""
+    "en": "YOU KNOW WHAT YOU DID.",
+    "zh": "你知道你做了什么。",
+    "ja": "お前は何をしたか知っている。",
+    "es": "SABES LO QUE HICISTE.",
+    "ru": "ТЫ ЗНАЕШЬ, ЧТО НАДЕЛАЛ.",
+    "pt": "VOCÊ SABE O QUE FEZ."
   },
   {
     "key": "CURSED_SPEECH_11",
     "tr": "SİNAN!",
-    "en": "",
-    "zh": "",
-    "ja": "",
-    "es": "",
-    "ru": "",
-    "pt": ""
+    "en": "SINAN!",
+    "zh": "SINAN!",
+    "ja": "SINAN!",
+    "es": "SINAN!",
+    "ru": "SINAN!",
+    "pt": "SINAN!"
   },
   {
-    "key": "CURSED_SPEECH_11",
+    "key": "CURSED_SPEECH_12",
     "tr": "KATİL!",
-    "en": "",
-    "zh": "",
-    "ja": "",
-    "es": "",
-    "ru": "",
-    "pt": ""
+    "en": "MURDERER!",
+    "zh": "凶手！",
+    "ja": "人殺し！",
+    "es": "¡ASESINO!",
+    "ru": "УБИЙЦА!",
+    "pt": "ASSASSINO!"
   },
   {
-    "key": "CURSED_SPEECH_11",
-    "tr": "BU SEFERKİNİ O BİLE ÇÖZEMEZ.",
-    "en": "",
-    "zh": "",
-    "ja": "",
-    "es": "",
-    "ru": "",
-    "pt": ""
+  "key": "CURSED_SPEECH_13",
+  "tr": "BU SEFERKİYLE O BİLE BAŞA ÇIKAMAZ.",
+  "en": "EVEN HE CAN'T HANDLE THIS ONE.",
+  "zh": "这一次连他也应付不了。",
+  "ja": "今回ばかりは、彼でも対処できない。",
+  "es": "NI SIQUIERA ÉL PUEDE LIDIAR CON ESTO.",
+  "ru": "ДАЖЕ ОН НЕ СМОЖЕТ С ЭТИМ СПРАВИТЬСЯ.",
+  "pt": "NEM MESMO ELE CONSEGUE LIDAR COM ISSO."
   },
   {
     "key": "TEENGIRL_GREETING_0",
@@ -3269,6 +3279,26 @@
     "es": "Buenos días.",
     "ru": "Добрый день.",
     "pt": "Bom dia."
+  },
+  {
+    "key": "TEENGUY_GREETING_0",
+    "tr": "Selamünaleyküm hacı.",
+    "en": "Yo, boss.",
+    "zh": "哟，老板。",
+    "ja": "うぃーす。",
+    "es": "¿Qué tal, jefe?",
+    "ru": "Салам, брат.",
+    "pt": "Salve, chefia."
+  },
+  {
+    "key": "TEENGUY_GREETING_1",
+    "tr": "Kolay gelsin kanka.",
+    "en": "Sup, bro.",
+    "zh": "哥们儿，辛苦啦。",
+    "ja": "お疲れっす。",
+    "es": "Todo bien, colega.",
+    "ru": "Здорово, братан.",
+    "pt": "E aí, mano."
   },
   {
     "key": "FAMILYKID_GREETING",
@@ -3341,6 +3371,36 @@
     "pt": "Você percebeu que essa bandeja tá vazia, né?"
   },
   {
+    "key": "TEENGUY_EMPTYORDER_0",
+    "tr": "Hmm evet bu tepsi tepsiden yapılmış.",
+    "en": "Hmm yes, this tray is made out of tray.",
+    "zh": "嗯，没错，这托盘是用托盘做的。",
+    "ja": "ふむ、確かにこのトレイはトレイでできている。",
+    "es": "Hmm sí, esta bandeja está hecha de bandeja.",
+    "ru": "Хмм да, этот поднос сделан из подноса.",
+    "pt": "Hmm sim, essa bandeja é feita de bandeja."
+  },
+  {
+    "key": "TEENGUY_EMPTYORDER_1",
+    "tr": "Hocam siparişlerimi sen mi yedin?",
+    "en": "Bro, did you eat my order or something?",
+    "zh": "老板，你把我的饭吃了吗？",
+    "ja": "大将、俺の飯食っちゃった？",
+    "es": "Jefe, ¿te has comido mi pedido?",
+    "ru": "Шеф, ты что, съел мой заказ?",
+    "pt": "Chefia, você comeu meu pedido?"
+  },
+  {
+    "key": "TEENGUY_EMPTYORDER_2",
+    "tr": "Evet harika bir tepsi. Bunun üstüne ne çok yakışır biliyor musun? Siparişim.",
+    "en": "Yeah, great tray. You know what would look good on it? My order.",
+    "zh": "嗯，好托盘。你知道上面放什么最配吗？我的饭。",
+    "ja": "うん、いいトレイだ。これに何が似合うか知ってる？俺の注文。",
+    "es": "Sí, gran bandeja. ¿Sabes qué le quedaría bien encima? Mi pedido.",
+    "ru": "Да, отличный поднос. Знаешь, что бы на нем хорошо смотрелось? Мой заказ.",
+    "pt": "Sim, bela bandeja. Sabe o que ficaria ótimo nela? O meu pedido."
+  },
+  {
     "key": "FAMILYKID_EMPTYORDER",
     "tr": "Bunda hiçbir şey yok ki abi.",
     "en": "There's nothing on this, mister.",
@@ -3409,6 +3469,36 @@
     "es": "No hagas tonterías.",
     "ru": "Не дури.",
     "pt": "Não faz besteira."
+  },
+  {
+    "key": "TEENGUY_KNIFETHROWED_0",
+    "tr": "Sağol kral ya bıçak yedim de geldim.",
+    "en": "Thanks King, but I already had a knife for breakfast.",
+    "zh": "谢了国王，但我刚吃过刀子了。",
+    "ja": "ありがとなキング、ナイフならもう食ってきたわ。",
+    "es": "Gracias crack, pero ya desayuné cuchillo hoy.",
+    "ru": "Спасибо, царь, но я уже ножей наелся.",
+    "pt": "Valeu mestre, mas já comi faca antes de vir."
+  },
+  {
+    "key": "TEENGUY_KNIFETHROWED_1",
+    "tr": "Ah bu acıdı!.. Şaka şaka hiçbir şey hissetmedim.",
+    "en": "Ouch, that hurt!.. Just kidding, didn't feel a thing.",
+    "zh": "哎哟好疼！……骗你的，一点感觉都没有。",
+    "ja": "いったー！…なーんて、全然痛くないけど。",
+    "es": "¡Au, eso dolió!... Es broma, no sentí nada.",
+    "ru": "Ай, больно!.. Шучу, вообще ничего не почувствовал.",
+    "pt": "Ai, doeu!... Zoera, não senti nada."
+  },
+  {
+    "key": "TEENGUY_KNIFETHROWED_2",
+    "tr": "Ben bıçak sipariş etmemiştim başkasının mı bu?",
+    "en": "I didn't order a knife. Is this for someone else?",
+    "zh": "我没点刀子啊，这是别人的吗？",
+    "ja": "ナイフ頼んでないんだけど。他の人の？",
+    "es": "Yo no pedí un cuchillo. ¿Es de otro?",
+    "ru": "Я нож не заказывал, это кому-то другому?",
+    "pt": "Eu não pedi faca, isso é de outra pessoa?"
   },
   {
     "key": "FAMILYKID_KNIFETHROWED",
@@ -3481,6 +3571,36 @@
     "pt": "Isso é de outra pessoa?"
   },
   {
+    "key": "TEENGUY_WRONGORDER_0",
+    "tr": "Bu siparişi dünya barışı adın- Ha yanlış siparişmiş.",
+    "en": "I accept this order on behalf of world pea- Oh, wrong order.",
+    "zh": "为了世界和平，我接受这——啊，给错了。",
+    "ja": "世界平和のために、この注文を謹んで…あ、注文間違ってるわ。",
+    "es": "Acepto este pedido en nombre de la paz mund— Ah, se han equivocado.",
+    "ru": "Я принимаю этот заказ во имя мира во вс— А, не тот заказ.",
+    "pt": "Aceito esse pedido em nome da paz mund— Ah, pedido errado."
+  },
+  {
+    "key": "TEENGUY_WRONGORDER_1",
+    "tr": "Şey benim bir de brokoli ve kapuska olacaktı.",
+    "en": "Uhh, I think I also ordered some broccoli and cabbage stew.",
+    "zh": "那个，我好像还点了一份西兰花和炖卷心菜来着。",
+    "ja": "えーっと、ブロッコリーとキャベツの煮込みも頼んだっけ？",
+    "es": "Ehm, creo que también pedí brócoli y sopa de repollo.",
+    "ru": "Эмм, у меня там еще были брокколи и тушеная капуста.",
+    "pt": "Hã, acho que eu também pedi brócolis e sopa de repolho."
+  },
+  {
+    "key": "TEENGUY_WRONGORDER_2",
+    "tr": "Bu siparişin ve benim siparişin ortak noktası ikisinin de sipariş olması.",
+    "en": "The only thing this order and my order have in common is that they're both orders.",
+    "zh": "这份餐和我点的餐唯一的共同点，就是它们都是餐。",
+    "ja": "これと俺の注文の共通点は、どっちも「注文」ってことだけだな。",
+    "es": "Lo único que tienen en común este pedido y el mío es que ambos son pedidos.",
+    "ru": "Единственное общее между этим и моим заказом — это то, что они оба заказы.",
+    "pt": "A única coisa em comum entre esse pedido e o meu é que os dois são pedidos."
+  },
+  {
     "key": "FAMILYFATHER_WRONGORDER",
     "tr": "Bu başkasının siparişi olsa gerek dostum.",
     "en": "This must be someone else's order, buddy.",
@@ -3549,6 +3669,26 @@
     "es": "Hasta luego.",
     "ru": "Пока.",
     "pt": "Tchau."
+  },
+  {
+    "key": "TEENGUY_TRUEORDER_0",
+    "tr": "Hayatım boyunca yiyeceğim en güzel şey olacağına eminim. Çünkü bedava. Yaşasın Dünya Burger Günü!",
+    "en": "I'm sure this is the best thing I'll ever eat. Because it's free. Long live World Burger Day!",
+    "zh": "这绝对是我这辈子吃过最好吃的东西。因为免费。世界汉堡日万岁！",
+    "ja": "人生で一番美味いメシになるって確信してるわ。だってタダだからな。世界バーガーデー万歳！",
+    "es": "Seguro que es lo mejor que comeré en mi vida. Porque es gratis. ¡Viva el Día Mundial de la Hamburguesa!",
+    "ru": "Уверен, это лучшее, что я когда-либо ел. Потому что бесплатно. Да здравствует Всемирный день бургера!",
+    "pt": "Certeza que é a melhor coisa que vou comer na vida. Porque é de graça. Viva o Dia Mundial do Hambúrguer!"
+  },
+  {
+    "key": "TEENGUY_TRUEORDER_1",
+    "tr": "Sağlığına ellik! Hehehehe- Evet bence de komik değidi. Açlıktan komikliğim kaçtı. Gideyim de şunu gömeyim.",
+    "en": "Bon apple-teeth! Hehehehe- Yeah, not funny. My humor is gone 'cause I'm starving. I'm gonna go smash this.",
+    "zh": "谢主隆恩！呵呵呵……好吧不好笑。饿得都没幽默感了。我先干饭去了。",
+    "ja": "ありが十匹（とうひき）！へへへ…うん、面白くないな。空腹で滑ったわ。さっさと食らおう。",
+    "es": "¡Mouchas gracias! Jejeje... Sí, malísimo. El hambre me quitó la gracia. Me voy a zumbar esto.",
+    "ru": "Спаси-бог-ты-мой! Хехехе... Да, не смешно. Юмор пропал от голода. Пойду заточу это.",
+    "pt": "Obrigatão! Hehehe... É, não teve graça. A fome matou meu humor. Vou lá traçar isso."
   },
   {
     "key": "FAMILYKID_TRUEORDER",

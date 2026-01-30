@@ -156,7 +156,6 @@ public class DialogueAnimator : MonoBehaviour
     public void Show(string text)
     {
         IsBusy = true;
-        gameObject.SetActive(true);
         typewriter.ShowText(text);
         typewriter.StartShowingText();
     }
@@ -173,7 +172,6 @@ public class DialogueAnimator : MonoBehaviour
     {
         if (typewriter != null) typewriter.StopShowingText();
         if (textComponent != null) textComponent.text = string.Empty;
-        gameObject.SetActive(false);
         IsBusy = false;
     }
 
@@ -187,7 +185,6 @@ public class DialogueAnimator : MonoBehaviour
     private void OnDisappearFinished()
     {
         IsBusy = false;
-        gameObject.SetActive(false);
     }
 
     public bool IsTyping()

@@ -28,8 +28,8 @@ public class DialogueData : ScriptableObject
         public float TextDelay = 0f;
 
         [Header("Camera Juice")]
-        public CustomerID FocusTargetID;
-        [Range(0f, 5f)] public float CamMoveDuration = 1f;
+        public CustomerID FocusTargetID = CustomerID.None;
+        [Range(0f, 5f)] public float CamMoveDuration = 0.5f;
         public Ease CamMoveEase = Ease.InOutSine;
         [Range(-45f, 45f)] public float DutchAngle = 0f;
         public float TargetFOV = 60f;

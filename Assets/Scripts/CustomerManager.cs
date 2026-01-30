@@ -48,6 +48,138 @@ public class CustomerManager : MonoBehaviour
         }
     }
 
+    public void UpdateMonitorWithGroupOrders()
+    {
+        // 1. Kasada yemek bekleyen veya sipariþ veren herkesi al
+        var customers = GetCustomersAtCounter(); // Bunu az önce public yapmýþtýk
+        if (customers == null || customers.Count == 0)
+        {
+            MonitorManager.Instance.ClearCurrentOrder();
+            return;
+        }
+
+        // 2. SANAL (Geçici) bir OrderData oluþtur.
+        // CreateInstance memory'de oluþturur, dosyaya kaydetmez. Oyun bitince silinir.
+        OrderData mergedOrder = ScriptableObject.CreateInstance<OrderData>();
+        mergedOrder.OrderName = "Group Order";
+
+        // 3. HERKESÝN SÝPARÝÞÝNÝ TEK TEK GEZ VE TOPLA
+        foreach (var customer in customers)
+        {
+            // Adamýn sipariþi yoksa veya sipariþ durumunda deðilse geç
+            // (Ýsteðe baðlý: Sadece WaitingForFood olanlarý mý ekleyelim? 
+            // Genelde grup kasaya gelince hepsi görünür, bence hepsini alalým.)
+            if (customer.CurrentProfile == null) continue;
+
+            // Müþterinin o anki sipariþi (Initialize'da atanan)
+            // NOT: CustomerController'da currentOrder'ý public property yapman gerekebilir:
+            // public OrderData CurrentOrder => currentOrder;
+            OrderData individualOrder = customer.GetCurrentOrder();
+
+            if (individualOrder == null) continue;
+
+            // --- BURGERLERÝ BÝRLEÞTÝR ---
+            foreach (var item in individualOrder.RequiredBurgers)
+            {
+                // FÝLTRE EKLENDÝ
+                if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+                // Bu burgerden listede zaten var mý?
+                int index = mergedOrder.RequiredBurgers.FindIndex(x => x.Type == item.Type);
+                if (index != -1)
+                {
+                    // Varsa sayýsýný artýr
+                    var existing = mergedOrder.RequiredBurgers[index];
+                    existing.Count += item.Count;
+                    mergedOrder.RequiredBurgers[index] = existing; // Struct olduðu için geri atýyoruz
+                }
+                else
+                {
+                    // Yoksa yeni ekle
+                    mergedOrder.RequiredBurgers.Add(item);
+                }
+            }
+
+            // --- ÝÇECEKLERÝ BÝRLEÞTÝR ---
+            foreach (var item in individualOrder.RequiredDrinks)
+            {
+                // FÝLTRE EKLENDÝ
+                if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+
+                int index = mergedOrder.RequiredDrinks.FindIndex(x => x.Type == item.Type);
+                if (index != -1)
+                {
+                    var existing = mergedOrder.RequiredDrinks[index];
+                    existing.Count += item.Count;
+                    mergedOrder.RequiredDrinks[index] = existing;
+                }
+                else
+                {
+                    mergedOrder.RequiredDrinks.Add(item);
+                }
+            }
+
+            // --- YAN ÜRÜNLERÝ BÝRLEÞTÝR ---
+            foreach (var item in individualOrder.RequiredSides)
+            {
+                // FÝLTRE EKLENDÝ
+                if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+
+                int index = mergedOrder.RequiredSides.FindIndex(x => x.Type == item.Type);
+                if (index != -1)
+                {
+                    var existing = mergedOrder.RequiredSides[index];
+                    existing.Count += item.Count;
+                    mergedOrder.RequiredSides[index] = existing;
+                }
+                else
+                {
+                    mergedOrder.RequiredSides.Add(item);
+                }
+            }
+
+            // --- SOSLARI BÝRLEÞTÝR ---
+            foreach (var item in individualOrder.RequiredSauces)
+            {
+                // FÝLTRE EKLENDÝ
+                if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+
+                int index = mergedOrder.RequiredSauces.FindIndex(x => x.Type == item.Type);
+                if (index != -1)
+                {
+                    var existing = mergedOrder.RequiredSauces[index];
+                    existing.Count += item.Count;
+                    mergedOrder.RequiredSauces[index] = existing;
+                }
+                else
+                {
+                    mergedOrder.RequiredSauces.Add(item);
+                }
+            }
+
+            // --- OYUNCAKLARI BÝRLEÞTÝR ---
+            foreach (var item in individualOrder.RequiredToys)
+            {
+                // FÝLTRE EKLENDÝ
+                if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+
+                int index = mergedOrder.RequiredToys.FindIndex(x => x.Type == item.Type);
+                if (index != -1)
+                {
+                    var existing = mergedOrder.RequiredToys[index];
+                    existing.Count += item.Count;
+                    mergedOrder.RequiredToys[index] = existing;
+                }
+                else
+                {
+                    mergedOrder.RequiredToys.Add(item);
+                }
+            }
+        }
+
+        // 4. TOPLANMIÞ LÝSTEYÝ MONÝTÖRE ÇAK
+        MonitorManager.Instance.SetCurrentOrder(mergedOrder);
+    }
+
     // --- YENÝ: Senaryoyu Baþlat ---
     private void StartScenario()
     {
@@ -99,6 +231,8 @@ public class CustomerManager : MonoBehaviour
         if (customersAtCounter.Contains(customer))
         {
             customersAtCounter.Remove(customer);
+
+            UpdateMonitorWithGroupOrders();
 
             // --- YENÝ: ZÝNCÝRLEME TETÝKLEYÝCÝ ---
             // Eðer kasadaki SON kiþi de ayrýldýysa VE senaryo devam ediyorsa...

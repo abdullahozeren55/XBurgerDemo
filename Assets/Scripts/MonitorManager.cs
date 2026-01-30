@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,6 +60,18 @@ public class MonitorManager : MonoBehaviour
     private float _initHeaderSpacing;
     private float _initIngSpacing;
     private float _initDescSpacing;
+
+    [Header("Order List Settings (YENÝ)")]
+    public FontType orderFontType = FontType.RetroUINoOutline; // Sipariþ listesi için font tipi
+    public TMP_Text currentOrdersTMP;      // UI'daki text
+    public TMP_Text currentOrdersTMPWorld; // World Space'deki text (Varsa)
+
+    private OrderData _activeOrderData; // Þu an ekranda gösterilen sipariþ verisi
+
+    // --- HAFIZA DEÐÝÞKENLERÝ (Order List) ---
+    private float _initOrderSize;
+    private float _initOrderSpacing;
+    private float _initOrderLineSpacing;
 
     [Header("Notepad Page Settings")]
     public InputMirror notePadInputMirror;
@@ -122,6 +135,14 @@ public class MonitorManager : MonoBehaviour
         {
             _initDescSize = descriptionTMP.fontSize;
             _initDescSpacing = descriptionTMP.characterSpacing;
+        }
+
+        // --- ORDER LIST BAÞLANGIÇ DEÐERLERÝ (YENÝ) ---
+        if (currentOrdersTMP != null)
+        {
+            _initOrderSize = currentOrdersTMP.fontSize;
+            _initOrderSpacing = currentOrdersTMP.characterSpacing;
+            _initOrderLineSpacing = currentOrdersTMP.lineSpacing;
         }
     }
 
@@ -249,47 +270,153 @@ public class MonitorManager : MonoBehaviour
         RefreshPage();
     }
 
+    // --- YENÝ: SÝPARÝÞÝ DIÞARIDAN ATAMA ---
+    public void SetCurrentOrder(OrderData order)
+    {
+        _activeOrderData = order;
+        RefreshOrderListDisplay(); // Hemen görseli güncelle
+    }
+
+    // --- YENÝ: SÝPARÝÞÝ TEMÝZLEME (Müþteri gidince vs.) ---
+    public void ClearCurrentOrder()
+    {
+        _activeOrderData = null;
+        if (currentOrdersTMP != null) currentOrdersTMP.text = "";
+        if (currentOrdersTMPWorld != null) currentOrdersTMPWorld.text = "";
+    }
+
     // --- OTOMATÝK ÇALIÞAN FONKSÝYON ---
     // Hem SetBurgerPage çaðýrýr, hem de Dil Deðiþimi çaðýrýr
     private void RefreshPage()
     {
+        // 1. Burger Sayfasýný Yenile
+        RefreshBurgerPageDisplay();
+
+        // 2. Sipariþ Listesini Yenile (Eðer aktif bir sipariþ varsa)
+        RefreshOrderListDisplay();
+    }
+
+    private void RefreshBurgerPageDisplay()
+    {
         if (currentBurgerIndex < 0 || currentBurgerIndex >= burgerSprites.Length) return;
 
-        // --- 1. GÖRSEL ---
         burgerImage.sprite = burgerSprites[currentBurgerIndex];
         burgerImageWorld.sprite = burgerImage.sprite;
 
-        // --- 2. FONT VE DÝL AYARLARI ---
         if (LocalizationManager.Instance != null)
         {
-            // A. FONT AYARLARINI HESAPLA
-            // LocalizedText'teki mantýðýn aynýsý:
             var targetData = LocalizationManager.Instance.GetFontDataForCurrentLanguage(burgerFontType);
             var defaultData = LocalizationManager.Instance.GetDefaultFontData(burgerFontType);
 
             float defaultBase = Mathf.Max(defaultData.basePixelSize, 0.1f);
-            float ratio = targetData.basePixelSize / defaultBase; // Boyut Oraný
-
-            // Spacing Farký
+            float ratio = targetData.basePixelSize / defaultBase;
             float charSpacingDiff = targetData.characterSpacingOffset - defaultData.characterSpacingOffset;
 
-            // B. METÝNLERÝ VE FONTLARI GÜNCELLE
-
-            // --- Header ---
             string headText = LocalizationManager.Instance.GetText(headerKeys[currentBurgerIndex]);
             UpdateTextComp(headerTMP, headText, targetData.font, _initHeaderSize * ratio, _initHeaderSpacing + charSpacingDiff);
             UpdateTextComp(headerTMPWorld, headText, targetData.font, _initHeaderSize * ratio, _initHeaderSpacing + charSpacingDiff);
 
-            // --- Ingredients ---
             string ingText = LocalizationManager.Instance.GetText(ingredientKeys[currentBurgerIndex]);
             UpdateTextComp(ingredientsTMP, ingText, targetData.font, _initIngSize * ratio, _initIngSpacing + charSpacingDiff);
             UpdateTextComp(ingredientsTMPWorld, ingText, targetData.font, _initIngSize * ratio, _initIngSpacing + charSpacingDiff);
 
-            // --- Description ---
             string descText = LocalizationManager.Instance.GetText(descriptionKeys[currentBurgerIndex]);
             UpdateTextComp(descriptionTMP, descText, targetData.font, _initDescSize * ratio, _initDescSpacing + charSpacingDiff);
             UpdateTextComp(descriptionTMPWorld, descText, targetData.font, _initDescSize * ratio, _initDescSpacing + charSpacingDiff);
         }
+    }
+
+    // --- YENÝ: SÝPARÝÞ LÝSTESÝNÝ GÜNCELLEME MANTIÐI ---
+    private void RefreshOrderListDisplay()
+    {
+        if (_activeOrderData == null) return;
+        if (currentOrdersTMP == null && currentOrdersTMPWorld == null) return;
+        if (LocalizationManager.Instance == null) return;
+
+        // 1. Font Verilerini Al
+        var targetData = LocalizationManager.Instance.GetFontDataForCurrentLanguage(orderFontType);
+        var defaultData = LocalizationManager.Instance.GetDefaultFontData(orderFontType);
+
+        // 2. Oranlarý Hesapla
+        float defaultBase = Mathf.Max(defaultData.basePixelSize, 0.1f);
+        float ratio = targetData.basePixelSize / defaultBase;
+
+        float charSpacingDiff = targetData.characterSpacingOffset - defaultData.characterSpacingOffset;
+        float lineSpacingDiff = targetData.lineSpacingOffset - defaultData.lineSpacingOffset;
+
+        // 3. Metni Oluþtur (Localize Edilmiþ String)
+        string orderContent = BuildOrderString(_activeOrderData);
+
+        // 4. Ekrana Bas (Font ayarlarýyla birlikte)
+        ApplyOrderTextSettings(currentOrdersTMP, orderContent, targetData.font,
+            _initOrderSize * ratio, _initOrderSpacing + charSpacingDiff, _initOrderLineSpacing + lineSpacingDiff);
+
+        ApplyOrderTextSettings(currentOrdersTMPWorld, orderContent, targetData.font,
+            _initOrderSize * ratio, _initOrderSpacing + charSpacingDiff, _initOrderLineSpacing + lineSpacingDiff);
+    }
+
+    private string BuildOrderString(OrderData data)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        // --- BURGERLER ---
+        foreach (var item in data.RequiredBurgers)
+        {
+            // FÝLTRE: Key boþsa veya sayý 0 ise GEÇ
+            if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue;
+
+            string name = LocalizationManager.Instance.GetText(item.OrderKey);
+            sb.AppendLine($"{name} x{item.Count}");
+        }
+
+        // --- ÝÇECEKLER ---
+        foreach (var item in data.RequiredDrinks)
+        {
+            if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue; // <--- FÝLTRE
+
+            string name = LocalizationManager.Instance.GetText(item.OrderKey);
+            sb.AppendLine($"{name} x{item.Count}");
+        }
+
+        // --- YAN ÜRÜNLER ---
+        foreach (var item in data.RequiredSides)
+        {
+            if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue; // <--- FÝLTRE
+
+            string name = LocalizationManager.Instance.GetText(item.OrderKey);
+            sb.AppendLine($"{name} x{item.Count}");
+        }
+
+        // --- SOSLAR ---
+        foreach (var item in data.RequiredSauces)
+        {
+            if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue; // <--- FÝLTRE
+
+            string name = LocalizationManager.Instance.GetText(item.OrderKey);
+            sb.AppendLine($"{name} x{item.Count}");
+        }
+
+        // --- OYUNCAKLAR ---
+        foreach (var item in data.RequiredToys)
+        {
+            if (string.IsNullOrEmpty(item.OrderKey) || item.Count <= 0) continue; // <--- FÝLTRE
+
+            string name = LocalizationManager.Instance.GetText(item.OrderKey);
+            sb.AppendLine($"{name} x{item.Count}");
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
+    private void ApplyOrderTextSettings(TMP_Text textComp, string content, TMP_FontAsset font, float size, float spacing, float lineSpacing)
+    {
+        if (textComp == null) return;
+
+        textComp.text = content;
+        if (font != null) textComp.font = font;
+        textComp.fontSize = size;
+        textComp.characterSpacing = spacing;
+        textComp.lineSpacing = lineSpacing;
     }
 
     // Kod tekrarýný önlemek için yardýmcý metod

@@ -14,6 +14,11 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     [SerializeField] private CustomerProfile currentProfile;
     [SerializeField] private OrderData currentOrder;
 
+    public OrderData GetCurrentOrder()
+    {
+        return currentOrder;
+    }
+
     public CustomerProfile CurrentProfile => currentProfile;
 
     [Header("Settings")]
@@ -555,6 +560,7 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
 
             case CustomerState.WaitingForFood:
                 CanInteract = false;
+                CustomerManager.Instance.UpdateMonitorWithGroupOrders();
                 ChangeLayer(uninteractableLayer);
                 // Not: Burada Unregister YAPMIYORUZ çünkü hala kasada bekliyor.
                 break;
@@ -850,8 +856,6 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     {
         assignedCounterOffset = offset;
     }
-
-    // --- ANIMATION EVENT TARAFINDAN ÇAÐRILIR ---
     public void PlayFootstep()
     {
         // 1. Data ve Manager Kontrolü

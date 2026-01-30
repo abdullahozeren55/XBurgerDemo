@@ -20,3 +20,4 @@ MonoBehaviour:
   RequiredToys:
   - Type: 2
     Count: 1
+    OrderKey: GRABABLE_TOY_BALL

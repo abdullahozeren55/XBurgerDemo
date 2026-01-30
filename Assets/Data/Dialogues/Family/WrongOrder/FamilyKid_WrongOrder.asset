@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02eb87e73e22d8241af6e84e70b394ab, type: 3}
+  m_Name: FamilyKid_WrongOrder
+  m_EditorClassIdentifier: 
+  lines:
+  - SpeakerID: 4
+    LocalizationKey: FAMILYKID_WRONGORDER
+    TextColor: {r: 0.8773585, g: 0.56697226, b: 0.6488797, a: 1}
+    TextEffects: 0
+    IsSkippable: 1
+    TypewriterSpeedMultiplier: 1
+    TextDelay: 0
+    FocusTargetID: 4
+    CamMoveDuration: 0.5
+    CamMoveEase: 4
+    DutchAngle: 0
+    TargetFOV: 60
+    NoiseType: 1
+    NoiseAmplitudeMultiplier: 1
+    NoiseFrequencyMultiplier: 1
+    Behavior: 0
+    AutoAdvanceDuration: 2
+    Jumpscare: 0
+    JumpscareFadeInDuration: 0.5
+    JumpscareFadeOutDuration: 1.5
+    JumpscareDelay: 0
+    SoundType: 1
+    Events: 0
+    EventFadeInDuration: 0.5
+    EventFadeOutDuration: 1.5
+    EventDelay: 0
