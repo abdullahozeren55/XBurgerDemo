@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6997104476409177429}
   - component: {fileID: 6971901394295448584}
   - component: {fileID: 6400974484683906263}
-  - component: {fileID: 636469172324249226}
+  - component: {fileID: -2602360878384307826}
   m_Layer: 7
   m_Name: Poster2
   m_TagString: Ground
@@ -169,8 +169,8 @@ MonoBehaviour:
       material: {fileID: 2100000, guid: 0044a4fd4d211154d86c823b433f523c, type: 2}
     - loopIndex: 2
       material: {fileID: 2100000, guid: 939eafa5643cf7b448ca0182c1d5a250, type: 2}
---- !u!65 &636469172324249226
-BoxCollider:
+--- !u!64 &-2602360878384307826
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -187,6 +187,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.0004461, y: 0.08884098, z: 1.4008197}
-  m_Center: {x: -0.00022311509, y: 0.039860852, z: 0.00040984154}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8342159127421523248, guid: b2ab8b55545a13247ab1e60b60b8e8f6, type: 3}

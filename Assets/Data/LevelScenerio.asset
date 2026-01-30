@@ -14,11 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LoopIndex: 0
   Waves:
-  - GroupName: AloneKid
-    DelayAfterPreviousGroup: 5
-    Members:
-    - ID: 7
-      ProfileForToday: {fileID: 11400000, guid: 0a7f2c1f91853854891b4be2b0e40bd5, type: 2}
   - GroupName: Family
     DelayAfterPreviousGroup: 5
     Members:
@@ -28,6 +23,11 @@ MonoBehaviour:
       ProfileForToday: {fileID: 11400000, guid: 5519e5e3abbbe2f429cb20e72ebc37e8, type: 2}
     - ID: 3
       ProfileForToday: {fileID: 11400000, guid: 3dac50f09399c4541b7c79568107819b, type: 2}
+  - GroupName: AloneKid
+    DelayAfterPreviousGroup: 5
+    Members:
+    - ID: 7
+      ProfileForToday: {fileID: 11400000, guid: 0a7f2c1f91853854891b4be2b0e40bd5, type: 2}
   - GroupName: TeenGuy
     DelayAfterPreviousGroup: 5
     Members:

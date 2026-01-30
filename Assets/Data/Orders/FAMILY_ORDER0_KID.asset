@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020f53f5e018e904f90117985b081fe1, type: 3}
+  m_Name: FAMILY_ORDER0_KID
+  m_EditorClassIdentifier: 
+  OrderName: FAMILY_ORDER0_KID
+  RequiredBurgers:
+  - Type: 14
+    Count: 1
+    OrderKey: BURGER_CHICK
+  RequiredDrinks:
+  - Type: 16
+    Count: 1
+    OrderKey: GRABABLE_AYRAN
+  RequiredSides:
+  - Type: 3
+    Count: 1
+    OrderKey: GRABABLE_SMILEY_FRIES_IN_BOX
+  RequiredSauces:
+  - Type: 0
+    Count: 1
+    OrderKey: GRABABLE_KETCHUP_CAPSULE
+  RequiredToys:
+  - Type: 0
+    Count: 1
+    OrderKey: GRABABLE_TOY_CLOWN

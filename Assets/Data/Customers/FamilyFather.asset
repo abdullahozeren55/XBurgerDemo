@@ -19,7 +19,15 @@ MonoBehaviour:
   SitPositionOffset: {x: 0, y: -0.494, z: 0.225}
   SitRotationOffset: {x: 0, y: 0, z: 0}
   PossibleOrders:
-  - Order: {fileID: 11400000, guid: 9f1951c216fb88d4582f78fbffb4888d, type: 2}
+  - Order: {fileID: 11400000, guid: 34609d14795398a46905092145703bee, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 9aa63490694a61347a535e3eae291ddb, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: 34609d14795398a46905092145703bee, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: a2fe93ecef350f74993fc4b07464d019, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: 34609d14795398a46905092145703bee, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 7213dac9d27ae954291d89afafd2cee2, type: 2}
     GlitchDialogue: {fileID: 0}
     GlitchChance: 0
