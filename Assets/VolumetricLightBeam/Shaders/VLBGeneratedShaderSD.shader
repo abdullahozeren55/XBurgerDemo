@@ -1,4 +1,4 @@
-Shader "Hidden/VLB_SD_URP_SRPBatcher"
+Shader "Hidden/VLB_SD_URP_Default"
 {
     Properties
     {
@@ -105,8 +105,6 @@ Shader "Hidden/VLB_SD_URP_SRPBatcher"
 
 
                 #define VLB_SRP_API 1
-                #define VLB_SRP_BATCHER 1
-                #pragma enable_cbuffer
                 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
                 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
                 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"

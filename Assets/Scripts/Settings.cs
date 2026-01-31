@@ -93,7 +93,7 @@ public class Settings : MonoBehaviour
 
     private readonly int[] fpsValues = { 30, 60, 75, 120, 144, 165, 240, 300, 360, -1 };
 
-    private readonly List<string> qualityKeys = new List<string> { "UI_TOAST_MACHINE", "UI_LOW", "UI_MEDIUM", "UI_HIGH", "UI_ULTRA" };
+    private readonly List<string> qualityKeys = new List<string> { "UI_LOW", "UI_MEDIUM", "UI_HIGH" };
     private readonly List<string> onOffKeys = new List<string> { "UI_ON", "UI_OFF" };
     private readonly List<string> offOnKeys = new List<string> { "UI_OFF", "UI_ON" }; // Invert Y için
     private readonly List<string> holdToggleKeys = new List<string> { "UI_HOLD", "UI_TOGGLE" };
@@ -505,44 +505,53 @@ public class Settings : MonoBehaviour
         resolutionDropdown.ClearOptions();
 
         List<string> options = new List<string>();
-
-        // YENİ: Hangi çözünürlükleri eklediğimizi 'ham' string olarak tutan bir küme (HashSet performanslıdır)
         HashSet<string> addedResolutions = new HashSet<string>();
 
-        int currentResolutionIndex = 0;
+        // Başlangıçta -1 yapıyoruz ki bulamazsak tespit edebilelim
+        int currentResolutionIndex = -1;
 
         for (int i = 0; i < allResolutions.Length; i++)
         {
             // Min çözünürlük filtresi
             if (allResolutions[i].width < 1024 || allResolutions[i].height < 720) continue;
 
+            // Max çözünürlük filtresi (Full HD Sınırı)
+            if (allResolutions[i].width > 1920 || allResolutions[i].height > 1080) continue;
+
             string rawOption = allResolutions[i].width + " x " + allResolutions[i].height;
 
-            // KONTROL: Eğer bu ham metin daha önce eklendiyse, bu turu pas geç (continue)
-            if (addedResolutions.Contains(rawOption))
-            {
-                continue;
-            }
+            if (addedResolutions.Contains(rawOption)) continue;
 
-            // Eklenmediyse listeye al
             addedResolutions.Add(rawOption);
-
-            // Dropdown için süslü (formatlı) halini oluştur ve ekle
             options.Add(FormatDropdownText(rawOption));
-
-            // Arka plan listesine objeyi ekle
             filteredResolutions.Add(allResolutions[i]);
 
-            // Eğer şu anki ekran çözünürlüğü buysa indexi kaydet
+            // Şu anki ekran çözünürlüğü, listeye eklediğimiz bu çözünürlükle eşleşiyor mu?
             if (allResolutions[i].width == Screen.width && allResolutions[i].height == Screen.height)
             {
                 currentResolutionIndex = filteredResolutions.Count - 1;
             }
         }
 
-        // Eğer hiç uygun çözünürlük bulamazsa (çok düşük çözünürlüklü ekran vb.) mevcut olanı ekle
-        if (options.Count == 0)
+        // --- KRİTİK DÜZELTME BURADA ---
+
+        // Eğer currentResolutionIndex hala -1 ise, bu demektir ki;
+        // Mevcut ekran çözünürlüğümüz (örn: 4K), filtrelenmiş listemizde YOK.
+        // Bu durumda oyunu zorla listemizdeki EN YÜKSEK (son) çözünürlüğe çekmeliyiz.
+        if (currentResolutionIndex == -1 && filteredResolutions.Count > 0)
         {
+            // Listemiz küçükten büyüğe sıralı olduğu için son eleman en yüksek (1080p) olandır.
+            currentResolutionIndex = filteredResolutions.Count - 1;
+
+            // Hemen şimdi uygula (Oyuncu fark etmeden düzelt)
+            Resolution targetRes = filteredResolutions[currentResolutionIndex];
+            Screen.SetResolution(targetRes.width, targetRes.height, Screen.fullScreen);
+
+            Debug.Log($"Çözünürlük çok yüksekti, otomatik olarak {targetRes.width}x{targetRes.height} değerine düşürüldü.");
+        }
+        else if (options.Count == 0)
+        {
+            // Hiç uygun çözünürlük bulamazsak mecburen mevcut olanı ekle (Fallback)
             string currentOption = Screen.width + " x " + Screen.height;
             options.Add(FormatDropdownText(currentOption));
             filteredResolutions.Add(Screen.currentResolution);
@@ -611,7 +620,7 @@ public class Settings : MonoBehaviour
     public void ResetGamepadUISettings() { if (stickLayoutDropdown != null) { stickLayoutDropdown.value = 0; stickLayoutDropdown.RefreshShownValue(); OnStickLayoutChanged(0); } if (controllerPromptsDropdown != null) { controllerPromptsDropdown.value = 0; controllerPromptsDropdown.RefreshShownValue(); OnControllerPromptsChanged(0); } if (aimAssistDropdown != null) { aimAssistDropdown.value = 1; aimAssistDropdown.RefreshShownValue(); OnAimAssistChanged(1); } Debug.Log("Gamepad Dropdownları ve Ayarları Sıfırlandı."); }
     public void ResetControlsSettings() { if (mouseSensSlider != null) { mouseSensSlider.value = 30f; OnMouseSensChanged(30f); } if (gamepadSensSlider != null) { gamepadSensSlider.value = 50f; OnGamepadSensChanged(50f); } if (invertYDropdown != null) { invertYDropdown.value = 0; invertYDropdown.RefreshShownValue(); OnInvertYChanged(0); } if (sprintModeDropdown != null) { sprintModeDropdown.value = 0; sprintModeDropdown.RefreshShownValue(); OnSprintModeChanged(0); } if (crouchModeDropdown != null) { crouchModeDropdown.value = 0; crouchModeDropdown.RefreshShownValue(); OnCrouchModeChanged(0); } Debug.Log("Kontrol Ayarları Varsayılanlara Döndü."); }
     public void ResetAudioSettings() { if (masterSlider != null) { masterSlider.value = defaultMasterVolume; OnMasterSliderChanged(defaultMasterVolume); } if (soundFXSlider != null) { soundFXSlider.value = defaultSoundFXVolume; OnSoundFXSliderChanged(defaultSoundFXVolume); } if (musicSlider != null) { musicSlider.value = defaultMusicVolume; OnMusicSliderChanged(defaultMusicVolume); } if (ambianceSlider != null) { ambianceSlider.value = defaultAmbianceVolume; OnAmbianceSliderChanged(defaultAmbianceVolume); } if (typewriterSlider != null) { typewriterSlider.value = defaultTypewriterVolume; OnTypewriterSliderChanged(defaultTypewriterVolume); } if (uiSlider != null) { uiSlider.value = defaultUIVolume; OnUISliderChanged(defaultUIVolume); } Debug.Log("Ses Ayarları Varsayılanlara Döndü."); }
-    public void ResetGeneralSettings() { if (qualityDropdown != null) { qualityDropdown.value = 2; qualityDropdown.RefreshShownValue(); SetQuality(2); } if (vSyncDropdown != null) { vSyncDropdown.value = 0; vSyncDropdown.RefreshShownValue(); SetVSync(0); } if (fpsDropdown != null) { int lastIndex = fpsValues.Length - 1; fpsDropdown.value = lastIndex; fpsDropdown.RefreshShownValue(); SetMaxFPS(lastIndex); } if (uiScaleDropdown != null) { uiScaleDropdown.value = 1; uiScaleDropdown.RefreshShownValue(); OnUIScaleChanged(1); } if (hintsDropdown != null) { hintsDropdown.value = 0; hintsDropdown.RefreshShownValue(); SetHints(0); } if (interactTextDropdown != null) { interactTextDropdown.value = 0; interactTextDropdown.RefreshShownValue(); SetInteractText(0); }
+    public void ResetGeneralSettings() { if (qualityDropdown != null) { qualityDropdown.value = 1; qualityDropdown.RefreshShownValue(); SetQuality(1); } if (vSyncDropdown != null) { vSyncDropdown.value = 0; vSyncDropdown.RefreshShownValue(); SetVSync(0); } if (fpsDropdown != null) { int lastIndex = fpsValues.Length - 1; fpsDropdown.value = lastIndex; fpsDropdown.RefreshShownValue(); SetMaxFPS(lastIndex); } if (uiScaleDropdown != null) { uiScaleDropdown.value = 1; uiScaleDropdown.RefreshShownValue(); OnUIScaleChanged(1); } if (hintsDropdown != null) { hintsDropdown.value = 0; hintsDropdown.RefreshShownValue(); SetHints(0); } if (interactTextDropdown != null) { interactTextDropdown.value = 0; interactTextDropdown.RefreshShownValue(); SetInteractText(0); }
         if (distortionDropdown != null)
         {
             distortionDropdown.value = 3; // Default High
