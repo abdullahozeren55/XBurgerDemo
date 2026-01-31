@@ -91,7 +91,7 @@ public class Settings : MonoBehaviour
     public TMP_Text typewriterText;
     public TMP_Text uiText;
 
-    private readonly int[] fpsValues = { 30, 60, 75, 120, 144, 165, 240, 300, 360, -1 };
+    private readonly int[] fpsValues = { 60, 75, 120, 144, 165, 240, 300, 360, -1 };
 
     private readonly List<string> qualityKeys = new List<string> { "UI_LOW", "UI_MEDIUM", "UI_HIGH" };
     private readonly List<string> onOffKeys = new List<string> { "UI_ON", "UI_OFF" };
@@ -256,53 +256,63 @@ public class Settings : MonoBehaviour
         // 1. Varsayılan Anahtarları Oluştur (Yoksa)
         if (!PlayerPrefs.HasKey("VSync"))
         {
-            QualitySettings.vSyncCount = 1;
-            PlayerPrefs.SetInt("VSync", 0); // 0 = UI_ON (Listenin ilk elemanı)
+            QualitySettings.vSyncCount = 1; // Default Vsync ON
+            PlayerPrefs.SetInt("VSync", 0);
             PlayerPrefs.Save();
         }
         if (!PlayerPrefs.HasKey("TargetFPS"))
         {
-            Application.targetFrameRate = -1;
-            PlayerPrefs.SetInt("TargetFPS", -1);
+            // İlk açılışta varsayılan 60 olsun (veya monitör hızı -1)
+            Application.targetFrameRate = 60;
+            PlayerPrefs.SetInt("TargetFPS", 60);
             PlayerPrefs.Save();
         }
 
         // 2. VSync Dropdown Ayarları
-        PopulateDropdown(vSyncDropdown, onOffKeys); // onOffKeys = {"UI_ON", "UI_OFF"}
+        PopulateDropdown(vSyncDropdown, onOffKeys);
+        int savedVSyncIndex = PlayerPrefs.GetInt("VSync", 0); // 0: Açık, 1: Kapalı (Senin koduna göre)
 
-        int savedVSyncIndex = PlayerPrefs.GetInt("VSync", 0);
-        // Index 0 ise (ON) -> vSyncCount 1 olsun. Index 1 ise (OFF) -> vSyncCount 0 olsun.
+        // DİKKAT: Unity'de vSyncCount 0 ise kapalı, 1 ise açıktır.
+        // Senin dropdown mantığın ters olabilir (0=Açık yazdıysan). Burayı senin mantığına göre bırakıyorum.
         QualitySettings.vSyncCount = (savedVSyncIndex == 0) ? 1 : 0;
 
         vSyncDropdown.value = savedVSyncIndex;
         vSyncDropdown.RefreshShownValue();
 
         // 3. FPS Dropdown Ayarları
-        InitializeFPSDropdown();
+        InitializeFPSDropdown(); // Listeyi doldur
 
-        // --- DÜZELTME BURADA ---
-        // Eskiden 'Application.targetFrameRate' okuyorduk, bu yanlıştı.
-        // Doğrudan kaydedilmiş tercihi okuyoruz:
-        int savedFPS = PlayerPrefs.GetInt("TargetFPS", -1);
+        // --- KRİTİK DÜZELTME BURADA ---
+        int savedFPS = PlayerPrefs.GetInt("TargetFPS", 60);
 
-        // Bu FPS değeri listede kaçıncı sırada? Bulamazsa -1 (Unlimited) yap.
+        // GÜVENLİK KİLİDİ: 
+        // Eğer hafızada 30 fps veya 60'tan düşük bir şey kalmışsa (ve Unlimited/-1 değilse)
+        // Bunu zorla 60'a çekiyoruz.
+        if (savedFPS != -1 && savedFPS < 60)
+        {
+            savedFPS = 60;
+            PlayerPrefs.SetInt("TargetFPS", 60); // Düzeltilen veriyi kaydet
+            Debug.Log("Eski düşük FPS ayarı bulundu ve 60'a yükseltildi.");
+        }
+
+        // Dropdown'da bu FPS değerinin kaçıncı sırada olduğunu bul
         int fpsIndex = GetFPSIndex(savedFPS);
+
+        // Dropdown'ı o sıraya getir
         fpsDropdown.value = fpsIndex;
         fpsDropdown.RefreshShownValue();
 
-        // 4. Değerleri Motora Uygula (Kritik Adım)
-        // Eğer VSync KAPALI ise (Index 1), FPS limitini hemen uygula.
-        // VSync AÇIK ise (Index 0), FPS limiti -1 olsun (Unity kuralı).
-        if (savedVSyncIndex == 1)
+        // 4. Değerleri Motora Uygula
+        if (savedVSyncIndex == 1) // VSync Kapalıysa (Senin mantığına göre Index 1 = Off ise)
         {
             Application.targetFrameRate = savedFPS;
         }
         else
         {
-            Application.targetFrameRate = -1;
+            Application.targetFrameRate = -1; // VSync açıksa FPS limiti işlemez
         }
 
-        // 5. UI Etkileşimini Güncelle
+        // UI Etkileşimi (VSync açıksa FPS dropdown kilitlensin)
         UpdateFPSDropdownInteractivity(savedVSyncIndex == 0);
     }
 
@@ -369,7 +379,17 @@ public class Settings : MonoBehaviour
         PlayerPrefs.SetInt("VSync", index);
         PlayerPrefs.Save();
     }
-    public void SetMaxFPS(int index) { if (QualitySettings.vSyncCount > 0) return; int targetFPS = fpsValues[index]; Application.targetFrameRate = targetFPS; PlayerPrefs.SetInt("TargetFPS", targetFPS); PlayerPrefs.Save(); }
+    public void SetMaxFPS(int index)
+    {
+        int fps = fpsValues[index];
+        Application.targetFrameRate = fps;
+
+        // BU SATIR ÇOK ÖNEMLİ: Seçimi hafızaya kazı.
+        PlayerPrefs.SetInt("TargetFPS", fps);
+        PlayerPrefs.Save();
+
+        Debug.Log("FPS Ayarlandı ve Kaydedildi: " + fps);
+    }
     private void UpdateFPSDropdownInteractivity(bool isVSyncOn) { if (fpsDropdown != null) { fpsDropdown.interactable = !isVSyncOn; fpsDropdownGroup.alpha = isVSyncOn ? 0.5f : 1f; } }
     public void SetHints(int index) { PlayerPrefs.SetInt("ShowHints", index); PlayerPrefs.Save(); if (PlayerManager.Instance != null) PlayerManager.Instance.UpdateGameplaySettings(); if (MonitorManager.Instance != null) MonitorManager.Instance.UpadateShowHint(); }
     public void SetInteractText(int index) { PlayerPrefs.SetInt("ShowInteractText", index); PlayerPrefs.Save(); if (PlayerManager.Instance != null) PlayerManager.Instance.UpdateGameplaySettings(); }

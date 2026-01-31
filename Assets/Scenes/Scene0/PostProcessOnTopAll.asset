@@ -55,7 +55,7 @@ MonoBehaviour:
   active: 1
   _weight:
     m_OverrideState: 1
-    m_Value: 0.64
+    m_Value: 0.16
   _tape:
     m_OverrideState: 0
     m_Value: 0.57
