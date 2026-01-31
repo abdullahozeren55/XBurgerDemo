@@ -22,14 +22,14 @@ MonoBehaviour:
     minColor: {r: 0.3773585, g: 0.27230468, b: 0.21181916, a: 1}
     maxColor: {r: 0.1981132, g: 0.13769063, b: 0.08877714, a: 1}
   rawSmokeColors:
-    minColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0.1254902}
-    maxColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.3764706}
+    minColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0.03137255}
+    maxColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.1254902}
   cookedSmokeColors:
-    minColor: {r: 0.8490566, g: 0.8213298, b: 0.74092203, a: 0.2509804}
+    minColor: {r: 0.8490566, g: 0.8213298, b: 0.74092203, a: 0.0627451}
     maxColor: {r: 0.8490566, g: 0.8003167, b: 0.6768423, a: 0.2509804}
   burntSmokeColors:
-    minColor: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 0.5019608}
-    maxColor: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 0.89411765}
+    minColor: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 0.2509804}
+    maxColor: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 0.627451}
   isUseable: 0
   isSauce: 0
   isThrowable: 1
@@ -40,6 +40,7 @@ MonoBehaviour:
   throwMultiplier: 1
   timeToCook: 10
   timeToBurn: 20
+  cookingVariance: 0.15
   rawMat: {fileID: 2100000, guid: 310a98676eab266418638be623013b04, type: 2}
   cookedMat: {fileID: 2100000, guid: 2ad6620bede8d5f468666b5840cc125b, type: 2}
   burntMat: {fileID: 2100000, guid: 716d4654074817a43ad590b410b87ab7, type: 2}

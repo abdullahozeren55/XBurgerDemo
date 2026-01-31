@@ -14,6 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LoopIndex: 0
   Waves:
+  - GroupName: TeenGirl
+    DelayAfterPreviousGroup: 5
+    Members:
+    - ID: 8
+      ProfileForToday: {fileID: 11400000, guid: 01870921cf4af0e42b8d1c197d87a261, type: 2}
   - GroupName: TeenGuy
     DelayAfterPreviousGroup: 5
     Members:
@@ -33,8 +38,3 @@ MonoBehaviour:
     Members:
     - ID: 7
       ProfileForToday: {fileID: 11400000, guid: 0a7f2c1f91853854891b4be2b0e40bd5, type: 2}
-  - GroupName: TeenGirl
-    DelayAfterPreviousGroup: 5
-    Members:
-    - ID: 8
-      ProfileForToday: {fileID: 11400000, guid: 01870921cf4af0e42b8d1c197d87a261, type: 2}

@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f9d4b025253a01428d678aaf123643f, type: 3}
+  m_Name: TeenGirl
+  m_EditorClassIdentifier: 
+  ID: 8
+  SkinMaterial: {fileID: 2100000, guid: 06a6eb1ac37d39b45b399252d00484ae, type: 2}
+  WalkSpeed: 2
+  ArrivalDistance: 0.2
+  SitPositionOffset: {x: 0, y: -0.458, z: -0.055}
+  SitRotationOffset: {x: 0, y: 0, z: 0}
+  PossibleOrders:
+  - Order: {fileID: 11400000, guid: 31e97506615c81a4db692dd363abb420, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 70e8519494263fb43a65da2339e2e0dd, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: 36544fa45a118b84eb210af72ef2563c, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 2370df2fcc52e52478494cd719ae8624, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: e92588013f309da469bad8bfc6a19583, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: eeb039dbf31e06b4c8bd2b964a619205, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: 2478c9e9ee485d04994730d38d77fc79, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 707309b890197d445a6ce42b4359ea0b, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: b74e027ef50521d40ac1ea71b4904e65, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 58341c837e149f046a095ecc0f712826, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - Order: {fileID: 11400000, guid: 6c83a47d08c713e44861a347234e3846, type: 2}
+    NormalDialogue: {fileID: 11400000, guid: 0bcc55feae92be14c9e11d9d0b665bc6, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleWrongOrderDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: 9d961912672298e4e9e59a99b7e5a0c4, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: b3318455af0a0e740895ed243a4c1915, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 97f5953c7b18f3542b4f3175165252fa, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: eb9348e9dae24ae4d80f17f0d9347f3e, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleCorrectOrderDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: e782dc28d34d15e47b09175aec3c78c7, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 2f5c5c88c0336db4394f95fc0c3742ba, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 9a5e587fad2cc084892f121e59a6c785, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 1677cf74d7cae5c40ba0c3779079cce2, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleEmptyTrayDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: 4400a010c40661446bf0bfff9cf2cc00, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 6e9004242c0263847be1b4bae59b64ba, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: a25d476ec7243b24b9d96cccff20fd67, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 8835a5c99aebe7c4bb1d01fbfabf9162, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  PossibleKnifeHitDialogues:
+  - NormalDialogue: {fileID: 11400000, guid: 9d3da009a42ced04bbf8aebe9ae2f280, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: 231e868e99b5ba44ab849fba7568af64, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: dc326eacf7e038c40ab36df51b02b3fd, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  - NormalDialogue: {fileID: 11400000, guid: dd02489699b17134b89e1ae32d66a67a, type: 2}
+    GlitchDialogue: {fileID: 0}
+    GlitchChance: 0
+  FootstepSounds: {fileID: 11400000, guid: feb076469b0f79c40b8cdc301428e2fd, type: 2}
