@@ -655,10 +655,11 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     {
         if (!CanInteract) return;
 
+        int layer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
         // Sadece kendimi deðil, TÜM GRUBU yak
         foreach (var member in myGroupMembers)
         {
-            if (member != null) member.SetGroupOutline(true);
+            if (member != null) member.ChangeLayer(layer);
         }
     }
 
@@ -666,10 +667,10 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     {
         if (!CanInteract) return;
 
-        // Sadece kendimi deðil, TÜM GRUBU söndür
+        // Sadece kendimi deðil, TÜM GRUBU yak
         foreach (var member in myGroupMembers)
         {
-            if (member != null) member.SetGroupOutline(false);
+            if (member != null) member.ChangeLayer(interactableLayer);
         }
     }
 
@@ -710,9 +711,17 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     public void OutlineChangeCheck()
     {
         if (meshRenderer.gameObject.layer == interactableOutlinedLayer && OutlineShouldBeRed)
-            ChangeLayer(interactableOutlinedRedLayer);
+            // Sadece kendimi deðil, TÜM GRUBU yak
+            foreach (var member in myGroupMembers)
+            {
+                if (member != null) member.ChangeLayer(interactableOutlinedRedLayer);
+            }
         else if (meshRenderer.gameObject.layer == interactableOutlinedRedLayer && !OutlineShouldBeRed)
-            ChangeLayer(interactableOutlinedLayer);
+            // Sadece kendimi deðil, TÜM GRUBU yak
+            foreach (var member in myGroupMembers)
+            {
+                if (member != null) member.ChangeLayer(interactableOutlinedLayer);
+            }
     }
 
     public void ChangeLayer(int layer)
@@ -901,26 +910,6 @@ public class CustomerController : MonoBehaviour, ICustomer, IInteractable
     }
 
     // --- YENÝ: GRUP OUTLINE TETÝKLEYÝCÝSÝ ---
-    public void SetGroupOutline(bool isActive)
-    {
-        if (!CanInteract) return;
-
-        // Kendi layer'ýmýzý deðiþtir
-        // Eðer kýrmýzý yanmasý gerekiyorsa (InteractableOutlinedRed) ona öncelik ver
-        // Deðilse normal outline veya normal layer.
-
-        int targetLayer;
-        if (isActive)
-        {
-            targetLayer = OutlineShouldBeRed ? interactableOutlinedRedLayer : interactableOutlinedLayer;
-        }
-        else
-        {
-            targetLayer = interactableLayer;
-        }
-
-        ChangeLayer(targetLayer);
-    }
 
     // --- YENÝ: GRUP SENKRONÝZASYONU ---
 

@@ -2,6 +2,7 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -282,37 +283,47 @@ public class CameraManager : MonoBehaviour
 
         // Kasadaki müşterileri al
         var customers = CustomerManager.Instance.GetCustomersAtCounter();
+
+        // --- GÜVENLİK KONTROLÜ 1: LİSTE BOŞ MU? ---
         if (customers == null || customers.Count == 0) return;
 
-        // Aritmetik Ortalama (Centroid) Hesapla
-        Vector3 centerPos = Vector3.zero;
-        Vector3 averageForward = Vector3.zero;
+        // --- GÜVENLİK KONTROLÜ 2: MÜŞTERİLER SAHNEDE Mİ? ---
+        // (Bazen listede olup sahnede yok edilmiş objeler kalabiliyor, temizleyelim)
+        var validCustomers = customers.Where(c => c != null && c.gameObject.activeInHierarchy).ToList();
+        if (validCustomers.Count == 0) return;
 
-        foreach (var c in customers)
+        // 1. KONUM ORTALAMASI (Burası Aynen Kalıyor)
+        Vector3 centerPos = Vector3.zero;
+        foreach (var c in validCustomers)
         {
             centerPos += c.transform.position;
-            averageForward += c.transform.forward;
         }
+        centerPos /= validCustomers.Count;
 
-        centerPos /= customers.Count;
-        averageForward /= customers.Count;
-        averageForward.Normalize();
+        // 2. YÖN HESABI (DEĞİŞİKLİK BURADA)
+        // Demokrasi bitti. Forward ortalaması almak yerine,
+        // grubun liderinin (0. eleman) baktığı yönü 'Doğru Yön' kabul ediyoruz.
+        // Çünkü NavMesh yüzünden yandakiler hafif yamuk dursa bile lider genelde düz durur.
+        Vector3 groupForward = validCustomers[0].transform.forward;
 
-        // Kameranın X ve Z'sini hesapla (Y'ye dokunma)
-        Vector3 targetCamPos = centerPos + (averageForward * faceToFaceDistance);
+        // Alternatif: Eğer Lider de yamuk duruyorsa, direkt Kasanın baktığı yönü (Tersini) alabilirsin.
+        // Vector3 groupForward = -counterTransform.forward; // (Eğer elinde kasa referansı varsa en garantisi budur)
 
-        // --- KRİTİK AYAR: YÜKSEKLİK FİX ---
+        // Kameranın duracağı yer:
+        // Merkez + (Müşterinin Baktığı Yön * Mesafe)
+        Vector3 targetCamPos = centerPos + (groupForward * faceToFaceDistance);
+
+        // Yükseklik Fix
         targetCamPos.y = dialogueFixedHeight;
-        // ----------------------------------
 
         // Kamerayı ışınla
         dialogueCam.transform.position = targetCamPos;
 
-        // LookTarget'ı da başlangıçta aynı yüksekliğe koy ki kamera yere bakarak başlamasın
+        // LookTarget Ayarı
         if (dialogueLookTarget != null)
         {
             Vector3 targetLookAt = centerPos;
-            targetLookAt.y = dialogueFixedHeight; // Veya biraz aşağısı/yukarısı
+            targetLookAt.y = dialogueFixedHeight;
             dialogueLookTarget.position = targetLookAt;
         }
     }
