@@ -1172,39 +1172,50 @@ public class FirstPersonController : MonoBehaviour
                     hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlined") ||
                     hit.collider.gameObject.layer == LayerMask.NameToLayer("InteractableOutlinedRed"))
                 {
-
-                    // Bir interactable bulduk! Kamerayý yavaþlat.
+                    // Aim Assist yavaþlatmasý
                     InputManager.Instance.aimAssistSlowdown = InputManager.Instance.GetMagnetStrength();
 
-                    if (currentInteractable == null)
-                    {
-                        currentInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
+                    // 1. ADIM: Bileþeni önce geçici bir deðiþkene al (Henüz atama yapma)
+                    IInteractable hitInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
 
-                        if (currentInteractable != null)
+                    // 2. ADIM: Hem null kontrolü hem de CanInteract kontrolü yap
+                    if (hitInteractable != null && hitInteractable.CanInteract)
+                    {
+                        // A. Þu an hiçbir þeye bakmýyorsak -> Ata
+                        if (currentInteractable == null)
                         {
+                            currentInteractable = hitInteractable;
                             DecideOutlineAndCrosshair();
                             currentInteractable.OnFocus();
                         }
-                        
-                    }
-                    else if (currentInteractable != hit.collider.gameObject.GetComponent<IInteractable>())
-                    {
-
-                        currentInteractable.OnLoseFocus();
-                        currentInteractable = null;
-
-                        currentInteractable = hit.collider.gameObject.GetComponent<IInteractable>();
-
-                        if (currentInteractable != null)
+                        // B. Zaten bir þeye bakýyoruz ama yeni bir interactable'a geçtik -> Deðiþtir
+                        else if (currentInteractable != hitInteractable)
                         {
+                            currentInteractable.OnLoseFocus();
+                            currentInteractable = null; // Önce temizle
+
+                            currentInteractable = hitInteractable; // Sonra yeni deðeri ata
                             DecideOutlineAndCrosshair();
                             currentInteractable.OnFocus();
+                        }
+                        // C. Durum: Zaten ayný 'hitInteractable'a bakýyoruz ve CanInteract hala true.
+                        // Hiçbir þey yapmaya gerek yok, focus devam ediyor.
+                    }
+                    else
+                    {
+                        // DURUM: Baktýðýmýz þey bir Interactable deðil VEYA CanInteract = false.
+                        // Eðer elimizde halihazýrda seçili bir interactable varsa, artýk ona bakmýyoruz demektir (veya izni gitmiþtir).
+                        if (currentInteractable != null)
+                        {
+                            currentInteractable.OnLoseFocus();
+                            currentInteractable = null;
+                            DecideOutlineAndCrosshair();
                         }
                     }
                 }
                 else
                 {
-
+                    // Interactable layer'ýnda olmayan bir þeye (Duvar, Zemin vb.) çarptýk
                     if (currentInteractable != null)
                     {
                         currentInteractable.OnLoseFocus();
@@ -1215,7 +1226,7 @@ public class FirstPersonController : MonoBehaviour
             }
             else
             {
-
+                // Collider yok (Raycast bir þeye çarptý ama collider null? Nadir durum)
                 if (currentInteractable != null)
                 {
                     currentInteractable.OnLoseFocus();
@@ -1226,7 +1237,7 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-
+            // Raycast boþa düþtü (Gökyüzüne bakýyoruz)
             if (currentInteractable != null)
             {
                 currentInteractable.OnLoseFocus();

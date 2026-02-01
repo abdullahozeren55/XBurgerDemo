@@ -4,6 +4,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class MonitorManager : MonoBehaviour
 {
@@ -84,14 +85,18 @@ public class MonitorManager : MonoBehaviour
     public float musicVolumeMultiplier = 0.2f; //to prevent it from being too loud
     private int currentIndex = 0;
     [Space]
-    public RetroMarquee marqueeScript;
-    public RetroMarquee marqueeScriptWorld;
+    public RetroMarquee universalMarquee;
     public float marqueeStepInterval = 0.4f; // Týrtýklý kayma hýzý burada
     [Space]
+    public GameObject musicPlayerWindow; //Oyun baþý açmak için
     public Image playPauseImage;
     public Image playPauseImageWorld;
     public Sprite[] playPauseSprites; //0 play, 1 pause
-    
+
+    [Header("Video Player Settings")]
+    public VideoPlayer monitorVideoPlayer; // Inspector'dan VideoPlayer'ý buraya sürükle
+    public VideoClip[] videoClips;         // Videolarý buraya ekleyeceksin
+
 
 
     // --- EKLENEN KISIM: SEÇÝM YÖNETÝMÝ ---
@@ -148,10 +153,14 @@ public class MonitorManager : MonoBehaviour
 
     private void Start()
     {
-
+        // 1. Oynatma listesinde þarký varsa baþlat
         if (playlist.Count > 0)
         {
-            LoadTrack(0, false); // false = Otomatik baþlatma
+             // ... Diðer kodlarýn ...
+             OpenWindow(musicPlayerWindow);
+             HandleMusicPlayerPage(true);
+             SetMusicPlayerPageState(1);
+             LoadTrack(0, true);
         }
 
         StartCoroutine(MarqueeDriverLoop());
@@ -172,6 +181,42 @@ public class MonitorManager : MonoBehaviour
                 IsFocused = false;
             }
         }
+    }
+
+    // Butonlardan çaðýracaðýn fonksiyon (Örn: OnClick -> PlayMonitorVideo(0))
+    public void PlayMonitorVideo(int index)
+    {
+        // 1. Güvenlik Kontrolü: Ýndex var mý?
+        if (index < 0 || index >= videoClips.Length)
+        {
+            Debug.LogWarning($"MonitorManager: {index} numaralý video bulunamadý!");
+            return;
+        }
+
+        // 2. Video Player referansý var mý?
+        if (monitorVideoPlayer == null)
+        {
+            monitorVideoPlayer = GetComponent<VideoPlayer>();
+        }
+
+        // 3. Videoyu Ata ve Oynat
+        monitorVideoPlayer.clip = videoClips[index];
+        monitorVideoPlayer.Play();
+    }
+
+    // Videoyu durdurup temizleyen fonksiyon
+    public void StopMonitorVideo()
+    {
+        if (monitorVideoPlayer == null) return;
+
+        // Oynuyorsa durdur
+        if (monitorVideoPlayer.isPlaying)
+        {
+            monitorVideoPlayer.Stop();
+        }
+
+        // Clip'i boþa çýkar (Temizle)
+        monitorVideoPlayer.clip = null;
     }
 
     public void FocusWindow(WindowController targetWindow)
@@ -532,14 +577,9 @@ public class MonitorManager : MonoBehaviour
         string displayName = $"{index + 1:00}. {song.trackName}";
 
         // 3. Kayan yazýyý güncelle
-        if (marqueeScript != null)
+        if (universalMarquee != null)
         {
-            marqueeScript.RefreshText(displayName);
-        }
-
-        if (marqueeScriptWorld != null)
-        {
-            marqueeScriptWorld.RefreshText(displayName);
+            universalMarquee.RefreshText(displayName);
         }
 
         // 4. Çalma ve Ýkon iþlemleri
@@ -572,21 +612,13 @@ public class MonitorManager : MonoBehaviour
 
         while (true)
         {
-            // Bekle
             yield return wait;
 
-            // Eðer kayýtlý bir marquee varsa ve hazýrsa, onu dürtekle
-            if (marqueeScript != null && marqueeScript.IsReady)
+            // Tek bir komutla ikisini de ilerlet
+            // Focus UI kapalý olsa bile arka planda koordinatý güncellenecek
+            if (universalMarquee != null)
             {
-                // UI kapalý (SetActive false) olsa bile
-                // C# referansý memory'de yaþadýðý için bu fonksiyon çalýþýr
-                // ve RectTransform deðerlerini günceller!
-                marqueeScript.Step();
-            }
-
-            if (marqueeScriptWorld != null && marqueeScriptWorld.IsReady)
-            {
-                marqueeScriptWorld.Step();
+                universalMarquee.Step();
             }
         }
     }

@@ -2,7 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
-using static System.TimeZoneInfo;
+using DG.Tweening; // DOTween kütüphanesi eklendi
+
+// 1. Adým: Ambiyans Tiplerini Belirleyen Enum
+public enum AmbianceType
+{
+    None,       // Sessizlik için
+    Wind,
+    Restaurant,
+    Forest,     // Örnek olarak ekledim
+    Cave        // Örnek olarak ekledim
+}
+
+// 2. Adým: Her bir ambiyansýn ayarlarýný tutan sýnýf
+[System.Serializable]
+public class AmbianceConfig
+{
+    public AmbianceType type;
+    public AudioSource source;
+    [Range(0f, 1f)] public float maxVolume = 0.5f;
+}
 
 public class SoundManager : MonoBehaviour
 {
@@ -20,10 +39,13 @@ public class SoundManager : MonoBehaviour
     [Space]
     [SerializeField] private AudioSource soundFXObjectForTypewriter;
 
-    [Header("Ambiance Settings")]
-    public AudioSource mainAmbianceSource;
-    public float mainAmbianceVolume;
-    public float mainAmbiancePitch;
+    [Header("Ambiance System")]
+    // 3. Adým: Artýk tek tek deðiþkenler yerine bir liste kullanýyoruz.
+    [SerializeField] private List<AmbianceConfig> ambianceConfigs;
+
+    // Performans için Dictionary cache'i (Update veya Change anýnda liste taramamak için)
+    private Dictionary<AmbianceType, AmbianceConfig> ambianceDictionary;
+    private AmbianceType currentAmbiance = AmbianceType.None;
 
     [Header("Bird Chirping Settings")]
     public bool CanPlayBirdChirping = true;
@@ -53,6 +75,7 @@ public class SoundManager : MonoBehaviour
         {
             // If not, set this instance as the singleton
             Instance = this;
+            InitializeAmbiances();
         }
         else
         {
@@ -65,6 +88,66 @@ public class SoundManager : MonoBehaviour
     {
         if (CanPlayBirdChirping)
             HandleBirdChirping();
+    }
+
+    // Dictionary'i doldur ve sesleri baþlangýçta kapat
+    private void InitializeAmbiances()
+    {
+        ambianceDictionary = new Dictionary<AmbianceType, AmbianceConfig>();
+
+        foreach (var config in ambianceConfigs)
+        {
+            if (config.source == null) continue;
+
+            // Dictionary'e ekle
+            if (!ambianceDictionary.ContainsKey(config.type))
+            {
+                ambianceDictionary.Add(config.type, config);
+            }
+
+            // Eðer oyun baþlar baþlamaz çalmasýn istiyorsan Stop, ama genelde
+            // Play diyip volume 0 tutmak, fade-in yaparken "pýt" sesini engeller.
+            if (!config.source.isPlaying)
+                config.source.Play();
+        }
+    }
+
+    // 4. Adým: Ýstenen ChangeAmbiance Fonksiyonu
+    /// <summary>
+    /// Ambiyansý yumuþak geçiþle deðiþtirir.
+    /// </summary>
+    /// <param name="targetType">Geçilecek yeni ambiyans tipi</param>
+    /// <param name="duration">Geçiþ süresi (Default: 2 saniye)</param>
+    public void ChangeAmbiance(AmbianceType targetType, float duration = 2f)
+    {
+        // Eðer zaten o ambiyanstaysak iþlem yapma (veya zorla resetlemek istersen bu check'i kaldýr)
+        if (currentAmbiance == targetType) return;
+
+        currentAmbiance = targetType;
+
+        // Tüm tanýmlý ambiyanslarý gez
+        foreach (var config in ambianceConfigs)
+        {
+            if (config.source == null) continue;
+
+            // Önce bu AudioSource üzerindeki mevcut Volume tween'lerini öldür.
+            // Bu çok önemli, yoksa fade-out yapan bir tween ile fade-in yapan çakýþabilir.
+            config.source.DOKill();
+
+            // Eðer bu konfigürasyon, hedeflediðimiz tip ise:
+            if (config.type == targetType)
+            {
+                // Hedef sese geçiþ yap (Kendi max volume deðerine)
+                if (!config.source.isPlaying) config.source.Play();
+                config.source.DOFade(config.maxVolume, duration).SetEase(Ease.Linear);
+            }
+            else
+            {
+                // Hedef bu deðilse, sesini 0'a çek (Sustur)
+                // Volume 0 olunca tamamen dursun istersen OnComplete ekleyebilirsin ama genelde gerekmez.
+                config.source.DOFade(0f, duration).SetEase(Ease.Linear);
+            }
+        }
     }
 
     public void SwitchSnapshot(string name, float duration)

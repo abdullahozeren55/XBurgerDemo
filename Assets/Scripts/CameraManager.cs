@@ -72,6 +72,9 @@ public class CameraManager : MonoBehaviour
         public float defaultFrequency;
     }
 
+    [Header("UI Cameras")]
+    [SerializeField] private Camera UIMainMenuCamera;
+
     [Header("Gameplay Cameras")]
     [SerializeField] private CameraEntry[] cameras;
 
@@ -79,6 +82,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private List<CinemachineVirtualCamera> mainMenuCameras;
     [SerializeField] private float menuToGameBlendTime = 2.0f; // Menüden oyuna geçiş süresi
     [SerializeField] private float gameToMenuBlendTime = 1.5f; // Oyundan menüye geçiş süresi
+    private int currentMenuCamIndex = -1;
 
     [Header("Render Setup")]
     [SerializeField] private Camera mainCamera;   // Main Camera'yı ata
@@ -416,6 +420,7 @@ public class CameraManager : MonoBehaviour
 
         ResetAllPriorities();
         int randomIndex = Random.Range(0, mainMenuCameras.Count);
+        currentMenuCamIndex = randomIndex;
         currentMenuCam = mainMenuCameras[randomIndex];
 
         if (currentMenuCam != null)
@@ -443,6 +448,50 @@ public class CameraManager : MonoBehaviour
 
         currentCam = null;
 
+        SetRenderStateForMainMenu();
+    }
+
+    // 3. BU FONKSİYONU EKLE: İndeks vererek kamera açmak için
+    public void SwitchToMainMenuCameraByIndex(int index, bool instant = false)
+    {
+        if (mainMenuCameras == null || mainMenuCameras.Count == 0) return;
+
+        // Güvenlik kontrolü: Eğer kayıtlı index liste dışındaysa (örn: sahne değişti, kamera sayısı azaldı)
+        if (index < 0 || index >= mainMenuCameras.Count)
+        {
+            SwitchToRandomMainMenuCamera(instant); // Fallback: Rastgele aç
+            return;
+        }
+
+        // --- Temizlik İşlemleri (Random fonksiyonundakilerin aynısı) ---
+        if (renderTransitionRoutine != null) StopCoroutine(renderTransitionRoutine);
+        if (blendResetRoutine != null) StopCoroutine(blendResetRoutine);
+        if (controlUnlockRoutine != null) StopCoroutine(controlUnlockRoutine);
+        if (PlayerManager.Instance != null) PlayerManager.Instance.SetPlayerCanPlay(false);
+        if (cinemachineBrain != null) cinemachineBrain.m_DefaultBlend.m_Time = instant ? 0f : gameToMenuBlendTime;
+
+        ResetAllPriorities();
+
+        // --- SPESİFİK KAMERAYI SEÇ ---
+        currentMenuCamIndex = index;
+        currentMenuCam = mainMenuCameras[index];
+
+        if (currentMenuCam != null)
+        {
+            currentMenuCam.Priority = basePriority + 1;
+
+            // Noise ayarları (Aynen kopyala)
+            var perlin = currentMenuCam.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+            if (perlin != null && noiseMap.ContainsKey(CameraNoiseType.IdleBreathing))
+            {
+                var preset = noiseMap[CameraNoiseType.IdleBreathing];
+                perlin.m_NoiseProfile = preset.settingsAsset;
+                perlin.m_AmplitudeGain = preset.defaultAmplitude * Settings.GlobalDistortionMultiplier;
+                perlin.m_FrequencyGain = preset.defaultFrequency;
+            }
+        }
+
+        currentCam = null;
         SetRenderStateForMainMenu();
     }
 
@@ -829,6 +878,8 @@ public class CameraManager : MonoBehaviour
 
     public Transform GetFirstPersonCamTransform() => firstPersonCam != null ? firstPersonCam.transform : transform;
 
+    public Camera GetUIMainMenuCamera() => UIMainMenuCamera;
+
     private IEnumerator EndFOVCoroutine(float delay, float duration)
     {
         yield return new WaitForSeconds(delay);
@@ -867,5 +918,10 @@ public class CameraManager : MonoBehaviour
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.SetPlayerCanPlay(true);
         controlUnlockRoutine = null;
+    }
+
+    public int GetCurrentMenuCameraIndex()
+    {
+        return currentMenuCamIndex;
     }
 }

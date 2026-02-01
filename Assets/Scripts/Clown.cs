@@ -84,7 +84,7 @@ public class Clown : MonoBehaviour, ICustomer, IInteractable
     private void Start()
     {
         // Oyuna baþlar baþlamaz devriyeye çýksýn
-        SetState(ClownState.Roaming);
+        SetState(ClownState.Idle);
     }
 
     private void Update()

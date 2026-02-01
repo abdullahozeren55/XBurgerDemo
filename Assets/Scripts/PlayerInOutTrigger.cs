@@ -14,6 +14,10 @@ public class PlayerInOutTrigger : MonoBehaviour
         ExitColdRoom,
         TurnOnLights,
         TurnOffLights,
+        ChangeAmbianceTo1,
+        ChangeAmbianceTo2,
+        TurnOnBirdChirping,
+        TurnOffBirdChirping
     }
 
     public enum LightSourceType
@@ -75,6 +79,11 @@ public class PlayerInOutTrigger : MonoBehaviour
 
     [Tooltip("Kýrmýzý Tarafa (Back) geçince devreye girecek Actionlar")]
     public InOutTriggerType[] redActions;
+
+    [Header("Ambiance")]
+    [SerializeField] private AmbianceType ambiance1;
+    [SerializeField] private AmbianceType ambiance2;
+    [SerializeField] private float ambianceChangeDuration = 2f;
 
     // --- OTOMATÝK IÞIK GECÝKME AYARLARI ---
     [Header("Automatic Light Delays")]
@@ -151,8 +160,36 @@ public class PlayerInOutTrigger : MonoBehaviour
                     case InOutTriggerType.TurnOffLights:
                         TriggerLights(false); // Kapatmayý tetikle
                         break;
+                    case InOutTriggerType.TurnOnBirdChirping:
+                        SetBirdChirping(true);
+                        break;
+                    case InOutTriggerType.TurnOffBirdChirping:
+                        SetBirdChirping(false);
+                        break;
+                    case InOutTriggerType.ChangeAmbianceTo1:
+                        ChangeAmbiance(true);
+                        break;
+                    case InOutTriggerType.ChangeAmbianceTo2:
+                        ChangeAmbiance(false);
+                        break;
                 }
             }
+        }
+    }
+
+    private void ChangeAmbiance(bool to1)
+    {
+        if (SoundManager.Instance)
+        {
+            SoundManager.Instance.ChangeAmbiance(to1? ambiance1 : ambiance2, ambianceChangeDuration);
+        }
+    }
+
+    private void SetBirdChirping(bool shouldOn)
+    {
+        if (SoundManager.Instance)
+        {
+            SoundManager.Instance.CanPlayBirdChirping = shouldOn;
         }
     }
 

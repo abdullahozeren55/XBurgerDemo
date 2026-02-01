@@ -1,108 +1,117 @@
 using UnityEngine;
 using TMPro;
-using System.Collections;
+using System.Collections.Generic;
 
 public class RetroMarquee : MonoBehaviour
 {
-    [Header("Hýz Ayarlarý")]
-    // stepInterval'ý artýk Manager yönetecek, buradaki sadece bilgi amaçlý durabilir
+    [System.Serializable]
+    public class MarqueeGroup
+    {
+        public TMP_Text textComponent; // Inspector'dan atanacak Text
+        [HideInInspector] public RectTransform rect1;
+        [HideInInspector] public RectTransform rect2;
+        [HideInInspector] public float parentWidth;
+        [HideInInspector] public bool isSetup = false;
+    }
+
+    [Header("Hedef Textler")]
+    public MarqueeGroup worldTextGroup; // Monitör üzerindeki
+    public MarqueeGroup focusTextGroup; // Ekrana gelen (Focus UI)
+
+    [Header("Ayarlar")]
     public float pixelsPerStep = 16f;
     public float gap = 64f;
 
-    private RectTransform rect1;
-    private RectTransform rect2;
-    private float textWidth;
-    private float parentWidth;
+    private float _textWidth; // Metin geniþliði (Ýkisi için de ayný kabul ediyoruz)
 
-    // Manager'ýn "Hazýr mýsýn?" diye sormasý için
-    public bool IsReady { get; private set; } = false;
-
-    private void Awake()
-    {
-        rect1 = GetComponent<RectTransform>();
-    }
-
-    // Bu artýk Coroutine deðil, tek seferlik kurulum fonksiyonu
-    IEnumerator SetupMarqueeRoutine()
-    {
-        IsReady = false; // Kurulum bitene kadar bekle
-
-        // Unity UI'ý oturtana kadar bekle (Bu obje aktifken çalýþmak zorunda)
-        yield return new WaitForEndOfFrame();
-
-        textWidth = rect1.rect.width;
-
-        // Parent Geniþliði
-        if (transform.parent != null)
-        {
-            RectTransform pRect = transform.parent.GetComponent<RectTransform>();
-            if (pRect != null) parentWidth = pRect.rect.width;
-        }
-        else
-        {
-            parentWidth = 500f;
-        }
-
-        // Varsa eski klonu temizle (Refresh durumunda)
-        string cloneName = gameObject.name + "_Clone";
-        Transform oldClone = transform.parent.Find(cloneName);
-        if (oldClone != null) Destroy(oldClone.gameObject);
-
-        // Kopyayý oluþtur
-        GameObject cloneObj = Instantiate(gameObject, transform.parent);
-        cloneObj.name = cloneName;
-
-        // Kopyadaki scripti yok et
-        Destroy(cloneObj.GetComponent<RetroMarquee>());
-
-        rect2 = cloneObj.GetComponent<RectTransform>();
-
-        // --- KONUMLARI GÜNCELLE ---
-        // Rect1: Panelin EN SAÐINDA
-        rect1.anchoredPosition = new Vector2(parentWidth, rect1.anchoredPosition.y);
-
-        // Rect2: Rect1'in arkasýnda
-        rect2.anchoredPosition = new Vector2(parentWidth + textWidth + gap, rect1.anchoredPosition.y);
-
-        IsReady = true; // Artýk Manager beni hareket ettirebilir
-    }
-
-    // --- MANAGER BURAYI ÇAÐIRACAK ---
-    public void Step()
-    {
-        if (!IsReady || rect1 == null || rect2 == null) return;
-
-        MoveRect(rect1);
-        MoveRect(rect2);
-
-        Debug.Log("ben gidiyon");
-    }
-
-    void MoveRect(RectTransform rect)
-    {
-        Vector2 pos = rect.anchoredPosition;
-        pos.x -= pixelsPerStep;
-
-        if (pos.x < -textWidth)
-        {
-            RectTransform otherRect = (rect == rect1) ? rect2 : rect1;
-            pos.x = otherRect.anchoredPosition.x + textWidth + gap;
-        }
-
-        rect.anchoredPosition = pos;
-    }
-
+    // Setup'ý manuel çaðýracaðýz
     public void RefreshText(string newText)
     {
-        GetComponent<TextMeshProUGUI>().text = newText;
-        StopAllCoroutines();
+        // 1. Textleri güncelle
+        if (worldTextGroup.textComponent != null) worldTextGroup.textComponent.text = newText;
+        if (focusTextGroup.textComponent != null) focusTextGroup.textComponent.text = newText;
 
-        // Eðer obje o an kapalýysa Coroutine çalýþmaz, 
-        // o yüzden açýlýnca çalýþsýn diye OnEnable kullanabilirsin 
-        // ama þimdilik aktif olduðunu varsayýyoruz.
-        if (gameObject.activeInHierarchy)
+        // 2. Hazýrlýðý Baþlat
+        SetupGroup(worldTextGroup);
+        SetupGroup(focusTextGroup);
+    }
+
+    private void SetupGroup(MarqueeGroup group)
+    {
+        if (group.textComponent == null) return;
+
+        group.isSetup = false;
+        group.rect1 = group.textComponent.GetComponent<RectTransform>();
+
+        // Text geniþliðini hesapla (ForceUpdate önemli)
+        group.textComponent.ForceMeshUpdate();
+        _textWidth = group.textComponent.GetRenderedValues(false).x;
+        // Not: Eðer rect.width kullanýyorsan ve AutoSize açýksa yukarýdaki daha güvenlidir, 
+        // ama senin yapýnda rect.width kullanýyorduk, yine ona dönelim:
+        _textWidth = group.rect1.rect.width;
+
+        // Parent Geniþliði
+        if (group.rect1.parent != null)
         {
-            StartCoroutine(SetupMarqueeRoutine());
+            RectTransform pRect = group.rect1.parent.GetComponent<RectTransform>();
+            group.parentWidth = (pRect != null) ? pRect.rect.width : 500f;
         }
+
+        // Varsa eski klonu temizle
+        string cloneName = group.textComponent.name + "_Clone";
+        Transform oldClone = group.rect1.parent.Find(cloneName);
+        if (oldClone != null) DestroyImmediate(oldClone.gameObject);
+
+        // Kopyayý oluþtur
+        GameObject cloneObj = Instantiate(group.textComponent.gameObject, group.rect1.parent);
+        cloneObj.name = cloneName;
+
+        // Kopyadaki gereksiz scriptleri (varsa) temizle
+        // (Bu script artýk textin üzerinde olmadýðý için recursive sorun olmaz ama temizlik iyidir)
+
+        group.rect2 = cloneObj.GetComponent<RectTransform>();
+
+        // --- BAÞLANGIÇ KONUMLARI ---
+        // Ýkisini de ayný mantýkla sýfýrlýyoruz
+        group.rect1.anchoredPosition = new Vector2(group.parentWidth, group.rect1.anchoredPosition.y);
+        group.rect2.anchoredPosition = new Vector2(group.parentWidth + _textWidth + gap, group.rect1.anchoredPosition.y);
+
+        group.isSetup = true;
+    }
+
+    // MonitorManager'ýn Loop'undan çaðrýlacak
+    public void Step()
+    {
+        // Ýki grubu da baðýmsýz ama ayný anda hareket ettir
+        MoveGroup(worldTextGroup);
+        MoveGroup(focusTextGroup);
+    }
+
+    private void MoveGroup(MarqueeGroup group)
+    {
+        // Obje setup olmamýþsa veya (önemli!) text objesi yok olmuþsa çalýþma
+        if (!group.isSetup || group.rect1 == null || group.rect2 == null) return;
+
+        // NOT: group.textComponent.gameObject.activeInHierarchy kontrolü YAPMIYORUZ.
+        // Obje kapalý olsa bile RectTransform deðerlerini deðiþtirebiliriz.
+        // Böylece açýldýðý anda doðru yerde olur.
+
+        MoveRect(group.rect1, group.rect2);
+        MoveRect(group.rect2, group.rect1);
+    }
+
+    private void MoveRect(RectTransform current, RectTransform other)
+    {
+        Vector2 pos = current.anchoredPosition;
+        pos.x -= pixelsPerStep;
+
+        // Ekrandan çýktý mý?
+        if (pos.x < -_textWidth)
+        {
+            // Diðerinin arkasýna geç
+            pos.x = other.anchoredPosition.x + _textWidth + gap;
+        }
+
+        current.anchoredPosition = pos;
     }
 }

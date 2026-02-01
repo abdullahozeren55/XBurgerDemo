@@ -2561,6 +2561,16 @@
     "pt": "Lixeira"
   },
   {
+    "key": "UI_VIDEO_PLAYER",
+    "tr": "Video Oynatıcı",
+    "en": "Video Player",
+    "zh": "视频播放器",
+    "ja": "ビデオプレーヤー",
+    "es": "Reproductor de Video",
+    "ru": "Видеоплеер",
+    "pt": "Reprodutor de Vídeo"
+  },
+  {
     "key": "UI_HOW_TO",
     "tr": "Nasıl?",
     "en": "How To?",
@@ -2569,6 +2579,46 @@
     "es": "¿Cómo?",
     "ru": "Как?",
     "pt": "Como?"
+  },
+  {
+    "key": "UI_PREPARE_BURGER",
+    "tr": "Burger Hazırlanır",
+    "en": "Prepare Burger",
+    "zh": "制作汉堡",
+    "ja": "バーガーを作る",
+    "es": "Preparar Burger",
+    "ru": "Готовить Бургер",
+    "pt": "Preparar Burger"
+  },
+  {
+    "key": "UI_PREPARE_DRINK",
+    "tr": "İçecek Hazırlanır",
+    "en": "Prepare Drink",
+    "zh": "制作饮料",
+    "ja": "ドリンクを作る",
+    "es": "Preparar Bebida",
+    "ru": "Готовить Напиток",
+    "pt": "Preparar Bebida"
+  },
+  {
+    "key": "UI_PREPARE_FRYABLE",
+    "tr": "Kızartmalık Hazırlanır",
+    "en": "Prepare Fryables",
+    "zh": "制作炸物",
+    "ja": "揚げ物を作る",
+    "es": "Preparar Fritos",
+    "ru": "Готовить Фритюр",
+    "pt": "Preparar Frituras"
+  },
+  {
+    "key": "UI_PREPARE_TRAY",
+    "tr": "Tepsi Hazırlanır",
+    "en": "Prepare Tray",
+    "zh": "准备托盘",
+    "ja": "トレイを準備する",
+    "es": "Preparar Bandeja",
+    "ru": "Собрать Поднос",
+    "pt": "Preparar Bandeja"
   },
   {
     "key": "UI_START",

@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
     public static MenuManager Instance;
+
+    // Bu deðiþken sahne yenilense bile hafýzada kalýr (static olduðu için)
+    public static bool IsRestarting = false;
+    public static int SavedMenuCameraIndex = -1;
 
     [HideInInspector]
     public int GlobalScaleOffset = 0;
@@ -18,7 +22,6 @@ public class MenuManager : MonoBehaviour
     private bool isGamePaused = false;
 
     [Header("UI References")]
-    public Volume globalVolume;
     public GameObject mainMenu;
     public GameObject pauseMenu;
     public GameObject settingsMenu;
@@ -86,10 +89,54 @@ public class MenuManager : MonoBehaviour
         GlobalScaleOffset = PlayerPrefs.GetInt("UIScaleOffset", 0);
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        // Oyun baþladýðýnda direkt ANA MENÜ modunda baþla
+        // Sahne yüklendiðinde 'OnSceneLoaded' fonksiyonunu çalýþtýr
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        // Aboneliði iptal et (Hata almamak için þart)
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Sahne her yüklendiðinde kameralarý tazeleyelim.
+        // CameraManager.Instance o sahnede yeni oluþtuðu için null gelmez.
+        if (CameraManager.Instance != null)
+        {
+            Camera uiCam = CameraManager.Instance.GetUIMainMenuCamera();
+            if (menuCanvas) menuCanvas.worldCamera = uiCam;
+            if (mouseCanvas) mouseCanvas.worldCamera = uiCam;
+        }
+
+        // Sonra restart mantýðýna geç
+        if (IsRestarting)
+        {
+            StartCoroutine(RestartSequence());
+        }
+        else
+        {
+            EnterMainMenuMode(true);
+        }
+    }
+
+    private IEnumerator RestartSequence()
+    {
+        // 1. Önce kamerayý ve menüyü "KÜT" diye ana menü pozisyonuna oturt.
+        // instant=true olduðu için animasyonsuz, direkt yerleþtirir.
         EnterMainMenuMode(true);
+
+        // 2. BURASI ÇOK ÖNEMLÝ: 
+        // Frame beklemek yerine, gerçek zamanlý çok kýsa bir bekleme koyuyoruz.
+        // Bu, kamera sisteminin "Tamam, þu an baþlangýç noktam burasý" diye kaydetmesini saðlar.
+        yield return new WaitForSeconds(0.1f);
+
+        // 3. Þimdi hareketi baþlat.
+        // Kamera artýk nerede olduðunu bildiði için, hedefe doðru süzülerek (blend) gidecektir.
+        EnterGameplayMode();
     }
 
     private void Update()
@@ -134,13 +181,31 @@ public class MenuManager : MonoBehaviour
 
         if (instant)
         {
-            // ANLIK GEÇÝÞ (Oyun Açýlýþý)
-            HandleTimeScale(1); // Ýlk açýlýþta da zamanýn aktýðýndan emin olalým
+            // ANLIK GEÇÝÞ (Oyun Açýlýþý / Restart Aný)
+            HandleTimeScale(1);
             mainMenuRect.anchoredPosition = Vector2.zero;
             if (pauseMenuRect) pauseMenuRect.anchoredPosition = new Vector2(0, height);
             pauseMenu.SetActive(false);
 
             FinishMainMenuEnterLogic(true);
+
+            // --- BURAYI DEÐÝÞTÝRÝYORUZ ---
+            // Eski kod: if (instant && CameraManager.Instance != null) CameraManager.Instance.SwitchToRandomMainMenuCamera(true);
+
+            if (CameraManager.Instance != null)
+            {
+                // Eðer Restart atýlmýþsa ve elimizde geçerli bir index varsa onu kullan
+                if (IsRestarting && SavedMenuCameraIndex != -1)
+                {
+                    CameraManager.Instance.SwitchToMainMenuCameraByIndex(SavedMenuCameraIndex, true);
+                }
+                else
+                {
+                    // Restart deðilse veya ilk açýlýþsa rastgele devam
+                    CameraManager.Instance.SwitchToRandomMainMenuCamera(true);
+                }
+            }
+            // -----------------------------
         }
         else
         {
@@ -198,7 +263,6 @@ public class MenuManager : MonoBehaviour
         }
 
         InputManager.Instance.SwitchToUIMode();
-        UpdateDoFState(true);
 
         if (SoundManager.Instance) SoundManager.Instance.SwitchSnapshot("Outside", 0f);
 
@@ -212,8 +276,33 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void EnterGameplayMode()
     {
+        // --- YENÝ EKLENEN KISIM BAÞLANGIÇ ---
+
+        // Eðer bu fonksiyon butona basýlarak çaðrýldýysa (Restarting modu aktif deðilse)
+        if (!IsRestarting)
+        {
+            // YENÝ: Sahne ölmeden önce þu an hangi menü kamerasýndayýz kaydet!
+            if (CameraManager.Instance != null)
+            {
+                SavedMenuCameraIndex = CameraManager.Instance.GetCurrentMenuCameraIndex();
+            }
+
+            IsRestarting = true;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            return;
+        }
+
+        // Eðer buraya geldiysek, sahne yeni açýlmýþtýr ve Start() bizi buraya göndermiþtir.
+        IsRestarting = false; // Bayraðý indir, bir sonraki sefere hazýr olsun.
+
+        // --- YENÝ EKLENEN KISIM BÝTÝÞ ---
+
+
+        // --- SENÝN ORÝJÝNAL KODLARIN ---
         if (isBusy) return;
         isBusy = true;
+
+        raycastBlockerForPause.SetActive(false);
 
         HandleTimeScale(1);
 
@@ -238,7 +327,7 @@ public class MenuManager : MonoBehaviour
 
         isGamePaused = false;
         isSettingsOpen = false;
-        
+
         CanPause = true;
 
         HandleTimeScale(1);
@@ -250,9 +339,11 @@ public class MenuManager : MonoBehaviour
         }
 
         InputManager.Instance.SwitchToGameplayMode();
-        UpdateDoFState(false);
 
-        if (SoundManager.Instance) SoundManager.Instance.SwitchSnapshot("Outside", 0f);
+        if (SoundManager.Instance)
+        {
+            SoundManager.Instance.SwitchSnapshot("Outside", 0f);
+        }
     }
 
     // ---------------------------------------------------
@@ -304,7 +395,6 @@ public class MenuManager : MonoBehaviour
         }
 
         raycastBlockerForPause.SetActive(isGamePaused);
-        UpdateDoFState(isGamePaused);
         HandleTimeScale(isGamePaused ? 0f : 1f);
         SetPlayerCanPlay(!isGamePaused);
 
@@ -630,18 +720,6 @@ public class MenuManager : MonoBehaviour
 
     private float GetCanvasWidth() { if (canvasRect != null) return canvasRect.rect.width; return 1920f; }
     private float GetCanvasHeight() { if (canvasRect != null) return canvasRect.rect.height; return 1080f; }
-
-    private void UpdateDoFState(bool enableDoF)
-    {
-        if (globalVolume == null) globalVolume = FindObjectOfType<Volume>();
-        if (globalVolume != null)
-        {
-            if (globalVolume.profile.TryGet(out DepthOfField dof))
-            {
-                dof.active = enableDoF;
-            }
-        }
-    }
 
     public void RegisterScaler(PixelPerfectCanvasScaler scaler) { if (!activeScalers.Contains(scaler)) { activeScalers.Add(scaler); scaler.UpdateScale(); } }
     public void UnregisterScaler(PixelPerfectCanvasScaler scaler) { if (activeScalers.Contains(scaler)) activeScalers.Remove(scaler); }
