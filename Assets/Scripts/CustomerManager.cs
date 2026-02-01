@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,13 +21,16 @@ public class CustomerManager : MonoBehaviour
     private readonly List<CustomerController> customersAtCounter = new List<CustomerController>();
     public List<CustomerController> GetCustomersAtCounter() => customersAtCounter;
 
-    // --- YENÝ: EVENTLER ---
-    // Tek müþteri kasaya geldi / kasadan ayrýldý
+    // --- EVENTLER ---
     public event System.Action<CustomerController> OnCustomerArrivedAtCounter;
     public event System.Action<CustomerController> OnCustomerLeftCounter;
 
-    // Kasa tamamen boþaldý (bu senin “wave bitti” koþulun)
-    public event System.Action OnCounterEmpty;
+    // Wave bitti (Sýradaki grup için ScenarioManager'a haber verir)
+    public event System.Action OnWaveCompleted;
+
+    // --- KONTROL DEÐÝÞKENLERÝ ---
+    private bool isSpawningActive = false;
+    private int remainingWaveMembers = 0; // BU DALGADA ÝÞÝ BÝTMEYEN KAÇ KÝÞÝ KALDI?
 
     private void Awake()
     {
@@ -38,6 +42,7 @@ public class CustomerManager : MonoBehaviour
         Instance = this;
     }
 
+    // Monitor güncelleme vs. aynen kalýyor
     public void UpdateMonitorWithGroupOrders()
     {
         var customers = GetCustomersAtCounter();
@@ -48,14 +53,12 @@ public class CustomerManager : MonoBehaviour
         }
 
         List<OrderData> groupOrders = new List<OrderData>();
-
         foreach (var customer in customers)
         {
             OrderData individualOrder = customer.GetCurrentOrder();
             if (individualOrder != null)
                 groupOrders.Add(individualOrder);
         }
-
         MonitorManager.Instance.SetCurrentOrder(groupOrders);
     }
 
@@ -68,25 +71,30 @@ public class CustomerManager : MonoBehaviour
         }
     }
 
+    // --- BURASI KRÝTÝK DEÐÝÞÝKLÝK ---
     public void UnregisterCustomerAtCounter(CustomerController customer)
     {
-        if (!customersAtCounter.Contains(customer))
-            return;
+        if (!customersAtCounter.Contains(customer)) return;
 
         customersAtCounter.Remove(customer);
-
         UpdateMonitorWithGroupOrders();
 
-        // Tek müþteri ayrýldý
+        // Müþteri kasadan ayrýldý
         OnCustomerLeftCounter?.Invoke(customer);
 
-        // Kasa tamamen boþaldý
-        if (customersAtCounter.Count == 0)
-            OnCounterEmpty?.Invoke();
+        // Bu gruptan bir kiþi eksildi (ister yemeðini aldý gitti, ister sinirlendi gitti)
+        if (remainingWaveMembers > 0)
+        {
+            remainingWaveMembers--;
+        }
+
+        // Kontrol et: Wave bitti mi?
+        CheckIfWaveCompleted();
     }
 
     public bool TryServeTray(Tray tray)
     {
+        // Burasý senin orijinal kodun, aynen koruyoruz
         if (customersAtCounter.Count == 0) return false;
 
         bool isAnyoneWaiting = customersAtCounter.Any(x => x.CurrentState == CustomerState.WaitingForFood);
@@ -115,19 +123,32 @@ public class CustomerManager : MonoBehaviour
         return false;
     }
 
-    // --- YENÝ: DIÞARIDAN ÇAÐRILACAK SPAWN ---
-    public bool SpawnGroupPublic(CustomerGroupData group)
+    // --- YENÝ SPAWN MANTIÐI ---
+    public void StartWaveSpawn(CustomerGroupData group)
     {
+        // ÖNEMLÝ: Wave baþlarken kaç kiþi bekleyeceðimizi not ediyoruz.
+        // Böylece kasaya varmalarý sürse bile "Wave bitti" sanmýyoruz.
+        remainingWaveMembers = group.Members.Count;
+
+        StartCoroutine(SpawnGroupRoutine(group));
+    }
+
+    private IEnumerator SpawnGroupRoutine(CustomerGroupData group)
+    {
+        isSpawningActive = true;
+
         int groupSize = group.Members.Count;
         DiningTable allocatedTable = SeatManager.Instance.FindTableForGroup(groupSize);
 
         if (allocatedTable == null)
         {
-            Debug.LogError($"Grup '{group.GroupName}' için masa yok!");
-            return false;
+            Debug.LogError($"Grup '{group.GroupName}' için masa yok! Wave iptal.");
+            // Masa yoksa bu wave'i iptal et, "bitti" say ki oyun týkanmasýn
+            remainingWaveMembers = 0;
+            isSpawningActive = false;
+            OnWaveCompleted?.Invoke();
+            yield break;
         }
-
-        Debug.Log($"Grup Spawnlanýyor: {group.GroupName} ({groupSize} Kiþi)");
 
         float counterSpacing = 0.8f;
         float totalCounterWidth = (groupSize - 1) * counterSpacing;
@@ -136,14 +157,21 @@ public class CustomerManager : MonoBehaviour
         float spawnSpacing = 0.6f;
         float totalSpawnWidth = (groupSize - 1) * spawnSpacing;
         float startSpawnX = -totalSpawnWidth / 2f;
-
         Transform spawnOrigin = WorldManager.Instance.GetSpawnPosition();
 
         List<CustomerController> currentGroupControllers = new List<CustomerController>();
-        int spawnedCount = 0;
 
         for (int i = 0; i < groupSize; i++)
         {
+            // Event sistemi duraklattýysa bekle
+            while (ScenarioManager.Instance.IsSpawningPaused) yield return null;
+
+            // Ufak bir doðal gecikme (robot gibi ayný anda çýkmasýnlar)
+            yield return new WaitForSeconds(Random.Range(0.2f, 0.5f));
+
+            // Tekrar kontrol (Delay sýrasýnda pause gelmiþ olabilir)
+            while (ScenarioManager.Instance.IsSpawningPaused) yield return null;
+
             var assignment = group.Members[i];
             var charRef = SceneCharacters.FirstOrDefault(x => x.ID == assignment.ID);
 
@@ -151,14 +179,13 @@ public class CustomerManager : MonoBehaviour
             {
                 CustomerController customer = charRef.Controller;
                 currentGroupControllers.Add(customer);
-                spawnedCount++;
 
                 float myCounterOffset = startCounterX + (i * counterSpacing);
                 customer.SetCounterOffset(myCounterOffset);
 
                 float mySpawnOffset = startSpawnX + (i * spawnSpacing);
-                Vector3 targetSpawnPos = spawnOrigin.position + (spawnOrigin.right * mySpawnOffset);
 
+                Vector3 targetSpawnPos = spawnOrigin.position + (spawnOrigin.right * mySpawnOffset);
                 UnityEngine.AI.NavMeshHit hit;
                 if (UnityEngine.AI.NavMesh.SamplePosition(targetSpawnPos, out hit, 2.0f, UnityEngine.AI.NavMesh.AllAreas))
                     customer.transform.position = hit.position;
@@ -174,12 +201,21 @@ public class CustomerManager : MonoBehaviour
         foreach (var member in currentGroupControllers)
             member.SetGroupMembers(currentGroupControllers);
 
-        if (spawnedCount == 0)
-        {
-            Debug.LogError($"Grup '{group.GroupName}' için hiç müþteri spawnlanmadý (ID eþleþmesi / SceneCharacters kontrol).");
-            return false;
-        }
+        isSpawningActive = false;
 
-        return true;
+        // Spawn bitti ama wave bitti mi? 
+        // HAYIR, çünkü remainingWaveMembers hala > 0 (Daha yemek yiyecekler)
+        // O yüzden burada OnWaveCompleted çaðýrmýyoruz, onu UnregisterCustomerAtCounter yapacak.
+    }
+
+    private void CheckIfWaveCompleted()
+    {
+        // 1. Spawn iþlemi bitmiþ olmalý
+        // 2. Bu gruptaki herkes kasadan iþlemini bitirip ayrýlmýþ olmalý (remainingWaveMembers == 0)
+
+        if (!isSpawningActive && remainingWaveMembers <= 0)
+        {
+            OnWaveCompleted?.Invoke();
+        }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Game/Scenario Events/Debug Log")]
 public class DebugLogEventSO : ScenarioEventSO
 {
-    public string message = "Scenario event played";
+    public string message = "Event played";
 
     public override IEnumerator Play(ScenarioContext ctx)
     {

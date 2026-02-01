@@ -11,11 +11,14 @@ public class LevelScenario : ScriptableObject
 [System.Serializable]
 public struct CustomerGroupData
 {
-    public string GroupName; // Debug için
-    public float DelayAfterPreviousGroup; // Önceki grup gittikten (veya geldikten) ne kadar sonra gelsinler?
-
-    // Gruptaki kiþiler ve o günkü rolleri
+    public string GroupName;
+    public float DelayAfterPreviousGroup;
     public List<CustomerRoleAssignment> Members;
+
+    public List<ScenarioEventSO> EventsBeforeSpawn;
+    public List<ScenarioEventSO> EventsAfterCounterEmpty;
+
+    public AmbientEventPoolSO AmbientPool;
 }
 
 [System.Serializable]

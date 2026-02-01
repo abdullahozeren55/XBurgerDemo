@@ -67,8 +67,9 @@ public class Monitor : MonoBehaviour, IInteractable
         if (PlayerManager.Instance.IsPlayerHoldingItem())
         {
             PlayerManager.Instance.SetPlayerIgnoreNextThrow(true);
-            PlayerManager.Instance.SetPlayerBasicMovements(false);
         }
+
+        PlayerManager.Instance.SetPlayerBasicMovements(false);
 
         CameraManager.Instance.SwitchToCamera(CameraManager.CameraName.Monitor);
 
