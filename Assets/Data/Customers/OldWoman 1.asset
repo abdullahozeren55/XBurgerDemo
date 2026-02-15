@@ -19,19 +19,19 @@ MonoBehaviour:
   SitPositionOffset: {x: 0, y: -0.458, z: -0.055}
   SitRotationOffset: {x: 0, y: 0, z: 0}
   PossibleOrders:
-  - Order: {fileID: 11400000, guid: 28c04dd90a7324c4ca77e80907463e74, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: cd008674cea5c75448df74a70e8076be, type: 2}
     GlitchDialogue: {fileID: 0}
     GlitchChance: 0
-  - Order: {fileID: 11400000, guid: 28c04dd90a7324c4ca77e80907463e74, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 2904a132398e27145b54b1db7ce05470, type: 2}
     GlitchDialogue: {fileID: 0}
     GlitchChance: 0
-  - Order: {fileID: 11400000, guid: 28c04dd90a7324c4ca77e80907463e74, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 53373ca2ec40d72498ebceb149170d50, type: 2}
     GlitchDialogue: {fileID: 0}
     GlitchChance: 0
-  - Order: {fileID: 11400000, guid: 28c04dd90a7324c4ca77e80907463e74, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: b2883fd49c9f8db45b608a7e757a4fcf, type: 2}
     GlitchDialogue: {fileID: 0}
     GlitchChance: 0

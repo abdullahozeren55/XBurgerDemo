@@ -160,6 +160,7 @@ public class Clown : MonoBehaviour, ICustomer, IInteractable
                 // Yüzünü oyuncuya dönme iþlemi OnInteract'ta yapýlýyor
                 break;
             case ClownState.SadIdle:
+                gameObject.SetActive(true);
                 anim.SetBool("walk", false);
                 anim.SetBool("dance", false);
                 anim.SetBool("sadIdle", true);

@@ -3201,6 +3201,16 @@
     "pt": "Obrigado por jogar! Se gostou e quiser apoiar, adicione à sua Lista de Desejos no Steam!"
   },
   {
+    "key": "UI_CREDITS",
+    "tr": "Emeği Geçenler",
+    "en": "Credits",
+    "zh": "制作人员",
+    "ja": "クレジット",
+    "es": "Créditos",
+    "ru": "Титры",
+    "pt": "Créditos"
+  },
+  {
     "key": "CURSED_SPEECH_0",
     "tr": "SENİN SUÇUN.",
     "en": "IT'S YOUR FAULT.",

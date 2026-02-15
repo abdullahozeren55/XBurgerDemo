@@ -89,6 +89,7 @@ public class EventManager : MonoBehaviour
     {
         MonitorManager.Instance.PlayRandomHorrorTrack();
         CustomerManager.Instance.DisableAllCustomers();
+        Clown.Instance.gameObject.SetActive(false);
         Clown.Instance.ShouldBeSad = true;
     }
 }

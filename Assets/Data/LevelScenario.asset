@@ -15,7 +15,7 @@ MonoBehaviour:
   LoopIndex: 0
   Waves:
   - GroupName: TeenGuy
-    DelayAfterPreviousGroup: 5
+    DelayAfterPreviousGroup: 0
     Members:
     - ID: 9
       ProfileForToday: {fileID: 11400000, guid: 2c9a9dcf450944c4d8eac4a25e0cd3b6, type: 2}
@@ -25,7 +25,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 1176a583bab625f4bb26ad8d65f6ebd9, type: 2}
     AmbientPool: {fileID: 0}
   - GroupName: Family
-    DelayAfterPreviousGroup: 5
+    DelayAfterPreviousGroup: 0
     Members:
     - ID: 2
       ProfileForToday: {fileID: 11400000, guid: 54c3c91a0071f5042a6a6064215777ad, type: 2}
@@ -38,7 +38,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e5443700b3d84fb40a38956b3663ce82, type: 2}
     AmbientPool: {fileID: 0}
   - GroupName: TeenGirl
-    DelayAfterPreviousGroup: 5
+    DelayAfterPreviousGroup: 0
     Members:
     - ID: 8
       ProfileForToday: {fileID: 11400000, guid: 01870921cf4af0e42b8d1c197d87a261, type: 2}
@@ -46,7 +46,7 @@ MonoBehaviour:
     EventsAfterCounterEmpty: []
     AmbientPool: {fileID: 0}
   - GroupName: OldCouple
-    DelayAfterPreviousGroup: 5
+    DelayAfterPreviousGroup: 0
     Members:
     - ID: 6
       ProfileForToday: {fileID: 11400000, guid: 677ea04584df0fc4f8caacd973ed795e, type: 2}
@@ -57,7 +57,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 085ceeb8cdc71dd408e5f99e948f3066, type: 2}
     AmbientPool: {fileID: 0}
   - GroupName: AloneKid
-    DelayAfterPreviousGroup: 5
+    DelayAfterPreviousGroup: 0
     Members:
     - ID: 7
       ProfileForToday: {fileID: 11400000, guid: 0a7f2c1f91853854891b4be2b0e40bd5, type: 2}

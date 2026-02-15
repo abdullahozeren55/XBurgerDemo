@@ -19,27 +19,27 @@ MonoBehaviour:
   SitPositionOffset: {x: 0, y: -0.458, z: -0.055}
   SitRotationOffset: {x: 0, y: 0, z: 0}
   PossibleOrders:
-  - Order: {fileID: 11400000, guid: 31e97506615c81a4db692dd363abb420, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 70e8519494263fb43a65da2339e2e0dd, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: 4162dda1e807bc543b2c08e4431d4c73, type: 2}
     GlitchChance: 100
-  - Order: {fileID: 11400000, guid: 36544fa45a118b84eb210af72ef2563c, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 2370df2fcc52e52478494cd719ae8624, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: a99ac9f09b160834a96644de5fe17e0e, type: 2}
     GlitchChance: 100
-  - Order: {fileID: 11400000, guid: e92588013f309da469bad8bfc6a19583, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: eeb039dbf31e06b4c8bd2b964a619205, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: d6d8c45290f48c54fb1c42c75aa794ab, type: 2}
     GlitchChance: 100
-  - Order: {fileID: 11400000, guid: 2478c9e9ee485d04994730d38d77fc79, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 707309b890197d445a6ce42b4359ea0b, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: 0dfee41ce265e88419ceda90eb0dd117, type: 2}
     GlitchChance: 100
-  - Order: {fileID: 11400000, guid: b74e027ef50521d40ac1ea71b4904e65, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 58341c837e149f046a095ecc0f712826, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: 006c356ed4c4c0644bfc231bd3d0d85f, type: 2}
     GlitchChance: 100
-  - Order: {fileID: 11400000, guid: 6c83a47d08c713e44861a347234e3846, type: 2}
+  - Order: {fileID: 11400000, guid: d67a9568ae355d14a81824ab111980be, type: 2}
     NormalDialogue: {fileID: 11400000, guid: 0bcc55feae92be14c9e11d9d0b665bc6, type: 2}
     GlitchDialogue: {fileID: 11400000, guid: 98a036925d4794847b785db23552fa4a, type: 2}
     GlitchChance: 100
